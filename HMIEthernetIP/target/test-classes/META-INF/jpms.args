@@ -1,0 +1,4 @@
+--patch-module
+andrade.luis.hmiethernetip=_
+--add-reads
+andrade.luis.hmiethernetip=ALL-UNNAMED
