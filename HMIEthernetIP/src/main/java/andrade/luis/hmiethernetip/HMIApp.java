@@ -15,9 +15,6 @@ public class HMIApp extends Application {
         var canvas = new Canvas(300,300);
         root.getChildren().add(canvas);
         var scene = new HMICanvasController(root,400,400, Color.WHITESMOKE);
-        String workingDirectory = System.getProperty("user.dir");
-        System.out.println(workingDirectory);
-        //scene.getStylesheets().add(getClass().getResource("border.css").toExternalForm());
         Button rectangleBtn = new Button("Rectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> scene.setAddOnClickEnabled(true));
         root.getChildren().add(rectangleBtn);
