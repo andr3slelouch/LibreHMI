@@ -16,7 +16,9 @@ public class HMIApp extends Application {
         root.getChildren().add(canvas);
         var scene = new HMICanvasController(root,400,400, Color.WHITESMOKE);
         Button rectangleBtn = new Button("Rectangle");
-        rectangleBtn.setOnMouseClicked(mouseEvent -> scene.setAddOnClickEnabled(true));
+        rectangleBtn.setOnMouseClicked(mouseEvent -> {
+            scene.setAddOnClickEnabled(true);
+        });
         root.getChildren().add(rectangleBtn);
 
         stage.setTitle("HMI");

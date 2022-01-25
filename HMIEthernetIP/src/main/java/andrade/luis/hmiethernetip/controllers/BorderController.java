@@ -84,4 +84,12 @@ public class BorderController extends Circle {
             selected = false;
         }
     };
+
+    private boolean pointIsInSide(double side, double point){
+        return side + 5 > point && side - 5 < point;
+    }
+
+    private boolean isInTop(MouseEvent event){
+        return pointIsInSide(0,event.getY());
+    }
 }

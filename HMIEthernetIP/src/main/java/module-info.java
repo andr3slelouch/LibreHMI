@@ -9,6 +9,9 @@ module andrade.luis.hmiethernetip {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
+    requires java.logging;
+    requires java.desktop;
+    requires com.google.gson;
 
     opens andrade.luis.hmiethernetip to javafx.fxml;
     exports andrade.luis.hmiethernetip;
