@@ -16,8 +16,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class HMICanvas extends Pane implements CanvasInterface {
@@ -44,6 +42,15 @@ public class HMICanvas extends Pane implements CanvasInterface {
 
     private ArrayList<CanvasRectangle> shapeArrayList = new ArrayList<>();
     private CanvasPoint currentMousePosition;
+
+    public ContextMenu getRightClickMenu() {
+        return rightClickMenu;
+    }
+
+    public void setRightClickMenu(ContextMenu rightClickMenu) {
+        this.rightClickMenu = rightClickMenu;
+    }
+
     private ContextMenu rightClickMenu;
 
     public HMICanvas(){
@@ -51,17 +58,12 @@ public class HMICanvas extends Pane implements CanvasInterface {
         rightClickMenu = new ContextMenu();
         rightClickMenu.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("consuming right release button in cm filter");
                 event.consume();
             }
         });
-        rightClickMenu.setOnAction(event -> System.out.println("right gets consumed so this must be left on "+
-                ((MenuItem)event.getTarget()).getText()));
 
         MenuItem pasteMenuItem = new MenuItem("Paste");
-        pasteMenuItem.setOnAction(actionEvent -> {
-            paste(currentMousePosition);
-        });
+        pasteMenuItem.setOnAction(actionEvent -> paste(currentMousePosition));
 
         rightClickMenu.getItems().addAll(pasteMenuItem);
     }
@@ -86,8 +88,6 @@ public class HMICanvas extends Pane implements CanvasInterface {
                 if (tempNode.getId().substring(0, 13).equals("#createdShape")) {
                     arrayList.add((CanvasRectangle) tempNode);
                 }
-            }else{
-                System.out.println(tempNode.getId());
             }
         }
         return arrayList;
@@ -164,9 +164,7 @@ public class HMICanvas extends Pane implements CanvasInterface {
                 this.addNewShape(canvasRectangle);
                 this.getChildren().add(canvasRectangle);
             }
-        }catch (ClassNotFoundException e){
-            System.out.println("hello");
-        } catch (IOException | UnsupportedFlavorException e) {
+        }catch (ClassNotFoundException | IOException | UnsupportedFlavorException e){
             e.printStackTrace();
         }
     }

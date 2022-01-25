@@ -196,7 +196,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>andrade.luis.hmiethernetip/andrade.luis.hmiethernetip.HelloApplication
+                            <mainClass>andrade.luis.hmiethernetip/andrade.luis.hmiethernetip.HMIApp
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

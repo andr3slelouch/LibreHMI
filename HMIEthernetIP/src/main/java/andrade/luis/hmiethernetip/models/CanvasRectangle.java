@@ -1,6 +1,5 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
@@ -17,13 +16,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasRectangle extends BorderPane {
@@ -39,6 +32,9 @@ public class CanvasRectangle extends BorderPane {
     private SimpleBooleanProperty rectangleBorderActive;
     private LocalDateTime lastTimeSelected;
     private ContextMenu rightClickMenu;
+    private MenuItem copyMenuItem;
+    private MenuItem cutMenuItem;
+    private MenuItem deleteMenuItem;
 
     public CanvasInterface getCanvas() {
         return canvas;
@@ -105,10 +101,13 @@ public class CanvasRectangle extends BorderPane {
         return graphicalRepresentation.getPosition();
     }
 
-    public void setPosition(CanvasPoint position) {
+    public void setPosition(CanvasPoint position, boolean force) {
         this.graphicalRepresentation.setPosition(position);
-        this.setLayoutX(position.getX());
-        this.setLayoutY(position.getY());
+        if(force){
+            this.setLayoutX(position.getX());
+            this.setLayoutY(position.getY());
+        }
+
     }
 
     public CanvasPoint getRectangleCenter() {
@@ -118,12 +117,12 @@ public class CanvasRectangle extends BorderPane {
     public void setCenter(CanvasPoint center) {
         this.graphicalRepresentation.setCenter(center);
 
-        double x = center.getX() - getWidth() / 2;
-        double y = center.getY() - getHeight() / 2;
+        double tempX = center.getX() - getWidth() / 2;
+        double tempY = center.getY() - getHeight() / 2;
 
-        setX(x);
-        setY(y);
-        setPosition(new CanvasPoint(x, y));
+        setX(tempX);
+        setY(tempY);
+        setPosition(new CanvasPoint(tempX, tempY), true);
 
         this.rectangle = new Rectangle(getX(), getY(), getWidth(), getHeight());
         this.rectangleBorder = PseudoClass.getPseudoClass("border");
@@ -210,30 +209,45 @@ public class CanvasRectangle extends BorderPane {
         rightClickMenu = new ContextMenu();
         rightClickMenu.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("consuming right release button in cm filter");
                 event.consume();
             }
         });
-        rightClickMenu.setOnAction(event -> System.out.println("right gets consumed so this must be left on " +
-                ((MenuItem) event.getTarget()).getText()));
 
-        MenuItem copyMenuItem = new MenuItem("Copy");
-        copyMenuItem.setOnAction(actionEvent -> {
-            System.out.println("Copied");
-            copy("Copy");
-        });
-        MenuItem cutMenuItem = new MenuItem("Cut");
-        cutMenuItem.setOnAction(actionEvent -> {
-            System.out.println("Cut");
-            cut();
-        });
-        MenuItem deleteMenuItem = new MenuItem("Delete");
-        deleteMenuItem.setOnAction(actionEvent -> {
-            System.out.println("Delete");
-            delete();
-        });
+        copyMenuItem = new MenuItem("Copy");
+        copyMenuItem.setId("#copy");
+        copyMenuItem.setOnAction(actionEvent -> copy("Copy"));
+        cutMenuItem = new MenuItem("Cut");
+        cutMenuItem.setId("#cut");
+        cutMenuItem.setOnAction(actionEvent -> cut());
+        deleteMenuItem = new MenuItem("Delete");
+        deleteMenuItem.setId("#delete");
+        deleteMenuItem.setOnAction(actionEvent -> delete());
 
         rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem,deleteMenuItem);
+    }
+
+    public MenuItem getCopyMenuItem() {
+        return copyMenuItem;
+    }
+
+    public void setCopyMenuItem(MenuItem copyMenuItem) {
+        this.copyMenuItem = copyMenuItem;
+    }
+
+    public MenuItem getCutMenuItem() {
+        return cutMenuItem;
+    }
+
+    public void setCutMenuItem(MenuItem cutMenuItem) {
+        this.cutMenuItem = cutMenuItem;
+    }
+
+    public MenuItem getDeleteMenuItem() {
+        return deleteMenuItem;
+    }
+
+    public void setDeleteMenuItem(MenuItem deleteMenuItem) {
+        this.deleteMenuItem = deleteMenuItem;
     }
 
     public CanvasRectangle(CanvasPoint center) {
@@ -266,6 +280,7 @@ public class CanvasRectangle extends BorderPane {
         this.setOnMouseReleased(getOnMyMouseReleased());
         this.setOnMouseClicked(getOnMyMouseDoubleClicked());
 
+
         this.graphicalRepresentation = graphicalRepresentation;
 
         this.setCenter(this.graphicalRepresentation.getCenter());
@@ -275,7 +290,8 @@ public class CanvasRectangle extends BorderPane {
 
     }
 
-    private CanvasPoint start, end;
+    private CanvasPoint start;
+    private CanvasPoint end;
 
     public EventHandler<MouseEvent> getOnMyMousePressed() {
         return onMyMousePressed;
@@ -308,7 +324,6 @@ public class CanvasRectangle extends BorderPane {
             end = new CanvasPoint(((BorderPane) (t.getSource())).getTranslateX(), ((BorderPane) (t.getSource())).getTranslateY());
             CanvasRectangle.this.setSelected(true);
             if (t.getButton() == MouseButton.SECONDARY) {
-                logger.log(Level.INFO, "RIGHT PRESSED");
                 showContextMenu(t.getScreenX(), t.getScreenY());
             }
         }
@@ -325,7 +340,6 @@ public class CanvasRectangle extends BorderPane {
     private EventHandler<MouseEvent> onMyMouseDragged = new EventHandler<>() {
         @Override
         public void handle(MouseEvent t) {
-
             double offsetX = t.getSceneX() - start.getX();
             double offsetY = t.getSceneY() - start.getY();
             double newTranslateX = end.getX() + offsetX;
@@ -335,9 +349,7 @@ public class CanvasRectangle extends BorderPane {
             ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
 
 
-            //System.out.println(isInTop(t));
-
-            setPosition(new CanvasPoint(CanvasRectangle.this.getLayoutX(), CanvasRectangle.this.getLayoutY()));
+            setPosition(new CanvasPoint(newTranslateX, newTranslateY),false);
         }
     };
 
@@ -350,18 +362,13 @@ public class CanvasRectangle extends BorderPane {
         if (this.isSelected()) {
             showBorder();
             setLastTimeSelected();
-            logger.log(Level.INFO,this.getId());
         } else {
             hideBorder();
         }
     }
 
-    private EventHandler<MouseEvent> onMyMouseReleased = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            CanvasRectangle.this.setSelected(false);
-            logger.log(Level.INFO, "RELEASED");
-        }
+    private EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> {
+        CanvasRectangle.this.setSelected(false);
     };
 
     public EventHandler<MouseEvent> getOnMyMouseDoubleClicked() {
@@ -374,10 +381,8 @@ public class CanvasRectangle extends BorderPane {
 
     private EventHandler<MouseEvent> onMyMouseDoubleClicked = mouseEvent -> {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 1) {
-            logger.log(Level.INFO, "CLICKED");
             this.setSelected(true);
         } else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-            logger.log(Level.INFO, "RIGHT CLICKED");
             showContextMenu(mouseEvent.getScreenX(), mouseEvent.getScreenY());
         }
     };

@@ -5,7 +5,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.logging.Level;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -37,7 +36,14 @@ public class GraphicalRepresentation implements Serializable, Transferable
     @SerializedName("operation")
     @Expose
     private String operation;
-    private final static long serialVersionUID = 6976931227659398285L;
+    @SerializedName("data")
+    @Expose
+    private String data;
+    @SerializedName("name")
+    @Expose
+    private String name;
+
+    private static final long serialVersionUID = 6976931227659398285L;
 
     public boolean isSelected() {
         return selected;
@@ -69,6 +75,22 @@ public class GraphicalRepresentation implements Serializable, Transferable
 
     public void setHeight(double height) {
         this.height = height;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public CanvasPoint getCenter() {
@@ -123,6 +145,14 @@ public class GraphicalRepresentation implements Serializable, Transferable
         sb.append('=');
         sb.append(((this.operation == null)?"<null>":this.operation));
         sb.append(',');
+        sb.append("data");
+        sb.append('=');
+        sb.append(((this.data == null)?"<null>":this.data));
+        sb.append(',');
+        sb.append("name");
+        sb.append('=');
+        sb.append(((this.name == null)?"<null>":this.name));
+        sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
         } else {
@@ -136,7 +166,6 @@ public class GraphicalRepresentation implements Serializable, Transferable
         DataFlavor[] flavors = new DataFlavor[2];
         Class<?> type = this.getClass();
         String mimeType = "application/x-java-serialized-object;class=" + type.getName();
-        System.out.println(mimeType);
         try {
             flavors[0] = new DataFlavor(mimeType);
             flavors[1] = DataFlavor.stringFlavor;
