@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -22,8 +23,15 @@ public class HMIApp extends Application {
         Button rectangleBtn = new Button("Rectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {
             scene.setAddOnClickEnabled(true);
+            root.setType("rectangle");
         });
-        root.getChildren().add(rectangleBtn);
+        Button labelBtn = new Button("Label");
+        labelBtn.setOnMouseClicked(mouseEvent -> {
+            scene.setAddOnClickEnabled(true);
+            root.setType("label");
+        });
+        HBox hbox = new HBox(rectangleBtn,labelBtn);
+        root.getChildren().add(hbox);
 
         stage.setTitle("HMI");
         stage.setScene(scene);

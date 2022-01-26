@@ -1,9 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
-import andrade.luis.hmiethernetip.models.CanvasInterface;
-import andrade.luis.hmiethernetip.models.CanvasPoint;
-import andrade.luis.hmiethernetip.models.CanvasRectangle;
-import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.*;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -20,11 +17,13 @@ import java.util.ArrayList;
 
 public class HMICanvas extends Pane implements CanvasInterface {
 
-    public ArrayList<CanvasRectangle> getShapeArrayList() {
+    private String type;
+
+    public ArrayList<CanvasBorderPane> getShapeArrayList() {
         return shapeArrayList;
     }
 
-    public void setShapeArrayList(ArrayList<CanvasRectangle> shapeArrayList) {
+    public void setShapeArrayList(ArrayList<CanvasBorderPane> shapeArrayList) {
         this.shapeArrayList = shapeArrayList;
     }
 
@@ -36,11 +35,11 @@ public class HMICanvas extends Pane implements CanvasInterface {
         this.currentMousePosition = currentMousePosition;
     }
 
-    public void addNewShape(CanvasRectangle shape) {
+    public void addNewShape(CanvasBorderPane shape) {
         this.shapeArrayList.add(shape);
     }
 
-    private ArrayList<CanvasRectangle> shapeArrayList = new ArrayList<>();
+    private ArrayList<CanvasBorderPane> shapeArrayList = new ArrayList<>();
     private CanvasPoint currentMousePosition;
 
     public ContextMenu getRightClickMenu() {
@@ -69,7 +68,27 @@ public class HMICanvas extends Pane implements CanvasInterface {
     }
 
     public void addFigureOnCanvasClicked(CanvasPoint current) {
+        if(type.equals("rectangle")){
+            addRectangleOnCanvasClicked(current);
+        }else if(type.equals("label")){
+            addLabelOnCanvasClicked(current);
+        }
+    }
+
+    public void addRectangleOnCanvasClicked(CanvasPoint current){
         CanvasRectangle newCreatedRectangle = new CanvasRectangle(current);
+        newCreatedRectangle.setCanvas(this);
+        if (this.getShapeArrayList().isEmpty()) {
+            newCreatedRectangle.setId("#createdShape0");
+        } else {
+            newCreatedRectangle.setId("#createdShape" + this.getShapeArrayList().size());
+        }
+        this.addNewShape(newCreatedRectangle);
+        this.getChildren().add(newCreatedRectangle);
+    }
+
+    public void addLabelOnCanvasClicked(CanvasPoint current){
+        CanvasLabel newCreatedRectangle = new CanvasLabel("Test",current);
         newCreatedRectangle.setCanvas(this);
         if (this.getShapeArrayList().isEmpty()) {
             newCreatedRectangle.setId("#createdShape0");
@@ -137,12 +156,12 @@ public class HMICanvas extends Pane implements CanvasInterface {
             DataFlavor flavor = new DataFlavor("application/x-java-serialized-object;class=andrade.luis.hmiethernetip.models.GraphicalRepresentation");
             if(clipboard.isDataFlavorAvailable(flavor)){
                 GraphicalRepresentation graphicalRepresentation = (GraphicalRepresentation) clipboard.getData(flavor);
-                CanvasRectangle canvasRectangle = new CanvasRectangle(graphicalRepresentation);
-                canvasRectangle.setCanvas(this);
+                CanvasRectangle CanvasRectangle = new CanvasRectangle(graphicalRepresentation);
+                CanvasRectangle.setCanvas(this);
                 if(currentMousePosition!=null){
-                    canvasRectangle.setCenter(currentMousePosition);
+                    CanvasRectangle.setCenter(currentMousePosition);
                 }else{
-                    canvasRectangle.setCenter(new CanvasPoint(graphicalRepresentation.getCenter().getX()+10,graphicalRepresentation.getCenter().getY()+10));
+                    CanvasRectangle.setCenter(new CanvasPoint(graphicalRepresentation.getCenter().getX()+10,graphicalRepresentation.getCenter().getY()+10));
                 }
                 if(graphicalRepresentation.getOperation().equals("Copy")){
                     int copyNumber = 0;
@@ -157,12 +176,12 @@ public class HMICanvas extends Pane implements CanvasInterface {
                             }
                         }
                     }
-                    canvasRectangle.setId(graphicalRepresentation.getId()+"("+copyNumber+")");
+                    CanvasRectangle.setId(graphicalRepresentation.getId()+"("+copyNumber+")");
                 }else{
-                    canvasRectangle.setId(graphicalRepresentation.getId());
+                    CanvasRectangle.setId(graphicalRepresentation.getId());
                 }
-                this.addNewShape(canvasRectangle);
-                this.getChildren().add(canvasRectangle);
+                this.addNewShape(CanvasRectangle);
+                this.getChildren().add(CanvasRectangle);
             }
         }catch (ClassNotFoundException | IOException | UnsupportedFlavorException e){
             e.printStackTrace();
@@ -177,5 +196,13 @@ public class HMICanvas extends Pane implements CanvasInterface {
                 this.getChildren().remove(temp);
             }
         }
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

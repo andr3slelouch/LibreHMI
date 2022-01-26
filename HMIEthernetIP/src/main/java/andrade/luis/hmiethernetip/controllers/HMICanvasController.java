@@ -3,14 +3,12 @@ package andrade.luis.hmiethernetip.controllers;
 import andrade.luis.hmiethernetip.models.CanvasPoint;
 import andrade.luis.hmiethernetip.models.CanvasRectangle;
 import andrade.luis.hmiethernetip.views.HMICanvas;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.*;
 import javafx.scene.paint.Paint;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HMICanvasController extends Scene {
@@ -73,27 +71,27 @@ public class HMICanvasController extends Scene {
     }
 
     public void updateSelected(){
-        ArrayList<CanvasRectangle> canvasRectangles = getCanvas().getCurrentCanvasObjects();
+        ArrayList<CanvasRectangle> canvasRectangleOlds = getCanvas().getCurrentCanvasObjects();
         LocalDateTime max = null;
         int index = -1;
-        for (int i = 0; i < canvasRectangles.size(); i++) {
+        for (int i = 0; i < canvasRectangleOlds.size(); i++) {
             if (i == 0) {
-                max = canvasRectangles.get(i).getLastTimeSelected();
+                max = canvasRectangleOlds.get(i).getLastTimeSelected();
                 index = i;
             } else {
-                CanvasRectangle rectangle = canvasRectangles.get(i);
+                CanvasRectangle rectangle = canvasRectangleOlds.get(i);
                 if (rectangle.getLastTimeSelected() != null && max != null) {
                     if (max.isBefore(rectangle.getLastTimeSelected())) {
-                        max = canvasRectangles.get(i).getLastTimeSelected();
+                        max = canvasRectangleOlds.get(i).getLastTimeSelected();
                         index = i;
                     }
                 }
             }
         }
         if (index > -1 && max != null) {
-            for (int i = 0; i < canvasRectangles.size(); i++) {
+            for (int i = 0; i < canvasRectangleOlds.size(); i++) {
                 if (i != index) {
-                    canvasRectangles.get(i).setSelected(false);
+                    canvasRectangleOlds.get(i).setSelected(false);
                 }
             }
         }

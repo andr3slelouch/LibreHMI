@@ -105,7 +105,7 @@ class HMICanvasTest {
         CanvasPoint firstPosition = rectangle.getPosition();
 
         robot.drag(rectangle, MouseButton.PRIMARY);
-        robot.dropBy(rectangle.getX() + 10, rectangle.getY() + 10);
+        robot.dropBy(rectangle.getPosition().getX() + 10, rectangle.getPosition().getY() + 10);
 
         rectangle = getAddedGraphicalRepresentation("#createdShape0");
 
@@ -115,7 +115,7 @@ class HMICanvasTest {
         Assertions.assertThat(newPosition.getY()).isNotEqualTo(firstPosition.getY());
     }
 
-    CanvasRectangle reduceMenuItemsInGraphicalRepresentation(CanvasRectangle rectangle,String id){
+    CanvasRectangle reduceMenuItemsInGraphicalRepresentation(CanvasRectangle rectangle, String id){
         MenuItem tempCopyMenuItem = null;
         ArrayList<MenuItem> tempItems = new ArrayList<>();
         for (int i = 0; i < rectangle.getRightClickMenu().getItems().size(); i++) {
