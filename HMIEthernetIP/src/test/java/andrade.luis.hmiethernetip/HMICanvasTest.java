@@ -2,7 +2,7 @@ package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMICanvasController;
 import andrade.luis.hmiethernetip.models.CanvasPoint;
-import andrade.luis.hmiethernetip.models.CanvasRectangle;
+import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -31,6 +32,8 @@ import java.util.ArrayList;
 class HMICanvasTest {
     private HMICanvas root;
     private HMICanvasController scene;
+    private Button rectangleBtn;
+    private Button systemDateTimeLabelBtn;
 
     @BeforeEach
     void setUp() {
@@ -48,10 +51,21 @@ class HMICanvasTest {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
         scene = new HMICanvasController(root, bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
-        Button rectangleBtn = new Button("Rectangle");
+        rectangleBtn = new Button("Rectangle");
         rectangleBtn.setId("addRectangle");
-        rectangleBtn.setOnMouseClicked(mouseEvent -> scene.setAddOnClickEnabled(true));
-        root.getChildren().add(rectangleBtn);
+        rectangleBtn.setOnMouseClicked(mouseEvent -> {
+            scene.setAddOnClickEnabled(true);
+            root.setType("Rectangle");
+        });
+
+        systemDateTimeLabelBtn = new Button("DateTime Label");
+        systemDateTimeLabelBtn.setOnMouseClicked(mouseEvent -> {
+            scene.setAddOnClickEnabled(true);
+            root.setType("SystemDateTimeLabel");
+        });
+        HBox hbox = new HBox(rectangleBtn,systemDateTimeLabelBtn);
+        root.getChildren().add(hbox);
+
 
         stage.setTitle("HMI");
         stage.setMaximized(true);
@@ -84,12 +98,12 @@ class HMICanvasTest {
         Assertions.assertThat(root.getShapeArrayList().size()).isEqualTo(5);
     }
 
-    CanvasRectangle getAddedGraphicalRepresentation(String id){
-        CanvasRectangle rectangle = null;
+    GraphicalRepresentation getAddedGraphicalRepresentation(String id){
+        GraphicalRepresentation rectangle = null;
         for (int i = 0; i < root.getChildren().size(); i++) {
             if (root.getChildren().get(i).getId() != null) {
                 if (root.getChildren().get(i).getId().equals(id)) {
-                    rectangle = (CanvasRectangle) root.getChildren().get(i);
+                    rectangle = (GraphicalRepresentation) root.getChildren().get(i);
                 }
             }
         }
@@ -99,7 +113,7 @@ class HMICanvasTest {
     @Test
     void moveGraphicalRepresentation(FxRobot robot) {
         addGraphicalRepresentationSequence(robot);
-        CanvasRectangle rectangle = getAddedGraphicalRepresentation("#createdShape0");
+        GraphicalRepresentation rectangle = getAddedGraphicalRepresentation("#createdShape0");
         Assertions.assertThat(rectangle).isNotNull();
 
         CanvasPoint firstPosition = rectangle.getPosition();
@@ -115,7 +129,7 @@ class HMICanvasTest {
         Assertions.assertThat(newPosition.getY()).isNotEqualTo(firstPosition.getY());
     }
 
-    CanvasRectangle reduceMenuItemsInGraphicalRepresentation(CanvasRectangle rectangle, String id){
+    GraphicalRepresentation reduceMenuItemsInGraphicalRepresentation(GraphicalRepresentation rectangle, String id){
         MenuItem tempCopyMenuItem = null;
         ArrayList<MenuItem> tempItems = new ArrayList<>();
         for (int i = 0; i < rectangle.getRightClickMenu().getItems().size(); i++) {
@@ -131,7 +145,7 @@ class HMICanvasTest {
         return rectangle;
     }
 
-    void rightClickOnRightClickMenu(FxRobot robot, CanvasRectangle rectangle){
+    void rightClickOnRightClickMenu(FxRobot robot, GraphicalRepresentation rectangle){
         robot.rightClickOn(rectangle);
         robot.clickOn(rectangle.getRightClickMenu());
     }
@@ -139,7 +153,7 @@ class HMICanvasTest {
     void checkForClipboardReadyToPaste(){
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         try {
-            DataFlavor flavor = new DataFlavor("application/x-java-serialized-object;class=andrade.luis.hmiethernetip.models.GraphicalRepresentation");
+            DataFlavor flavor = new DataFlavor("application/x-java-serialized-object;class=andrade.luis.hmiethernetip.models.GraphicalRepresentationData");
             Assertions.assertThat(clipboard.isDataFlavorAvailable(flavor)).isTrue();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -152,7 +166,7 @@ class HMICanvasTest {
         Assertions.assertThat(root.getShapeArrayList().isEmpty()).isFalse();
         Assertions.assertThat(root.getShapeArrayList().get(0).getId()).isEqualTo("#createdShape0");
 
-        CanvasRectangle rectangle = getAddedGraphicalRepresentation("#createdShape0");
+        GraphicalRepresentation rectangle = getAddedGraphicalRepresentation("#createdShape0");
 
         rectangle = reduceMenuItemsInGraphicalRepresentation(rectangle,"#copy");
 
@@ -328,7 +342,7 @@ class HMICanvasTest {
         Assertions.assertThat(root.getShapeArrayList().isEmpty()).isFalse();
         Assertions.assertThat(root.getShapeArrayList().get(0).getId()).isEqualTo("#createdShape0");
 
-        CanvasRectangle rectangle = getAddedGraphicalRepresentation("#createdShape0");
+        GraphicalRepresentation rectangle = getAddedGraphicalRepresentation("#createdShape0");
         Assertions.assertThat(rectangle).isNotNull();
 
         rectangle = reduceMenuItemsInGraphicalRepresentation(rectangle,"#cut");
@@ -381,7 +395,7 @@ class HMICanvasTest {
         Assertions.assertThat(root.getShapeArrayList().isEmpty()).isFalse();
         Assertions.assertThat(root.getShapeArrayList().get(0).getId()).isEqualTo("#createdShape0");
 
-        CanvasRectangle rectangle = getAddedGraphicalRepresentation("#createdShape0");
+        GraphicalRepresentation rectangle = getAddedGraphicalRepresentation("#createdShape0");
         Assertions.assertThat(rectangle).isNotNull();
 
         rectangle = reduceMenuItemsInGraphicalRepresentation(rectangle,"#delete");
@@ -401,5 +415,14 @@ class HMICanvasTest {
         robot.press(KeyCode.DELETE);
         robot.release(KeyCode.DELETE);
         Assertions.assertThat(root.getShapeArrayList().size()).isZero();
+    }
+
+    @Test
+    void addSystemDateTimeLabel(FxRobot robot){
+        robot.clickOn(systemDateTimeLabelBtn);
+        robot.clickOn(scene);
+
+        GraphicalRepresentation canvasSystemDateTimeLabel = getAddedGraphicalRepresentation("#createdShape0");
+        Assertions.assertThat(canvasSystemDateTimeLabel).isNotNull();
     }
 }

@@ -1,208 +1,301 @@
 package andrade.luis.hmiethernetip.models;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.io.Serializable;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.css.PseudoClass;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.time.LocalDateTime;
 
-public class GraphicalRepresentation implements Serializable, Transferable
-{
-
-    @SerializedName("selected")
-    @Expose
-    private boolean selected;
-    @SerializedName("mouseOver")
-    @Expose
-    private boolean mouseOver;
-    @SerializedName("width")
-    @Expose
-    private double width;
-    @SerializedName("height")
-    @Expose
-    private double height;
-    @SerializedName("center")
-    @Expose
-    private CanvasPoint center;
-    @SerializedName("position")
-    @Expose
-    private CanvasPoint position;
-    @SerializedName("id")
-    @Expose
-    private String id;
-    @SerializedName("operation")
-    @Expose
-    private String operation;
-    @SerializedName("data")
-    @Expose
-    private String data;
-    @SerializedName("name")
-    @Expose
-    private String name;
-
-    private static final long serialVersionUID = 6976931227659398285L;
-
-    public boolean isSelected() {
-        return selected;
+public class GraphicalRepresentation extends BorderPane {
+    public CanvasInterface getCanvas() {
+        return canvas;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void setCanvas(CanvasInterface canvas) {
+        this.canvas = canvas;
     }
 
-    public boolean isMouseOver() {
-        return mouseOver;
+    public GraphicalRepresentationData getGraphicalRepresentationData() {
+        return graphicalRepresentationData;
     }
 
-    public void setMouseOver(boolean mouseOver) {
-        this.mouseOver = mouseOver;
+    public void setGraphicalRepresentation(GraphicalRepresentationData graphicalRepresentationData) {
+        this.graphicalRepresentationData = graphicalRepresentationData;
     }
 
-    public double getWidth() {
-        return width;
+    public PseudoClass getGraphicalRepresentationBorder() {
+        return border;
     }
 
-    public void setWidth(double width) {
-        this.width = width;
+    public void setBorder(PseudoClass border) {
+        this.border = border;
     }
 
-    public double getHeight() {
-        return height;
+    public boolean isBorderActive() {
+        return borderActive.get();
     }
 
-    public void setHeight(double height) {
-        this.height = height;
+    public SimpleBooleanProperty borderActiveProperty() {
+        return borderActive;
     }
 
-    public String getData() {
-        return data;
+    public void setBorderActive(boolean borderActive) {
+        this.borderActive.set(borderActive);
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public LocalDateTime getLastTimeSelected() {
+        return lastTimeSelected;
     }
 
-    public String getName() {
-        return name;
+    public void setLastTimeSelected() {
+        this.lastTimeSelected = LocalDateTime.now();
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public ContextMenu getRightClickMenu() {
+        return rightClickMenu;
     }
 
-    public CanvasPoint getCenter() {
-        return center;
+    public void setRightClickMenu(ContextMenu rightClickMenu) {
+        this.rightClickMenu = rightClickMenu;
     }
 
-    public void setCenter(CanvasPoint center) {
-        this.center = center;
+    public MenuItem getCopyMenuItem() {
+        return copyMenuItem;
+    }
+
+    public void setCopyMenuItem(MenuItem copyMenuItem) {
+        this.copyMenuItem = copyMenuItem;
+    }
+
+    public MenuItem getCutMenuItem() {
+        return cutMenuItem;
+    }
+
+    public void setCutMenuItem(MenuItem cutMenuItem) {
+        this.cutMenuItem = cutMenuItem;
+    }
+
+    public MenuItem getDeleteMenuItem() {
+        return deleteMenuItem;
+    }
+
+    public void setDeleteMenuItem(MenuItem deleteMenuItem) {
+        this.deleteMenuItem = deleteMenuItem;
     }
 
     public CanvasPoint getPosition() {
-        return position;
+        return graphicalRepresentationData.getPosition();
     }
 
-    public void setPosition(CanvasPoint position) {
-        this.position = position;
+    public CanvasPoint getStart() {
+        return start;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(GraphicalRepresentation.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
-        sb.append("selected");
-        sb.append('=');
-        sb.append(this.selected);
-        sb.append(',');
-        sb.append("mouseOver");
-        sb.append('=');
-        sb.append(this.mouseOver);
-        sb.append(',');
-        sb.append("width");
-        sb.append('=');
-        sb.append(this.width);
-        sb.append(',');
-        sb.append("height");
-        sb.append('=');
-        sb.append(this.height);
-        sb.append(',');
-        sb.append("center");
-        sb.append('=');
-        sb.append(((this.center == null)?"<null>":this.center));
-        sb.append(',');
-        sb.append("position");
-        sb.append('=');
-        sb.append(((this.position == null)?"<null>":this.position));
-        sb.append(',');
-        sb.append("id");
-        sb.append('=');
-        sb.append(((this.id == null)?"<null>":this.id));
-        sb.append(',');
-        sb.append("operation");
-        sb.append('=');
-        sb.append(((this.operation == null)?"<null>":this.operation));
-        sb.append(',');
-        sb.append("data");
-        sb.append('=');
-        sb.append(((this.data == null)?"<null>":this.data));
-        sb.append(',');
-        sb.append("name");
-        sb.append('=');
-        sb.append(((this.name == null)?"<null>":this.name));
-        sb.append(',');
-        if (sb.charAt((sb.length()- 1)) == ',') {
-            sb.setCharAt((sb.length()- 1), ']');
+    public void setStart(CanvasPoint start) {
+        this.start = start;
+    }
+
+    public CanvasPoint getEnd() {
+        return end;
+    }
+
+    public void setEnd(CanvasPoint end) {
+        this.end = end;
+    }
+
+    public void setPosition(CanvasPoint position, boolean force) {
+        this.graphicalRepresentationData.setPosition(position);
+        if(force){
+            this.setLayoutX(position.getX());
+            this.setLayoutY(position.getY());
+        }
+    }
+
+    public void copy(String operation){
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        this.graphicalRepresentationData.setId(this.getId());
+        this.graphicalRepresentationData.setOperation(operation);
+        clipboard.setContents(this.graphicalRepresentationData,null);
+    }
+
+    public void cut(){
+        this.copy("Cut");
+        canvas.delete(this.graphicalRepresentationData);
+    }
+
+    public void delete(){
+        this.graphicalRepresentationData.setId(this.getId());
+        canvas.delete(this.graphicalRepresentationData);
+    }
+
+    public void hideBorder() {
+        GraphicalRepresentation.this.borderActive.set(false);
+        GraphicalRepresentation.this.setStyle("");
+        for (int i = 0; i < GraphicalRepresentation.this.getChildren().size(); i++) {
+            Node node = GraphicalRepresentation.this.getChildren().get(i);
+            if (node.getId() != null && node.getId().length() > 5) {
+                String substring = node.getId().substring(0, 7);
+                if (substring.equals("circle#")) {
+                    node.setVisible(false);
+                }
+            }
+        }
+    }
+
+    public void showBorder() {
+        GraphicalRepresentation.this.setStyle("-fx-border-color: red;-fx-border-width: 2;");
+        for (int i = 0; i < GraphicalRepresentation.this.getChildren().size(); i++) {
+            Node node = GraphicalRepresentation.this.getChildren().get(i);
+            if (node.getId() != null && node.getId().length() > 5) {
+                String substring = node.getId().substring(0, 7);
+                if (substring.equals("circle#")) {
+                    node.setVisible(true);
+                }
+            }
+        }
+    }
+
+    public void showContextMenu(double screenX, double screenY) {
+        rightClickMenu.show(GraphicalRepresentation.this, screenX, screenY);
+        showBorder();
+    }
+
+    private EventHandler<MouseEvent> onMyMousePressed = new EventHandler<>() {
+        @Override
+        public void handle(MouseEvent t) {
+            start = new CanvasPoint(t.getSceneX(), t.getSceneY());
+            end = new CanvasPoint(((BorderPane) (t.getSource())).getTranslateX(), ((BorderPane) (t.getSource())).getTranslateY());
+            GraphicalRepresentation.this.setSelected(true);
+            if (t.getButton() == MouseButton.SECONDARY) {
+                showContextMenu(t.getScreenX(), t.getScreenY());
+            }
+        }
+    };
+
+    private EventHandler<MouseEvent> onMyMouseDragged = new EventHandler<>() {
+        @Override
+        public void handle(MouseEvent t) {
+            double offsetX = t.getSceneX() - start.getX();
+            double offsetY = t.getSceneY() - start.getY();
+            double newTranslateX = end.getX() + offsetX;
+            double newTranslateY = end.getY() + offsetY;
+
+            ((BorderPane) (t.getSource())).setTranslateX(newTranslateX);
+            ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
+
+            setPosition(new CanvasPoint(newTranslateX, newTranslateY),false);
+        }
+    };
+
+    private EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> GraphicalRepresentation.this.getGraphicalRepresentationData().setSelected(false);
+
+    private EventHandler<MouseEvent> onMyMouseDoubleClicked = mouseEvent -> {
+        if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 1) {
+            this.setSelected(true);
+        } else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+            showContextMenu(mouseEvent.getScreenX(), mouseEvent.getScreenY());
+        }
+    };
+
+    public void setSelected(boolean selected) {
+        this.graphicalRepresentationData.setSelected(selected);
+        if (this.graphicalRepresentationData.isSelected()) {
+            showBorder();
+            setLastTimeSelected();
         } else {
-            sb.append(']');
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-        DataFlavor[] flavors = new DataFlavor[2];
-        Class<?> type = this.getClass();
-        String mimeType = "application/x-java-serialized-object;class=" + type.getName();
-        try {
-            flavors[0] = new DataFlavor(mimeType);
-            flavors[1] = DataFlavor.stringFlavor;
-            return flavors;
-        } catch (ClassNotFoundException e) {
-            return new DataFlavor[0];
+            hideBorder();
         }
     }
 
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return DataFlavor.stringFlavor.equals(flavor)
-                || "application".equals(flavor.getPrimaryType())
-                && "x-java-serialized-object".equals(flavor.getSubType())
-                && flavor.getRepresentationClass().isAssignableFrom(this.getClass());
+    public boolean isSelected(){
+        return graphicalRepresentationData.isSelected();
     }
 
-    @Override
-    public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
-        if(!isDataFlavorSupported(dataFlavor)) throw  new UnsupportedFlavorException(dataFlavor);
-        if(DataFlavor.stringFlavor.equals(dataFlavor)) return this.toString();
-        return this;
+    public void setCenter(CanvasPoint center){
+        this.graphicalRepresentationData.setCenter(center);
+
+        double tempX = center.getX() - getWidth() / 2;
+        double tempY = center.getY() - getHeight() / 2;
+
+        this.graphicalRepresentationData.setPosition(new CanvasPoint(tempX,tempY));
+        setPosition(new CanvasPoint(tempX, tempY), true);
+
+        this.border = PseudoClass.getPseudoClass("border");
+        this.borderActive = new SimpleBooleanProperty() {
+            @Override
+            protected void invalidated() {
+                GraphicalRepresentation.this.pseudoClassStateChanged(GraphicalRepresentation.this.border, get());
+            }
+        };
     }
 
-    public String getId() {
-        return id;
+    public GraphicalRepresentation(GraphicalRepresentationData graphicalRepresentationData){
+        super();
+
+        this.setOnMousePressed(onMyMousePressed);
+        this.setOnMouseDragged(onMyMouseDragged);
+        this.setOnMouseReleased(onMyMouseReleased);
+        this.setOnMouseClicked(onMyMouseDoubleClicked);
+
+
+        this.graphicalRepresentationData = graphicalRepresentationData;
+
+        this.setCenter(this.graphicalRepresentationData.getCenter());
+
+        setContextMenu();
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setContextMenu(){
+        rightClickMenu = new ContextMenu();
+        rightClickMenu.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                event.consume();
+            }
+        });
+
+        copyMenuItem = new MenuItem("Copy");
+        copyMenuItem.setId("#copy");
+        copyMenuItem.setOnAction(actionEvent -> copy("Copy"));
+        cutMenuItem = new MenuItem("Cut");
+        cutMenuItem.setId("#cut");
+        cutMenuItem.setOnAction(actionEvent -> cut());
+        deleteMenuItem = new MenuItem("Delete");
+        deleteMenuItem.setId("#delete");
+        deleteMenuItem.setOnAction(actionEvent -> delete());
+        rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem,deleteMenuItem);
     }
 
-    public String getOperation() {
-        return operation;
+    public GraphicalRepresentation(CanvasPoint center){
+        super();
+
+        this.setOnMousePressed(onMyMousePressed);
+        this.setOnMouseDragged(onMyMouseDragged);
+        this.setOnMouseReleased(onMyMouseReleased);
+        this.setOnMouseClicked(onMyMouseDoubleClicked);
+
+        setCenter(center);
+        setSelected(true);
+
+        setContextMenu();
     }
 
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
+    private CanvasInterface canvas;
+    private GraphicalRepresentationData graphicalRepresentationData = new GraphicalRepresentationData();
+    private PseudoClass border;
+    private SimpleBooleanProperty borderActive;
+    private LocalDateTime lastTimeSelected;
+    private ContextMenu rightClickMenu;
+    private MenuItem copyMenuItem;
+    private MenuItem cutMenuItem;
+    private MenuItem deleteMenuItem;
+    private CanvasPoint start;
+    private CanvasPoint end;
 }

@@ -1,7 +1,7 @@
 package andrade.luis.hmiethernetip.controllers;
 
+import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
 import andrade.luis.hmiethernetip.models.CanvasPoint;
-import andrade.luis.hmiethernetip.models.CanvasRectangle;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.scene.Scene;
 import javafx.scene.input.*;
@@ -49,49 +49,49 @@ public class HMICanvasController extends Scene {
         });
         this.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.DELETE) {
-                CanvasRectangle selected = getCanvas().getSelectedFigure();
+                GraphicalRepresentation selected = getCanvas().getSelectedFigure();
                 if (selected != null) {
                     selected.delete();
                 }
             }
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), () -> {
-            CanvasRectangle selected = getCanvas().getSelectedFigure();
+            GraphicalRepresentation selected = getCanvas().getSelectedFigure();
             selected.copy("Copy");
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY), () -> {
-            CanvasRectangle selected = getCanvas().getSelectedFigure();
+            GraphicalRepresentation selected = getCanvas().getSelectedFigure();
             selected.cut();
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), () -> {
-            CanvasRectangle selected = getCanvas().getSelectedFigure();
-            getCanvas().paste(getCanvas().getCurrentMousePosition());
+            GraphicalRepresentation selected = getCanvas().getSelectedFigure();
+            getCanvas().paste();
         });
 
     }
 
     public void updateSelected(){
-        ArrayList<CanvasRectangle> canvasRectangleOlds = getCanvas().getCurrentCanvasObjects();
+        ArrayList<GraphicalRepresentation> canvasObjects = getCanvas().getCurrentCanvasObjects();
         LocalDateTime max = null;
         int index = -1;
-        for (int i = 0; i < canvasRectangleOlds.size(); i++) {
+        for (int i = 0; i < canvasObjects.size(); i++) {
             if (i == 0) {
-                max = canvasRectangleOlds.get(i).getLastTimeSelected();
+                max = canvasObjects.get(i).getLastTimeSelected();
                 index = i;
             } else {
-                CanvasRectangle rectangle = canvasRectangleOlds.get(i);
+                GraphicalRepresentation rectangle = canvasObjects.get(i);
                 if (rectangle.getLastTimeSelected() != null && max != null) {
                     if (max.isBefore(rectangle.getLastTimeSelected())) {
-                        max = canvasRectangleOlds.get(i).getLastTimeSelected();
+                        max = canvasObjects.get(i).getLastTimeSelected();
                         index = i;
                     }
                 }
             }
         }
         if (index > -1 && max != null) {
-            for (int i = 0; i < canvasRectangleOlds.size(); i++) {
+            for (int i = 0; i < canvasObjects.size(); i++) {
                 if (i != index) {
-                    canvasRectangleOlds.get(i).setSelected(false);
+                    canvasObjects.get(i).setSelected(false);
                 }
             }
         }

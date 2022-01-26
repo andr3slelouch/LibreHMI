@@ -2,22 +2,24 @@ package andrade.luis.hmiethernetip.models;
 
 import javafx.scene.shape.Rectangle;
 
-public class CanvasRectangle extends CanvasBorderPane{
+public class CanvasRectangle extends GraphicalRepresentation {
     private Rectangle rectangle;
-    public CanvasRectangle(GraphicalRepresentation graphicalRepresentation) {
-        super(graphicalRepresentation);
-        this.rectangle = new Rectangle(this.getGraphicalRepresentation().getPosition().getX(),this.getGraphicalRepresentation().getPosition().getY());
-        this.rectangle.setWidth(graphicalRepresentation.getWidth());
-        this.rectangle.setHeight(graphicalRepresentation.getHeight());
+    public CanvasRectangle(GraphicalRepresentationData graphicalRepresentationData) {
+        super(graphicalRepresentationData);
+        this.rectangle = new Rectangle(this.getGraphicalRepresentationData().getPosition().getX(),this.getGraphicalRepresentationData().getPosition().getY());
+        this.rectangle.setWidth(graphicalRepresentationData.getWidth());
+        this.rectangle.setHeight(graphicalRepresentationData.getHeight());
         this.setCenter(rectangle);
+        this.getGraphicalRepresentationData().setType("Rectangle");
     }
 
     public CanvasRectangle(CanvasPoint center) {
         super(center);
-        this.rectangle = new Rectangle(this.getGraphicalRepresentation().getPosition().getX(),this.getGraphicalRepresentation().getPosition().getY());
+        this.rectangle = new Rectangle(this.getGraphicalRepresentationData().getPosition().getX(),this.getGraphicalRepresentationData().getPosition().getY());
         this.rectangle.setWidth(150);
         this.rectangle.setHeight(150);
         this.setCenter(rectangle);
+        this.getGraphicalRepresentationData().setType("Rectangle");
     }
 
     @Override

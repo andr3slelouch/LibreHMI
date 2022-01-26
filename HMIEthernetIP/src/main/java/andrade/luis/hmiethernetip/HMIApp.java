@@ -23,14 +23,19 @@ public class HMIApp extends Application {
         Button rectangleBtn = new Button("Rectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {
             scene.setAddOnClickEnabled(true);
-            root.setType("rectangle");
+            root.setType("Rectangle");
         });
         Button labelBtn = new Button("Label");
         labelBtn.setOnMouseClicked(mouseEvent -> {
             scene.setAddOnClickEnabled(true);
-            root.setType("label");
+            root.setType("Label");
         });
-        HBox hbox = new HBox(rectangleBtn,labelBtn);
+        Button systemDateTimeLabelBtn = new Button("DateTime Label");
+        systemDateTimeLabelBtn.setOnMouseClicked(mouseEvent -> {
+            scene.setAddOnClickEnabled(true);
+            root.setType("SystemDateTimeLabel");
+        });
+        HBox hbox = new HBox(rectangleBtn,labelBtn,systemDateTimeLabelBtn);
         root.getChildren().add(hbox);
 
         stage.setTitle("HMI");

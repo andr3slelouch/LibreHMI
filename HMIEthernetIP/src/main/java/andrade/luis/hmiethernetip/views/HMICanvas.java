@@ -14,45 +14,33 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class HMICanvas extends Pane implements CanvasInterface {
 
     private String type;
 
-    public ArrayList<CanvasBorderPane> getShapeArrayList() {
+    private static final String FIGURE_ID = "#createdShape";
+
+
+    public ArrayList<GraphicalRepresentation> getShapeArrayList() {
         return shapeArrayList;
     }
 
-    public void setShapeArrayList(ArrayList<CanvasBorderPane> shapeArrayList) {
-        this.shapeArrayList = shapeArrayList;
-    }
-
-    public CanvasPoint getCurrentMousePosition() {
-        return currentMousePosition;
-    }
-
-    public void setCurrentMousePosition(CanvasPoint currentMousePosition) {
-        this.currentMousePosition = currentMousePosition;
-    }
-
-    public void addNewShape(CanvasBorderPane shape) {
+    public void addNewShape(GraphicalRepresentation shape) {
         this.shapeArrayList.add(shape);
     }
 
-    private ArrayList<CanvasBorderPane> shapeArrayList = new ArrayList<>();
+    private ArrayList<GraphicalRepresentation> shapeArrayList = new ArrayList<>();
     private CanvasPoint currentMousePosition;
 
     public ContextMenu getRightClickMenu() {
         return rightClickMenu;
     }
 
-    public void setRightClickMenu(ContextMenu rightClickMenu) {
-        this.rightClickMenu = rightClickMenu;
-    }
-
     private ContextMenu rightClickMenu;
 
-    public HMICanvas(){
+    public HMICanvas() {
         this.setId("MainCanvas");
         rightClickMenu = new ContextMenu();
         rightClickMenu.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
@@ -62,144 +50,194 @@ public class HMICanvas extends Pane implements CanvasInterface {
         });
 
         MenuItem pasteMenuItem = new MenuItem("Paste");
-        pasteMenuItem.setOnAction(actionEvent -> paste(currentMousePosition));
+        pasteMenuItem.setOnAction(actionEvent -> paste());
 
         rightClickMenu.getItems().addAll(pasteMenuItem);
     }
 
     public void addFigureOnCanvasClicked(CanvasPoint current) {
-        if(type.equals("rectangle")){
-            addRectangleOnCanvasClicked(current);
-        }else if(type.equals("label")){
-            addLabelOnCanvasClicked(current);
+        switch (type) {
+            case "Rectangle":
+                addRectangleOnCanvasClicked(current);
+                break;
+            case "Label":
+                addLabelOnCanvasClicked(current);
+                break;
+            case "SystemDateTimeLabel":
+                addSystemDateTimeLabelOnCanvasClicked(current);
+                break;
+            default:
+                break;
         }
     }
 
-    public void addRectangleOnCanvasClicked(CanvasPoint current){
+    public void addRectangleOnCanvasClicked(CanvasPoint current) {
         CanvasRectangle newCreatedRectangle = new CanvasRectangle(current);
         newCreatedRectangle.setCanvas(this);
         if (this.getShapeArrayList().isEmpty()) {
-            newCreatedRectangle.setId("#createdShape0");
+            newCreatedRectangle.setId(FIGURE_ID + "0");
         } else {
-            newCreatedRectangle.setId("#createdShape" + this.getShapeArrayList().size());
+            newCreatedRectangle.setId(FIGURE_ID + this.getShapeArrayList().size());
         }
         this.addNewShape(newCreatedRectangle);
         this.getChildren().add(newCreatedRectangle);
     }
 
-    public void addLabelOnCanvasClicked(CanvasPoint current){
-        CanvasLabel newCreatedRectangle = new CanvasLabel("Test",current);
-        newCreatedRectangle.setCanvas(this);
+    public void addLabelOnCanvasClicked(CanvasPoint current) {
+        CanvasLabel canvasLabel = new CanvasLabel("Test", current);
+        canvasLabel.setCanvas(this);
         if (this.getShapeArrayList().isEmpty()) {
-            newCreatedRectangle.setId("#createdShape0");
+            canvasLabel.setId(FIGURE_ID + "0");
         } else {
-            newCreatedRectangle.setId("#createdShape" + this.getShapeArrayList().size());
+            canvasLabel.setId(FIGURE_ID + this.getShapeArrayList().size());
         }
-        this.addNewShape(newCreatedRectangle);
-        this.getChildren().add(newCreatedRectangle);
+        this.addNewShape(canvasLabel);
+        this.getChildren().add(canvasLabel);
     }
 
-    public ArrayList<CanvasRectangle> getCurrentCanvasObjects() {
-        ArrayList<CanvasRectangle> arrayList = new ArrayList<>();
+    public void addSystemDateTimeLabelOnCanvasClicked(CanvasPoint current) {
+        CanvasSystemDateTimeLabel canvasSystemDateTimeLabel = new CanvasSystemDateTimeLabel("yyyy/MM/dd HH:mm:ss", current);
+        canvasSystemDateTimeLabel.setCanvas(this);
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasSystemDateTimeLabel.setId(FIGURE_ID + "0");
+        } else {
+            canvasSystemDateTimeLabel.setId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        this.addNewShape(canvasSystemDateTimeLabel);
+        this.getChildren().add(canvasSystemDateTimeLabel);
+        canvasSystemDateTimeLabel.setTimeline();
+    }
+
+    public ArrayList<GraphicalRepresentation> getCurrentCanvasObjects() {
+        ArrayList<GraphicalRepresentation> arrayList = new ArrayList<>();
         for (int i = 0; i < this.getChildren().size(); i++) {
             Node tempNode = this.getChildren().get(i);
-            if(tempNode.getId()!=null && tempNode.getId().length()>=13){
-                if (tempNode.getId().substring(0, 13).equals("#createdShape")) {
-                    arrayList.add((CanvasRectangle) tempNode);
-                }
+
+            if (Objects.requireNonNullElse(tempNode.getId(), "").startsWith(FIGURE_ID)) {
+                arrayList.add((GraphicalRepresentation) tempNode);
             }
+
         }
         return arrayList;
     }
 
-    public boolean existsId(String id){
-        for(CanvasRectangle rect:getCurrentCanvasObjects()){
-            if(rect.getId().equals(id)){
+    public boolean existsId(String id) {
+        for (GraphicalRepresentation rect : getCurrentCanvasObjects()) {
+            if (rect.getId().equals(id)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isFigureContextMenuShowing(){
-        for(CanvasRectangle rect: this.getCurrentCanvasObjects()){
-            if(rect.getRightClickMenu().isShowing()){
+    public boolean isFigureContextMenuShowing() {
+        for (GraphicalRepresentation rect : this.getCurrentCanvasObjects()) {
+            if (rect.getRightClickMenu().isShowing()) {
                 return true;
             }
         }
         return false;
     }
 
-    public CanvasRectangle getSelectedFigure(){
-        for(CanvasRectangle rect: this.getCurrentCanvasObjects()){
-            if(rect.isSelected()){
+    public GraphicalRepresentation getSelectedFigure() {
+        for (GraphicalRepresentation rect : this.getCurrentCanvasObjects()) {
+            if (rect.isSelected()) {
                 return rect;
             }
         }
         return null;
     }
 
-    public void showContextMenu(double screenX,double screenY){
-        currentMousePosition = new CanvasPoint(screenX,screenY);
-        rightClickMenu.show(HMICanvas.this,screenX,screenY);
+    public void showContextMenu(double screenX, double screenY) {
+        currentMousePosition = new CanvasPoint(screenX, screenY);
+        rightClickMenu.show(HMICanvas.this, screenX, screenY);
     }
 
     public void onCanvasClicked(CanvasPoint canvasPoint) {
-        if(!isFigureContextMenuShowing()){
-            showContextMenu(canvasPoint.getX(),canvasPoint.getY());
+        if (!isFigureContextMenuShowing()) {
+            showContextMenu(canvasPoint.getX(), canvasPoint.getY());
         }
     }
 
-    public void paste(CanvasPoint currentMousePosition){
+    public void paste() {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         try {
-            DataFlavor flavor = new DataFlavor("application/x-java-serialized-object;class=andrade.luis.hmiethernetip.models.GraphicalRepresentation");
-            if(clipboard.isDataFlavorAvailable(flavor)){
-                GraphicalRepresentation graphicalRepresentation = (GraphicalRepresentation) clipboard.getData(flavor);
-                CanvasRectangle CanvasRectangle = new CanvasRectangle(graphicalRepresentation);
-                CanvasRectangle.setCanvas(this);
-                if(currentMousePosition!=null){
-                    CanvasRectangle.setCenter(currentMousePosition);
-                }else{
-                    CanvasRectangle.setCenter(new CanvasPoint(graphicalRepresentation.getCenter().getX()+10,graphicalRepresentation.getCenter().getY()+10));
+            DataFlavor flavor = new DataFlavor("application/x-java-serialized-object;class=andrade.luis.hmiethernetip.models.GraphicalRepresentationData");
+            if (clipboard.isDataFlavorAvailable(flavor)) {
+                GraphicalRepresentationData graphicalRepresentationData = (GraphicalRepresentationData) clipboard.getData(flavor);
+                switch (graphicalRepresentationData.getType()) {
+                    case "Rectangle":
+                        addPastedRectangle(graphicalRepresentationData);
+                        break;
+                    case "Label":
+                        addPastedLabel(graphicalRepresentationData);
+                        break;
+                    case "SystemDateTimeLabel":
+                        addPastedSystemDateTimeLabel(graphicalRepresentationData);
+                        break;
+                    default:
+                        break;
                 }
-                if(graphicalRepresentation.getOperation().equals("Copy")){
-                    int copyNumber = 0;
-                    for(int i=0;i<getCurrentCanvasObjects().size();i++){
-                        if(i==0){
-                            if (existsId(graphicalRepresentation.getId())){
-                                copyNumber = i+1;
-                            }
-                        }else{
-                            if (existsId(graphicalRepresentation.getId()+"("+i+")")){
-                                copyNumber = i+1;
-                            }
-                        }
-                    }
-                    CanvasRectangle.setId(graphicalRepresentation.getId()+"("+copyNumber+")");
-                }else{
-                    CanvasRectangle.setId(graphicalRepresentation.getId());
-                }
-                this.addNewShape(CanvasRectangle);
-                this.getChildren().add(CanvasRectangle);
             }
-        }catch (ClassNotFoundException | IOException | UnsupportedFlavorException e){
+        } catch (ClassNotFoundException | IOException | UnsupportedFlavorException e) {
             e.printStackTrace();
         }
     }
 
+    public void addPastedRectangle(GraphicalRepresentationData graphicalRepresentationData) {
+        CanvasRectangle canvasRectangle = new CanvasRectangle(graphicalRepresentationData);
+        canvasRectangle.setCanvas(this);
+        canvasRectangle.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
+        canvasRectangle.setId(generateIdForPasteOperation(graphicalRepresentationData));
+        this.addNewShape(canvasRectangle);
+        this.getChildren().add(canvasRectangle);
+    }
+
+    public void addPastedLabel(GraphicalRepresentationData graphicalRepresentationData) {
+        CanvasLabel canvasLabel = new CanvasLabel(graphicalRepresentationData);
+        canvasLabel.setCanvas(this);
+        canvasLabel.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
+        canvasLabel.setId(generateIdForPasteOperation(graphicalRepresentationData));
+        this.addNewShape(canvasLabel);
+        this.getChildren().add(canvasLabel);
+    }
+
+    public void addPastedSystemDateTimeLabel(GraphicalRepresentationData graphicalRepresentationData) {
+        CanvasSystemDateTimeLabel canvasSystemDateTimeLabel = new CanvasSystemDateTimeLabel(graphicalRepresentationData);
+        canvasSystemDateTimeLabel.setCanvas(this);
+        canvasSystemDateTimeLabel.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
+        canvasSystemDateTimeLabel.setId(generateIdForPasteOperation(graphicalRepresentationData));
+        this.addNewShape(canvasSystemDateTimeLabel);
+        this.getChildren().add(canvasSystemDateTimeLabel);
+        canvasSystemDateTimeLabel.setTimeline();
+    }
+
+    public String generateIdForPasteOperation(GraphicalRepresentationData graphicalRepresentationData) {
+        if (graphicalRepresentationData.getOperation().equals("Copy")) {
+            int copyNumber = 0;
+            for (int i = 0; i < getCurrentCanvasObjects().size(); i++) {
+                if (i == 0 && existsId(graphicalRepresentationData.getId())) {
+                    copyNumber = i + 1;
+                } else {
+                    if (existsId(graphicalRepresentationData.getId() + "(" + i + ")")) {
+                        copyNumber = i + 1;
+                    }
+                }
+            }
+            return graphicalRepresentationData.getId() + "(" + copyNumber + ")";
+        } else {
+            return graphicalRepresentationData.getId();
+        }
+    }
+
     @Override
-    public void delete(GraphicalRepresentation graphicalRepresentation) {
-        for(CanvasRectangle temp: getCurrentCanvasObjects()){
-            if(temp.getId().equals(graphicalRepresentation.getId())){
+    public void delete(GraphicalRepresentationData graphicalRepresentationData) {
+        for (GraphicalRepresentation temp : getCurrentCanvasObjects()) {
+            if (temp.getId().equals(graphicalRepresentationData.getId())) {
                 this.shapeArrayList.remove(temp);
                 this.getChildren().remove(temp);
             }
         }
-    }
-
-    public String getType() {
-        return type;
     }
 
     public void setType(String type) {
