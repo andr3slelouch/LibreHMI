@@ -2,6 +2,7 @@ package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.*;
 import javafx.scene.Node;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
@@ -15,6 +16,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 
 public class HMICanvas extends Pane implements CanvasInterface {
 
@@ -66,6 +68,9 @@ public class HMICanvas extends Pane implements CanvasInterface {
             case "SystemDateTimeLabel":
                 addSystemDateTimeLabelOnCanvasClicked(current);
                 break;
+            case "Text":
+                addTextOnCanvasClicked(current);
+                break;
             default:
                 break;
         }
@@ -106,6 +111,24 @@ public class HMICanvas extends Pane implements CanvasInterface {
         this.addNewShape(canvasSystemDateTimeLabel);
         this.getChildren().add(canvasSystemDateTimeLabel);
         canvasSystemDateTimeLabel.setTimeline();
+    }
+
+    public void addTextOnCanvasClicked(CanvasPoint current) {
+        CanvasText canvasText = new CanvasText("0.0", current);
+        canvasText.setCanvas(this);
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasText.setId(FIGURE_ID + "0");
+        } else {
+            canvasText.setId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        CanvasConfirmTagDialog canvasConfirmTagDialog = new CanvasConfirmTagDialog(canvasText.getGraphicalRepresentationData());
+        Optional<ButtonType> result = canvasConfirmTagDialog.showAndWait();
+        if(result.isPresent() && result.get() == ButtonType.OK){
+            this.addNewShape(canvasText);
+            this.getChildren().add(canvasText);
+            canvasText.setTimeline();
+        }
+
     }
 
     public ArrayList<GraphicalRepresentation> getCurrentCanvasObjects() {

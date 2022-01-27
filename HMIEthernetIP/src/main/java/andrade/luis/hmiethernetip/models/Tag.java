@@ -1,0 +1,121 @@
+package andrade.luis.hmiethernetip.models;
+
+import javafx.beans.property.SimpleStringProperty;
+
+public class Tag {
+    public String getPlcName() {
+        return plcName.get();
+    }
+
+    public SimpleStringProperty plcNameProperty() {
+        return plcName;
+    }
+
+    public void setPlcName(String plcName) {
+        this.plcName.set(plcName);
+    }
+
+    public String getPlcAddress() {
+        return plcAddress.get();
+    }
+
+    public SimpleStringProperty plcAddressProperty() {
+        return plcAddress;
+    }
+
+    public void setPlcAddress(String plcAddress) {
+        this.plcAddress.set(plcAddress);
+    }
+
+    public String getPlcDeviceGroup() {
+        return plcDeviceGroup.get();
+    }
+
+    public SimpleStringProperty plcDeviceGroupProperty() {
+        return plcDeviceGroup;
+    }
+
+    public void setPlcDeviceGroup(String plcDeviceGroup) {
+        this.plcDeviceGroup.set(plcDeviceGroup);
+    }
+
+    public String getTagName() {
+        return tagName.get();
+    }
+
+    public SimpleStringProperty tagNameProperty() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName.set(tagName);
+    }
+
+    public String getTagType() {
+        return tagType.get();
+    }
+
+    public SimpleStringProperty tagTypeProperty() {
+        return tagType;
+    }
+
+    public void setTagType(String tagType) {
+        this.tagType.set(tagType);
+    }
+
+    public String getTagAddress() {
+        return tagAddress.get();
+    }
+
+    public SimpleStringProperty tagAddressProperty() {
+        return tagAddress;
+    }
+
+    public void setTagAddress(String tagAddress) {
+        this.tagAddress.set(tagAddress);
+    }
+
+    public String getTagAction() {
+        return tagAction.get();
+    }
+
+    public SimpleStringProperty tagActionProperty() {
+        return tagAction;
+    }
+
+    public void setTagAction(String tagAction) {
+        this.tagAction.set(tagAction);
+    }
+
+    public String getTagVale() {
+        return tagVale.get();
+    }
+
+    public SimpleStringProperty tagValeProperty() {
+        return tagVale;
+    }
+
+    public void setTagVale(String tagVale) {
+        this.tagVale.set(tagVale);
+    }
+
+    private final SimpleStringProperty plcName;
+    private final SimpleStringProperty plcAddress;
+    private final SimpleStringProperty plcDeviceGroup;
+    private final SimpleStringProperty tagName;
+    private final SimpleStringProperty tagType;
+    private final SimpleStringProperty tagAddress;
+    private final SimpleStringProperty tagAction;
+    private final SimpleStringProperty tagVale;
+
+    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction, String tagVale) {
+        this.plcName = new SimpleStringProperty(plcName);
+        this.plcAddress = new SimpleStringProperty(plcAddress);;
+        this.plcDeviceGroup = new SimpleStringProperty(plcDeviceGroup);;
+        this.tagName = new SimpleStringProperty(tagName);
+        this.tagType = new SimpleStringProperty(tagType);
+        this.tagAddress = new SimpleStringProperty(tagAddress);
+        this.tagAction = new SimpleStringProperty(tagAction);
+        this.tagVale = new SimpleStringProperty(tagVale);
+    }
+}

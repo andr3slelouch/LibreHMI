@@ -35,7 +35,12 @@ public class HMIApp extends Application {
             scene.setAddOnClickEnabled(true);
             root.setType("SystemDateTimeLabel");
         });
-        HBox hbox = new HBox(rectangleBtn,labelBtn,systemDateTimeLabelBtn);
+        Button textBtn = new Button("Text");
+        textBtn.setOnMouseClicked(mouseEvent -> {
+            scene.setAddOnClickEnabled(true);
+            root.setType("Text");
+        });
+        HBox hbox = new HBox(rectangleBtn,labelBtn,systemDateTimeLabelBtn,textBtn);
         root.getChildren().add(hbox);
 
         stage.setTitle("HMI");
