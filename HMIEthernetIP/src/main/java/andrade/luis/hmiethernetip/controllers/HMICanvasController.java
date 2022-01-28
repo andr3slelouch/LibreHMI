@@ -15,33 +15,23 @@ public class HMICanvasController extends Scene {
     Logger logger
             = Logger.getLogger(
             HMICanvasController.class.getName());
-    private HMICanvas HMICanvas;
-
-    public boolean isAddOnClickEnabled() {
-        return addOnClickEnabled;
-    }
-
-    public void setAddOnClickEnabled(boolean addOnClickEnabled) {
-        this.addOnClickEnabled = addOnClickEnabled;
-    }
-
-    private boolean addOnClickEnabled;
+    private HMICanvas hmiCanvas;
 
     public HMICanvas getCanvas() {
-        return HMICanvas;
+        return hmiCanvas;
     }
 
     public void setCanvas(HMICanvas HMICanvas) {
-        this.HMICanvas = HMICanvas;
+        this.hmiCanvas = HMICanvas;
     }
 
     public HMICanvasController(HMICanvas hmiCanvas, double v, double v1, Paint paint) {
         super(hmiCanvas, v, v1, paint);
-        this.HMICanvas = hmiCanvas;
+        this.hmiCanvas = hmiCanvas;
         this.setOnMouseClicked(mouseEvent -> {
-            if (isAddOnClickEnabled()) {
+            if (this.hmiCanvas.isAddOnClickEnabled()) {
                 hmiCanvas.addFigureOnCanvasClicked(new CanvasPoint(mouseEvent.getX(), mouseEvent.getY()));
-                setAddOnClickEnabled(false);
+                this.hmiCanvas.setAddOnClickEnabled(false);
             }else if(mouseEvent.getButton() == MouseButton.SECONDARY){
                 hmiCanvas.onCanvasClicked(new CanvasPoint(mouseEvent.getScreenX(), mouseEvent.getScreenY()));
             }

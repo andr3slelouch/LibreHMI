@@ -54,13 +54,13 @@ class HMICanvasTest {
         rectangleBtn = new Button("Rectangle");
         rectangleBtn.setId("addRectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {
-            scene.setAddOnClickEnabled(true);
+            scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Rectangle");
         });
 
         systemDateTimeLabelBtn = new Button("DateTime Label");
         systemDateTimeLabelBtn.setOnMouseClicked(mouseEvent -> {
-            scene.setAddOnClickEnabled(true);
+            scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("SystemDateTimeLabel");
         });
         HBox hbox = new HBox(rectangleBtn,systemDateTimeLabelBtn);

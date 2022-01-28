@@ -1,8 +1,12 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMICanvasController;
+import andrade.luis.hmiethernetip.models.Tag;
+import andrade.luis.hmiethernetip.models.UserAccount;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -19,25 +23,25 @@ public class HMIApp extends Application {
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        var scene = new HMICanvasController(root, bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
+        HMICanvasController scene = new HMICanvasController(root, bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
         Button rectangleBtn = new Button("Rectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {
-            scene.setAddOnClickEnabled(true);
+            scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Rectangle");
         });
         Button labelBtn = new Button("Label");
         labelBtn.setOnMouseClicked(mouseEvent -> {
-            scene.setAddOnClickEnabled(true);
+            scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Label");
         });
         Button systemDateTimeLabelBtn = new Button("DateTime Label");
         systemDateTimeLabelBtn.setOnMouseClicked(mouseEvent -> {
-            scene.setAddOnClickEnabled(true);
+            scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("SystemDateTimeLabel");
         });
         Button textBtn = new Button("Text");
         textBtn.setOnMouseClicked(mouseEvent -> {
-            scene.setAddOnClickEnabled(true);
+            scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Text");
         });
         HBox hbox = new HBox(rectangleBtn,labelBtn,systemDateTimeLabelBtn,textBtn);

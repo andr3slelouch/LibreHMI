@@ -9,22 +9,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class CanvasTable<T> extends TableView {
     public CanvasTable() {
 
-        TableColumn namePLCColumn = new TableColumn("Nombre del PLC");
-        namePLCColumn.setCellFactory(new PropertyValueFactory<Tag,String>("plcName"));
-        TableColumn ipColumn = new TableColumn("IP");
-        ipColumn.setCellFactory(new PropertyValueFactory<Tag,String>("plcAddress"));
-        TableColumn groupColumn = new TableColumn("Grupo");
-        groupColumn.setCellFactory(new PropertyValueFactory<Tag,String>("plcDeviceGroup"));
-        TableColumn tagNameColumn = new TableColumn("Nombre del Tag");
-        tagNameColumn.setCellFactory(new PropertyValueFactory<Tag,String>("tagName"));
-        TableColumn typeColumn = new TableColumn("Tipo");
-        typeColumn.setCellFactory(new PropertyValueFactory<Tag,String>("tagType"));
-        TableColumn addressColumn = new TableColumn("Dirección");
-        addressColumn.setCellFactory(new PropertyValueFactory<Tag,String>("tagAddress"));
-        TableColumn actionColumn = new TableColumn("Acción");
-        actionColumn.setCellFactory(new PropertyValueFactory<Tag,String>("tagAction"));
-        TableColumn valueColumn = new TableColumn("Valor");
-        valueColumn.setCellFactory(new PropertyValueFactory<Tag,String>("tagValue"));
+        TableColumn<Tag, String> namePLCColumn = new TableColumn<>("Nombre del PLC");
+        namePLCColumn.setCellFactory(new PropertyValueFactory("plcName"));
+        TableColumn<Tag, String> ipColumn = new TableColumn("IP");
+        ipColumn.setCellFactory(new PropertyValueFactory("plcAddress"));
+        TableColumn<Tag, String> groupColumn = new TableColumn("Grupo");
+        groupColumn.setCellFactory(new PropertyValueFactory("plcDeviceGroup"));
+        TableColumn<Tag, String> tagNameColumn = new TableColumn("Nombre del Tag");
+        tagNameColumn.setCellFactory(new PropertyValueFactory("tagName"));
+        TableColumn<Tag, String> typeColumn = new TableColumn("Tipo");
+        typeColumn.setCellFactory(new PropertyValueFactory("tagType"));
+        TableColumn<Tag, String> addressColumn = new TableColumn("Dirección");
+        addressColumn.setCellFactory(new PropertyValueFactory("tagAddress"));
+        TableColumn<Tag, String> actionColumn = new TableColumn("Acción");
+        actionColumn.setCellFactory(new PropertyValueFactory("tagAction"));
+        TableColumn<Tag, String> valueColumn = new TableColumn("Valor");
+        valueColumn.setCellFactory(new PropertyValueFactory("tagValue"));
 
         this.getColumns().addAll(namePLCColumn,
                 ipColumn,

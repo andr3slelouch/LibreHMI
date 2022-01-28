@@ -10,12 +10,31 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class CanvasText extends CanvasLabel{
+public class CanvasText extends CanvasLabel {
     private Connection con;
     private Statement statement;
     private ResultSet resultSet;
     private String text;
+    private String query;
+
+    public Tag getTag() {
+        return tag;
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+        if(tag != null){
+            this.query = prepareQuery(tag);
+        }
+    }
+
+    private Tag tag;
+    private Map<String, String> queries = Map.of("Entero", "select valor from ENTERO where nombreTag=", "Flotante", "select valor from FLOTANTE where nombreTag=", "Bool", "select valor from BOOLEAN where nombreTag=");
 
     public CanvasText(GraphicalRepresentationData graphicalRepresentationData) {
         super(graphicalRepresentationData);
@@ -27,7 +46,11 @@ public class CanvasText extends CanvasLabel{
         this.getGraphicalRepresentationData().setType("Text");
     }
 
-    public void setTimeline(){
+    private String prepareQuery(Tag tag) {
+        return queries.get(tag.getTagType()) + "'" + tag.getTagName() + "'";
+    }
+
+    public void setTimeline() {
         Timeline t1 = new Timeline(
                 new KeyFrame(
                         Duration.seconds(0),
@@ -35,11 +58,14 @@ public class CanvasText extends CanvasLabel{
                             try {
                                 con = DBConnection.createConnection();
                                 statement = con.createStatement();
-                                resultSet = statement.executeQuery("select valor from FLOTANTE where nombreTag='temperatura'");
-                                while (resultSet.next()){
-                                    text = resultSet.getString("valor");
-                                    this.getLabel().setText(text);
+                                if(query != null){
+                                    resultSet = statement.executeQuery(query);
+                                    while (resultSet.next()) {
+                                        text = resultSet.getString("valor");
+                                        this.getLabel().setText(text);
+                                    }
                                 }
+                                con.close();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }

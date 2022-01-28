@@ -2,7 +2,6 @@ package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.*;
 import javafx.scene.Node;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
@@ -16,7 +15,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HMICanvas extends Pane implements CanvasInterface {
 
@@ -24,6 +24,15 @@ public class HMICanvas extends Pane implements CanvasInterface {
 
     private static final String FIGURE_ID = "#createdShape";
 
+    public boolean isAddOnClickEnabled() {
+        return addOnClickEnabled;
+    }
+
+    public void setAddOnClickEnabled(boolean addOnClickEnabled) {
+        this.addOnClickEnabled = addOnClickEnabled;
+    }
+
+    private boolean addOnClickEnabled;
 
     public ArrayList<GraphicalRepresentation> getShapeArrayList() {
         return shapeArrayList;
@@ -121,13 +130,16 @@ public class HMICanvas extends Pane implements CanvasInterface {
         } else {
             canvasText.setId(FIGURE_ID + this.getShapeArrayList().size());
         }
-        CanvasConfirmTagDialog canvasConfirmTagDialog = new CanvasConfirmTagDialog(canvasText.getGraphicalRepresentationData());
-        Optional<ButtonType> result = canvasConfirmTagDialog.showAndWait();
-        if(result.isPresent() && result.get() == ButtonType.OK){
-            this.addNewShape(canvasText);
-            this.getChildren().add(canvasText);
-            canvasText.setTimeline();
-        }
+        SelectTagWindow selectTagWindow = new SelectTagWindow();
+        selectTagWindow.showAndWait();
+        Tag tag = selectTagWindow.getSelectedTag();
+        Logger logger = Logger.getLogger(this.getClass().getSimpleName());
+        logger.log(Level.INFO,tag.getTagName());
+        canvasText.setTag(tag);
+        this.addNewShape(canvasText);
+        this.getChildren().add(canvasText);
+        canvasText.setTimeline();
+
 
     }
 

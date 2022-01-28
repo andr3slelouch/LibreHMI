@@ -15,9 +15,15 @@ while True:
 
     cs = mydb.cursor()
     val = random.random() * 5
+    valInt = random.randint(0, 100);
     # drop clause
     statement = (
         "UPDATE FLOTANTE SET valor = " + str(val) + " WHERE nombreTag='temperatura'"
+    )
+    print("Written statement:" + statement)
+    cs.execute(statement)
+    statement = (
+            "UPDATE ENTERO SET valor = " + str(valInt) + " WHERE nombreTag='nivelTanque'"
     )
     print("Written statement:" + statement)
     cs.execute(statement)

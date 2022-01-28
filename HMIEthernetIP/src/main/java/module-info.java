@@ -16,5 +16,7 @@ module andrade.luis.hmiethernetip {
     opens andrade.luis.hmiethernetip to javafx.fxml;
     exports andrade.luis.hmiethernetip;
     exports andrade.luis.hmiethernetip.views;
+    exports andrade.luis.hmiethernetip.models;
+    opens andrade.luis.hmiethernetip.models to javafx.base;
     opens andrade.luis.hmiethernetip.views to javafx.fxml;
 }

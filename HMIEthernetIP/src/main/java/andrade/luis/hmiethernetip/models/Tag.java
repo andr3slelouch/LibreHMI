@@ -87,16 +87,16 @@ public class Tag {
         this.tagAction.set(tagAction);
     }
 
-    public String getTagVale() {
-        return tagVale.get();
+    public String getTagValue() {
+        return tagValue.get();
     }
 
-    public SimpleStringProperty tagValeProperty() {
-        return tagVale;
+    public SimpleStringProperty tagValueProperty() {
+        return tagValue;
     }
 
-    public void setTagVale(String tagVale) {
-        this.tagVale.set(tagVale);
+    public void setTagValue(String tagValue) {
+        this.tagValue.set(tagValue);
     }
 
     private final SimpleStringProperty plcName;
@@ -106,9 +106,9 @@ public class Tag {
     private final SimpleStringProperty tagType;
     private final SimpleStringProperty tagAddress;
     private final SimpleStringProperty tagAction;
-    private final SimpleStringProperty tagVale;
+    private final SimpleStringProperty tagValue;
 
-    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction, String tagVale) {
+    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction, String tagValue) {
         this.plcName = new SimpleStringProperty(plcName);
         this.plcAddress = new SimpleStringProperty(plcAddress);;
         this.plcDeviceGroup = new SimpleStringProperty(plcDeviceGroup);;
@@ -116,6 +116,6 @@ public class Tag {
         this.tagType = new SimpleStringProperty(tagType);
         this.tagAddress = new SimpleStringProperty(tagAddress);
         this.tagAction = new SimpleStringProperty(tagAction);
-        this.tagVale = new SimpleStringProperty(tagVale);
+        this.tagValue = new SimpleStringProperty(tagValue);
     }
 }
