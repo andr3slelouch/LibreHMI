@@ -1,0 +1,22 @@
+.root {
+    -fx-padding: 20 ;
+    -fx-alignment: center ;
+}
+
+.base-pane {
+    -fx-background-color: gray ;
+}
+
+.dynamic-pane {
+    -fx-background-color: green, gray ;
+}
+
+.solution-pane {
+    -fx-spacing: 5 ;
+    -fx-padding: 10 ;
+}
+
+.progress-bar {
+    -fx-accent: green ;
+    -fx-control-inner-background: gray ;
+}

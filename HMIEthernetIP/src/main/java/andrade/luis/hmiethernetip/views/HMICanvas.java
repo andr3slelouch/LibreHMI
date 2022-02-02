@@ -19,6 +19,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HMICanvas extends Pane implements CanvasInterface {
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    private String mode;
 
     private String type;
 
@@ -59,6 +68,7 @@ public class HMICanvas extends Pane implements CanvasInterface {
                 event.consume();
             }
         });
+        this.mode = "Default";
 
         MenuItem pasteMenuItem = new MenuItem("Paste");
         pasteMenuItem.setOnAction(actionEvent -> paste());
@@ -80,9 +90,26 @@ public class HMICanvas extends Pane implements CanvasInterface {
             case "Text":
                 addTextOnCanvasClicked(current);
                 break;
+            case "DynRect":
+                addDynRectOnCanvasClicked(current);
+                Logger logger = Logger.getLogger(HMICanvas.this.getClass().getName());
+                logger.log(Level.INFO,"DONE");
+                break;
             default:
                 break;
         }
+    }
+
+    private void addDynRectOnCanvasClicked(CanvasPoint current) {
+        CanvasDynamicRectangle canvasDynamicRectangle = new CanvasDynamicRectangle(current);
+        canvasDynamicRectangle.setCanvas(this);
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasDynamicRectangle.setId(FIGURE_ID + "0");
+        } else {
+            canvasDynamicRectangle.setId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        this.addNewShape(canvasDynamicRectangle);
+        this.getChildren().add(canvasDynamicRectangle);
     }
 
     public void addRectangleOnCanvasClicked(CanvasPoint current) {
@@ -130,17 +157,28 @@ public class HMICanvas extends Pane implements CanvasInterface {
         } else {
             canvasText.setId(FIGURE_ID + this.getShapeArrayList().size());
         }
-        SelectTagWindow selectTagWindow = new SelectTagWindow();
-        selectTagWindow.showAndWait();
-        Tag tag = selectTagWindow.getSelectedTag();
+        Tag tag;
+        if (this.getMode().equals("Test")) {
+            tag = new Tag("","","","temperatura","Flotante","","","");
+        } else {
+            tag = selectTag();
+        }
+
         Logger logger = Logger.getLogger(this.getClass().getSimpleName());
         logger.log(Level.INFO,tag.getTagName());
-        canvasText.setTag(tag);
+        canvasText.getGraphicalRepresentationData().setTag(tag);
         this.addNewShape(canvasText);
         this.getChildren().add(canvasText);
         canvasText.setTimeline();
 
 
+    }
+
+    @Override
+    public Tag selectTag(){
+        SelectTagWindow selectTagWindow = new SelectTagWindow(false);
+        selectTagWindow.showAndWait();
+        return selectTagWindow.getSelectedTag();
     }
 
     public ArrayList<GraphicalRepresentation> getCurrentCanvasObjects() {

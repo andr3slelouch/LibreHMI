@@ -2,108 +2,141 @@ package andrade.luis.hmiethernetip.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import javafx.beans.property.SimpleStringProperty;
 
 import java.io.Serializable;
 
-public class Tag implements Serializable {
+public class TagRow implements Serializable {
     public String getPlcName() {
+        return plcName.get();
+    }
+
+    public SimpleStringProperty plcNameProperty() {
         return plcName;
     }
 
     public void setPlcName(String plcName) {
-        this.plcName = plcName;
+        this.plcName.set(plcName);
     }
 
     public String getPlcAddress() {
+        return plcAddress.get();
+    }
+
+    public SimpleStringProperty plcAddressProperty() {
         return plcAddress;
     }
 
     public void setPlcAddress(String plcAddress) {
-        this.plcAddress = plcAddress;
+        this.plcAddress.set(plcAddress);
     }
 
     public String getPlcDeviceGroup() {
+        return plcDeviceGroup.get();
+    }
+
+    public SimpleStringProperty plcDeviceGroupProperty() {
         return plcDeviceGroup;
     }
 
     public void setPlcDeviceGroup(String plcDeviceGroup) {
-        this.plcDeviceGroup = plcDeviceGroup;
+        this.plcDeviceGroup.set(plcDeviceGroup);
     }
 
     public String getTagName() {
+        return tagName.get();
+    }
+
+    public SimpleStringProperty tagNameProperty() {
         return tagName;
     }
 
     public void setTagName(String tagName) {
-        this.tagName = tagName;
+        this.tagName.set(tagName);
     }
 
     public String getTagType() {
+        return tagType.get();
+    }
+
+    public SimpleStringProperty tagTypeProperty() {
         return tagType;
     }
 
     public void setTagType(String tagType) {
-        this.tagType = tagType;
+        this.tagType.set(tagType);
     }
 
     public String getTagAddress() {
+        return tagAddress.get();
+    }
+
+    public SimpleStringProperty tagAddressProperty() {
         return tagAddress;
     }
 
     public void setTagAddress(String tagAddress) {
-        this.tagAddress = tagAddress;
+        this.tagAddress.set(tagAddress);
     }
 
     public String getTagAction() {
+        return tagAction.get();
+    }
+
+    public SimpleStringProperty tagActionProperty() {
         return tagAction;
     }
 
     public void setTagAction(String tagAction) {
-        this.tagAction = tagAction;
+        this.tagAction.set(tagAction);
     }
 
     public String getTagValue() {
+        return tagValue.get();
+    }
+
+    public SimpleStringProperty tagValueProperty() {
         return tagValue;
     }
 
     public void setTagValue(String tagValue) {
-        this.tagValue = tagValue;
+        this.tagValue.set(tagValue);
     }
 
     @SerializedName("plcName")
     @Expose
-    private String plcName;
+    private final SimpleStringProperty plcName;
     @SerializedName("plcAddress")
     @Expose
-    private String plcAddress;
+    private final SimpleStringProperty plcAddress;
     @SerializedName("plcDeviceGroup")
     @Expose
-    private String plcDeviceGroup;
+    private final SimpleStringProperty plcDeviceGroup;
     @SerializedName("tagName")
     @Expose
-    private String tagName;
+    private final SimpleStringProperty tagName;
     @SerializedName("tagType")
     @Expose
-    private String tagType;
+    private final SimpleStringProperty tagType;
     @SerializedName("tagAddress")
     @Expose
-    private String tagAddress;
+    private final SimpleStringProperty tagAddress;
     @SerializedName("tagAction")
     @Expose
-    private String tagAction;
+    private final SimpleStringProperty tagAction;
     @SerializedName("tagValue")
     @Expose
-    private String tagValue;
+    private final SimpleStringProperty tagValue;
 
-    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction, String tagValue) {
-        this.plcName = plcName;
-        this.plcAddress = plcAddress;
-        this.plcDeviceGroup = plcDeviceGroup;
-        this.tagName = tagName;
-        this.tagType = tagType;
-        this.tagAddress = tagAddress;
-        this.tagAction = tagAction;
-        this.tagValue = tagValue;
+    public TagRow(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction, String tagValue) {
+        this.plcName = new SimpleStringProperty(plcName);
+        this.plcAddress = new SimpleStringProperty(plcAddress);;
+        this.plcDeviceGroup = new SimpleStringProperty(plcDeviceGroup);;
+        this.tagName = new SimpleStringProperty(tagName);
+        this.tagType = new SimpleStringProperty(tagType);
+        this.tagAddress = new SimpleStringProperty(tagAddress);
+        this.tagAction = new SimpleStringProperty(tagAction);
+        this.tagValue = new SimpleStringProperty(tagValue);
     }
 
     @Override

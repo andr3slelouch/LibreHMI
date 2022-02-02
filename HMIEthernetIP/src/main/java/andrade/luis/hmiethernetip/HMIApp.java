@@ -1,17 +1,14 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMICanvasController;
-import andrade.luis.hmiethernetip.models.Tag;
-import andrade.luis.hmiethernetip.models.UserAccount;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -44,7 +41,12 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Text");
         });
-        HBox hbox = new HBox(rectangleBtn,labelBtn,systemDateTimeLabelBtn,textBtn);
+        Button dynamicRectBtn = new Button("DynRect");
+        dynamicRectBtn.setOnMouseClicked(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("DynRect");
+        });
+        HBox hbox = new HBox(rectangleBtn,labelBtn,systemDateTimeLabelBtn,textBtn,dynamicRectBtn);
         root.getChildren().add(hbox);
 
         stage.setTitle("HMI");

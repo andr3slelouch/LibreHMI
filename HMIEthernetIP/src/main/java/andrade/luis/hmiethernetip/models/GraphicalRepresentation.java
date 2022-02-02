@@ -15,6 +15,10 @@ import java.awt.datatransfer.Clipboard;
 import java.time.LocalDateTime;
 
 public class GraphicalRepresentation extends BorderPane {
+    public GraphicalRepresentation() {
+
+    }
+
     public CanvasInterface getCanvas() {
         return canvas;
     }

@@ -8,8 +8,14 @@ import javafx.util.Duration;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javafx.animation.Animation;
 
 public class CanvasSystemDateTimeLabel extends CanvasLabel {
+    public Timeline getTimeline() {
+        return timeline;
+    }
+
+    private Timeline timeline;
     public CanvasSystemDateTimeLabel(GraphicalRepresentationData graphicalRepresentationData) {
         super(graphicalRepresentationData);
         this.getGraphicalRepresentationData().setType("SystemDateTimeLabel");
@@ -21,7 +27,7 @@ public class CanvasSystemDateTimeLabel extends CanvasLabel {
     }
 
     public void setTimeline() {
-        Timeline t1 = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
@@ -29,7 +35,7 @@ public class CanvasSystemDateTimeLabel extends CanvasLabel {
                             LocalDateTime now = LocalDateTime.now();
                             this.getLabel().setText(dtf.format(now));
                         }), new KeyFrame(Duration.seconds(1)));
-        t1.setCycleCount(t1.INDEFINITE);
-        t1.play();
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
     }
 }

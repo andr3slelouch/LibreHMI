@@ -2,6 +2,7 @@ package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMICanvasController;
 import andrade.luis.hmiethernetip.models.CanvasPoint;
+import andrade.luis.hmiethernetip.models.CanvasText;
 import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.geometry.Rectangle2D;
@@ -34,6 +35,7 @@ class HMICanvasTest {
     private HMICanvasController scene;
     private Button rectangleBtn;
     private Button systemDateTimeLabelBtn;
+    private Button textBtn;
 
     @BeforeEach
     void setUp() {
@@ -46,6 +48,7 @@ class HMICanvasTest {
     @Start
     private void start(Stage stage) {
         root = new HMICanvas();
+        root.setMode("Test");
         Canvas canvas = new Canvas(300, 300);
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
@@ -57,13 +60,17 @@ class HMICanvasTest {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Rectangle");
         });
-
         systemDateTimeLabelBtn = new Button("DateTime Label");
         systemDateTimeLabelBtn.setOnMouseClicked(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("SystemDateTimeLabel");
         });
-        HBox hbox = new HBox(rectangleBtn,systemDateTimeLabelBtn);
+        textBtn = new Button("Text");
+        textBtn.setOnMouseClicked(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Text");
+        });
+        HBox hbox = new HBox(rectangleBtn,systemDateTimeLabelBtn,textBtn);
         root.getChildren().add(hbox);
 
 
@@ -424,5 +431,15 @@ class HMICanvasTest {
 
         GraphicalRepresentation canvasSystemDateTimeLabel = getAddedGraphicalRepresentation("#createdShape0");
         Assertions.assertThat(canvasSystemDateTimeLabel).isNotNull();
+    }
+    @Test
+    void addTextLabel(FxRobot robot){
+        robot.clickOn(textBtn);
+        robot.clickOn(scene);
+
+        CanvasText canvasSystemDateTimeLabel = (CanvasText) getAddedGraphicalRepresentation("#createdShape0");
+        Assertions.assertThat(canvasSystemDateTimeLabel).isNotNull();
+        Assertions.assertThat(canvasSystemDateTimeLabel.getGraphicalRepresentationData().getTag()).isNotNull();
+
     }
 }

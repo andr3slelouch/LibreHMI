@@ -5,7 +5,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Map;
 
+import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -45,8 +50,13 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     @SerializedName("type")
     @Expose
     private String type;
+    @SerializedName("tag")
+    @Expose
+    private Tag tag;
 
     private static final long serialVersionUID = 6976931227659398285L;
+
+    private final Map<String, String> queries = Map.of("Entero", "select valor from ENTERO where nombreTag=", "Flotante", "select valor from FLOTANTE where nombreTag=", "Bool", "select valor from BOOLEAN where nombreTag=");
 
     public boolean isSelected() {
         return selected;
@@ -112,6 +122,13 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         this.position = position;
     }
 
+    public Tag getTag() {
+        return tag;
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -155,6 +172,10 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         sb.append("name");
         sb.append('=');
         sb.append(((this.name == null)?"<null>":this.name));
+        sb.append(',');
+        sb.append("tag");
+        sb.append('=');
+        sb.append(((this.tag == null)?"<null>":this.tag.toString()));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
@@ -214,5 +235,25 @@ public class GraphicalRepresentationData implements Serializable, Transferable
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String readTagFromDatabase(){
+        try {
+            Connection con = DBConnection.createConnection();
+            Statement statement = con.createStatement();
+            if(tag.getTagType() != null && tag.getTagName() != null){
+                String query = queries.get(tag.getTagType()) + "'" + tag.getTagName() + "'";
+                ResultSet resultSet = statement.executeQuery(query);
+                while (resultSet.next()) {
+                    if(!resultSet.getString("valor").isEmpty()) {
+                        return resultSet.getString("valor");
+                    }
+                }
+            }
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
