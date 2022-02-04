@@ -14,7 +14,7 @@ while True:
     )
 
     cs = mydb.cursor()
-    val = random.random() * 5
+    val = random.random() * 50
     valInt = random.randint(0, 100);
     # drop clause
     statement = (

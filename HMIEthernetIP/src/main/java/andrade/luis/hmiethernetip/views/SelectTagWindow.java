@@ -1,5 +1,7 @@
-package andrade.luis.hmiethernetip.models;
+package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.Tag;
+import andrade.luis.hmiethernetip.models.TagRow;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

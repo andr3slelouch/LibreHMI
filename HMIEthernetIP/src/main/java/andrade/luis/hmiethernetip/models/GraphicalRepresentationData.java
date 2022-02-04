@@ -5,9 +5,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Map;
 
 import andrade.luis.hmiethernetip.util.DBConnection;
@@ -53,6 +50,10 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     @SerializedName("tag")
     @Expose
     private Tag tag;
+    @SerializedName("refillExpression")
+    @Expose
+    private Expression refillExpression;
+
 
     private static final long serialVersionUID = 6976931227659398285L;
 
@@ -129,6 +130,14 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     public void setTag(Tag tag) {
         this.tag = tag;
     }
+
+    public Expression getRefillExpression() {
+        return refillExpression;
+    }
+
+    public void setRefillExpression(Expression refillExpression) {
+        this.refillExpression = refillExpression;
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -176,6 +185,10 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         sb.append("tag");
         sb.append('=');
         sb.append(((this.tag == null)?"<null>":this.tag.toString()));
+        sb.append(',');
+        sb.append("refillExpression");
+        sb.append('=');
+        sb.append(((this.refillExpression == null)?"<null>":this.refillExpression.toString()));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
@@ -238,22 +251,6 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     }
 
     public String readTagFromDatabase(){
-        try {
-            Connection con = DBConnection.createConnection();
-            Statement statement = con.createStatement();
-            if(tag.getTagType() != null && tag.getTagName() != null){
-                String query = queries.get(tag.getTagType()) + "'" + tag.getTagName() + "'";
-                ResultSet resultSet = statement.executeQuery(query);
-                while (resultSet.next()) {
-                    if(!resultSet.getString("valor").isEmpty()) {
-                        return resultSet.getString("valor");
-                    }
-                }
-            }
-            con.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
+        return DBConnection.readTagValueFromDatabase(this.tag);
     }
 }

@@ -201,7 +201,7 @@ public class GraphicalRepresentation extends BorderPane {
 
     private EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> GraphicalRepresentation.this.getGraphicalRepresentationData().setSelected(false);
 
-    private EventHandler<MouseEvent> onMyMouseDoubleClicked = mouseEvent -> {
+    private EventHandler<MouseEvent> onMyMouseClicked = mouseEvent -> {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 1) {
             this.setSelected(true);
         } else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
@@ -247,7 +247,7 @@ public class GraphicalRepresentation extends BorderPane {
         this.setOnMousePressed(onMyMousePressed);
         this.setOnMouseDragged(onMyMouseDragged);
         this.setOnMouseReleased(onMyMouseReleased);
-        this.setOnMouseClicked(onMyMouseDoubleClicked);
+        this.setOnMouseClicked(onMyMouseClicked);
 
 
         this.graphicalRepresentationData = graphicalRepresentationData;
@@ -283,7 +283,7 @@ public class GraphicalRepresentation extends BorderPane {
         this.setOnMousePressed(onMyMousePressed);
         this.setOnMouseDragged(onMyMouseDragged);
         this.setOnMouseReleased(onMyMouseReleased);
-        this.setOnMouseClicked(onMyMouseDoubleClicked);
+        this.setOnMouseClicked(onMyMouseClicked);
 
         setCenter(center);
         setSelected(true);

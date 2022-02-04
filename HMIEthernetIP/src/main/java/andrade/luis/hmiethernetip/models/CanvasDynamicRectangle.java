@@ -2,9 +2,13 @@ package andrade.luis.hmiethernetip.models;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
@@ -15,40 +19,30 @@ public class CanvasDynamicRectangle extends GraphicalRepresentation{
     private double value = 0;
     public CanvasDynamicRectangle(CanvasPoint center){
         super(center);
-        Rectangle rectangle= new Rectangle();
-        rectangle.setX(center.getX());
-        rectangle.setY(center.getY());
-        rectangle.setWidth(200);
-        rectangle.setHeight(200);
-        rectangle.setStroke(Paint.valueOf("#000000"));
-        rectangle.setFill(Color.TRANSPARENT);
-        rectangle.setStrokeWidth(5);
-        rectangle.setStrokeMiterLimit(5);
-        rectangle.setSmooth(true);
-        rectangle.setStrokeLineCap(StrokeLineCap.ROUND);
-        // rectangle.setStrokeLineJoin(StrokeLineJoin.ROUND);
-        double length=rectangle.getWidth()*2+rectangle.getHeight()*2;
 
-        //set stroke dash length
-        rectangle.getStrokeDashArray().addAll(length);
+        // Solution 2: Two rectangles changing together:
+        Rectangle leftRect = new Rectangle();
+        leftRect.setHeight(20);
+        leftRect.setFill(Color.GREEN);
 
-        //display empty stroke/border
-        rectangle.setStrokeDashOffset(length);
+        Rectangle rightRect = new Rectangle();
+        rightRect.setHeight(20);
+        rightRect.setFill(Color.GRAY);
 
-        Group group = new Group();
-        group.getChildren().add(rectangle);
-        super.setCenter(group);
+        DoubleProperty life = new SimpleDoubleProperty(100);
+        leftRect.widthProperty().bind(life.multiply(4));
+        rightRect.xProperty().bind(leftRect.widthProperty());
+        rightRect.widthProperty().bind(life.multiply(-4).add(400));
+
+        Pane solutionPane2 = new Pane(leftRect, rightRect);
+        this.setCenter(solutionPane2);
+
         Timeline timeline = new Timeline(
-                new KeyFrame(
-                        Duration.seconds(0),
-                        (ActionEvent actionEvent) -> {
-                            value=value+50;
-                            double offset=length-((length*(value/100)));
-                            rectangle.setStrokeDashOffset(-offset);
-                        }), new KeyFrame(Duration.seconds(1)));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+                new KeyFrame(Duration.ZERO, new KeyValue(life, 100)),
+                new KeyFrame(Duration.seconds(2), new KeyValue(life, 0))
+        );
 
+        //timeline.playFromStart();
 
     }
 }

@@ -12,6 +12,8 @@ module andrade.luis.hmiethernetip {
     requires java.logging;
     requires java.desktop;
     requires com.google.gson;
+    requires commons.compiler;
+    requires janino;
 
     opens andrade.luis.hmiethernetip to javafx.fxml;
     exports andrade.luis.hmiethernetip;
@@ -19,5 +21,5 @@ module andrade.luis.hmiethernetip {
     exports andrade.luis.hmiethernetip.models;
     exports andrade.luis.hmiethernetip.example to javafx.graphics;
     opens andrade.luis.hmiethernetip.models to javafx.base;
-    opens andrade.luis.hmiethernetip.views to javafx.fxml;
+    opens andrade.luis.hmiethernetip.views to javafx.base, javafx.fxml;
 }

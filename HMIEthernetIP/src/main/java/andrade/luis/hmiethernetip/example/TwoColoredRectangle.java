@@ -1,5 +1,8 @@
 package andrade.luis.hmiethernetip.example;
 
+import andrade.luis.hmiethernetip.models.Expression;
+import andrade.luis.hmiethernetip.models.Tag;
+import andrade.luis.hmiethernetip.views.SelectTagWindow;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -17,6 +20,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.codehaus.janino.ExpressionEvaluator;
+
+import java.util.ArrayList;
+
+//Source:https://stackoverflow.com/questions/37555932/javafx-multicolor-background-rectangle
 
 public class TwoColoredRectangle extends Application {
 
@@ -102,7 +110,39 @@ public class TwoColoredRectangle extends Application {
         scene.getStylesheets().add("two-colored-rectangle.css");
 
         primaryStage.setScene(scene);
+
         primaryStage.show();
+
+        try{
+            // Now here's where the story begins...
+            ExpressionEvaluator ee = new ExpressionEvaluator();
+
+            // The expression will have two "int" parameters: "a" and "b".
+
+            ee.setParameters(new String[] { "a", "b" }, new Class[] { int.class, int.class });
+
+            // And the expression (i.e. "result") type is also "int".
+            ee.setExpressionType(boolean.class);
+
+            // And now we "cook" (scan, parse, compile and load) the fabulous expression.
+            ee.cook("a < b");
+
+            // Eventually we evaluate the expression - and that goes super-fast.
+            boolean result = (boolean) ee.evaluate(new Object[] { 19, 23 });
+            System.out.println(result);
+
+            SelectTagWindow selectTagWindow = new SelectTagWindow(false);
+            selectTagWindow.showAndWait();
+            Tag tag = selectTagWindow.getSelectedTag();
+            ArrayList<Tag> test = new ArrayList<>();
+            test.add(tag);
+            String expressionStr = "(nivelTanque/2)<1";
+            Expression expression = new Expression(expressionStr,test);
+            System.out.println(expression.evaluate());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     private Node createSolutionPane(String title, Node content) {
