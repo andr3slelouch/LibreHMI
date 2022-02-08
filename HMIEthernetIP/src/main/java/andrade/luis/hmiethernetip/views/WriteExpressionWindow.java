@@ -17,8 +17,52 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 
 public class WriteExpressionWindow extends Stage {
-    private Button finishSelectionButton;
+    private TextField textField;
 
+    public TextField getTextField() {
+        return textField;
+    }
+
+    public void setTextField(TextField textField) {
+        this.textField = textField;
+    }
+
+    public ArrayList<Tag> getAddedTags() {
+        return addedTags;
+    }
+
+    public void setAddedTags(ArrayList<Tag> addedTags) {
+        this.addedTags = addedTags;
+    }
+
+    private Button finishSelectionButton;
+    private ArrayList<Tag> addedTags;
+
+    public Scene getMainScene() {
+        return mainScene;
+    }
+
+    public void setMainScene(Scene mainScene) {
+        this.mainScene = mainScene;
+    }
+
+    private Scene mainScene;
+
+    public StackPane getRoot() {
+        return root;
+    }
+
+    public void setRoot(StackPane root) {
+        this.root = root;
+    }
+
+    private StackPane root;
+
+    public VBox getVbox() {
+        return vbox;
+    }
+
+    private final VBox vbox;
     public Expression getLocalExpression() {
         return localExpression;
     }
@@ -28,17 +72,17 @@ public class WriteExpressionWindow extends Stage {
     }
 
     private Expression localExpression;
-    public WriteExpressionWindow(){
-        StackPane root = new StackPane();
-        ArrayList<Tag> addedTags = new ArrayList<Tag>();
+    public WriteExpressionWindow(double width, double height) {
+        root = new StackPane();
+        addedTags = new ArrayList<>();
 
 
         final Label label = new Label("Escriba la expresión");
 
-        TextField textField = new TextField();
+        textField = new TextField();
         textField.setPromptText("Ingrese la expresión");
 
-        final VBox vbox = new VBox();
+        vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(label, textField);
@@ -51,8 +95,10 @@ public class WriteExpressionWindow extends Stage {
             SelectTagWindow selectTagWindow = new SelectTagWindow(false);
             selectTagWindow.showAndWait();
             Tag tag = selectTagWindow.getSelectedTag();
-            addedTags.add(tag);
-            textField.setText(textField.getText()+tag.getTagName());
+            if(tag!=null){
+                addedTags.add(tag);
+                textField.setText(textField.getText()+tag.getTagName());
+            }
         });
         finishSelectionButton.setOnAction(actionEvent -> {
             this.localExpression = new Expression(textField.getText(),addedTags);
@@ -64,7 +110,7 @@ public class WriteExpressionWindow extends Stage {
         hbox.setAlignment(Pos.BASELINE_RIGHT);
         vbox.getChildren().add(hbox);
         root.getChildren().add(vbox);
-        Scene scene = new Scene(root,500,100);
-        this.setScene(scene);
+        mainScene = new Scene(root,width,height);
+        this.setScene(mainScene);
     }
 }

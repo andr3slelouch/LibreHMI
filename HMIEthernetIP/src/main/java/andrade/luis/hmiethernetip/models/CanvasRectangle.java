@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.models;
 
+import andrade.luis.hmiethernetip.views.SetPercentFillPropertiesWindow;
 import andrade.luis.hmiethernetip.views.WriteExpressionWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -10,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -21,16 +23,11 @@ import org.codehaus.commons.compiler.CompileException;
 import java.lang.reflect.InvocationTargetException;
 
 public class CanvasRectangle extends GraphicalRepresentation {
-    private MenuItem linkTag;
-    private MenuItem percentFill;
     private Timeline refillRectangleTimeline;
+    private DoubleProperty life;
 
     public Rectangle getRectangle() {
         return rectangle;
-    }
-
-    public void setRectangle(Rectangle rectangle) {
-        this.rectangle = rectangle;
     }
 
     private Rectangle rectangle;
@@ -38,10 +35,6 @@ public class CanvasRectangle extends GraphicalRepresentation {
     public CanvasRectangle(GraphicalRepresentationData graphicalRepresentationData) {
         super(graphicalRepresentationData);
         setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), graphicalRepresentationData.getWidth(), graphicalRepresentationData.getHeight());
-        setPercentFill(graphicalRepresentationData.getRefillExpression());
-        System.out.println(this.getGraphicalRepresentationData().getRefillExpression().getExpressionToEvaluate());
-        System.out.println(this.refillRectangleTimeline.getStatus());
-
     }
 
     public CanvasRectangle(CanvasPoint center) {
@@ -66,47 +59,64 @@ public class CanvasRectangle extends GraphicalRepresentation {
         this.rectangle.setHeight(height);
         this.setCenter(rectangle);
         this.getGraphicalRepresentationData().setType("Rectangle");
-        this.linkTag = new MenuItem("Link Tag");
-        this.linkTag.setId("#linkTag");
-        this.linkTag.setOnAction(actionEvent -> this.getGraphicalRepresentationData().setTag(this.getCanvas().selectTag()));
+        MenuItem linkTag = new MenuItem("Link Tag");
+        linkTag.setId("#linkTag");
+        linkTag.setOnAction(actionEvent -> this.getGraphicalRepresentationData().setTag(this.getCanvas().selectTag()));
         this.setContextMenu();
-        this.getRightClickMenu().getItems().add(this.linkTag);
-        this.percentFill = new MenuItem("Percent Fill Animation");
-        this.percentFill.setId("#percentFill");
-        this.percentFill.setOnAction(actionEvent -> this.setPercentFill());
+        this.getRightClickMenu().getItems().add(linkTag);
+        MenuItem percentFill = new MenuItem("Percent Fill Animation");
+        percentFill.setId("#percentFill");
+        percentFill.setOnAction(actionEvent -> this.setPercentFill());
         this.setContextMenu();
-        this.getRightClickMenu().getItems().add(this.percentFill);
+        this.getRightClickMenu().getItems().add(percentFill);
     }
 
     private void setPercentFill() {
-        WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
+        SetPercentFillPropertiesWindow writeExpressionWindow = new SetPercentFillPropertiesWindow();
+        if(this.getGraphicalRepresentationData().getRefillExpression()!=null){
+            writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getRefillExpression());
+            writeExpressionWindow.setTextField(new TextField(this.getGraphicalRepresentationData().getRefillExpression().getExpressionToEvaluate()));
+        }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();
         try {
-            expression.evaluate();
-            this.setPercentFill(expression);
+            if(expression !=null) {
+                expression.evaluate();
+                this.setPercentFill(expression, writeExpressionWindow.getPrimaryColor(),writeExpressionWindow.getBackgroundColor());
+            }
         } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
             errorAlert.setHeaderText("Error");
             errorAlert.setContentText(e.toString());
             errorAlert.showAndWait();
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void setPercentFill(Expression exp){
-        this.getGraphicalRepresentationData().setRefillExpression(exp);
-        double width = this.rectangle.getWidth();
-        DoubleProperty life = new SimpleDoubleProperty(width);
-        this.rectangle.widthProperty().bind(life.multiply(width * 0.01));
-        Rectangle rightRect = new Rectangle();
-        rightRect.setFill(Color.GREEN);
-        rightRect.setHeight(this.rectangle.getHeight());
-        rightRect.xProperty().bind(this.rectangle.widthProperty());
-        rightRect.widthProperty().bind(life.multiply(-width * 0.01).add(width));
-        Pane solutionPane2 = new Pane(this.rectangle, rightRect);
-        this.setCenter(solutionPane2);
-        refillRectangleTimeline = new Timeline(
+    public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor) {
+        if(exp != null){
+            this.getGraphicalRepresentationData().setRefillExpression(exp);
+            double width = this.rectangle.getWidth();
+            life = new SimpleDoubleProperty(width);
+            this.rectangle.widthProperty().bind(life.multiply(width * 0.01));
+            this.rectangle.setFill(primaryColor.getColor());
+            this.getGraphicalRepresentationData().setPrimaryColor(primaryColor);
+            Rectangle rightRect = new Rectangle();
+            rightRect.setFill(backgroundColor.getColor());
+            this.getGraphicalRepresentationData().setBackgroundColor(backgroundColor);
+            rightRect.setHeight(this.rectangle.getHeight());
+            rightRect.xProperty().bind(this.rectangle.widthProperty());
+            rightRect.widthProperty().bind(life.multiply(-width * 0.01).add(width));
+            Pane solutionPane2 = new Pane(this.rectangle, rightRect);
+            this.setCenter(solutionPane2);
+            this.setRefillRectangleTimeline();
+            this.refillRectangleTimeline.play();
+            this.setOnMouseClicked(onMyMouseClicked);
+        }
+    }
+
+    private void setRefillRectangleTimeline(){
+        this.refillRectangleTimeline = new Timeline(
                 new KeyFrame(
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
@@ -116,13 +126,10 @@ public class CanvasRectangle extends GraphicalRepresentation {
                                 e.printStackTrace();
                             }
                         }), new KeyFrame(Duration.seconds(1)));
-        refillRectangleTimeline.setCycleCount(Animation.INDEFINITE);
-        refillRectangleTimeline.play();
-
-        this.setOnMouseClicked(onMyMouseClicked);
+        this.refillRectangleTimeline.setCycleCount(Animation.INDEFINITE);
     }
 
-    private EventHandler<MouseEvent> onMyMouseClicked = mouseEvent -> {
+    private final EventHandler<MouseEvent> onMyMouseClicked = mouseEvent -> {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 1) {
             this.setSelected(true);
         } else if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2) {

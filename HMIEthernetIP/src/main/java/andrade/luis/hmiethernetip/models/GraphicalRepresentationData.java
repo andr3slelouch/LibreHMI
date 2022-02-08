@@ -53,6 +53,12 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     @SerializedName("refillExpression")
     @Expose
     private Expression refillExpression;
+    @SerializedName("primaryColor")
+    @Expose
+    private CanvasColor primaryColor;
+    @SerializedName("backgroundColor")
+    @Expose
+    private CanvasColor backgroundColor;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
@@ -135,6 +141,22 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         return refillExpression;
     }
 
+    public CanvasColor getPrimaryColor() {
+        return primaryColor;
+    }
+
+    public void setPrimaryColor(CanvasColor primaryColor) {
+        this.primaryColor = primaryColor;
+    }
+
+    public CanvasColor getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(CanvasColor backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
     public void setRefillExpression(Expression refillExpression) {
         this.refillExpression = refillExpression;
     }
@@ -189,6 +211,14 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         sb.append("refillExpression");
         sb.append('=');
         sb.append(((this.refillExpression == null)?"<null>":this.refillExpression.toString()));
+        sb.append(',');
+        sb.append("primaryColor");
+        sb.append('=');
+        sb.append(((this.primaryColor == null)?"<null>":this.primaryColor.toString()));
+        sb.append(',');
+        sb.append("backgroundColor");
+        sb.append('=');
+        sb.append(((this.backgroundColor == null)?"<null>":this.backgroundColor.toString()));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
