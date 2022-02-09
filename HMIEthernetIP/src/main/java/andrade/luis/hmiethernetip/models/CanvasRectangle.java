@@ -1,7 +1,6 @@
 package andrade.luis.hmiethernetip.models;
 
 import andrade.luis.hmiethernetip.views.SetPercentFillPropertiesWindow;
-import andrade.luis.hmiethernetip.views.WriteExpressionWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -11,11 +10,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.codehaus.commons.compiler.CompileException;
@@ -55,8 +52,11 @@ public class CanvasRectangle extends GraphicalRepresentation {
 
     public void setData(double x, double y, double width, double height) {
         this.rectangle = new Rectangle(x, y);
+        this.getGraphicalRepresentationData().setPosition(new CanvasPoint(x,y));
         this.rectangle.setWidth(width);
+        this.getGraphicalRepresentationData().setWidth(width);
         this.rectangle.setHeight(height);
+        this.getGraphicalRepresentationData().setHeight(height);
         this.setCenter(rectangle);
         this.getGraphicalRepresentationData().setType("Rectangle");
         MenuItem linkTag = new MenuItem("Link Tag");
@@ -72,10 +72,14 @@ public class CanvasRectangle extends GraphicalRepresentation {
     }
 
     private void setPercentFill() {
-        SetPercentFillPropertiesWindow writeExpressionWindow = new SetPercentFillPropertiesWindow();
+        SetPercentFillPropertiesWindow writeExpressionWindow;
         if(this.getGraphicalRepresentationData().getRefillExpression()!=null){
+            writeExpressionWindow = new SetPercentFillPropertiesWindow(this.getGraphicalRepresentationData().getPrimaryColor().getColor(),this.getGraphicalRepresentationData().getBackgroundColor().getColor());
+            writeExpressionWindow.setAddedTags(this.getGraphicalRepresentationData().getRefillExpression().getParameters());
             writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getRefillExpression());
-            writeExpressionWindow.setTextField(new TextField(this.getGraphicalRepresentationData().getRefillExpression().getExpressionToEvaluate()));
+            writeExpressionWindow.getTextField().setText(this.getGraphicalRepresentationData().getRefillExpression().getExpressionToEvaluate());
+        }else{
+            writeExpressionWindow = new SetPercentFillPropertiesWindow();
         }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();
@@ -96,15 +100,18 @@ public class CanvasRectangle extends GraphicalRepresentation {
     public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor) {
         if(exp != null){
             this.getGraphicalRepresentationData().setRefillExpression(exp);
-            double width = this.rectangle.getWidth();
+            double width = this.getGraphicalRepresentationData().getWidth();
             life = new SimpleDoubleProperty(width);
+            this.rectangle = new Rectangle();
             this.rectangle.widthProperty().bind(life.multiply(width * 0.01));
             this.rectangle.setFill(primaryColor.getColor());
+            this.rectangle.setHeight(this.getGraphicalRepresentationData().getHeight());
             this.getGraphicalRepresentationData().setPrimaryColor(primaryColor);
+
             Rectangle rightRect = new Rectangle();
             rightRect.setFill(backgroundColor.getColor());
             this.getGraphicalRepresentationData().setBackgroundColor(backgroundColor);
-            rightRect.setHeight(this.rectangle.getHeight());
+            rightRect.setHeight(this.getGraphicalRepresentationData().getHeight());
             rightRect.xProperty().bind(this.rectangle.widthProperty());
             rightRect.widthProperty().bind(life.multiply(-width * 0.01).add(width));
             Pane solutionPane2 = new Pane(this.rectangle, rightRect);
