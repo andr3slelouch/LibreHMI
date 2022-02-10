@@ -264,7 +264,7 @@ public class HMICanvas extends Pane implements CanvasInterface {
         canvasRectangle.setId(generateIdForPasteOperation(graphicalRepresentationData));
         this.addNewShape(canvasRectangle);
         this.getChildren().add(canvasRectangle);
-        canvasRectangle.setPercentFill(graphicalRepresentationData.getRefillExpression(),graphicalRepresentationData.getPrimaryColor(),graphicalRepresentationData.getBackgroundColor());
+        canvasRectangle.setPercentFill(graphicalRepresentationData.getRefillExpression(),graphicalRepresentationData.getPrimaryColor(),graphicalRepresentationData.getBackgroundColor(),graphicalRepresentationData.getOrientation());
     }
 
     public void addPastedLabel(GraphicalRepresentationData graphicalRepresentationData) {

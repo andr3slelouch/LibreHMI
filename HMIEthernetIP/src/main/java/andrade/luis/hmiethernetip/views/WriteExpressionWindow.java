@@ -5,16 +5,18 @@ import andrade.luis.hmiethernetip.models.Tag;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.codehaus.commons.compiler.CompileException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class WriteExpressionWindow extends Stage {
     private TextField textField;
@@ -101,8 +103,21 @@ public class WriteExpressionWindow extends Stage {
             }
         });
         finishSelectionButton.setOnAction(actionEvent -> {
-            this.localExpression = new Expression(textField.getText(),addedTags);
-            this.close();
+            if(addedTags.isEmpty() && !textField.getText().isEmpty()){
+                this.localExpression = new Expression(textField.getText(),addedTags);
+                try{
+                    this.localExpression.evaluate();
+                } catch (CompileException | InvocationTargetException e) {
+                    confirmExit();
+                }
+                this.close();
+            } else if(!textField.getText().isEmpty()){
+                this.localExpression = new Expression(textField.getText(),addedTags);
+                this.close();
+            }else{
+                confirmExit();
+            }
+
         });
         HBox hbox = new HBox();
         hbox.getChildren().add(addTagButton);
@@ -112,5 +127,21 @@ public class WriteExpressionWindow extends Stage {
         root.getChildren().add(vbox);
         mainScene = new Scene(root,width,height);
         this.setScene(mainScene);
+    }
+
+    private void confirmExit(){
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Advertencia");
+        alert.setHeaderText("Debe escribir una expresión con un Tag añadido a través del botón 'Añadir Tag' ");
+
+        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
+
+        alert.getButtonTypes().setAll(okButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.isPresent() && result.get() == okButton)
+        {
+            alert.close();
+        }
     }
 }

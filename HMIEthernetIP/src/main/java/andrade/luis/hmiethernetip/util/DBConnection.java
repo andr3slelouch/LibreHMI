@@ -37,7 +37,9 @@ public class DBConnection {
                 ResultSet resultSet = statement.executeQuery(query);
                 while (resultSet.next()) {
                     if(!resultSet.getString("valor").isEmpty()) {
-                        return resultSet.getString("valor");
+                        String result = resultSet.getString("valor");
+                        con.close();
+                        return result;
                     }
                 }
             }

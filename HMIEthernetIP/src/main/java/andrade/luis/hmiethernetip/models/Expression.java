@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Expression implements Serializable {
-    private final ArrayList<String> arithmeticOperators = new ArrayList<>(Arrays.asList("+", "-", "*", "/", "%", "++", "--"));
-    private final ArrayList<String> comparisonOperators = new ArrayList<>(Arrays.asList("==", "!=", ">", "<", ">=", "<="));
-    private final ArrayList<String> logicalOperators = new ArrayList<>(Arrays.asList("&&", "||", "!"));
+    private static final ArrayList<String> arithmeticOperators = new ArrayList<>(Arrays.asList("+", "-", "*", "/", "%", "++", "--"));
+    private static final ArrayList<String> comparisonOperators = new ArrayList<>(Arrays.asList("==", "!=", ">", "<", ">=", "<="));
+    private static final ArrayList<String> logicalOperators = new ArrayList<>(Arrays.asList("&&", "||", "!"));
     static final String BOOLEAN_STR = "Booleano";
     static final String INT_STR = "Entero";
     static final String FLOAT_STR = "Flotante";
@@ -141,7 +141,7 @@ public class Expression implements Serializable {
         sb.append(',');
         sb.append("parameters");
         sb.append('=');
-        sb.append(((this.parameters == null) ? NULL_STR : ArraysTagToString()));
+        sb.append(((this.parameters == null) ? NULL_STR : arraysTagToString()));
         sb.append(',');
         if (sb.charAt((sb.length() - 1)) == ',') {
             sb.setCharAt((sb.length() - 1), ']');
@@ -214,7 +214,7 @@ public class Expression implements Serializable {
         return ee.evaluate(valuesToEvaluate);
     }
 
-    private String ArraysTagToString(){
+    private String arraysTagToString(){
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for(int i = 0; i < parameters.size();i++){

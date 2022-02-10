@@ -10,6 +10,7 @@ import java.util.Map;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import javafx.geometry.Orientation;
 
 public class GraphicalRepresentationData implements Serializable, Transferable
 {
@@ -59,6 +60,15 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     @SerializedName("backgroundColor")
     @Expose
     private CanvasColor backgroundColor;
+    @SerializedName("orientation")
+    @Expose
+    private PercentFillOrientation orientation;
+    @SerializedName("minValue")
+    @Expose
+    private double minValue;
+    @SerializedName("maxValue")
+    @Expose
+    private double maxValue;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
@@ -160,6 +170,28 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     public void setRefillExpression(Expression refillExpression) {
         this.refillExpression = refillExpression;
     }
+    public PercentFillOrientation getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(PercentFillOrientation orientation) {
+        this.orientation = orientation;
+    }
+    public double getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(double minValue) {
+        this.minValue = minValue;
+    }
+
+    public double getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(double maxValue) {
+        this.maxValue = maxValue;
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -219,6 +251,18 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         sb.append("backgroundColor");
         sb.append('=');
         sb.append(((this.backgroundColor == null)?"<null>":this.backgroundColor.toString()));
+        sb.append(',');
+        sb.append("orientation");
+        sb.append('=');
+        sb.append(((this.orientation == null)?"<null>":this.orientation.toString()));
+        sb.append(',');
+        sb.append("minValue");
+        sb.append('=');
+        sb.append(minValue);
+        sb.append(',');
+        sb.append("maxValue");
+        sb.append('=');
+        sb.append(maxValue);
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');

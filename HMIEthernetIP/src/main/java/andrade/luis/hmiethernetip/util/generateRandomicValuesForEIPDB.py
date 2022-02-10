@@ -30,5 +30,6 @@ while True:
     mydb.commit()
 
     # Disconnecting from the database
+    cs.close()
     mydb.close()
     time.sleep(1)

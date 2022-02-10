@@ -8,18 +8,21 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.codehaus.commons.compiler.CompileException;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class CanvasRectangle extends GraphicalRepresentation {
+    private PercentFillOrientation perfectFillOrientation;
     private Timeline refillRectangleTimeline;
     private DoubleProperty life;
 
@@ -78,6 +81,7 @@ public class CanvasRectangle extends GraphicalRepresentation {
             writeExpressionWindow.setAddedTags(this.getGraphicalRepresentationData().getRefillExpression().getParameters());
             writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getRefillExpression());
             writeExpressionWindow.getTextField().setText(this.getGraphicalRepresentationData().getRefillExpression().getExpressionToEvaluate());
+            writeExpressionWindow.setSelectedOrientation(this.getGraphicalRepresentationData().getOrientation().toString().toLowerCase());
         }else{
             writeExpressionWindow = new SetPercentFillPropertiesWindow();
         }
@@ -86,36 +90,103 @@ public class CanvasRectangle extends GraphicalRepresentation {
         try {
             if(expression !=null) {
                 expression.evaluate();
-                this.setPercentFill(expression, writeExpressionWindow.getPrimaryColor(),writeExpressionWindow.getBackgroundColor());
+                this.setPercentFill(
+                        expression,
+                        writeExpressionWindow.getPrimaryColor(),
+                        writeExpressionWindow.getBackgroundColor(),
+                        writeExpressionWindow.getSelectedOrientation()
+                );
             }
         } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
             errorAlert.setHeaderText("Error");
-            errorAlert.setContentText(e.toString());
+            errorAlert.setContentText("Error al agregar la expresión, reintente");
             errorAlert.showAndWait();
+            setPercentFill();
             e.printStackTrace();
         }
     }
 
-    public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor) {
+    public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor, PercentFillOrientation orientation) {
         if(exp != null){
             this.getGraphicalRepresentationData().setRefillExpression(exp);
             double width = this.getGraphicalRepresentationData().getWidth();
+            double height = this.getGraphicalRepresentationData().getHeight();
             life = new SimpleDoubleProperty(width);
             this.rectangle = new Rectangle();
-            this.rectangle.widthProperty().bind(life.multiply(width * 0.01));
-            this.rectangle.setFill(primaryColor.getColor());
-            this.rectangle.setHeight(this.getGraphicalRepresentationData().getHeight());
+
             this.getGraphicalRepresentationData().setPrimaryColor(primaryColor);
 
             Rectangle rightRect = new Rectangle();
-            rightRect.setFill(backgroundColor.getColor());
+
             this.getGraphicalRepresentationData().setBackgroundColor(backgroundColor);
-            rightRect.setHeight(this.getGraphicalRepresentationData().getHeight());
-            rightRect.xProperty().bind(this.rectangle.widthProperty());
-            rightRect.widthProperty().bind(life.multiply(-width * 0.01).add(width));
-            Pane solutionPane2 = new Pane(this.rectangle, rightRect);
-            this.setCenter(solutionPane2);
+            this.getGraphicalRepresentationData().setOrientation(orientation);
+            Pane solutionPane2;
+            switch (orientation) {
+                case HORIZONTAL:
+                    this.rectangle.setFill(primaryColor.getColor());
+                    rightRect.setFill(backgroundColor.getColor());
+
+                    this.rectangle.widthProperty().bind(life.multiply(width * 0.01));
+                    //this.rectangle.widthProperty().bind(life.multiply(width * (1/(this.getGraphicalRepresentationData().getMaxValue()-this.getGraphicalRepresentationData().getMinValue()))));
+                    this.rectangle.setHeight(this.getGraphicalRepresentationData().getHeight());
+
+                    rightRect.setHeight(this.getGraphicalRepresentationData().getHeight());
+                    rightRect.xProperty().bind(this.rectangle.widthProperty());
+                    rightRect.widthProperty().bind(life.multiply(-width * 0.01).add(width));
+                    //rightRect.widthProperty().bind(life.multiply(-width * (1/(this.getGraphicalRepresentationData().getMaxValue()-this.getGraphicalRepresentationData().getMinValue()))).add(width));
+                    solutionPane2 = new Pane(this.rectangle, rightRect);
+                    this.setCenter(solutionPane2);
+
+                    perfectFillOrientation = PercentFillOrientation.HORIZONTAL;
+                    break;
+                case HORIZONTAL_REVERSED:
+                    this.rectangle.setFill(backgroundColor.getColor());
+                    rightRect.setFill(primaryColor.getColor());
+
+                    rightRect.widthProperty().bind(life.multiply(width * 0.01));
+                    rightRect.setHeight(this.getGraphicalRepresentationData().getHeight());
+
+                    this.rectangle.setHeight(this.getGraphicalRepresentationData().getHeight());
+                    this.rectangle.xProperty().bind(rightRect.widthProperty());
+                    this.rectangle.widthProperty().bind(life.multiply(-width * 0.01).add(width));
+                    solutionPane2 = new Pane(this.rectangle, rightRect);
+                    this.setCenter(solutionPane2);
+
+                    perfectFillOrientation = PercentFillOrientation.HORIZONTAL_REVERSED;
+                    break;
+                case VERTICAL:
+                    this.rectangle.setFill(backgroundColor.getColor());
+                    rightRect.setFill(primaryColor.getColor());
+
+                    this.rectangle.heightProperty().bind(life.multiply(height * 0.01));
+                    this.rectangle.setWidth(this.getGraphicalRepresentationData().getWidth());
+
+                    rightRect.setWidth(this.getGraphicalRepresentationData().getWidth());
+                    rightRect.yProperty().bind(this.rectangle.heightProperty());
+                    rightRect.heightProperty().bind(life.multiply(-height * 0.01).add(height));
+                    solutionPane2 = new Pane(rightRect,this.rectangle);
+                    this.setCenter(solutionPane2);
+
+                    perfectFillOrientation = PercentFillOrientation.VERTICAL;
+                    break;
+                case VERTICAL_REVERSED:
+                    rightRect.setFill(primaryColor.getColor());
+                    this.rectangle.setFill(backgroundColor.getColor());
+
+                    rightRect.heightProperty().bind(life.multiply(height * 0.01));
+                    rightRect.setWidth(this.getGraphicalRepresentationData().getWidth());
+
+                    this.rectangle.setWidth(this.getGraphicalRepresentationData().getWidth());
+                    this.rectangle.yProperty().bind(rightRect.heightProperty());
+                    this.rectangle.heightProperty().bind(life.multiply(-height * 0.01).add(height));
+                    solutionPane2 = new Pane(rightRect,this.rectangle);
+                    this.setCenter(solutionPane2);
+
+                    perfectFillOrientation = PercentFillOrientation.VERTICAL_REVERSED;
+                    break;
+            }
+
             this.setRefillRectangleTimeline();
             this.refillRectangleTimeline.play();
             this.setOnMouseClicked(onMyMouseClicked);
@@ -128,7 +199,55 @@ public class CanvasRectangle extends GraphicalRepresentation {
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
                             try {
-                                life.set((double) this.getGraphicalRepresentationData().getRefillExpression().evaluate());
+
+                                double value = 0;
+                                if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL){
+                                    value = (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
+                                }else if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL_REVERSED){
+                                    value = 100 - (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
+                                }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL){
+                                    value = 100 - (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
+                                }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL_REVERSED){
+                                    value = (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
+                                }
+
+                                /*double value = 0;
+                                double evaluatedValue =(double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
+                                if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL){
+                                    if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
+                                        value = 0;
+                                    }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
+                                        value = this.getGraphicalRepresentationData().getWidth();
+                                    }else{
+                                        value = ((evaluatedValue * this.getGraphicalRepresentationData().getWidth()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                    }
+                                }else if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL_REVERSED){
+                                    if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
+                                        value = 0;
+                                    }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
+                                        value = this.getGraphicalRepresentationData().getWidth();
+                                    }else{
+                                        value = 100 - ((evaluatedValue * this.getGraphicalRepresentationData().getWidth()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                    }
+                                }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL){
+                                    if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
+                                        value = 0;
+                                    }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
+                                        value = this.getGraphicalRepresentationData().getWidth();
+                                    }else{
+                                        value = 100 - ((evaluatedValue * this.getGraphicalRepresentationData().getHeight()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                    }
+                                }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL_REVERSED){
+                                    if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
+                                        value = 0;
+                                    }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
+                                        value = this.getGraphicalRepresentationData().getWidth();
+                                    }else{
+                                        value = ((evaluatedValue * this.getGraphicalRepresentationData().getHeight()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                    }
+                                }*/
+
+                                life.set(value);
                             } catch (CompileException | InvocationTargetException e) {
                                 e.printStackTrace();
                             }
