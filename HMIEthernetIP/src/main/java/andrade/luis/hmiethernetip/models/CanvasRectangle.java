@@ -82,6 +82,8 @@ public class CanvasRectangle extends GraphicalRepresentation {
             writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getRefillExpression());
             writeExpressionWindow.getTextField().setText(this.getGraphicalRepresentationData().getRefillExpression().getExpressionToEvaluate());
             writeExpressionWindow.setSelectedOrientation(this.getGraphicalRepresentationData().getOrientation().toString().toLowerCase());
+            writeExpressionWindow.getMinValueField().setText(this.getGraphicalRepresentationData().getMinValue()+"");
+            writeExpressionWindow.getMaxValueField().setText(this.getGraphicalRepresentationData().getMaxValue()+"");
         }else{
             writeExpressionWindow = new SetPercentFillPropertiesWindow();
         }
@@ -96,6 +98,8 @@ public class CanvasRectangle extends GraphicalRepresentation {
                         writeExpressionWindow.getBackgroundColor(),
                         writeExpressionWindow.getSelectedOrientation()
                 );
+                this.getGraphicalRepresentationData().setMinValue(writeExpressionWindow.getMinValue());
+                this.getGraphicalRepresentationData().setMaxValue(writeExpressionWindow.getMaxValue());
             }
         } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -201,52 +205,48 @@ public class CanvasRectangle extends GraphicalRepresentation {
                             try {
 
                                 double value = 0;
-                                if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL){
-                                    value = (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
-                                }else if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL_REVERSED){
-                                    value = 100 - (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
-                                }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL){
-                                    value = 100 - (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
-                                }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL_REVERSED){
-                                    value = (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
-                                }
-
-                                /*double value = 0;
                                 double evaluatedValue =(double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
                                 if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL){
                                     if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
                                         value = 0;
                                     }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
-                                        value = this.getGraphicalRepresentationData().getWidth();
+                                        value = 100;
                                     }else{
-                                        value = ((evaluatedValue * this.getGraphicalRepresentationData().getWidth()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                        double multiplication = ((evaluatedValue - this.getGraphicalRepresentationData().getMinValue())* 100);
+                                        double difference = (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue());
+                                        value = ( multiplication / difference);
                                     }
                                 }else if(perfectFillOrientation==PercentFillOrientation.HORIZONTAL_REVERSED){
                                     if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
                                         value = 0;
                                     }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
-                                        value = this.getGraphicalRepresentationData().getWidth();
+                                        value = 100;
                                     }else{
-                                        value = 100 - ((evaluatedValue * this.getGraphicalRepresentationData().getWidth()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                        double multiplication = ((evaluatedValue - this.getGraphicalRepresentationData().getMinValue())* 100);
+                                        double difference = (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue());
+                                        value = 100 - ( multiplication / difference);
                                     }
                                 }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL){
                                     if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
                                         value = 0;
                                     }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
-                                        value = this.getGraphicalRepresentationData().getWidth();
+                                        value = 100;
                                     }else{
-                                        value = 100 - ((evaluatedValue * this.getGraphicalRepresentationData().getHeight()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                        double multiplication = ((evaluatedValue - this.getGraphicalRepresentationData().getMinValue())* 100);
+                                        double difference = (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue());
+                                        value = 100 - ( multiplication / difference);
                                     }
                                 }else if (perfectFillOrientation == PercentFillOrientation.VERTICAL_REVERSED){
                                     if(evaluatedValue < this.getGraphicalRepresentationData().getMinValue()){
                                         value = 0;
                                     }else if(evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()){
-                                        value = this.getGraphicalRepresentationData().getWidth();
+                                        value = 100;
                                     }else{
-                                        value = ((evaluatedValue * this.getGraphicalRepresentationData().getHeight()) / (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue()));
+                                        double multiplication = ((evaluatedValue - this.getGraphicalRepresentationData().getMinValue())* 100);
+                                        double difference = (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue());
+                                        value = ( multiplication / difference);
                                     }
-                                }*/
-
+                                }
                                 life.set(value);
                             } catch (CompileException | InvocationTargetException e) {
                                 e.printStackTrace();

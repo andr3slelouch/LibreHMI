@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class WriteExpressionWindow extends Stage {
-    private TextField textField;
+    protected TextField textField;
 
     public TextField getTextField() {
         return textField;
@@ -37,7 +37,7 @@ public class WriteExpressionWindow extends Stage {
         this.addedTags = addedTags;
     }
 
-    private Button finishSelectionButton;
+    protected Button finishSelectionButton;
     private ArrayList<Tag> addedTags;
 
     public Scene getMainScene() {
@@ -103,21 +103,7 @@ public class WriteExpressionWindow extends Stage {
             }
         });
         finishSelectionButton.setOnAction(actionEvent -> {
-            if(addedTags.isEmpty() && !textField.getText().isEmpty()){
-                this.localExpression = new Expression(textField.getText(),addedTags);
-                try{
-                    this.localExpression.evaluate();
-                } catch (CompileException | InvocationTargetException e) {
-                    confirmExit();
-                }
-                this.close();
-            } else if(!textField.getText().isEmpty()){
-                this.localExpression = new Expression(textField.getText(),addedTags);
-                this.close();
-            }else{
-                confirmExit();
-            }
-
+            finishingAction();
         });
         HBox hbox = new HBox();
         hbox.getChildren().add(addTagButton);
@@ -143,5 +129,29 @@ public class WriteExpressionWindow extends Stage {
         {
             alert.close();
         }
+    }
+    
+    public void finishingAction(){
+        if(addedTags.isEmpty() && !textField.getText().isEmpty()){
+            this.localExpression = new Expression(textField.getText(),addedTags);
+            try{
+                this.localExpression.evaluate();
+            } catch (CompileException | InvocationTargetException e) {
+                confirmExit();
+            }
+            this.close();
+        } else if(!textField.getText().isEmpty()){
+            this.localExpression = new Expression(textField.getText(),addedTags);
+            this.close();
+        }else{
+            confirmExit();
+        }
+        ArrayList<Tag> toDelete = new ArrayList<>();
+        for(int i=0;i< getAddedTags().size();i++){
+            if(!textField.getText().contains(getAddedTags().get(i).getTagName())){
+                toDelete.add(getAddedTags().get(i));
+            }
+        }
+        getAddedTags().removeAll(toDelete);
     }
 }
