@@ -3,6 +3,7 @@ package andrade.luis.hmiethernetip.models;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -13,6 +14,9 @@ import javafx.scene.layout.BorderPane;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.time.LocalDateTime;
+
+import static andrade.luis.hmiethernetip.models.MouseOverMode.DEFAULT;
+import static andrade.luis.hmiethernetip.models.MouseOverMode.DRAG;
 
 public class GraphicalRepresentation extends BorderPane {
     public GraphicalRepresentation() {
@@ -175,6 +179,11 @@ public class GraphicalRepresentation extends BorderPane {
     private EventHandler<MouseEvent> onMyMousePressed = new EventHandler<>() {
         @Override
         public void handle(MouseEvent t) {
+            if(isInResizingMode(t)){
+                mouseOverMode = currentMouseOverMode(t);
+            }
+            startWidth = GraphicalRepresentation.this.getBoundsInLocal().getWidth();
+            startHeight= GraphicalRepresentation.this.getBoundsInLocal().getHeight();
             start = new CanvasPoint(t.getSceneX(), t.getSceneY());
             end = new CanvasPoint(((BorderPane) (t.getSource())).getTranslateX(), ((BorderPane) (t.getSource())).getTranslateY());
             GraphicalRepresentation.this.setSelected(true);
@@ -187,19 +196,54 @@ public class GraphicalRepresentation extends BorderPane {
     private EventHandler<MouseEvent> onMyMouseDragged = new EventHandler<>() {
         @Override
         public void handle(MouseEvent t) {
-            double offsetX = t.getSceneX() - start.getX();
-            double offsetY = t.getSceneY() - start.getY();
-            double newTranslateX = end.getX() + offsetX;
-            double newTranslateY = end.getY() + offsetY;
+            if(mouseOverMode == DRAG){
+                double offsetX = t.getSceneX() - start.getX();
+                double offsetY = t.getSceneY() - start.getY();
+                double newTranslateX = end.getX() + offsetX;
+                double newTranslateY = end.getY() + offsetY;
 
-            ((BorderPane) (t.getSource())).setTranslateX(newTranslateX);
-            ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
+                ((BorderPane) (t.getSource())).setTranslateX(newTranslateX);
+                ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
 
-            setPosition(new CanvasPoint(newTranslateX, newTranslateY),false);
+                setPosition(new CanvasPoint(newTranslateX, newTranslateY),false);
+            }else if(mouseOverMode != DEFAULT){
+                double newTranslateX = start.getX();
+                double newTranslateY = start.getY();
+                double newH = startHeight;
+                double newW = startWidth;
+
+                if(mouseOverMode == MouseOverMode.RIGHT || mouseOverMode == MouseOverMode.SUPERIOR_RIGHT || mouseOverMode == MouseOverMode.INFERIOR_RIGHT){
+                    newW = GraphicalRepresentation.this.getBoundsInLocal().getMinX() + t.getX() - start.getX();
+                }
+
+                if(mouseOverMode == MouseOverMode.LEFT || mouseOverMode == MouseOverMode.SUPERIOR_LEFT || mouseOverMode == MouseOverMode.INFERIOR_LEFT){
+                    newTranslateX = GraphicalRepresentation.this.getBoundsInLocal().getMinX() + t.getX();
+                    newW = startWidth + start.getX() - newTranslateX;
+                }
+
+                if(mouseOverMode == MouseOverMode.INFERIOR || mouseOverMode == MouseOverMode.INFERIOR_LEFT || mouseOverMode == MouseOverMode.INFERIOR_RIGHT){
+                    newH = GraphicalRepresentation.this.getBoundsInLocal().getMinY() + t.getY() - start.getY();
+                }
+
+                if(mouseOverMode == MouseOverMode.SUPERIOR || mouseOverMode == MouseOverMode.SUPERIOR_LEFT || mouseOverMode == MouseOverMode.SUPERIOR_RIGHT){
+                    newTranslateY = GraphicalRepresentation.this.getBoundsInLocal().getMinY() + t.getY();
+                    newH = startHeight + start.getY() - newTranslateY;
+                }
+
+                GraphicalRepresentation.this.setLayoutX(newTranslateX);
+                GraphicalRepresentation.this.setLayoutY(newTranslateY);
+                GraphicalRepresentation.this.setWidth(newW);
+                GraphicalRepresentation.this.setHeight(newH);
+            }
+
         }
     };
 
-    private EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> GraphicalRepresentation.this.getGraphicalRepresentationData().setSelected(false);
+    private EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> {
+        GraphicalRepresentation.this.getGraphicalRepresentationData().setSelected(false);
+        GraphicalRepresentation.this.setCursor(Cursor.DEFAULT);
+        mouseOverMode = MouseOverMode.DEFAULT;
+    };
 
     private EventHandler<MouseEvent> onMyMouseClicked = mouseEvent -> {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 1) {
@@ -208,6 +252,74 @@ public class GraphicalRepresentation extends BorderPane {
             showContextMenu(mouseEvent.getScreenX(), mouseEvent.getScreenY());
         }
     };
+
+    private EventHandler<MouseEvent> onMyMouseMoved = mouseEvent -> {
+        MouseOverMode mode = currentMouseOverMode(mouseEvent);
+        Cursor cursor = getCursorForMode(mode);
+        this.setCursor(cursor);
+    };
+
+    private Cursor getCursorForMode(MouseOverMode mode){
+        switch(mode){
+            case SUPERIOR_LEFT:
+                return Cursor.NW_RESIZE;
+            case INFERIOR_LEFT:
+                return Cursor.SW_RESIZE;
+            case SUPERIOR_RIGHT:
+                return Cursor.NE_RESIZE;
+            case INFERIOR_RIGHT:
+                return Cursor.SE_RESIZE;
+            case LEFT:
+                return Cursor.W_RESIZE;
+            case RIGHT:
+                return Cursor.E_RESIZE;
+            case SUPERIOR:
+                return Cursor.N_RESIZE;
+            case INFERIOR:
+                return Cursor.S_RESIZE;
+            default:
+                return Cursor.DEFAULT;
+        }
+
+    }
+
+    private MouseOverMode currentMouseOverMode(MouseEvent mouseEvent) {
+        MouseOverMode mode;
+        boolean isLeftOverMode = intersectOperation(0, mouseEvent.getX());
+        boolean isRightOverMode = intersectOperation(this.getBoundsInParent().getWidth(), mouseEvent.getX());
+        boolean isTopOverMode = intersectOperation(0, mouseEvent.getY());
+        boolean isBottomOverMode = intersectOperation(this.getBoundsInParent().getHeight(), mouseEvent.getY());
+
+        if(isLeftOverMode && isTopOverMode){
+            mode = MouseOverMode.SUPERIOR_LEFT;
+        }else if(isLeftOverMode && isBottomOverMode){
+            mode = MouseOverMode.INFERIOR_LEFT;
+        }else if(isRightOverMode && isTopOverMode){
+            mode = MouseOverMode.SUPERIOR_RIGHT;
+        }else if(isRightOverMode && isBottomOverMode){
+            mode = MouseOverMode.INFERIOR_RIGHT;
+        }else if(isRightOverMode){
+            mode = MouseOverMode.RIGHT;
+        }else if(isLeftOverMode){
+            mode = MouseOverMode.LEFT;
+        }else if(isTopOverMode){
+            mode = MouseOverMode.SUPERIOR;
+        }else if(isBottomOverMode){
+            mode = MouseOverMode.INFERIOR;
+        }else{
+            mode = DRAG;
+        }
+        return mode;
+    }
+
+    private boolean isInResizingMode(MouseEvent event){
+        return currentMouseOverMode(event) != DRAG && currentMouseOverMode(event) != DEFAULT;
+    }
+
+    private boolean intersectOperation(double side, double point){
+        return side + borderMargin > point && side - borderMargin < point;
+    }
+
 
     public void setSelected(boolean selected) {
         this.graphicalRepresentationData.setSelected(selected);
@@ -248,6 +360,7 @@ public class GraphicalRepresentation extends BorderPane {
         this.setOnMouseDragged(onMyMouseDragged);
         this.setOnMouseReleased(onMyMouseReleased);
         this.setOnMouseClicked(onMyMouseClicked);
+        this.setOnMouseMoved(onMyMouseMoved);
 
 
         this.graphicalRepresentationData = graphicalRepresentationData;
@@ -284,6 +397,7 @@ public class GraphicalRepresentation extends BorderPane {
         this.setOnMouseDragged(onMyMouseDragged);
         this.setOnMouseReleased(onMyMouseReleased);
         this.setOnMouseClicked(onMyMouseClicked);
+        this.setOnMouseMoved(onMyMouseMoved);
 
         setCenter(center);
         setSelected(true);
@@ -302,4 +416,10 @@ public class GraphicalRepresentation extends BorderPane {
     private MenuItem deleteMenuItem;
     private CanvasPoint start;
     private CanvasPoint end;
+    private static final int borderMargin = 10;
+    private MouseOverMode mouseOverMode;
+    private double startWidth;
+    private double startHeight;
+    private double endWidth;
+    private double endHeight;
 }

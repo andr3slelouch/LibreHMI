@@ -132,6 +132,13 @@ public class WriteExpressionWindow extends Stage {
     }
     
     public void finishingAction(){
+        ArrayList<Tag> toDelete = new ArrayList<>();
+        for(int i=0;i< getAddedTags().size();i++){
+            if(!textField.getText().contains(getAddedTags().get(i).getTagName())){
+                toDelete.add(getAddedTags().get(i));
+            }
+        }
+        getAddedTags().removeAll(toDelete);
         if(addedTags.isEmpty() && !textField.getText().isEmpty()){
             this.localExpression = new Expression(textField.getText(),addedTags);
             try{
@@ -146,12 +153,6 @@ public class WriteExpressionWindow extends Stage {
         }else{
             confirmExit();
         }
-        ArrayList<Tag> toDelete = new ArrayList<>();
-        for(int i=0;i< getAddedTags().size();i++){
-            if(!textField.getText().contains(getAddedTags().get(i).getTagName())){
-                toDelete.add(getAddedTags().get(i));
-            }
-        }
-        getAddedTags().removeAll(toDelete);
+
     }
 }
