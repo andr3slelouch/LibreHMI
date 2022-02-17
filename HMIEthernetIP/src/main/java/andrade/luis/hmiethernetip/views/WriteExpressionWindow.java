@@ -9,13 +9,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.codehaus.commons.compiler.CompileException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 public class WriteExpressionWindow extends Stage {

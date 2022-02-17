@@ -1,6 +1,6 @@
 package andrade.luis.hmiethernetip;
 
-import andrade.luis.hmiethernetip.controllers.HMICanvasController;
+import andrade.luis.hmiethernetip.controllers.HMIScene;
 import andrade.luis.hmiethernetip.models.CanvasPoint;
 import andrade.luis.hmiethernetip.models.CanvasText;
 import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 @ExtendWith(ApplicationExtension.class)
 class HMICanvasTest {
     private HMICanvas root;
-    private HMICanvasController scene;
+    private HMIScene scene;
     private Button rectangleBtn;
     private Button systemDateTimeLabelBtn;
     private Button textBtn;
@@ -53,7 +53,7 @@ class HMICanvasTest {
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        scene = new HMICanvasController(root, bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
+        scene = new HMIScene(root, bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
         rectangleBtn = new Button("Rectangle");
         rectangleBtn.setId("addRectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {

@@ -2,12 +2,10 @@ package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.CanvasColor;
 import andrade.luis.hmiethernetip.models.PercentFillOrientation;
-import andrade.luis.hmiethernetip.models.Tag;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
 
 public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
     public CanvasColor getPrimaryColor() {

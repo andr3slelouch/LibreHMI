@@ -95,6 +95,7 @@ public class Expression implements Serializable {
     }
 
     public String determineResultType() {
+        StringBuilder sb = new StringBuilder(this.expressionToEvaluate);
         for (String comparisonOperator : comparisonOperators) {
             if (expressionToEvaluate.contains(comparisonOperator)) {
                 return BOOLEAN_STR;
@@ -113,7 +114,14 @@ public class Expression implements Serializable {
             }
         }
 
-        this.expressionToEvaluate = this.expressionToEvaluate + "*1";
+        if(parameters.size()==1){
+            if(parameters.get(0).getTagType().equals(BOOLEAN_STR)){
+                sb.append("&& true");
+            }else if(parameters.get(0).getTagType().equals(FLOAT_STR)){
+                sb.append("*1");
+            }
+            this.expressionToEvaluate = sb.toString();
+        }
 
         return FLOAT_STR;
 
@@ -200,11 +208,11 @@ public class Expression implements Serializable {
         Object[] valuesToEvaluate = new Object[parameterNames.length];
         for (int i = 0; i < parameters.size(); i++) {
             switch (parameters.get(i).getTagType()) {
-                case "Entero":
-                case "Flotante":
+                case INT_STR:
+                case FLOAT_STR:
                     valuesToEvaluate[i] = Double.valueOf(DBConnection.readTagValueFromDatabase(parameters.get(i)));
                     break;
-                case "Booleano":
+                case BOOLEAN_STR:
                     valuesToEvaluate[i] = Boolean.valueOf(DBConnection.readTagValueFromDatabase(parameters.get(i)));
                     break;
                 default:
@@ -217,8 +225,8 @@ public class Expression implements Serializable {
     private String arraysTagToString(){
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        for(int i = 0; i < parameters.size();i++){
-            sb.append(parameters.get(i).toString());
+        for (Tag parameter : parameters) {
+            sb.append(parameter.toString());
             sb.append(",");
         }
         if (sb.charAt((sb.length()- 1)) == ',') {

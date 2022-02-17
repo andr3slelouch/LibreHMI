@@ -179,11 +179,11 @@ public class GraphicalRepresentation extends BorderPane {
     private EventHandler<MouseEvent> onMyMousePressed = new EventHandler<>() {
         @Override
         public void handle(MouseEvent t) {
-            if(isInResizingMode(t)){
+            /*if(isInResizingMode(t)){
                 mouseOverMode = currentMouseOverMode(t);
             }
             startWidth = GraphicalRepresentation.this.getBoundsInLocal().getWidth();
-            startHeight= GraphicalRepresentation.this.getBoundsInLocal().getHeight();
+            startHeight= GraphicalRepresentation.this.getBoundsInLocal().getHeight();*/
             start = new CanvasPoint(t.getSceneX(), t.getSceneY());
             end = new CanvasPoint(((BorderPane) (t.getSource())).getTranslateX(), ((BorderPane) (t.getSource())).getTranslateY());
             GraphicalRepresentation.this.setSelected(true);
@@ -196,7 +196,7 @@ public class GraphicalRepresentation extends BorderPane {
     private EventHandler<MouseEvent> onMyMouseDragged = new EventHandler<>() {
         @Override
         public void handle(MouseEvent t) {
-            if(mouseOverMode == DRAG){
+            //if(mouseOverMode == DRAG){
                 double offsetX = t.getSceneX() - start.getX();
                 double offsetY = t.getSceneY() - start.getY();
                 double newTranslateX = end.getX() + offsetX;
@@ -206,7 +206,7 @@ public class GraphicalRepresentation extends BorderPane {
                 ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
 
                 setPosition(new CanvasPoint(newTranslateX, newTranslateY),false);
-            }else if(mouseOverMode != DEFAULT){
+            /*}else if(mouseOverMode != DEFAULT){
                 double newTranslateX = start.getX();
                 double newTranslateY = start.getY();
                 double newH = startHeight;
@@ -234,7 +234,7 @@ public class GraphicalRepresentation extends BorderPane {
                 GraphicalRepresentation.this.setLayoutY(newTranslateY);
                 GraphicalRepresentation.this.setWidth(newW);
                 GraphicalRepresentation.this.setHeight(newH);
-            }
+            }*/
 
         }
     };
@@ -360,7 +360,7 @@ public class GraphicalRepresentation extends BorderPane {
         this.setOnMouseDragged(onMyMouseDragged);
         this.setOnMouseReleased(onMyMouseReleased);
         this.setOnMouseClicked(onMyMouseClicked);
-        this.setOnMouseMoved(onMyMouseMoved);
+        //this.setOnMouseMoved(onMyMouseMoved);
 
 
         this.graphicalRepresentationData = graphicalRepresentationData;
@@ -397,12 +397,17 @@ public class GraphicalRepresentation extends BorderPane {
         this.setOnMouseDragged(onMyMouseDragged);
         this.setOnMouseReleased(onMyMouseReleased);
         this.setOnMouseClicked(onMyMouseClicked);
-        this.setOnMouseMoved(onMyMouseMoved);
+        //this.setOnMouseMoved(onMyMouseMoved);
 
         setCenter(center);
         setSelected(true);
 
         setContextMenu();
+    }
+
+    public void setSize(double width, double height) {
+        setPrefWidth(width);
+        setPrefHeight(height);
     }
 
     private CanvasInterface canvas;
