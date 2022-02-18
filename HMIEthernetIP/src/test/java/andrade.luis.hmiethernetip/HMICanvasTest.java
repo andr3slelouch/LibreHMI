@@ -12,6 +12,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -53,7 +54,9 @@ class HMICanvasTest {
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        scene = new HMIScene(root, bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().add(root);
+        scene = new HMIScene(stackPane,root, "Page","",bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
         rectangleBtn = new Button("Rectangle");
         rectangleBtn.setId("addRectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {

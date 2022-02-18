@@ -1,44 +1,92 @@
 package andrade.luis.hmiethernetip.controllers;
 
+import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
 import andrade.luis.hmiethernetip.models.CanvasPoint;
 import andrade.luis.hmiethernetip.views.HMICanvas;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-public class HMIScene extends Scene {
+public class HMIScene extends Scene implements Cloneable {
     Logger logger
             = Logger.getLogger(
             HMIScene.class.getName());
-    //private final Image windowImage = new Image(getClass().getResource("images/window.png").toExternalForm());
-    private final Image windowImage = new Image("https://sc01.alicdn.com/kf/HTB1gevJvuySBuNjy1zdq6xPxFXaO/201140127/HTB1gevJvuySBuNjy1zdq6xPxFXaO.jpg");
     /*
-    * windowImage source <a href="https://www.flaticon.com/free-icons/window" title="window icons">Window icons created by Anas Mannaa - Flaticon</a>
-    * */
+     * windowImage source <a href="https://www.flaticon.com/free-icons/window" title="window icons">Window icons created by Anas Mannaa - Flaticon</a>
+     * */
+    private final Image windowImage = new Image(getClass().getResource("window.png").toExternalForm());
+    private StackPane backgroundStackPane;
+    private ListView<String> listViewReference;
+    private ArrayList<String> itemsForComboBox;
+    private String sceneTitle;
+    private String sceneCommentary;
+    private Color background;
     private HMICanvas hmiCanvas;
+
+    public String getSceneTitle() {
+        return sceneTitle;
+    }
+
+    public void setSceneTitle(String sceneTitle) {
+        this.sceneTitle = sceneTitle;
+    }
+
+    public Color getBackground() {
+        return background;
+    }
+
+    public void setBackground(Color background) {
+        this.background = background;
+        this.backgroundStackPane.setBackground(new Background(new BackgroundFill(background, CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+
+    public String getSceneCommentary() {
+        return sceneCommentary;
+    }
+
+    public void setSceneCommentary(String sceneCommentary) {
+        this.sceneCommentary = sceneCommentary;
+    }
+
+    public HMIApp getHmiApp() {
+        return hmiApp;
+    }
+
+    public void setHmiApp(HMIApp hmiApp) {
+        this.hmiApp = hmiApp;
+    }
+
+    private HMIApp hmiApp;
 
     public ArrayList<String> getItemsForComboBox() {
         return itemsForComboBox;
     }
 
+    public void updateItem(int index, String value){
+        this.listViewReference.getItems().set(index, value);
+    }
+
     public void setItems(ArrayList<String> itemsForComboBox) {
         this.itemsForComboBox = itemsForComboBox;
-        comboBox.setItems(FXCollections
-                .observableArrayList(itemsForComboBox));
         ObservableList<String> elements = FXCollections.observableArrayList(itemsForComboBox);
-        comboBox.getSelectionModel().select(0);
 
         listViewReference.setItems(elements);
         /*setting each image to corresponding array index*/
@@ -52,23 +100,47 @@ public class HMIScene extends Scene {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    System.out.println("Updating item");
+                    displayImage.setFitWidth(45);
+                    displayImage.setFitHeight(45);
                     displayImage.setImage(windowImage);
                     setText(name);
                     setGraphic(displayImage);
+                    ContextMenu contextMenu = new ContextMenu();
+
+                    MenuItem newItem = new MenuItem();
+                    newItem.setText("New...");
+                    newItem.setOnAction(event -> {
+                        hmiApp.addNewScene();
+                    });
+                    MenuItem saveItem = new MenuItem();
+                    saveItem.setText("Save");
+                    saveItem.setOnAction(event -> {
+                        String item = getItem();
+                        // code to edit item...
+                    });
+                    MenuItem duplicateItem = new MenuItem();
+                    duplicateItem.setText("Duplicate");
+                    duplicateItem.setOnAction(event -> hmiApp.duplicateScene(getItem()));
+                    MenuItem deleteItem = new MenuItem();
+                    deleteItem.setText("Delete");
+                    deleteItem.setOnAction(event -> hmiApp.deleteScene(getItem()));
+                    MenuItem propertiesItem = new MenuItem();
+                    propertiesItem.setText("Properties...");
+                    propertiesItem.setOnAction(event -> {
+                        String item = getItem();
+                        hmiApp.updateScene(item);
+                    });
+                    contextMenu.getItems().addAll(newItem,saveItem,duplicateItem,deleteItem,propertiesItem);
+                    setContextMenu(contextMenu);
+                    setOnMouseClicked(event -> {
+                        if(event.getClickCount()==2){
+                            hmiApp.changeSelectedScene(getItem());
+                        }
+                    });
                 }
             }
         });
-        ImageView imageView = new ImageView(windowImage);
 
-    }
-
-    public ComboBox getComboBox() {
-        return comboBox;
-    }
-
-    public void setComboBox(ComboBox comboBox) {
-        this.comboBox = comboBox;
     }
 
     public ListView<String> getListViewReference() {
@@ -79,20 +151,29 @@ public class HMIScene extends Scene {
         this.listViewReference = listViewReference;
     }
 
-    private ListView<String> listViewReference;
-    private ArrayList<String> itemsForComboBox;
-    private ComboBox comboBox;
+    public StackPane getBackgroundStackPane() {
+        return backgroundStackPane;
+    }
+
+    public void setBackgroundStackPane(StackPane backgroundStackPane) {
+        this.backgroundStackPane = backgroundStackPane;
+    }
 
     public HMICanvas getCanvas() {
         return hmiCanvas;
     }
 
-    public void setCanvas(HMICanvas HMICanvas) {
-        this.hmiCanvas = HMICanvas;
+    public void setCanvas(HMICanvas hmiCanvas) {
+        this.hmiCanvas = hmiCanvas;
     }
 
-    public HMIScene(HMICanvas hmiCanvas, double v, double v1, Paint paint) {
-        super(hmiCanvas, v, v1, paint);
+    public HMIScene(StackPane stackPane,HMICanvas hmiCanvas, String sceneTitle , String sceneCommentary, double v, double v1, Paint paint) {
+        super(stackPane, v, v1, paint);
+        this.backgroundStackPane = stackPane;
+        stackPane.setBackground(new Background(new BackgroundFill(paint, CornerRadii.EMPTY, Insets.EMPTY)));
+        this.background = (Color) paint;
+        this.sceneTitle = sceneTitle;
+        this.sceneCommentary = sceneCommentary;
         this.hmiCanvas = hmiCanvas;
         this.setOnMouseClicked(mouseEvent -> {
             if (this.hmiCanvas.isAddOnClickEnabled()) {
@@ -151,5 +232,19 @@ public class HMIScene extends Scene {
                 }
             }
         }
+
+    }
+
+    public void update(String sceneTitle, String sceneCommentary, Color background) {
+        setSceneTitle(sceneTitle);
+        setSceneCommentary(sceneCommentary);
+        setBackground(background);
+        setFill(getBackground());
+    }
+
+    @Override
+    public HMIScene clone() throws CloneNotSupportedException {
+        HMIScene clonedScene = (HMIScene) super.clone();
+        return clonedScene;
     }
 }

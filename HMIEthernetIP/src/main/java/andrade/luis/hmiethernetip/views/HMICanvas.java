@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HMICanvas extends Pane implements CanvasInterface {
+public class HMICanvas extends Pane implements CanvasInterface, Cloneable {
     public String getMode() {
         return mode;
     }
@@ -28,10 +28,10 @@ public class HMICanvas extends Pane implements CanvasInterface {
     }
 
     private String mode;
-
     private String type;
-
+    private boolean addOnClickEnabled;
     private static final String FIGURE_ID = "#createdShape";
+    private ContextMenu rightClickMenu;
 
     public boolean isAddOnClickEnabled() {
         return addOnClickEnabled;
@@ -41,7 +41,6 @@ public class HMICanvas extends Pane implements CanvasInterface {
         this.addOnClickEnabled = addOnClickEnabled;
     }
 
-    private boolean addOnClickEnabled;
 
     public ArrayList<GraphicalRepresentation> getShapeArrayList() {
         return shapeArrayList;
@@ -57,8 +56,6 @@ public class HMICanvas extends Pane implements CanvasInterface {
     public ContextMenu getRightClickMenu() {
         return rightClickMenu;
     }
-
-    private ContextMenu rightClickMenu;
 
     public HMICanvas() {
         this.setId("MainCanvas");
@@ -93,7 +90,7 @@ public class HMICanvas extends Pane implements CanvasInterface {
             case "DynRect":
                 addDynRectOnCanvasClicked(current);
                 Logger logger = Logger.getLogger(HMICanvas.this.getClass().getName());
-                logger.log(Level.INFO,"DONE");
+                logger.log(Level.INFO, "DONE");
                 break;
             default:
                 break;
@@ -159,13 +156,13 @@ public class HMICanvas extends Pane implements CanvasInterface {
         }
         Tag tag;
         if (this.getMode().equals("Test")) {
-            tag = new Tag("","","","temperatura","Flotante","","","");
+            tag = new Tag("", "", "", "temperatura", "Flotante", "", "", "");
         } else {
             tag = selectTag();
         }
 
         Logger logger = Logger.getLogger(this.getClass().getSimpleName());
-        logger.log(Level.INFO,tag.getTagName());
+        logger.log(Level.INFO, tag.getTagName());
         canvasText.getGraphicalRepresentationData().setTag(tag);
         this.addNewShape(canvasText);
         this.getChildren().add(canvasText);
@@ -175,7 +172,7 @@ public class HMICanvas extends Pane implements CanvasInterface {
     }
 
     @Override
-    public Tag selectTag(){
+    public Tag selectTag() {
         SelectTagWindow selectTagWindow = new SelectTagWindow(false);
         selectTagWindow.showAndWait();
         return selectTagWindow.getSelectedTag();
@@ -264,7 +261,7 @@ public class HMICanvas extends Pane implements CanvasInterface {
         canvasRectangle.setId(generateIdForPasteOperation(graphicalRepresentationData));
         this.addNewShape(canvasRectangle);
         this.getChildren().add(canvasRectangle);
-        canvasRectangle.setPercentFill(graphicalRepresentationData.getRefillExpression(),graphicalRepresentationData.getPrimaryColor(),graphicalRepresentationData.getBackgroundColor(),graphicalRepresentationData.getOrientation());
+        canvasRectangle.setPercentFill(graphicalRepresentationData.getRefillExpression(), graphicalRepresentationData.getPrimaryColor(), graphicalRepresentationData.getBackgroundColor(), graphicalRepresentationData.getOrientation());
     }
 
     public void addPastedLabel(GraphicalRepresentationData graphicalRepresentationData) {
@@ -316,5 +313,11 @@ public class HMICanvas extends Pane implements CanvasInterface {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public HMICanvas clone() throws CloneNotSupportedException {
+        HMICanvas clone = (HMICanvas) super.clone();
+        return clone;
     }
 }

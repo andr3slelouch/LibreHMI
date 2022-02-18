@@ -2,16 +2,13 @@ package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
 import andrade.luis.hmiethernetip.views.HMICanvas;
+import andrade.luis.hmiethernetip.views.SetWindowPropertiesWindow;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
@@ -19,29 +16,43 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HMIApp extends Application {
     private Stage mainStage;
-    private ArrayList<HMIScene> pagesScene = new ArrayList<>();
+    Logger logger
+            = Logger.getLogger(
+            HMIApp.class.getName());
+
+    public ArrayList<HMIScene> getPages() {
+        return pages;
+    }
+
+    private final ArrayList<HMIScene> pages = new ArrayList<>();
+    private static final String HMI_TITLE = "HMI: ";
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
 
         mainStage = stage;
-        HMIScene scene = generatePage();
-        pagesScene.add(scene);
-        mainStage.setTitle("HMI");
+        HMIScene scene = generatePage("Página 1", "", Color.WHITESMOKE);
+        pages.add(scene);
+        mainStage.setTitle(HMI_TITLE + scene.getSceneTitle());
         mainStage.setScene(scene);
         mainStage.show();
     }
 
-    private HMIScene generatePage(){
-        var canvas = new Canvas(300,300);
+    private HMIScene generatePage(String sceneTitle, String sceneCommentary, Color backgroundColor) {
+        var canvas = new Canvas(300, 300);
         HMICanvas root = new HMICanvas();
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        HMIScene scene = new HMIScene(root, bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().add(root);
+        HMIScene scene = new HMIScene(stackPane, root, sceneTitle, sceneCommentary, bounds.getWidth(), bounds.getHeight(), backgroundColor);
         Button rectangleBtn = new Button("Rectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
@@ -58,51 +69,136 @@ public class HMIApp extends Application {
             root.setType("Text");
         });
         Button newPageBtn = new Button("Add new Page");
-        HBox hbox = new HBox(rectangleBtn,systemDateTimeLabelBtn,textBtn,newPageBtn);
+        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, newPageBtn);
 
-        Label selectStagesLabel = new Label("Seleccione la ventana");
-        ArrayList<String> itemsForComboBox = new ArrayList<>(List.of("Page "+pagesScene.size()));
-        ComboBox<String> comboBox = new ComboBox<>();
+        ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getSceneTitle()));
         ListView<String> listViewReference = new ListView<>();
-        scene.setComboBox(comboBox);
         scene.setListViewReference(listViewReference);
         scene.setItems(itemsForComboBox);
-        Button changeButton = new Button("Cambiar");
-        changeButton.setOnAction(actionEvent -> {
-            int index = scene.getComboBox().getSelectionModel().getSelectedIndex();
-            mainStage.setScene(pagesScene.get(index));
-        });
 
-        HBox changeStagesBox = new HBox(selectStagesLabel,scene.getComboBox(),changeButton);
-
-        Image windowImage = null;
-        try {
-            windowImage = new Image("https://sc01.alicdn.com/kf/HTB1gevJvuySBuNjy1zdq6xPxFXaO/201140127/HTB1gevJvuySBuNjy1zdq6xPxFXaO.jpg");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ImageView imageView = new ImageView(windowImage);
-
-        VBox vbox = new VBox(hbox,changeStagesBox,scene.getListViewReference(),imageView);
+        VBox vbox = new VBox(hbox, scene.getListViewReference());
         root.getChildren().add(vbox);
 
-        newPageBtn.setOnMouseClicked(mouseEvent -> {
-            HMIScene newScene = generatePage();
-            ArrayList<String> pages = new ArrayList<>();
-            pagesScene.add(newScene);
-            for(int i = 0; i < pagesScene.size(); i++){
-                pages.add("Page "+i);
-            }
-            updateScenesComboBox(pages);
-            mainStage.setScene(newScene);
-        });
+        newPageBtn.setOnMouseClicked(mouseEvent -> addNewScene());
+        scene.setHmiApp(this);
 
         return scene;
     }
 
-    private void updateScenesComboBox(ArrayList<String> itemsForComboBox){
-        for(int i = 0; i < pagesScene.size(); i++){
-            pagesScene.get(i).setItems(itemsForComboBox);
+    public void changeSelectedScene(String sceneTitle) {
+        int index = findSceneIndex(sceneTitle);
+        mainStage.setScene(pages.get(index));
+        mainStage.setTitle(HMI_TITLE + pages.get(index).getSceneTitle());
+        pages.get(index).getListViewReference().getSelectionModel().select(index);
+    }
+
+    private void updateScenesInListView(ArrayList<String> itemsForComboBox) {
+        for (HMIScene page : pages) {
+            page.setItems(itemsForComboBox);
         }
+    }
+
+    public void duplicateScene(String sceneTitle) {
+        int index = findSceneIndex(sceneTitle);
+        try {
+            HMIScene duplicateScene = pages.get(index).clone();
+            if (duplicateScene != null) {
+                SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(duplicateScene.getSceneTitle() + " copy", duplicateScene.getSceneCommentary(), duplicateScene.getBackground());
+                setWindowPropertiesWindow.showAndWait();
+                duplicateScene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
+                addScene(duplicateScene);
+            } else {
+                logger.log(Level.INFO, "duplication is null");
+            }
+
+
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        logger.log(Level.INFO, "Finished duplicatedScene method");
+
+    }
+
+    public void deleteScene(String sceneTitle) {
+        int index = findSceneIndex(sceneTitle);
+        if (confirmDelete(sceneTitle)) {
+            pages.remove(index);
+            ArrayList<String> pagesTitles = new ArrayList<>();
+            for (HMIScene hmiScene : this.pages) {
+                pagesTitles.add(hmiScene.getSceneTitle());
+            }
+            updateScenesInListView(pagesTitles);
+            mainStage.setScene(pages.get(0));
+        }
+    }
+
+    public void updateScene(String sceneTitle) {
+        int index = findSceneIndex(sceneTitle);
+        HMIScene scene = (index != -1 && index < pages.size()) ? pages.get(index) : null;
+
+        if (scene != null) {
+            SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(scene.getSceneTitle(), scene.getSceneCommentary(), scene.getBackground());
+            setWindowPropertiesWindow.showAndWait();
+            scene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
+            pages.set(index, scene);
+            for (HMIScene page : pages) {
+                page.updateItem(index, scene.getSceneTitle());
+            }
+        }
+    }
+
+
+    public void addNewScene() {
+        SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow();
+        setWindowPropertiesWindow.showAndWait();
+        if (!setWindowPropertiesWindow.isCancelled()) {
+            HMIScene newScene = generatePage(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
+            addScene(newScene);
+        }
+    }
+
+    private void addScene(HMIScene newScene) {
+        logger.log(Level.INFO, "In addScene");
+        this.pages.add(newScene);
+        ArrayList<String> pagesTitles = new ArrayList<>();
+        for (HMIScene hmiScene : this.pages) {
+            pagesTitles.add(hmiScene.getSceneTitle());
+        }
+        updateScenesInListView(pagesTitles);
+
+        mainStage.setScene(newScene);
+        mainStage.setTitle(HMI_TITLE + newScene.getSceneTitle());
+
+        logger.log(Level.INFO, "Finishing addScene");
+    }
+
+    private int findSceneIndex(String sceneTitle) {
+        for (int i = 0; i < pages.size(); i++) {
+            if (pages.get(i).getSceneTitle().equals(sceneTitle)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean confirmDelete(String sceneTitle) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar eliminación");
+        alert.setHeaderText("Desea eliminar la página seleccionada \"" + sceneTitle + "\"?");
+
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(cancelButton, okButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == okButton) {
+            alert.close();
+            return true;
+        } else if (result.isPresent() && result.get() == cancelButton) {
+            alert.close();
+            return false;
+        }
+        return false;
     }
 }
