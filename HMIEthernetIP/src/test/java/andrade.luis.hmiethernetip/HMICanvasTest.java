@@ -1,14 +1,15 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
-import andrade.luis.hmiethernetip.models.CanvasPoint;
-import andrade.luis.hmiethernetip.models.CanvasText;
-import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
+import andrade.luis.hmiethernetip.models.canvas.CanvasText;
+import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -54,8 +55,8 @@ class HMICanvasTest {
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        StackPane stackPane = new StackPane();
-        stackPane.getChildren().add(root);
+        javafx.scene.control.ScrollPane stackPane = new ScrollPane();
+        stackPane.setContent(root);
         scene = new HMIScene(stackPane,root, "Page","",bounds.getWidth(), bounds.getHeight(), Color.WHITESMOKE);
         rectangleBtn = new Button("Rectangle");
         rectangleBtn.setId("addRectangle");

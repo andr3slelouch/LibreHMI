@@ -1,8 +1,12 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
+import andrade.luis.hmiethernetip.models.users.HMIPassword;
+import andrade.luis.hmiethernetip.util.DBConnection;
 import andrade.luis.hmiethernetip.views.HMICanvas;
+import andrade.luis.hmiethernetip.views.LogInWindow;
 import andrade.luis.hmiethernetip.views.SetWindowPropertiesWindow;
+import andrade.luis.hmiethernetip.views.SignUpWindow;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
@@ -14,7 +18,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -37,7 +43,30 @@ public class HMIApp extends Application {
     public void start(Stage stage) {
 
         mainStage = stage;
+        try{
+            generateDatabase();
+        }catch(SQLException sqlException){
+            showAlertForGeneratingSchemas(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",sqlException.getMessage());
+            sqlException.printStackTrace();
+        }
         HMIScene scene = generatePage("Página 1", "", Color.WHITESMOKE);
+        /*HMIPassword password = new HMIPassword();
+        String saltStr = "qATX04VQ7XoYwVzCMdzA0Q==";
+        byte[] salt = Base64.getDecoder().decode(saltStr);
+        byte[] hash = HMIPassword.computeSaltedHash("kakaroto".toCharArray(),salt);
+        System.out.println(Base64.getEncoder().encodeToString(salt));
+        String encondeHash = Base64.getEncoder().encodeToString(hash);
+        System.out.println("New Hash:"+encondeHash+"Hash length:"+encondeHash.length());
+        String computeSaltedHash = "jio1PQFD1Y2qcZGguQU5B4m4ZPhq7+VGB6drl53l9m8YNVUqsEBJvoFzSdI2juxj17vnhGTwb0tHtgLbKociiQ==";
+        System.out.println(HMIPassword.verifyPassword("kakaroto",saltStr,computeSaltedHash));
+
+        String saltedString = HMIPassword.createRandomSaltString();
+        String hashString = HMIPassword.computeSaltedHashString("12345",saltedString);
+        System.out.println("New Salt:"+saltedString);
+        System.out.println("New Hash:"+hashString+"Hash length:"+hashString.length());
+        System.out.println(HMIPassword.verifyPassword("12345","1bk/Dj19jpWgdCeyx63V9w==","ivK9LYDfcFki9zTJm3kksQUqUTYazkvki6+ZLks6wQIyyNM3xbEnWIE6YesnjkHM+1GqpbMK8ul6CPAE71vFgQ=="));*/
+
+
         pages.add(scene);
         mainStage.setTitle(HMI_TITLE + scene.getSceneTitle());
         mainStage.setScene(scene);
@@ -50,8 +79,8 @@ public class HMIApp extends Application {
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        StackPane stackPane = new StackPane();
-        stackPane.getChildren().add(root);
+        ScrollPane stackPane = new ScrollPane();
+        stackPane.setContent(root);
         HMIScene scene = new HMIScene(stackPane, root, sceneTitle, sceneCommentary, bounds.getWidth(), bounds.getHeight(), backgroundColor);
         Button rectangleBtn = new Button("Rectangle");
         rectangleBtn.setOnMouseClicked(mouseEvent -> {
@@ -68,8 +97,25 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Text");
         });
+        Button buttonBtn = new Button("Button");
+        buttonBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Button");
+        });
+        Button sliderBtn = new Button("Slider");
+        sliderBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Slider");
+        });
+        Button textFieldBtn = new Button("TextField");
+        textFieldBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("TextField");
+        });
         Button newPageBtn = new Button("Add new Page");
-        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, newPageBtn);
+        Button registerUserBtn = new Button("Register");
+        Button logIntUserBtn = new Button("Log In");
+        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn,sliderBtn,textFieldBtn,newPageBtn,registerUserBtn,logIntUserBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getSceneTitle()));
         ListView<String> listViewReference = new ListView<>();
@@ -80,6 +126,15 @@ public class HMIApp extends Application {
         root.getChildren().add(vbox);
 
         newPageBtn.setOnMouseClicked(mouseEvent -> addNewScene());
+        registerUserBtn.setOnMouseClicked(mouseEvent -> {
+            SignUpWindow signUpWindow = new SignUpWindow();
+            signUpWindow.show();
+        });
+        logIntUserBtn.setOnAction(mouseEvent -> {
+            LogInWindow logInWindow = new LogInWindow();
+            logInWindow.show();
+        });
+
         scene.setHmiApp(this);
 
         return scene;
@@ -200,5 +255,31 @@ public class HMIApp extends Application {
             return false;
         }
         return false;
+    }
+
+    private void generateDatabase() throws SQLException {
+        if(!DBConnection.checkIfTablesFromSchemaBDDriverAreReady()){
+            DBConnection dbConnection = new DBConnection();
+            dbConnection.generateSchemaBDDriverEIP();
+        }
+        if(!DBConnection.tableExistsInSchema("Users","HMIUsers")){
+            DBConnection.generateSchemaHMIUsers();
+        }
+    }
+
+    public void showAlertForGeneratingSchemas(Alert.AlertType type, String title,String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
+
+        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
+
+        alert.getButtonTypes().setAll(okButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.isPresent() && result.get() == okButton)
+        {
+            alert.close();
+        }
     }
 }

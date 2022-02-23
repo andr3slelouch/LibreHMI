@@ -1,13 +1,11 @@
 package andrade.luis.hmiethernetip.controllers;
 
 import andrade.luis.hmiethernetip.HMIApp;
-import andrade.luis.hmiethernetip.models.GraphicalRepresentation;
-import andrade.luis.hmiethernetip.models.CanvasPoint;
+import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.views.HMICanvas;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,7 +15,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
@@ -32,10 +29,11 @@ public class HMIScene extends Scene implements Cloneable {
     /*
      * windowImage source <a href="https://www.flaticon.com/free-icons/window" title="window icons">Window icons created by Anas Mannaa - Flaticon</a>
      * */
+    private final String location = getClass().getResource("").toExternalForm();
     private final Image windowImage = new Image(getClass().getResource("window.png").toExternalForm());
-    private StackPane backgroundStackPane;
+    private ScrollPane backgroundStackPane;
     private ListView<String> listViewReference;
-    private ArrayList<String> itemsForComboBox;
+    private ArrayList<String> itemsForList;
     private String sceneTitle;
     private String sceneCommentary;
     private Color background;
@@ -76,8 +74,8 @@ public class HMIScene extends Scene implements Cloneable {
 
     private HMIApp hmiApp;
 
-    public ArrayList<String> getItemsForComboBox() {
-        return itemsForComboBox;
+    public ArrayList<String> getItemsForList() {
+        return itemsForList;
     }
 
     public void updateItem(int index, String value){
@@ -85,7 +83,7 @@ public class HMIScene extends Scene implements Cloneable {
     }
 
     public void setItems(ArrayList<String> itemsForComboBox) {
-        this.itemsForComboBox = itemsForComboBox;
+        this.itemsForList = itemsForComboBox;
         ObservableList<String> elements = FXCollections.observableArrayList(itemsForComboBox);
 
         listViewReference.setItems(elements);
@@ -151,11 +149,11 @@ public class HMIScene extends Scene implements Cloneable {
         this.listViewReference = listViewReference;
     }
 
-    public StackPane getBackgroundStackPane() {
+    public ScrollPane getBackgroundStackPane() {
         return backgroundStackPane;
     }
 
-    public void setBackgroundStackPane(StackPane backgroundStackPane) {
+    public void setBackgroundStackPane(ScrollPane backgroundStackPane) {
         this.backgroundStackPane = backgroundStackPane;
     }
 
@@ -167,7 +165,7 @@ public class HMIScene extends Scene implements Cloneable {
         this.hmiCanvas = hmiCanvas;
     }
 
-    public HMIScene(StackPane stackPane,HMICanvas hmiCanvas, String sceneTitle , String sceneCommentary, double v, double v1, Paint paint) {
+    public HMIScene(ScrollPane stackPane,HMICanvas hmiCanvas, String sceneTitle , String sceneCommentary, double v, double v1, Paint paint) {
         super(stackPane, v, v1, paint);
         this.backgroundStackPane = stackPane;
         stackPane.setBackground(new Background(new BackgroundFill(paint, CornerRadii.EMPTY, Insets.EMPTY)));

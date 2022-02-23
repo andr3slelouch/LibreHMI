@@ -1,5 +1,7 @@
 package andrade.luis.hmiethernetip.models;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasLabel;
+import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.assertions.api.Assertions;

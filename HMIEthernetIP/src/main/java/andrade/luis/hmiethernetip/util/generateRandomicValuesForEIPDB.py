@@ -10,7 +10,7 @@ import time
 while True:
     # Connecting to the Database
     mydb = mysql.connector.connect(
-        host="localhost", database="bd_driver_eip", user="root", password="kakaroto"
+        host="localhost", database="bd_driver_eip", user="root", password="12345"
     )
 
     cs = mydb.cursor()

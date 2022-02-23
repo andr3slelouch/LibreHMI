@@ -1,6 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
-import andrade.luis.hmiethernetip.models.CanvasColor;
+import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.PercentFillOrientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;

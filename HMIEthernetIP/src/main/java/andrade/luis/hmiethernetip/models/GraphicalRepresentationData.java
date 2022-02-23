@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
+import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import javafx.geometry.Orientation;
 
 public class GraphicalRepresentationData implements Serializable, Transferable
 {

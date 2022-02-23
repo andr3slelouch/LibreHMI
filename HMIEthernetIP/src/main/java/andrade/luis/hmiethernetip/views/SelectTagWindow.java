@@ -95,9 +95,9 @@ public class SelectTagWindow extends Stage {
     }
 
     public ObservableList<TagRow> getExistingTags() {
-        String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from PLCS p , TAGS t, INTERMEDIA i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
+        String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
         ObservableList<TagRow> data = FXCollections.observableArrayList();
-        try (Connection con = DBConnection.createConnection()) {
+        try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {

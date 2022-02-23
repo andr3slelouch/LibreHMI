@@ -1,6 +1,7 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.*;
+import andrade.luis.hmiethernetip.models.canvas.*;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -87,26 +88,55 @@ public class HMICanvas extends Pane implements CanvasInterface, Cloneable {
             case "Text":
                 addTextOnCanvasClicked(current);
                 break;
-            case "DynRect":
-                addDynRectOnCanvasClicked(current);
-                Logger logger = Logger.getLogger(HMICanvas.this.getClass().getName());
-                logger.log(Level.INFO, "DONE");
+            case "Button":
+                addButtonOnCanvasClicked(current);
                 break;
+            case "Slider":
+                addSliderOnCanvasClicked(current);
+                break;
+            case "TextField":
+                addTextFieldOnCanvasClicked(current);
+                break;
+
             default:
                 break;
         }
     }
 
-    private void addDynRectOnCanvasClicked(CanvasPoint current) {
-        CanvasDynamicRectangle canvasDynamicRectangle = new CanvasDynamicRectangle(current);
-        canvasDynamicRectangle.setCanvas(this);
+    private void addTextFieldOnCanvasClicked(CanvasPoint current) {
+        CanvasTextField canvasTextField = new CanvasTextField(current);
+        canvasTextField.setCanvas(this);
         if (this.getShapeArrayList().isEmpty()) {
-            canvasDynamicRectangle.setId(FIGURE_ID + "0");
+            canvasTextField.setId(FIGURE_ID + "0");
         } else {
-            canvasDynamicRectangle.setId(FIGURE_ID + this.getShapeArrayList().size());
+            canvasTextField.setId(FIGURE_ID + this.getShapeArrayList().size());
         }
-        this.addNewShape(canvasDynamicRectangle);
-        this.getChildren().add(canvasDynamicRectangle);
+        this.addNewShape(canvasTextField);
+        this.getChildren().add(canvasTextField);
+    }
+
+    private void addSliderOnCanvasClicked(CanvasPoint current) {
+        CanvasSlider canvasSlider = new CanvasSlider(current);
+        canvasSlider.setCanvas(this);
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasSlider.setId(FIGURE_ID + "0");
+        } else {
+            canvasSlider.setId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        this.addNewShape(canvasSlider);
+        this.getChildren().add(canvasSlider);
+    }
+
+    private void addButtonOnCanvasClicked(CanvasPoint current) {
+        CanvasButton canvasButton = new CanvasButton(current);
+        canvasButton.setCanvas(this);
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasButton.setId(FIGURE_ID + "0");
+        } else {
+            canvasButton.setId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        this.addNewShape(canvasButton);
+        this.getChildren().add(canvasButton);
     }
 
     public void addRectangleOnCanvasClicked(CanvasPoint current) {

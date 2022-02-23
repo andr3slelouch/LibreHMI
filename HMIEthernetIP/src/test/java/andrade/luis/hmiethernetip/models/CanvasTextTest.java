@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.models;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasText;
 import javafx.scene.control.Label;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

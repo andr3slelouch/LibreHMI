@@ -1,11 +1,11 @@
 package andrade.luis.hmiethernetip.models;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
+import andrade.luis.hmiethernetip.models.canvas.CanvasRectangle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationExtension;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(ApplicationExtension.class)
 class CanvasRectangleTest {
