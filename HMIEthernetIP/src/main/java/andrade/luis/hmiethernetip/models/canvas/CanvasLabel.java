@@ -35,5 +35,7 @@ public class CanvasLabel extends GraphicalRepresentation {
         this.label = new Label(content);
         this.setCenter(this.label);
         this.getGraphicalRepresentationData().setType("Label");
+        this.getGraphicalRepresentationData().setWidth(this.label.getWidth());
+        this.getGraphicalRepresentationData().setHeight(this.label.getHeight());
     }
 }

@@ -79,19 +79,16 @@ public class CanvasRectangle extends GraphicalRepresentation {
         percentFillMI.setId("#percentFillMI");
         percentFillMI.setOnAction(actionEvent -> this.setPercentFill());
         this.getRightClickMenu().getItems().add(percentFillMI);
-        MenuItem resizeMI = new MenuItem("Resize");
+        /*MenuItem resizeMI = new MenuItem("Resize");
         resizeMI.setId("#resizeMI");
-        resizeMI.setOnAction(actionEvent -> this.setResize());
-        this.getRightClickMenu().getItems().add(resizeMI);
+        resizeMI.setOnAction(actionEvent -> this.resize());
+        this.getRightClickMenu().getItems().add(resizeMI);*/
 
     }
 
-    private void setResize() {
-        SetSizeWindow setSizeWindow = new SetSizeWindow(this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
-        setSizeWindow.showAndWait();
-        this.getGraphicalRepresentationData().setWidth(setSizeWindow.getWidthFromField());
-        this.getGraphicalRepresentationData().setHeight(setSizeWindow.getHeightFromField());
-        this.setSize(this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+    @Override
+    public void resize() {
+        super.resize();
         if (refillRectangleTimeline != null) {
             if (refillRectangleTimeline.getStatus().toString().equals("RUNNING")) {
                 refillRectangleTimeline.stop();

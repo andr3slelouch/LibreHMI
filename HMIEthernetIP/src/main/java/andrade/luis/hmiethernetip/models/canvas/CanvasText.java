@@ -38,6 +38,8 @@ public class CanvasText extends CanvasLabel {
     public CanvasText(String content, CanvasPoint center) {
         super(content, center);
         this.getGraphicalRepresentationData().setType("Text");
+        this.getGraphicalRepresentationData().setWidth(this.getWidth());
+        this.getGraphicalRepresentationData().setHeight(this.getHeight());
     }
 
     public void setTimeline() {

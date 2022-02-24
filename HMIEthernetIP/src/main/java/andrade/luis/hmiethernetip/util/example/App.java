@@ -19,17 +19,17 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        TableView<Item> table = new TableView<>();
+        /*TableView<SceneItem> table = new TableView<>();
         table.setEditable(true);
 
-        TableColumn<Item, Boolean> selectedCol = new TableColumn<>("Select");
+        TableColumn<SceneItem, Boolean> selectedCol = new TableColumn<>("Select");
         selectedCol.setCellValueFactory(cellData -> cellData.getValue().selectedProperty());
 
         selectedCol.setCellFactory(CheckBoxTableCell.forTableColumn(selectedCol));
 
         table.getColumns().add(selectedCol);
 
-        TableColumn<Item, String> itemCol = new TableColumn<>("Item");
+        TableColumn<SceneItem, String> itemCol = new TableColumn<>("Item");
         itemCol.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         table.getColumns().add(itemCol);
 
@@ -37,28 +37,28 @@ public class App extends Application {
 
         // observable list of items that fires updates when the selectedProperty of
         // any item in the list changes:
-        ObservableList<Item> selectionList = FXCollections
-                .observableArrayList(item -> new Observable[] { item.selectedProperty() });
+        ObservableList<SceneItem> selectionList = FXCollections
+                .observableArrayList(sceneItem -> new Observable[] { sceneItem.selectedProperty() });
 
         // bind contents to items selected in the table:
         table.getSelectionModel().getSelectedItems().addListener(
-                (Change<? extends Item> c) -> selectionList.setAll(table.getSelectionModel().getSelectedItems()));
+                (Change<? extends SceneItem> c) -> selectionList.setAll(table.getSelectionModel().getSelectedItems()));
 
         // add listener so that any updates in the selection list are propagated to all
         // elements:
-        selectionList.addListener(new ListChangeListener<Item>() {
+        selectionList.addListener(new ListChangeListener<SceneItem>() {
 
             private boolean processingChange = false;
 
             @Override
-            public void onChanged(Change<? extends Item> c) {
+            public void onChanged(Change<? extends SceneItem> c) {
                 if (!processingChange) {
                     while (c.next()) {
                         if (c.wasUpdated() && c.getTo() - c.getFrom() == 1) {
                             boolean selectedVal = c.getList().get(c.getFrom()).isSelected();
                             processingChange = true;
                             table.getSelectionModel().getSelectedItems()
-                                    .forEach(item -> item.setSelected(selectedVal));
+                                    .forEach(sceneItem -> sceneItem.setSelected(selectedVal));
                             processingChange = false;
                         }
                     }
@@ -68,13 +68,13 @@ public class App extends Application {
         });
 
         for (int i = 1; i <= 20; i++) {
-            table.getItems().add(new Item("Item " + i));
-        }
+            //table.getItems().add(new SceneItem("Item " + i));
+        }*/
         Button button = new Button("Get");
-        BorderPane borderPane = new BorderPane(table);
-        borderPane.getChildren().add(button);
-        Scene scene = new Scene(borderPane);
-        stage.setScene(scene);
+        //BorderPane borderPane = new BorderPane(table);
+        //borderPane.getChildren().add(button);
+        //Scene scene = new Scene(borderPane);
+        //stage.setScene(scene);
         stage.show();
     }
 

@@ -34,17 +34,17 @@ public class HMIScene extends Scene implements Cloneable {
     private ScrollPane backgroundStackPane;
     private ListView<String> listViewReference;
     private ArrayList<String> itemsForList;
-    private String sceneTitle;
+    private String title;
     private String sceneCommentary;
     private Color background;
     private HMICanvas hmiCanvas;
 
-    public String getSceneTitle() {
-        return sceneTitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setSceneTitle(String sceneTitle) {
-        this.sceneTitle = sceneTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Color getBackground() {
@@ -70,6 +70,9 @@ public class HMIScene extends Scene implements Cloneable {
 
     public void setHmiApp(HMIApp hmiApp) {
         this.hmiApp = hmiApp;
+        if(this.hmiCanvas != null){
+            this.hmiCanvas.setHmiApp(hmiApp);
+        }
     }
 
     private HMIApp hmiApp;
@@ -165,12 +168,12 @@ public class HMIScene extends Scene implements Cloneable {
         this.hmiCanvas = hmiCanvas;
     }
 
-    public HMIScene(ScrollPane stackPane,HMICanvas hmiCanvas, String sceneTitle , String sceneCommentary, double v, double v1, Paint paint) {
+    public HMIScene(ScrollPane stackPane, HMICanvas hmiCanvas, String title, String sceneCommentary, double v, double v1, Paint paint) {
         super(stackPane, v, v1, paint);
         this.backgroundStackPane = stackPane;
         stackPane.setBackground(new Background(new BackgroundFill(paint, CornerRadii.EMPTY, Insets.EMPTY)));
         this.background = (Color) paint;
-        this.sceneTitle = sceneTitle;
+        this.title = title;
         this.sceneCommentary = sceneCommentary;
         this.hmiCanvas = hmiCanvas;
         this.setOnMouseClicked(mouseEvent -> {
@@ -234,7 +237,7 @@ public class HMIScene extends Scene implements Cloneable {
     }
 
     public void update(String sceneTitle, String sceneCommentary, Color background) {
-        setSceneTitle(sceneTitle);
+        setTitle(sceneTitle);
         setSceneCommentary(sceneCommentary);
         setBackground(background);
         setFill(getBackground());

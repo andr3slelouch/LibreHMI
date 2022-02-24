@@ -2,6 +2,7 @@ package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
 import andrade.luis.hmiethernetip.models.MouseOverMode;
+import andrade.luis.hmiethernetip.views.SetSizeWindow;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
@@ -25,11 +26,11 @@ public class GraphicalRepresentation extends BorderPane {
 
     }
 
-    public CanvasInterface getCanvas() {
+    public HMICanvasInterface getCanvas() {
         return canvas;
     }
 
-    public void setCanvas(CanvasInterface canvas) {
+    public void setCanvas(HMICanvasInterface canvas) {
         this.canvas = canvas;
     }
 
@@ -123,25 +124,25 @@ public class GraphicalRepresentation extends BorderPane {
 
     public void setPosition(CanvasPoint position, boolean force) {
         this.graphicalRepresentationData.setPosition(position);
-        if(force){
+        if (force) {
             this.setLayoutX(position.getX());
             this.setLayoutY(position.getY());
         }
     }
 
-    public void copy(String operation){
+    public void copy(String operation) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         this.graphicalRepresentationData.setId(this.getId());
         this.graphicalRepresentationData.setOperation(operation);
-        clipboard.setContents(this.graphicalRepresentationData,null);
+        clipboard.setContents(this.graphicalRepresentationData, null);
     }
 
-    public void cut(){
+    public void cut() {
         this.copy("Cut");
         canvas.delete(this.graphicalRepresentationData);
     }
 
-    public void delete(){
+    public void delete() {
         this.graphicalRepresentationData.setId(this.getId());
         canvas.delete(this.graphicalRepresentationData);
     }
@@ -199,15 +200,15 @@ public class GraphicalRepresentation extends BorderPane {
         @Override
         public void handle(MouseEvent t) {
             //if(mouseOverMode == DRAG){
-                double offsetX = t.getSceneX() - start.getX();
-                double offsetY = t.getSceneY() - start.getY();
-                double newTranslateX = end.getX() + offsetX;
-                double newTranslateY = end.getY() + offsetY;
+            double offsetX = t.getSceneX() - start.getX();
+            double offsetY = t.getSceneY() - start.getY();
+            double newTranslateX = end.getX() + offsetX;
+            double newTranslateY = end.getY() + offsetY;
 
-                ((BorderPane) (t.getSource())).setTranslateX(newTranslateX);
-                ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
+            ((BorderPane) (t.getSource())).setTranslateX(newTranslateX);
+            ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
 
-                setPosition(new CanvasPoint(newTranslateX, newTranslateY),false);
+            setPosition(new CanvasPoint(newTranslateX, newTranslateY), false);
             /*}else if(mouseOverMode != DEFAULT){
                 double newTranslateX = start.getX();
                 double newTranslateY = start.getY();
@@ -261,8 +262,8 @@ public class GraphicalRepresentation extends BorderPane {
         this.setCursor(cursor);
     };
 
-    private Cursor getCursorForMode(MouseOverMode mode){
-        switch(mode){
+    private Cursor getCursorForMode(MouseOverMode mode) {
+        switch (mode) {
             case SUPERIOR_LEFT:
                 return Cursor.NW_RESIZE;
             case INFERIOR_LEFT:
@@ -292,33 +293,33 @@ public class GraphicalRepresentation extends BorderPane {
         boolean isTopOverMode = intersectOperation(0, mouseEvent.getY());
         boolean isBottomOverMode = intersectOperation(this.getBoundsInParent().getHeight(), mouseEvent.getY());
 
-        if(isLeftOverMode && isTopOverMode){
+        if (isLeftOverMode && isTopOverMode) {
             mode = MouseOverMode.SUPERIOR_LEFT;
-        }else if(isLeftOverMode && isBottomOverMode){
+        } else if (isLeftOverMode && isBottomOverMode) {
             mode = MouseOverMode.INFERIOR_LEFT;
-        }else if(isRightOverMode && isTopOverMode){
+        } else if (isRightOverMode && isTopOverMode) {
             mode = MouseOverMode.SUPERIOR_RIGHT;
-        }else if(isRightOverMode && isBottomOverMode){
+        } else if (isRightOverMode && isBottomOverMode) {
             mode = MouseOverMode.INFERIOR_RIGHT;
-        }else if(isRightOverMode){
+        } else if (isRightOverMode) {
             mode = MouseOverMode.RIGHT;
-        }else if(isLeftOverMode){
+        } else if (isLeftOverMode) {
             mode = MouseOverMode.LEFT;
-        }else if(isTopOverMode){
+        } else if (isTopOverMode) {
             mode = MouseOverMode.SUPERIOR;
-        }else if(isBottomOverMode){
+        } else if (isBottomOverMode) {
             mode = MouseOverMode.INFERIOR;
-        }else{
+        } else {
             mode = DRAG;
         }
         return mode;
     }
 
-    private boolean isInResizingMode(MouseEvent event){
+    private boolean isInResizingMode(MouseEvent event) {
         return currentMouseOverMode(event) != DRAG && currentMouseOverMode(event) != DEFAULT;
     }
 
-    private boolean intersectOperation(double side, double point){
+    private boolean intersectOperation(double side, double point) {
         return side + borderMargin > point && side - borderMargin < point;
     }
 
@@ -333,17 +334,17 @@ public class GraphicalRepresentation extends BorderPane {
         }
     }
 
-    public boolean isSelected(){
+    public boolean isSelected() {
         return graphicalRepresentationData.isSelected();
     }
 
-    public void setCenter(CanvasPoint center){
+    public void setCenter(CanvasPoint center) {
         this.graphicalRepresentationData.setCenter(center);
 
         double tempX = center.getX() - getWidth() / 2;
         double tempY = center.getY() - getHeight() / 2;
 
-        this.graphicalRepresentationData.setPosition(new CanvasPoint(tempX,tempY));
+        this.graphicalRepresentationData.setPosition(new CanvasPoint(tempX, tempY));
         setPosition(new CanvasPoint(tempX, tempY), true);
 
         this.border = PseudoClass.getPseudoClass("border");
@@ -355,7 +356,7 @@ public class GraphicalRepresentation extends BorderPane {
         };
     }
 
-    public GraphicalRepresentation(GraphicalRepresentationData graphicalRepresentationData){
+    public GraphicalRepresentation(GraphicalRepresentationData graphicalRepresentationData) {
         super();
 
         this.setOnMousePressed(onMyMousePressed);
@@ -372,7 +373,7 @@ public class GraphicalRepresentation extends BorderPane {
         setContextMenu();
     }
 
-    public void setContextMenu(){
+    public void setContextMenu() {
         rightClickMenu = new ContextMenu();
         rightClickMenu.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
@@ -389,10 +390,13 @@ public class GraphicalRepresentation extends BorderPane {
         deleteMenuItem = new MenuItem("Delete");
         deleteMenuItem.setId("#delete");
         deleteMenuItem.setOnAction(actionEvent -> delete());
-        rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem,deleteMenuItem);
+        MenuItem resizeMI = new MenuItem("Resize");
+        resizeMI.setId("#resizeMI");
+        resizeMI.setOnAction(actionEvent -> this.resize());
+        rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, deleteMenuItem, resizeMI);
     }
 
-    public GraphicalRepresentation(CanvasPoint center){
+    public GraphicalRepresentation(CanvasPoint center) {
         super();
 
         this.setOnMousePressed(onMyMousePressed);
@@ -412,7 +416,19 @@ public class GraphicalRepresentation extends BorderPane {
         setPrefHeight(height);
     }
 
-    private CanvasInterface canvas;
+    public void resize() {
+        SetSizeWindow setSizeWindow = new SetSizeWindow(this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+        setSizeWindow.showAndWait();
+        this.getGraphicalRepresentationData().setWidth(setSizeWindow.getWidthFromField());
+        this.getGraphicalRepresentationData().setHeight(setSizeWindow.getHeightFromField());
+        this.setSize(this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+    }
+
+    public void setEnable(String enabled) {
+        this.setDisable(enabled.equals("Play"));
+    }
+
+    private HMICanvasInterface canvas;
     private GraphicalRepresentationData graphicalRepresentationData = new GraphicalRepresentationData();
     private PseudoClass border;
     private SimpleBooleanProperty borderActive;

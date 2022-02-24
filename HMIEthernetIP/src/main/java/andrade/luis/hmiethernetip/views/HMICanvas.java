@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.*;
 import andrade.luis.hmiethernetip.models.canvas.*;
 import javafx.scene.Node;
@@ -19,7 +20,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HMICanvas extends Pane implements CanvasInterface, Cloneable {
+public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     public String getMode() {
         return mode;
     }
@@ -33,6 +34,16 @@ public class HMICanvas extends Pane implements CanvasInterface, Cloneable {
     private boolean addOnClickEnabled;
     private static final String FIGURE_ID = "#createdShape";
     private ContextMenu rightClickMenu;
+
+    public HMIApp getHmiApp() {
+        return hmiApp;
+    }
+
+    public void setHmiApp(HMIApp hmiApp) {
+        this.hmiApp = hmiApp;
+    }
+
+    private HMIApp hmiApp;
 
     public boolean isAddOnClickEnabled() {
         return addOnClickEnabled;
@@ -129,6 +140,7 @@ public class HMICanvas extends Pane implements CanvasInterface, Cloneable {
 
     private void addButtonOnCanvasClicked(CanvasPoint current) {
         CanvasButton canvasButton = new CanvasButton(current);
+        canvasButton.setHmiApp(hmiApp);
         canvasButton.setCanvas(this);
         if (this.getShapeArrayList().isEmpty()) {
             canvasButton.setId(FIGURE_ID + "0");

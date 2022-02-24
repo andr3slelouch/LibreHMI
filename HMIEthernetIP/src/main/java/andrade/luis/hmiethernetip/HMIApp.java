@@ -1,18 +1,13 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
-import andrade.luis.hmiethernetip.models.users.HMIPassword;
 import andrade.luis.hmiethernetip.util.DBConnection;
-import andrade.luis.hmiethernetip.views.HMICanvas;
-import andrade.luis.hmiethernetip.views.LogInWindow;
-import andrade.luis.hmiethernetip.views.SetWindowPropertiesWindow;
-import andrade.luis.hmiethernetip.views.SignUpWindow;
+import andrade.luis.hmiethernetip.views.*;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
@@ -20,7 +15,6 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -37,38 +31,23 @@ public class HMIApp extends Application {
     }
 
     private final ArrayList<HMIScene> pages = new ArrayList<>();
+    private ArrayList<HMIScene> selectedPages = new ArrayList<>();
     private static final String HMI_TITLE = "HMI: ";
 
     @Override
     public void start(Stage stage) {
 
         mainStage = stage;
-        try{
+        try {
             generateDatabase();
-        }catch(SQLException sqlException){
-            showAlertForGeneratingSchemas(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",sqlException.getMessage());
+        } catch (SQLException sqlException) {
+            showAlertForGeneratingSchemas(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", sqlException.getMessage());
             sqlException.printStackTrace();
         }
         HMIScene scene = generatePage("Página 1", "", Color.WHITESMOKE);
-        /*HMIPassword password = new HMIPassword();
-        String saltStr = "qATX04VQ7XoYwVzCMdzA0Q==";
-        byte[] salt = Base64.getDecoder().decode(saltStr);
-        byte[] hash = HMIPassword.computeSaltedHash("kakaroto".toCharArray(),salt);
-        System.out.println(Base64.getEncoder().encodeToString(salt));
-        String encondeHash = Base64.getEncoder().encodeToString(hash);
-        System.out.println("New Hash:"+encondeHash+"Hash length:"+encondeHash.length());
-        String computeSaltedHash = "jio1PQFD1Y2qcZGguQU5B4m4ZPhq7+VGB6drl53l9m8YNVUqsEBJvoFzSdI2juxj17vnhGTwb0tHtgLbKociiQ==";
-        System.out.println(HMIPassword.verifyPassword("kakaroto",saltStr,computeSaltedHash));
-
-        String saltedString = HMIPassword.createRandomSaltString();
-        String hashString = HMIPassword.computeSaltedHashString("12345",saltedString);
-        System.out.println("New Salt:"+saltedString);
-        System.out.println("New Hash:"+hashString+"Hash length:"+hashString.length());
-        System.out.println(HMIPassword.verifyPassword("12345","1bk/Dj19jpWgdCeyx63V9w==","ivK9LYDfcFki9zTJm3kksQUqUTYazkvki6+ZLks6wQIyyNM3xbEnWIE6YesnjkHM+1GqpbMK8ul6CPAE71vFgQ=="));*/
-
 
         pages.add(scene);
-        mainStage.setTitle(HMI_TITLE + scene.getSceneTitle());
+        mainStage.setTitle(HMI_TITLE + scene.getTitle());
         mainStage.setScene(scene);
         mainStage.show();
     }
@@ -115,14 +94,22 @@ public class HMIApp extends Application {
         Button newPageBtn = new Button("Add new Page");
         Button registerUserBtn = new Button("Register");
         Button logIntUserBtn = new Button("Log In");
-        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn,sliderBtn,textFieldBtn,newPageBtn,registerUserBtn,logIntUserBtn);
+        Button selectWindowBtn = new Button("Select Window");
+        Button showSelectedWindowsBtn = new Button("Show");
+        Button playBtn = new Button("Play");
+        Button stopBtn = new Button("Stop");
+        Button defaultBtn = new Button("Default");
+        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
+        HBox secondHBox = new HBox(sliderBtn, textFieldBtn, newPageBtn, registerUserBtn);
+        HBox thirdHBox = new HBox(logIntUserBtn, selectWindowBtn, showSelectedWindowsBtn);
+        HBox fourthHBox = new HBox(playBtn, stopBtn, defaultBtn);
 
-        ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getSceneTitle()));
+        ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
         scene.setListViewReference(listViewReference);
         scene.setItems(itemsForComboBox);
 
-        VBox vbox = new VBox(hbox, scene.getListViewReference());
+        VBox vbox = new VBox(hbox, secondHBox, thirdHBox, fourthHBox, scene.getListViewReference());
         root.getChildren().add(vbox);
 
         newPageBtn.setOnMouseClicked(mouseEvent -> addNewScene());
@@ -134,16 +121,45 @@ public class HMIApp extends Application {
             LogInWindow logInWindow = new LogInWindow();
             logInWindow.show();
         });
+        selectWindowBtn.setOnAction(mouseEvent -> {
+            SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(this.pages);
+            selectWindowsWindow.showAndWait();
+            selectedPages = selectWindowsWindow.getSelectedItems();
+        });
+        showSelectedWindowsBtn.setOnAction(mouseEvent -> generateStagesForPages(selectedPages));
+        playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
+        stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
+        defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
 
         scene.setHmiApp(this);
 
         return scene;
     }
 
+    public void enableInputRepresentations(String value){
+        for (HMIScene page : this.pages) {
+            for (int i = 0; i < page.getCanvas().getShapeArrayList().size(); i++) {
+                page.getCanvas().getShapeArrayList().get(i).setEnable(value);
+            }
+        }
+    }
+
+    public void generateStagesForPages(ArrayList<HMIScene> selectedPages) {
+        if (!selectedPages.isEmpty()) {
+            changeSelectedScene(selectedPages.get(0).getTitle());
+            for (int i = 1; i < selectedPages.size(); i++) {
+                Stage stage = new Stage();
+                stage.setScene(selectedPages.get(i));
+                stage.setTitle(HMI_TITLE + selectedPages.get(i).getTitle());
+                stage.show();
+            }
+        }
+    }
+
     public void changeSelectedScene(String sceneTitle) {
         int index = findSceneIndex(sceneTitle);
         mainStage.setScene(pages.get(index));
-        mainStage.setTitle(HMI_TITLE + pages.get(index).getSceneTitle());
+        mainStage.setTitle(HMI_TITLE + pages.get(index).getTitle());
         pages.get(index).getListViewReference().getSelectionModel().select(index);
     }
 
@@ -158,7 +174,7 @@ public class HMIApp extends Application {
         try {
             HMIScene duplicateScene = pages.get(index).clone();
             if (duplicateScene != null) {
-                SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(duplicateScene.getSceneTitle() + " copy", duplicateScene.getSceneCommentary(), duplicateScene.getBackground());
+                SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(duplicateScene.getTitle() + " copy", duplicateScene.getSceneCommentary(), duplicateScene.getBackground());
                 setWindowPropertiesWindow.showAndWait();
                 duplicateScene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
                 addScene(duplicateScene);
@@ -180,7 +196,7 @@ public class HMIApp extends Application {
             pages.remove(index);
             ArrayList<String> pagesTitles = new ArrayList<>();
             for (HMIScene hmiScene : this.pages) {
-                pagesTitles.add(hmiScene.getSceneTitle());
+                pagesTitles.add(hmiScene.getTitle());
             }
             updateScenesInListView(pagesTitles);
             mainStage.setScene(pages.get(0));
@@ -192,12 +208,12 @@ public class HMIApp extends Application {
         HMIScene scene = (index != -1 && index < pages.size()) ? pages.get(index) : null;
 
         if (scene != null) {
-            SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(scene.getSceneTitle(), scene.getSceneCommentary(), scene.getBackground());
+            SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(scene.getTitle(), scene.getSceneCommentary(), scene.getBackground());
             setWindowPropertiesWindow.showAndWait();
             scene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
             pages.set(index, scene);
             for (HMIScene page : pages) {
-                page.updateItem(index, scene.getSceneTitle());
+                page.updateItem(index, scene.getTitle());
             }
         }
     }
@@ -217,19 +233,19 @@ public class HMIApp extends Application {
         this.pages.add(newScene);
         ArrayList<String> pagesTitles = new ArrayList<>();
         for (HMIScene hmiScene : this.pages) {
-            pagesTitles.add(hmiScene.getSceneTitle());
+            pagesTitles.add(hmiScene.getTitle());
         }
         updateScenesInListView(pagesTitles);
 
         mainStage.setScene(newScene);
-        mainStage.setTitle(HMI_TITLE + newScene.getSceneTitle());
+        mainStage.setTitle(HMI_TITLE + newScene.getTitle());
 
         logger.log(Level.INFO, "Finishing addScene");
     }
 
     private int findSceneIndex(String sceneTitle) {
         for (int i = 0; i < pages.size(); i++) {
-            if (pages.get(i).getSceneTitle().equals(sceneTitle)) {
+            if (pages.get(i).getTitle().equals(sceneTitle)) {
                 return i;
             }
         }
@@ -258,27 +274,26 @@ public class HMIApp extends Application {
     }
 
     private void generateDatabase() throws SQLException {
-        if(!DBConnection.checkIfTablesFromSchemaBDDriverAreReady()){
+        if (!DBConnection.checkIfTablesFromSchemaBDDriverAreReady()) {
             DBConnection dbConnection = new DBConnection();
             dbConnection.generateSchemaBDDriverEIP();
         }
-        if(!DBConnection.tableExistsInSchema("Users","HMIUsers")){
+        if (!DBConnection.tableExistsInSchema("Users", "HMIUsers")) {
             DBConnection.generateSchemaHMIUsers();
         }
     }
 
-    public void showAlertForGeneratingSchemas(Alert.AlertType type, String title,String message) {
+    public void showAlertForGeneratingSchemas(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(message);
 
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
 
         alert.getButtonTypes().setAll(okButton);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
+        if (result.isPresent() && result.get() == okButton) {
             alert.close();
         }
     }
