@@ -3,6 +3,8 @@ package andrade.luis.hmiethernetip.views;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -12,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.Optional;
@@ -21,6 +24,18 @@ import java.util.regex.Pattern;
 public class SignUpWindow extends Stage {
 
     private StackPane root;
+    private HMIUser hmiUser;
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    private boolean cancelled = true;
+    private final String[] userRoles = { "Administrador", "Diseñador", "Operador"};
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
@@ -29,7 +44,7 @@ public class SignUpWindow extends Stage {
         return matcher.find();
     }
 
-    public SignUpWindow(){
+    public SignUpWindow(HMIUser hmiUser){
         root = new StackPane();
         final Label label = new Label("Registro de usuario");
 
@@ -53,10 +68,6 @@ public class SignUpWindow extends Stage {
         HBox usernameHBox = new HBox(usernameLabel, usernameField);
         usernameHBox.setSpacing(25);
 
-        // Weekdays
-        String userRoles[] =
-                { "Administrador", "Diseñador", "Operador"};
-
         // Create a combo box
         Label rolesLabel = new Label("Rol:");
         ComboBox<String> rolesComboBox =
@@ -77,27 +88,55 @@ public class SignUpWindow extends Stage {
         HBox repeatPasswordHBox = new HBox(repeatPasswordLabel, repeatPasswordField);
         repeatPasswordHBox.setSpacing(30);
 
-        Button registerButton = new Button("Registrar Usuario");
-        registerButton.setOnAction(mouseEvent -> {
+        if(hmiUser !=null){
+            this.hmiUser = hmiUser;
+            label.setText("Actualizar Datos de Usuario");
+            firstNameField.setText(this.hmiUser.getFirstName());
+            lastNameField.setText(this.hmiUser.getLastName());
+            emailField.setText(this.hmiUser.getEmail());
+            usernameField.setText(this.hmiUser.getUsername());
+            rolesComboBox.getSelectionModel().select(this.hmiUser.getRole());
+            passwordField.setPromptText("Deje en blanco para no cambiar, la contraseña");
+            repeatPasswordField.setPromptText("Deje en blanco para no cambiar, la contraseña");
+        }
+
+        Button cancelButton = new Button("Cancelar");
+        cancelButton.setOnAction(mouseEvent -> this.close());
+        Button registerButton = new Button("Guardar Usuario");
+        registerButton.setOnAction(actionEvent -> {
             try{
                 if(verifyFields(firstNameField,lastNameField,emailField,usernameField,rolesComboBox,passwordField,repeatPasswordField)){
-                    HMIUser user = new HMIUser(firstNameField.getText(),lastNameField.getText(),emailField.getText(),usernameField.getText(),rolesComboBox.getSelectionModel().getSelectedItem(),passwordField.getText());
-                    user.createInDatabase();
+                    if(SignUpWindow.this.hmiUser == null){
+                        SignUpWindow.this.hmiUser = new HMIUser(firstNameField.getText(),lastNameField.getText(),emailField.getText(),usernameField.getText(),rolesComboBox.getSelectionModel().getSelectedItem(),passwordField.getText());
+                        SignUpWindow.this.hmiUser.createInDatabase();
+                    }else{
+                        SignUpWindow.this.hmiUser.setFirstName(firstNameField.getText());
+                        SignUpWindow.this.hmiUser.setLastName(lastNameField.getText());
+                        SignUpWindow.this.hmiUser.setEmail(emailField.getText());
+                        SignUpWindow.this.hmiUser.setUsername(usernameField.getText());
+                        SignUpWindow.this.hmiUser.setRole(rolesComboBox.getSelectionModel().getSelectedItem());
+                        SignUpWindow.this.hmiUser.setPassword(passwordField.getText());
+                        SignUpWindow.this.hmiUser.updateInDatabase();
+                    }
                 }
-            } catch (SQLException sqlException){
+                this.cancelled = false;
+                this.close();
+            } catch (SQLException | IOException sqlException){
                 sqlException.printStackTrace();
                 databaseConnectionFailed(sqlException.getMessage());
             }
         });
+        HBox buttonsHBox = new HBox();
+        buttonsHBox.getChildren().addAll(cancelButton,registerButton);
 
         VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, firstNameHBox,lastNameHBox,emailHBox,usernameHBox,rolesHBox,passwordHBox,repeatPasswordHBox, registerButton);
+        vbox.getChildren().addAll(label, firstNameHBox,lastNameHBox,emailHBox,usernameHBox,rolesHBox,passwordHBox,repeatPasswordHBox, buttonsHBox);
 
         root.getChildren().add(vbox);
 
-        this.setScene(new Scene(root,700,500));
+        this.setScene(new Scene(root,400,300));
     }
 
     private void databaseConnectionFailed(String message) {
@@ -120,16 +159,20 @@ public class SignUpWindow extends Stage {
         }
     }
 
-    public boolean verifyFields(TextField firstName, TextField lastName, TextField email, TextField username, ComboBox<String> role, PasswordField passwordField, PasswordField repeatPasswordField) throws SQLException {
+    public boolean verifyFields(TextField firstName, TextField lastName, TextField email, TextField username, ComboBox<String> role, PasswordField passwordField, PasswordField repeatPasswordField) throws SQLException, IOException {
         String message = "";
-        if(firstName.getText().isEmpty() && lastName.getText().isEmpty() && email.getText().isEmpty() && username.getText().isEmpty() && passwordField.getText().isEmpty() && repeatPasswordField.getText().isEmpty() ){
+        if(firstName.getText().isEmpty() && lastName.getText().isEmpty() && email.getText().isEmpty() && username.getText().isEmpty()){
+            message = "Existen campos vacíos";
+        }else if(passwordField.getText().isEmpty() && repeatPasswordField.getText().isEmpty() && this.hmiUser == null){
             message = "Existen campos vacíos";
         }else if(!validateEmailAddress(email.getText())){
             message = "Ingrese un correo electrónico válido";
-        }else if(HMIUser.existsEmail(email.getText())){
+        }else if(HMIUser.existsEmail(email.getText(),(this.hmiUser!=null)? this.hmiUser.getUsername() : "")){
             message = "El correo electrónico ya se encuentra asociado a una cuenta";
-        }else if(HMIUser.existsUsername(username.getText())){
-            message = "El nombre de usuario ya existe";
+        }else if((this.hmiUser!=null)? !this.hmiUser.getUsername().equals(username.getText()) : false){
+            if(HMIUser.existsUsername(username.getText())){
+                message = "El nombre de usuario ya existe";
+            }
         }else if(role.getSelectionModel().getSelectedIndex()==-1){
             message = "Debe seleccionar un rol";
         }else if(!passwordField.getText().equals(repeatPasswordField.getText())){

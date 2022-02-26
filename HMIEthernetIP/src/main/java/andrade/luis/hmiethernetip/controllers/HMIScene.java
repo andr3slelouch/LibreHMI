@@ -31,7 +31,7 @@ public class HMIScene extends Scene implements Cloneable {
      * */
     private final String location = getClass().getResource("").toExternalForm();
     private final Image windowImage = new Image(getClass().getResource("window.png").toExternalForm());
-    private ScrollPane backgroundStackPane;
+    private ScrollPane backgroundScrollPane;
     private ListView<String> listViewReference;
     private ArrayList<String> itemsForList;
     private String title;
@@ -53,7 +53,7 @@ public class HMIScene extends Scene implements Cloneable {
 
     public void setBackground(Color background) {
         this.background = background;
-        this.backgroundStackPane.setBackground(new Background(new BackgroundFill(background, CornerRadii.EMPTY, Insets.EMPTY)));
+        this.backgroundScrollPane.setBackground(new Background(new BackgroundFill(background, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
     public String getSceneCommentary() {
@@ -93,7 +93,7 @@ public class HMIScene extends Scene implements Cloneable {
         /*setting each image to corresponding array index*/
         listViewReference.setCellFactory(param -> new ListCell<String>() {
             /*view the image class to display the image*/
-            private ImageView displayImage = new ImageView();
+            private final ImageView displayImage = new ImageView();
             @Override
             public void updateItem(String name, boolean empty) {
                 super.updateItem(name, empty);
@@ -119,9 +119,9 @@ public class HMIScene extends Scene implements Cloneable {
                         String item = getItem();
                         // code to edit item...
                     });
-                    MenuItem duplicateItem = new MenuItem();
+                    /*MenuItem duplicateItem = new MenuItem();
                     duplicateItem.setText("Duplicate");
-                    duplicateItem.setOnAction(event -> hmiApp.duplicateScene(getItem()));
+                    duplicateItem.setOnAction(event -> hmiApp.duplicateScene(getItem()));*/
                     MenuItem deleteItem = new MenuItem();
                     deleteItem.setText("Delete");
                     deleteItem.setOnAction(event -> hmiApp.deleteScene(getItem()));
@@ -131,7 +131,7 @@ public class HMIScene extends Scene implements Cloneable {
                         String item = getItem();
                         hmiApp.updateScene(item);
                     });
-                    contextMenu.getItems().addAll(newItem,saveItem,duplicateItem,deleteItem,propertiesItem);
+                    contextMenu.getItems().addAll(newItem,saveItem,deleteItem,propertiesItem);
                     setContextMenu(contextMenu);
                     setOnMouseClicked(event -> {
                         if(event.getClickCount()==2){
@@ -152,12 +152,12 @@ public class HMIScene extends Scene implements Cloneable {
         this.listViewReference = listViewReference;
     }
 
-    public ScrollPane getBackgroundStackPane() {
-        return backgroundStackPane;
+    public ScrollPane getBackgroundScrollPane() {
+        return backgroundScrollPane;
     }
 
-    public void setBackgroundStackPane(ScrollPane backgroundStackPane) {
-        this.backgroundStackPane = backgroundStackPane;
+    public void setBackgroundScrollPane(ScrollPane backgroundScrollPane) {
+        this.backgroundScrollPane = backgroundScrollPane;
     }
 
     public HMICanvas getCanvas() {
@@ -168,10 +168,10 @@ public class HMIScene extends Scene implements Cloneable {
         this.hmiCanvas = hmiCanvas;
     }
 
-    public HMIScene(ScrollPane stackPane, HMICanvas hmiCanvas, String title, String sceneCommentary, double v, double v1, Paint paint) {
-        super(stackPane, v, v1, paint);
-        this.backgroundStackPane = stackPane;
-        stackPane.setBackground(new Background(new BackgroundFill(paint, CornerRadii.EMPTY, Insets.EMPTY)));
+    public HMIScene(ScrollPane scrollPane, HMICanvas hmiCanvas, String title, String sceneCommentary, double v, double v1, Paint paint) {
+        super(scrollPane, v, v1, paint);
+        this.backgroundScrollPane = scrollPane;
+        scrollPane.setBackground(new Background(new BackgroundFill(paint, CornerRadii.EMPTY, Insets.EMPTY)));
         this.background = (Color) paint;
         this.title = title;
         this.sceneCommentary = sceneCommentary;

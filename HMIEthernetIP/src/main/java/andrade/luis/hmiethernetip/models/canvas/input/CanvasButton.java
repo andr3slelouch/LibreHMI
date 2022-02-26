@@ -1,7 +1,10 @@
-package andrade.luis.hmiethernetip.models.canvas;
+package andrade.luis.hmiethernetip.models.canvas.input;
 
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.controllers.HMIScene;
+import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
+import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SelectWindowsWindow;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
@@ -10,6 +13,17 @@ import java.util.ArrayList;
 
 public class CanvasButton extends GraphicalRepresentation {
     private Button button;
+
+    public HMIUser getUser() {
+        return user;
+    }
+
+    public void setUser(HMIUser user) {
+        this.user = user;
+    }
+
+    private HMIUser user;
+    private ArrayList<HMIScene> selectedPages = new ArrayList<>();
 
     public HMIApp getHmiApp() {
         return hmiApp;
@@ -43,17 +57,20 @@ public class CanvasButton extends GraphicalRepresentation {
     }
 
     public void selectWindows() {
-        SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(hmiApp.getPages());
+        SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(hmiApp.getPages(), selectedPages);
         selectWindowsWindow.showAndWait();
-        ArrayList<HMIScene> selectedPages = selectWindowsWindow.getSelectedItems();
+        selectedPages = selectWindowsWindow.getSelectedItems();
         this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(selectedPages));
     }
 
     @Override
     public void setEnable(String enabled) {
+        if(user.getRole().equals("Operador")){
+            enabled = "Stop";
+        }
         switch (enabled) {
             case "Play":
-                super.setEnable("True");
+                super.setEnable("Play");
                 this.button.setDisable(false);
                 break;
             case "Stop":
@@ -65,7 +82,5 @@ public class CanvasButton extends GraphicalRepresentation {
                 this.button.setDisable(true);
                 break;
         }
-
     }
-
 }

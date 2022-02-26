@@ -425,7 +425,7 @@ public class GraphicalRepresentation extends BorderPane {
     }
 
     public void setEnable(String enabled) {
-        this.setDisable(enabled.equals("Play"));
+        this.setDisable(enabled.equals("Stop"));
     }
 
     private HMICanvasInterface canvas;

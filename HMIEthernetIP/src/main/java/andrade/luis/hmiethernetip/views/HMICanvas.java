@@ -3,6 +3,9 @@ package andrade.luis.hmiethernetip.views;
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.*;
 import andrade.luis.hmiethernetip.models.canvas.*;
+import andrade.luis.hmiethernetip.models.canvas.input.CanvasButton;
+import andrade.luis.hmiethernetip.models.canvas.input.CanvasSlider;
+import andrade.luis.hmiethernetip.models.canvas.input.CanvasTextField;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -117,6 +120,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {
         CanvasTextField canvasTextField = new CanvasTextField(current);
         canvasTextField.setCanvas(this);
+        canvasTextField.setUser(hmiApp.getUser());
         if (this.getShapeArrayList().isEmpty()) {
             canvasTextField.setId(FIGURE_ID + "0");
         } else {
@@ -129,6 +133,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     private void addSliderOnCanvasClicked(CanvasPoint current) {
         CanvasSlider canvasSlider = new CanvasSlider(current);
         canvasSlider.setCanvas(this);
+        canvasSlider.setUser(hmiApp.getUser());
         if (this.getShapeArrayList().isEmpty()) {
             canvasSlider.setId(FIGURE_ID + "0");
         } else {
@@ -142,6 +147,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         CanvasButton canvasButton = new CanvasButton(current);
         canvasButton.setHmiApp(hmiApp);
         canvasButton.setCanvas(this);
+        canvasButton.setUser(hmiApp.getUser());
         if (this.getShapeArrayList().isEmpty()) {
             canvasButton.setId(FIGURE_ID + "0");
         } else {

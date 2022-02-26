@@ -18,7 +18,7 @@ public class SelectWindowsWindow extends Stage {
     private ArrayList<HMIScene> selectedItems = new ArrayList<>();
     private int height = 50;
 
-    public SelectWindowsWindow(ArrayList<HMIScene> itemsForList){
+    public SelectWindowsWindow(ArrayList<HMIScene> itemsForList, ArrayList<HMIScene> selectedItems) {
         root = new StackPane();
         final Label label = new Label("Seleccione una Ventana");
 
@@ -33,8 +33,18 @@ public class SelectWindowsWindow extends Stage {
             checkBoxHBox.getChildren().addAll(box, sceneName);
             checkBoxesVBox.getChildren().addAll(checkBoxHBox);
             items.add(new SceneItem(hmiScene,box));
-            height= height +50;
+            height= height + 50;
         }
+
+        for(SceneItem item : items) {
+            for(HMIScene selectedScene : selectedItems) {
+                if(selectedScene.getTitle().equals(item.getScene().getTitle())){
+                    item.setSelected(true);
+                }
+            }
+        }
+        
+        setSelectedItems();
 
         Button okButton = new Button("Aceptar");
         Button cancelButton = new Button("Cancelar");

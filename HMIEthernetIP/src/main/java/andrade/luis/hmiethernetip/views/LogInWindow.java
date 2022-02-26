@@ -9,11 +9,22 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
 public class LogInWindow extends Stage {
     private final StackPane root;
+
+    public HMIUser getLoggedUser() {
+        return loggedUser;
+    }
+
+    public void setLoggedUser(HMIUser loggedUser) {
+        this.loggedUser = loggedUser;
+    }
+
+    private HMIUser loggedUser;
 
     public LogInWindow(){
         root = new StackPane();
@@ -33,9 +44,16 @@ public class LogInWindow extends Stage {
         signInButton.setOnAction(mouseEvent -> {
             try {
                 HMIUser user = new HMIUser(usernameEmailField.getText(),passwordField.getText());
-                System.out.println(user.isUserLoggedIn());
+                if(user.isUserLoggedIn()){
+                    loggedUser = user;
+                    this.close();
+                }else{
+                    showAlert(Alert.AlertType.ERROR,"Error al Iniciar Sesión","Usuario o contraseña incorrectos");
+                }
             } catch (SQLException e) {
                 databaseConnectionFailed(e.getMessage());
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });

@@ -1,5 +1,8 @@
 package andrade.luis.hmiethernetip.views;
 
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class SetWindowPropertiesWindow extends Stage {
@@ -47,10 +51,11 @@ public class SetWindowPropertiesWindow extends Stage {
         this.cancelled = cancelled;
     }
 
-    private boolean cancelled =false;
+    private boolean cancelled =true;
     private TextField nameField;
     private TextField commentField;
     private ColorPicker windowColorPicker;
+    private ArrayList<String> windowsTitles = new ArrayList<>();
     public SetWindowPropertiesWindow(){
         init("","",Color.WHITESMOKE);
     }
@@ -85,16 +90,17 @@ public class SetWindowPropertiesWindow extends Stage {
         finishButton.setAlignment(Pos.CENTER);
         finishButton.setOnAction(actionEvent -> {
             if(nameField.getText().isEmpty()){
-                confirmExit();
-            }else{
+                confirmExit(Alert.AlertType.WARNING, "Advertencia","El campo nombre no puede estar vacío");
+            } else if(windowsTitles.contains(nameField.getText())){
+                confirmExit(Alert.AlertType.ERROR, "Error","Ya existe una página con el nombre '"+nameField.getText()+"',utilice un nombre diferente");
+            }
+            else{
+                cancelled = false;
                 this.close();
             }
         });
         Button cancelButton = new Button("Cancelar");
-        cancelButton.setOnAction(actionEvent -> {
-            cancelled = true;
-            this.close();
-        });
+        cancelButton.setOnAction(actionEvent -> this.close());
         HBox bottomHBox = new HBox();
         bottomHBox.setSpacing(5);
         bottomHBox.getChildren().addAll(cancelButton,finishButton);
@@ -109,10 +115,10 @@ public class SetWindowPropertiesWindow extends Stage {
         this.setScene(mainScene);
     }
 
-    private void confirmExit(){
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Advertencia");
-        alert.setHeaderText("El campo nombre no puede estar vacío");
+    private void confirmExit(Alert.AlertType type,String title ,String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
 
         ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
 
@@ -123,5 +129,13 @@ public class SetWindowPropertiesWindow extends Stage {
         {
             alert.close();
         }
+    }
+
+    public ArrayList<String> getWindowsTitles() {
+        return windowsTitles;
+    }
+
+    public void setPagesTitles(ArrayList<String> windowsTitles) {
+        this.windowsTitles = windowsTitles;
     }
 }

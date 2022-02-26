@@ -4,6 +4,7 @@ import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.IOException;
 import java.sql.*;
 
 public class HMIUser {
@@ -31,6 +32,7 @@ public class HMIUser {
     @SerializedName("userLoggedIn")
     @Expose
     private boolean userLoggedIn = false;
+    private String oldUsername;
 
     public boolean isUserLoggedIn() {
         return userLoggedIn;
@@ -93,6 +95,7 @@ public class HMIUser {
     }
 
     public void setUsername(String username) {
+        this.oldUsername = this.username;
         this.username = username;
     }
 
@@ -105,7 +108,7 @@ public class HMIUser {
         setPassword(password);
     }
 
-    public HMIUser(String usernameOrEmail, String password) throws SQLException {
+    public HMIUser(String usernameOrEmail, String password) throws SQLException, IOException {
         this.userLoggedIn = verifyUserAndPassword(usernameOrEmail, password);
         if (this.username != null) {
             readFromDatabase(this.username);
@@ -117,7 +120,7 @@ public class HMIUser {
         this.saltedHashPassword = HMIPassword.computeSaltedHashString(password, this.salt);
     }
 
-    public boolean createInDatabase() throws SQLException {
+    public boolean createInDatabase() throws SQLException, IOException {
         Connection con = DBConnection.createConnectionToHMIUsers();
         String query = "INSERT INTO Users(first,last,email,username,role,salt,saltedHashPassword) values (?,?,?,?,?,?,?)";
         PreparedStatement prepareStatement = con.prepareStatement(query);
@@ -133,9 +136,12 @@ public class HMIUser {
         return insertRowResult > 0;
     }
 
-    public static boolean existsEmail(String email) throws SQLException {
+    public static boolean existsEmail(String email, String username) throws SQLException, IOException {
         Connection con = DBConnection.createConnectionToHMIUsers();
         String query = "SELECT email from Users WHERE email='" + email + "'";
+        if(!username.isEmpty()){
+            query = query.concat(" AND username!='"+username+"'");
+        }
         Statement statement = con.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
         boolean res = false;
@@ -146,7 +152,7 @@ public class HMIUser {
         return res;
     }
 
-    public static boolean existsUsername(String username) throws SQLException {
+    public static boolean existsUsername(String username) throws SQLException, IOException {
         Connection con = DBConnection.createConnectionToHMIUsers();
         String query = "SELECT username from Users WHERE username='" + username + "'";
         Statement statement = con.createStatement();
@@ -159,7 +165,7 @@ public class HMIUser {
         return res;
     }
 
-    public boolean verifyUserAndPassword(String usernameOrEmail, String password) throws SQLException {
+    public boolean verifyUserAndPassword(String usernameOrEmail, String password) throws SQLException, IOException {
         Connection con = DBConnection.createConnectionToHMIUsers();
         String query = "SELECT username, salt, saltedHashPassword FROM Users WHERE username='" + usernameOrEmail + "' or email='" + usernameOrEmail + "'";
         Statement statement = con.createStatement();
@@ -176,7 +182,7 @@ public class HMIUser {
 
     }
 
-    public void readFromDatabase(String username) throws SQLException {
+    public void readFromDatabase(String username) throws SQLException, IOException {
         Connection con = DBConnection.createConnectionToHMIUsers();
         String query = "SELECT * FROM Users WHERE username='" + username + "'";
         Statement statement = con.createStatement();
@@ -194,9 +200,9 @@ public class HMIUser {
         con.close();
     }
 
-    public boolean updateInDatabase() throws SQLException {
+    public boolean updateInDatabase() throws SQLException, IOException {
         Connection con = DBConnection.createConnectionToHMIUsers();
-        String query = "UPDATE Users SET first=?, last=?,email=?,username=?,role=?,salt=?,saltedHashPassword=?";
+        String query = "UPDATE Users SET first=?, last=?,email=?,username=?,role=?,salt=?,saltedHashPassword=? WHERE username='"+oldUsername+"'";
         PreparedStatement prepareStatement = con.prepareStatement(query);
         prepareStatement.setString(1, this.firstName);
         prepareStatement.setString(2, this.lastName);
@@ -210,12 +216,12 @@ public class HMIUser {
         return insertRowResult > 0;
     }
 
-    public boolean deleteFromDatabase(String username) throws SQLException {
+    public boolean deleteFromDatabase() throws SQLException, IOException {
         Connection con = DBConnection.createConnectionToHMIUsers();
         String sql = "DELETE FROM Users WHERE username=?";
 
         PreparedStatement statement = con.prepareStatement(sql);
-        statement.setString(1, username);
+        statement.setString(1, this.username);
 
         int rowsDeleted = statement.executeUpdate();
         return rowsDeleted > 0;

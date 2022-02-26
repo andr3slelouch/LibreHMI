@@ -1,6 +1,7 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
+import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import andrade.luis.hmiethernetip.views.*;
 import javafx.application.Application;
@@ -13,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,21 +34,18 @@ public class HMIApp extends Application {
 
     private final ArrayList<HMIScene> pages = new ArrayList<>();
     private ArrayList<HMIScene> selectedPages = new ArrayList<>();
+    private ArrayList<Stage> createdWindows = new ArrayList<>();
+    private ArrayList<String> pagesTitles = new ArrayList<>();
     private static final String HMI_TITLE = "HMI: ";
+    private HMIUser user;
 
     @Override
     public void start(Stage stage) {
 
         mainStage = stage;
-        try {
-            generateDatabase();
-        } catch (SQLException sqlException) {
-            showAlertForGeneratingSchemas(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", sqlException.getMessage());
-            sqlException.printStackTrace();
-        }
+        generateDatabase();
         HMIScene scene = generatePage("Página 1", "", Color.WHITESMOKE);
-
-        pages.add(scene);
+        addScene(scene);
         mainStage.setTitle(HMI_TITLE + scene.getTitle());
         mainStage.setScene(scene);
         mainStage.show();
@@ -91,17 +90,17 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("TextField");
         });
-        Button newPageBtn = new Button("Add new Page");
+        Button manageUsersBtn = new Button("Manage Users");
         Button registerUserBtn = new Button("Register");
         Button logIntUserBtn = new Button("Log In");
-        Button selectWindowBtn = new Button("Select Window");
+        Button saveBtn = new Button("Guardar Propiedades");
         Button showSelectedWindowsBtn = new Button("Show");
         Button playBtn = new Button("Play");
         Button stopBtn = new Button("Stop");
         Button defaultBtn = new Button("Default");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
-        HBox secondHBox = new HBox(sliderBtn, textFieldBtn, newPageBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(logIntUserBtn, selectWindowBtn, showSelectedWindowsBtn);
+        HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
+        HBox thirdHBox = new HBox(logIntUserBtn, saveBtn, showSelectedWindowsBtn);
         HBox fourthHBox = new HBox(playBtn, stopBtn, defaultBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
@@ -112,19 +111,22 @@ public class HMIApp extends Application {
         VBox vbox = new VBox(hbox, secondHBox, thirdHBox, fourthHBox, scene.getListViewReference());
         root.getChildren().add(vbox);
 
-        newPageBtn.setOnMouseClicked(mouseEvent -> addNewScene());
+        manageUsersBtn.setOnMouseClicked(mouseEvent -> {
+            ManageUsersWindow manageUsersWindow = new ManageUsersWindow(this.user);
+            manageUsersWindow.show();
+        });
         registerUserBtn.setOnMouseClicked(mouseEvent -> {
-            SignUpWindow signUpWindow = new SignUpWindow();
+            SignUpWindow signUpWindow = new SignUpWindow(null);
             signUpWindow.show();
         });
         logIntUserBtn.setOnAction(mouseEvent -> {
             LogInWindow logInWindow = new LogInWindow();
-            logInWindow.show();
+            logInWindow.showAndWait();
+            user = logInWindow.getLoggedUser();
         });
-        selectWindowBtn.setOnAction(mouseEvent -> {
-            SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(this.pages);
-            selectWindowsWindow.showAndWait();
-            selectedPages = selectWindowsWindow.getSelectedItems();
+        saveBtn.setOnAction(mouseEvent -> {
+            SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
+            saveDatabaseCredentialsWindow.show();
         });
         showSelectedWindowsBtn.setOnAction(mouseEvent -> generateStagesForPages(selectedPages));
         playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
@@ -136,7 +138,7 @@ public class HMIApp extends Application {
         return scene;
     }
 
-    public void enableInputRepresentations(String value){
+    public void enableInputRepresentations(String value) {
         for (HMIScene page : this.pages) {
             for (int i = 0; i < page.getCanvas().getShapeArrayList().size(); i++) {
                 page.getCanvas().getShapeArrayList().get(i).setEnable(value);
@@ -145,15 +147,44 @@ public class HMIApp extends Application {
     }
 
     public void generateStagesForPages(ArrayList<HMIScene> selectedPages) {
+        boolean mainStageWasUpdated = false;
         if (!selectedPages.isEmpty()) {
-            changeSelectedScene(selectedPages.get(0).getTitle());
-            for (int i = 1; i < selectedPages.size(); i++) {
-                Stage stage = new Stage();
-                stage.setScene(selectedPages.get(i));
-                stage.setTitle(HMI_TITLE + selectedPages.get(i).getTitle());
-                stage.show();
+            for (HMIScene selectedPage : selectedPages) {
+                int index = getIndexForStageWithScene(selectedPage.getTitle());
+                if (index == -1) {
+                    if (!mainStageWasUpdated) {
+                        changeSelectedScene(selectedPage.getTitle());
+                        mainStageWasUpdated = true;
+                    } else {
+                        generateStage(selectedPage);
+                    }
+                } else {
+                    if(createdWindows.get(index).isShowing()){
+                        createdWindows.get(index).requestFocus();
+                    }else{
+                        createdWindows.get(index).show();
+                    }
+                }
             }
         }
+    }
+
+    private void generateStage(HMIScene scene){
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle(HMI_TITLE + scene.getTitle());
+        stage.show();
+        createdWindows.add(stage);
+    }
+
+    private int getIndexForStageWithScene(String title) {
+        int index = -1;
+        for (int i = 0; i < createdWindows.size(); i++) {
+            if (((HMIScene) createdWindows.get(i).getScene()).getTitle().equals(title)) {
+                index = i;
+            }
+        }
+        return index;
     }
 
     public void changeSelectedScene(String sceneTitle) {
@@ -194,10 +225,7 @@ public class HMIApp extends Application {
         int index = findSceneIndex(sceneTitle);
         if (confirmDelete(sceneTitle)) {
             pages.remove(index);
-            ArrayList<String> pagesTitles = new ArrayList<>();
-            for (HMIScene hmiScene : this.pages) {
-                pagesTitles.add(hmiScene.getTitle());
-            }
+            pagesTitles.remove(index);
             updateScenesInListView(pagesTitles);
             mainStage.setScene(pages.get(0));
         }
@@ -209,11 +237,15 @@ public class HMIApp extends Application {
 
         if (scene != null) {
             SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(scene.getTitle(), scene.getSceneCommentary(), scene.getBackground());
+            setWindowPropertiesWindow.setPagesTitles(pagesTitles);
             setWindowPropertiesWindow.showAndWait();
-            scene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
-            pages.set(index, scene);
-            for (HMIScene page : pages) {
-                page.updateItem(index, scene.getTitle());
+            if(!setWindowPropertiesWindow.isCancelled()){
+                scene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
+                pages.set(index, scene);
+                for (HMIScene page : pages) {
+                    pagesTitles.set(index, page.getTitle());
+                    page.updateItem(index, scene.getTitle());
+                }
             }
         }
     }
@@ -221,6 +253,7 @@ public class HMIApp extends Application {
 
     public void addNewScene() {
         SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow();
+        setWindowPropertiesWindow.setPagesTitles(pagesTitles);
         setWindowPropertiesWindow.showAndWait();
         if (!setWindowPropertiesWindow.isCancelled()) {
             HMIScene newScene = generatePage(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
@@ -229,18 +262,12 @@ public class HMIApp extends Application {
     }
 
     private void addScene(HMIScene newScene) {
-        logger.log(Level.INFO, "In addScene");
         this.pages.add(newScene);
-        ArrayList<String> pagesTitles = new ArrayList<>();
-        for (HMIScene hmiScene : this.pages) {
-            pagesTitles.add(hmiScene.getTitle());
-        }
+        this.pagesTitles.add(newScene.getTitle());
         updateScenesInListView(pagesTitles);
 
         mainStage.setScene(newScene);
         mainStage.setTitle(HMI_TITLE + newScene.getTitle());
-
-        logger.log(Level.INFO, "Finishing addScene");
     }
 
     private int findSceneIndex(String sceneTitle) {
@@ -273,17 +300,28 @@ public class HMIApp extends Application {
         return false;
     }
 
-    private void generateDatabase() throws SQLException {
-        if (!DBConnection.checkIfTablesFromSchemaBDDriverAreReady()) {
-            DBConnection dbConnection = new DBConnection();
-            dbConnection.generateSchemaBDDriverEIP();
+    private void generateDatabase() {
+        try {
+            if (!DBConnection.checkIfTablesFromSchemaBDDriverAreReady()) {
+                DBConnection dbConnection = new DBConnection();
+                dbConnection.generateSchemaBDDriverEIP();
+            }
+            if (!DBConnection.tableExistsInSchema("Users", "HMIUsers")) {
+                DBConnection.generateSchemaHMIUsers();
+            }
+        } catch (SQLException sqlException) {
+            showAlertForGeneratingSchemas(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", sqlException.getMessage(),false);
+            sqlException.printStackTrace();
+        } catch (IOException e){
+            if(!showAlertForGeneratingSchemas(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", e.getMessage()+"; pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos",true)){
+                generateDatabase();
+            }
+            e.printStackTrace();
         }
-        if (!DBConnection.tableExistsInSchema("Users", "HMIUsers")) {
-            DBConnection.generateSchemaHMIUsers();
-        }
+
     }
 
-    public void showAlertForGeneratingSchemas(Alert.AlertType type, String title, String message) {
+    public boolean showAlertForGeneratingSchemas(Alert.AlertType type, String title, String message, boolean showCredentialsWindow) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(message);
@@ -295,6 +333,20 @@ public class HMIApp extends Application {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == okButton) {
             alert.close();
+            if(showCredentialsWindow){
+                SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
+                saveDatabaseCredentialsWindow.showAndWait();
+                return saveDatabaseCredentialsWindow.isCancelled();
+            }
         }
+        return true;
+    }
+
+    public HMIUser getUser() {
+        return user;
+    }
+
+    public void setUser(HMIUser user) {
+        this.user = user;
     }
 }
