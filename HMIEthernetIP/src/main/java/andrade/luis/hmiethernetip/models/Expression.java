@@ -15,9 +15,11 @@ public class Expression implements Serializable {
     private static final ArrayList<String> arithmeticOperators = new ArrayList<>(Arrays.asList("+", "-", "*", "/", "%", "++", "--"));
     private static final ArrayList<String> comparisonOperators = new ArrayList<>(Arrays.asList("==", "!=", ">", "<", ">=", "<="));
     private static final ArrayList<String> logicalOperators = new ArrayList<>(Arrays.asList("&&", "||", "!"));
+    private static final ArrayList<String> stringOperators = new ArrayList<>(Arrays.asList("\"", "+"));
     static final String BOOLEAN_STR = "Booleano";
     static final String INT_STR = "Entero";
     static final String FLOAT_STR = "Flotante";
+    static final String STRING_STR = "String";
     static final String NULL_STR = "<null>";
     @SerializedName("expressionToEvaluate")
     @Expose
@@ -96,6 +98,23 @@ public class Expression implements Serializable {
 
     public String determineResultType() {
         StringBuilder sb = new StringBuilder(this.expressionToEvaluate);
+        String res = null;
+
+        for (String stringOperator : stringOperators) {
+            if (expressionToEvaluate.contains(stringOperator)) {
+                if(parameters.isEmpty()){
+                    this.expressionToEvaluate = expressionToEvaluate + "+\"\"";
+                }else{
+                    for(int i = 0; i < parameters.size(); i++) {
+                        if(!this.expressionToEvaluate.contains("String.valueOf("+parameterNames[i]+")")){
+                            this.expressionToEvaluate = this.expressionToEvaluate.replace(parameterNames[i],"String.valueOf("+parameterNames[i]+")");
+                        }
+                    }
+                }
+                return STRING_STR;
+            }
+        }
+
         for (String comparisonOperator : comparisonOperators) {
             if (expressionToEvaluate.contains(comparisonOperator)) {
                 return BOOLEAN_STR;
@@ -114,14 +133,16 @@ public class Expression implements Serializable {
             }
         }
 
-        if(parameters.size()==1){
+        /*if(parameters.size()==1){
             if(parameters.get(0).getTagType().equals(BOOLEAN_STR)){
                 sb.append("&& true");
             }else if(parameters.get(0).getTagType().equals(FLOAT_STR)){
                 sb.append("*1");
+            }else if(parameters.get(0).getTagType().equals(STRING_STR)){
+                sb.append("+\"\"");
             }
             this.expressionToEvaluate = sb.toString();
-        }
+        }*/
 
         return FLOAT_STR;
 
@@ -183,7 +204,7 @@ public class Expression implements Serializable {
         if (parameterNames.length == parameterTypes.length) {
             ee.setParameters(parameterNames, getParameterTypesClasses());
         }
-        switch (resultType) {
+        switch (this.resultType) {
             case INT_STR:
                 ee.setExpressionType(int.class);
                 break;
@@ -192,6 +213,9 @@ public class Expression implements Serializable {
                 break;
             case BOOLEAN_STR:
                 ee.setExpressionType(boolean.class);
+                break;
+            case STRING_STR:
+                ee.setExpressionType(String.class);
                 break;
             default:
                 ee.setExpressionType(void.class);

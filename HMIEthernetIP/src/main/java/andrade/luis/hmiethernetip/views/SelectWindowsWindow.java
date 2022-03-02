@@ -1,7 +1,7 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
-import andrade.luis.hmiethernetip.util.example.SceneItem;
+import andrade.luis.hmiethernetip.models.SceneItem;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;

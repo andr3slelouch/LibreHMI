@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -128,7 +129,11 @@ public class HMIApp extends Application {
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.show();
         });
-        showSelectedWindowsBtn.setOnAction(mouseEvent -> generateStagesForPages(selectedPages));
+        showSelectedWindowsBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Image");
+
+        });
         playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
         stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
         defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));

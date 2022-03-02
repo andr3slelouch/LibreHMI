@@ -7,23 +7,28 @@ import andrade.luis.hmiethernetip.models.canvas.input.CanvasButton;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasSlider;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasTextField;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
+    Logger logger = Logger.getLogger(this.getClass().getName());
     public String getMode() {
         return mode;
     }
@@ -111,13 +116,40 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
             case "TextField":
                 addTextFieldOnCanvasClicked(current);
                 break;
-
+            case "Image":
+                addImageViewOnCanvasClicked(current);
+                break;
             default:
                 break;
         }
     }
 
+    private void addImageViewOnCanvasClicked(CanvasPoint current) {
+        Image selectedSymbol = null;
+        String selectedSymbolPath = null;
+        try {
+            SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow();
+            selectHMISymbolWindow.showAndWait();
+            selectedSymbol = selectHMISymbolWindow.getSelectedImage();
+            selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        CanvasImage canvasImage = new CanvasImage(selectedSymbol,current,true,selectedSymbolPath);
+        canvasImage.setCanvas(this);
+
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasImage.setId(FIGURE_ID + "0");
+        } else {
+            canvasImage.setId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        this.addNewShape(canvasImage);
+        this.getChildren().add(canvasImage);
+    }
+
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {
+        SetTextFieldPropertiesWindow setTextFieldPropertiesWindow = new SetTextFieldPropertiesWindow();
+        setTextFieldPropertiesWindow.show();
         CanvasTextField canvasTextField = new CanvasTextField(current);
         canvasTextField.setCanvas(this);
         canvasTextField.setUser(hmiApp.getUser());
@@ -202,28 +234,19 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         } else {
             canvasText.setId(FIGURE_ID + this.getShapeArrayList().size());
         }
-        Tag tag;
-        if (this.getMode().equals("Test")) {
-            tag = new Tag("", "", "", "temperatura", "Flotante", "", "", "");
-        } else {
-            tag = selectTag();
-        }
-
-        Logger logger = Logger.getLogger(this.getClass().getSimpleName());
-        logger.log(Level.INFO, tag.getTagName());
-        canvasText.getGraphicalRepresentationData().setTag(tag);
+        Expression expression;
+        expression = writeExpression();
+        canvasText.setExpression(expression);
         this.addNewShape(canvasText);
         this.getChildren().add(canvasText);
-        canvasText.setTimeline();
 
 
     }
 
-    @Override
-    public Tag selectTag() {
-        SelectTagWindow selectTagWindow = new SelectTagWindow(false);
-        selectTagWindow.showAndWait();
-        return selectTagWindow.getSelectedTag();
+    public Expression writeExpression() {
+        WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
+        writeExpressionWindow.showAndWait();
+        return writeExpressionWindow.getLocalExpression();
     }
 
     public ArrayList<GraphicalRepresentation> getCurrentCanvasObjects() {
@@ -293,6 +316,21 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
                     case "SystemDateTimeLabel":
                         addPastedSystemDateTimeLabel(graphicalRepresentationData);
                         break;
+                    case "Text":
+                        addPastedTextOnCanvasClicked(graphicalRepresentationData);
+                        break;
+                    case "Button":
+                        addPastedButtonOnCanvasClicked(graphicalRepresentationData);
+                        break;
+                    case "Slider":
+                        addPastedSliderOnCanvasClicked(graphicalRepresentationData);
+                        break;
+                    case "TextField":
+                        addPastedTextFieldOnCanvasClicked(graphicalRepresentationData);
+                        break;
+                    case "Image":
+                        addPastedImageViewOnCanvasClicked(graphicalRepresentationData);
+                        break;
                     default:
                         break;
                 }
@@ -302,6 +340,45 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         }
     }
 
+    private void addPastedImageViewOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
+        try{
+            CanvasImage canvasImage = new CanvasImage(graphicalRepresentationData);
+            canvasImage.setCanvas(this);
+            canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
+            canvasImage.setId(generateIdForPasteOperation(graphicalRepresentationData));
+            this.addNewShape(canvasImage);
+            this.getChildren().add(canvasImage);
+        }catch(Exception e){
+            showAlert(Alert.AlertType.ERROR,"Error al agregar imagen","Error:'"+e.getMessage()+"'");
+        }
+    }
+
+    private void addPastedTextFieldOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
+        CanvasTextField canvasTextField = new CanvasTextField(graphicalRepresentationData);
+        canvasTextField.setCanvas(this);
+        canvasTextField.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
+        canvasTextField.setUser(hmiApp.getUser());
+        canvasTextField.setId(generateIdForPasteOperation(graphicalRepresentationData));
+        this.addNewShape(canvasTextField);
+        this.getChildren().add(canvasTextField);
+    }
+
+    private void addPastedSliderOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
+    }
+
+    private void addPastedButtonOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
+    }
+
+    private void addPastedTextOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
+        CanvasText canvasText = new CanvasText(graphicalRepresentationData);
+        canvasText.setCanvas(this);
+        canvasText.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
+        canvasText.setId(generateIdForPasteOperation(graphicalRepresentationData));
+        this.addNewShape(canvasText);
+        this.getChildren().add(canvasText);
+        canvasText.setExpression(graphicalRepresentationData.getExpression());
+    }
+
     public void addPastedRectangle(GraphicalRepresentationData graphicalRepresentationData) {
         CanvasRectangle canvasRectangle = new CanvasRectangle(graphicalRepresentationData);
         canvasRectangle.setCanvas(this);
@@ -309,7 +386,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         canvasRectangle.setId(generateIdForPasteOperation(graphicalRepresentationData));
         this.addNewShape(canvasRectangle);
         this.getChildren().add(canvasRectangle);
-        canvasRectangle.setPercentFill(graphicalRepresentationData.getRefillExpression(), graphicalRepresentationData.getPrimaryColor(), graphicalRepresentationData.getBackgroundColor(), graphicalRepresentationData.getOrientation());
+        canvasRectangle.setPercentFill(graphicalRepresentationData.getExpression(), graphicalRepresentationData.getPrimaryColor(), graphicalRepresentationData.getBackgroundColor(), graphicalRepresentationData.getOrientation());
     }
 
     public void addPastedLabel(GraphicalRepresentationData graphicalRepresentationData) {
@@ -367,5 +444,21 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     public HMICanvas clone() throws CloneNotSupportedException {
         HMICanvas clone = (HMICanvas) super.clone();
         return clone;
+    }
+
+    private void showAlert(Alert.AlertType type,String title, String message){
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
+
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+
+        alert.getButtonTypes().setAll(okButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.isPresent() && result.get() == okButton)
+        {
+            alert.close();
+        }
     }
 }

@@ -21,7 +21,6 @@ module andrade.luis.hmiethernetip {
     exports andrade.luis.hmiethernetip.views;
     exports andrade.luis.hmiethernetip.models;
     exports andrade.luis.hmiethernetip.controllers;
-    exports andrade.luis.hmiethernetip.util.example;
     opens andrade.luis.hmiethernetip.models to javafx.base;
     opens andrade.luis.hmiethernetip.views to javafx.base, javafx.fxml;
     exports andrade.luis.hmiethernetip.models.canvas;

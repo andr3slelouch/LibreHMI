@@ -28,12 +28,22 @@ public class SelectTagWindow extends Stage {
     private TableView<TagRow> table;
     private Button finishSelectionButton;
     private Alert alert;
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    private boolean cancelled = true;
     public Tag getSelectedTag() {
         return selectedTagRow;
     }
 
     private Tag selectedTagRow;
-    public SelectTagWindow(boolean testMode) {
+    public SelectTagWindow(boolean inputMode,boolean testMode) {
         StackPane root = new StackPane();
 
 
@@ -59,10 +69,10 @@ public class SelectTagWindow extends Stage {
         TableColumn<TagRow, String> valueColumn = new TableColumn<>("Valor");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("tagValue"));
 
-        if(getExistingTags().isEmpty() || testMode){
+        if(getExistingTags(inputMode).isEmpty() || testMode){
             setAlertIfTableIsEmpty();
         }else{
-            table.setItems(getExistingTags());
+            table.setItems(getExistingTags(inputMode));
         }
         table.setPlaceholder(new Label("No existen Tags definidos en la base de datos"));
 
@@ -95,8 +105,11 @@ public class SelectTagWindow extends Stage {
 
     }
 
-    public ObservableList<TagRow> getExistingTags() {
+    public ObservableList<TagRow> getExistingTags(boolean inputMode) {
         String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
+        if(inputMode){
+            query = query +"AND t.accion = 'Escritura'";
+        }
         ObservableList<TagRow> data = FXCollections.observableArrayList();
         try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
             Statement statement = con.createStatement();
@@ -125,6 +138,7 @@ public class SelectTagWindow extends Stage {
         if(!selected.isEmpty()){
             logger.log(Level.INFO,selected.get(0).getTagName());
             this.selectedTagRow = new Tag(selected.get(0).getPlcName(),selected.get(0).getPlcAddress(),selected.get(0).getPlcDeviceGroup(),selected.get(0).getTagName(),selected.get(0).getTagType(),selected.get(0).getTagAddress(),selected.get(0).getTagAction(),selected.get(0).getTagValue());
+            this.cancelled = false;
             this.close();
         }else{
             confirmExit();

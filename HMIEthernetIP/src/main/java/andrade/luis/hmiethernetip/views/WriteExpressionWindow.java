@@ -2,6 +2,8 @@ package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.Tag;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,6 +19,17 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class WriteExpressionWindow extends Stage {
+    public Button getAddTagButton() {
+        return addTagButton;
+    }
+
+    private final Button addTagButton;
+
+    public HBox getButtonsHBox() {
+        return buttonsHBox;
+    }
+
+    private final HBox buttonsHBox;
     protected TextField textField;
 
     public TextField getTextField() {
@@ -72,6 +85,19 @@ public class WriteExpressionWindow extends Stage {
     }
 
     private Expression localExpression;
+
+    public boolean isInputMode() {
+        return inputMode;
+    }
+
+    public void setInputMode(boolean inputMode) {
+        this.inputMode = inputMode;
+    }
+
+    private boolean inputMode;
+    public WriteExpressionWindow(){
+        this(750,250);
+    }
     public WriteExpressionWindow(double width, double height) {
         root = new StackPane();
         addedTags = new ArrayList<>();
@@ -89,28 +115,28 @@ public class WriteExpressionWindow extends Stage {
 
         finishSelectionButton = new Button("OK");
         finishSelectionButton.setAlignment(Pos.CENTER);
-        Button addTagButton = new Button("Añadir Tag");
+        addTagButton = new Button("Añadir Tag");
         addTagButton.setAlignment(Pos.BOTTOM_LEFT);
-        addTagButton.setOnAction(actionEvent -> {
-            SelectTagWindow selectTagWindow = new SelectTagWindow(false);
-            selectTagWindow.showAndWait();
-            Tag tag = selectTagWindow.getSelectedTag();
-            if(tag!=null){
-                addedTags.add(tag);
-                textField.setText(textField.getText()+tag.getTagName());
-            }
-        });
-        finishSelectionButton.setOnAction(actionEvent -> {
-            finishingAction();
-        });
-        HBox hbox = new HBox();
-        hbox.getChildren().add(addTagButton);
-        hbox.getChildren().add(finishSelectionButton);
-        hbox.setAlignment(Pos.BASELINE_RIGHT);
-        vbox.getChildren().add(hbox);
+        addTagButton.setOnAction(actionEvent -> addTag());
+        finishSelectionButton.setOnAction(actionEvent -> finishingAction());
+        buttonsHBox = new HBox();
+        buttonsHBox.getChildren().add(addTagButton);
+        buttonsHBox.getChildren().add(finishSelectionButton);
+        buttonsHBox.setAlignment(Pos.BASELINE_RIGHT);
+        vbox.getChildren().add(buttonsHBox);
         root.getChildren().add(vbox);
         mainScene = new Scene(root,width,height);
         this.setScene(mainScene);
+    }
+
+    protected void addTag(){
+        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,false);
+        selectTagWindow.showAndWait();
+        Tag tag = selectTagWindow.getSelectedTag();
+        if(tag!=null){
+            addedTags.add(tag);
+            textField.setText(textField.getText()+tag.getTagName());
+        }
     }
 
     private void confirmExit(){

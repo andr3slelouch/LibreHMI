@@ -4,7 +4,6 @@ import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
 import andrade.luis.hmiethernetip.models.PercentFillOrientation;
 import andrade.luis.hmiethernetip.views.SetPercentFillPropertiesWindow;
-import andrade.luis.hmiethernetip.views.SetSizeWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -70,11 +69,11 @@ public class CanvasRectangle extends GraphicalRepresentation {
         this.setCenter(rectangle);
         this.getGraphicalRepresentationData().setType("Rectangle");
         this.setContextMenu();
-        MenuItem linkTagMI = new MenuItem("Link Tag");
+        /*MenuItem linkTagMI = new MenuItem("Link Tag");
         linkTagMI.setId("#linkTagMI");
-        linkTagMI.setOnAction(actionEvent -> this.getGraphicalRepresentationData().setTag(this.getCanvas().selectTag()));
-        this.setContextMenu();
-        this.getRightClickMenu().getItems().add(linkTagMI);
+        linkTagMI.setOnAction(actionEvent -> this.getGraphicalRepresentationData().setTag(this.getCanvas().selectTag()));*/
+        //this.setContextMenu();
+        //this.getRightClickMenu().getItems().add(linkTagMI);
         MenuItem percentFillMI = new MenuItem("Percent Fill Animation");
         percentFillMI.setId("#percentFillMI");
         percentFillMI.setOnAction(actionEvent -> this.setPercentFill());
@@ -93,7 +92,7 @@ public class CanvasRectangle extends GraphicalRepresentation {
             if (refillRectangleTimeline.getStatus().toString().equals("RUNNING")) {
                 refillRectangleTimeline.stop();
                 refillRectangleTimeline = null;
-                setPercentFill(this.getGraphicalRepresentationData().getRefillExpression(), this.getGraphicalRepresentationData().getPrimaryColor(), this.getGraphicalRepresentationData().getBackgroundColor(), this.getGraphicalRepresentationData().getOrientation());
+                setPercentFill(this.getGraphicalRepresentationData().getExpression(), this.getGraphicalRepresentationData().getPrimaryColor(), this.getGraphicalRepresentationData().getBackgroundColor(), this.getGraphicalRepresentationData().getOrientation());
             }
         } else {
             this.rectangle.setWidth(this.getGraphicalRepresentationData().getWidth());
@@ -103,11 +102,11 @@ public class CanvasRectangle extends GraphicalRepresentation {
 
     private void setPercentFill() {
         SetPercentFillPropertiesWindow writeExpressionWindow;
-        if (this.getGraphicalRepresentationData().getRefillExpression() != null) {
+        if (this.getGraphicalRepresentationData().getExpression() != null) {
             writeExpressionWindow = new SetPercentFillPropertiesWindow(this.getGraphicalRepresentationData().getPrimaryColor().getColor(), this.getGraphicalRepresentationData().getBackgroundColor().getColor());
-            writeExpressionWindow.setAddedTags(this.getGraphicalRepresentationData().getRefillExpression().getParameters());
-            writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getRefillExpression());
-            writeExpressionWindow.getTextField().setText(this.getGraphicalRepresentationData().getRefillExpression().getExpressionToEvaluate());
+            writeExpressionWindow.setAddedTags(this.getGraphicalRepresentationData().getExpression().getParameters());
+            writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getExpression());
+            writeExpressionWindow.getTextField().setText(this.getGraphicalRepresentationData().getExpression().getExpressionToEvaluate());
             writeExpressionWindow.setSelectedOrientation(this.getGraphicalRepresentationData().getOrientation().toString().toLowerCase());
             writeExpressionWindow.getMinValueField().setText(this.getGraphicalRepresentationData().getMinValue() + "");
             writeExpressionWindow.getMaxValueField().setText(this.getGraphicalRepresentationData().getMaxValue() + "");
@@ -140,7 +139,7 @@ public class CanvasRectangle extends GraphicalRepresentation {
 
     public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor, PercentFillOrientation orientation) {
         if (exp != null) {
-            this.getGraphicalRepresentationData().setRefillExpression(exp);
+            this.getGraphicalRepresentationData().setExpression(exp);
             double width = this.getGraphicalRepresentationData().getWidth();
             double height = this.getGraphicalRepresentationData().getHeight();
             life = new SimpleDoubleProperty(width);
@@ -235,12 +234,17 @@ public class CanvasRectangle extends GraphicalRepresentation {
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
                             try {
-                                String type = this.getGraphicalRepresentationData().getRefillExpression().getResultType() != null ? this.getGraphicalRepresentationData().getRefillExpression().getResultType() : "";
+                                String type = this.getGraphicalRepresentationData().getExpression().getResultType() != null ? this.getGraphicalRepresentationData().getExpression().getResultType() : "";
                                 double evaluatedValue = 0;
-                                if (type.equals("Booleano")) {
-                                    evaluatedValue = (boolean) this.getGraphicalRepresentationData().getRefillExpression().evaluate() ? 100 : 0;
-                                } else if (type.equals("Flotante")) {
-                                    evaluatedValue = (double) this.getGraphicalRepresentationData().getRefillExpression().evaluate();
+                                switch (type) {
+                                    case "Booleano":
+                                        evaluatedValue = (boolean) this.getGraphicalRepresentationData().getExpression().evaluate() ? 100 : 0;
+                                        break;
+                                    case "Flotante":
+                                        evaluatedValue = (double) this.getGraphicalRepresentationData().getExpression().evaluate();
+                                        break;
+                                    default:
+                                        break;
                                 }
 
                                 double value = calculatePercentFillValue(evaluatedValue);

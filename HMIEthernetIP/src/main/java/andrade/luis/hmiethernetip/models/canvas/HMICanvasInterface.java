@@ -5,5 +5,5 @@ import andrade.luis.hmiethernetip.models.Tag;
 
 public interface HMICanvasInterface {
     void delete(GraphicalRepresentationData graphicalRepresentationData);
-    Tag selectTag();
+    //Tag selectTag();
 }

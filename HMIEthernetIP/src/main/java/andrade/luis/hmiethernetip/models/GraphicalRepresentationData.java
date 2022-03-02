@@ -52,9 +52,9 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     @SerializedName("tag")
     @Expose
     private Tag tag;
-    @SerializedName("refillExpression")
+    @SerializedName("expression")
     @Expose
-    private Expression refillExpression;
+    private Expression expression;
     @SerializedName("primaryColor")
     @Expose
     private CanvasColor primaryColor;
@@ -148,8 +148,8 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         this.tag = tag;
     }
 
-    public Expression getRefillExpression() {
-        return refillExpression;
+    public Expression getExpression() {
+        return expression;
     }
 
     public CanvasColor getPrimaryColor() {
@@ -168,8 +168,8 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         this.backgroundColor = backgroundColor;
     }
 
-    public void setRefillExpression(Expression refillExpression) {
-        this.refillExpression = refillExpression;
+    public void setExpression(Expression expression) {
+        this.expression = expression;
     }
     public PercentFillOrientation getOrientation() {
         return orientation;
@@ -243,7 +243,7 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         sb.append(',');
         sb.append("refillExpression");
         sb.append('=');
-        sb.append(((this.refillExpression == null)?"<null>":this.refillExpression.toString()));
+        sb.append(((this.expression == null)?"<null>":this.expression.toString()));
         sb.append(',');
         sb.append("primaryColor");
         sb.append('=');

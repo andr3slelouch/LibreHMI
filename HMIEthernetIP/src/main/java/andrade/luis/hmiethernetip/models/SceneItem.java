@@ -1,4 +1,4 @@
-package andrade.luis.hmiethernetip.util.example;
+package andrade.luis.hmiethernetip.models;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
 import javafx.scene.control.CheckBox;
