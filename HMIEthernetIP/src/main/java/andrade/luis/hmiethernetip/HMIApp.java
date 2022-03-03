@@ -95,13 +95,14 @@ public class HMIApp extends Application {
         Button registerUserBtn = new Button("Register");
         Button logIntUserBtn = new Button("Log In");
         Button saveBtn = new Button("Guardar Propiedades");
-        Button showSelectedWindowsBtn = new Button("Show");
+        Button showSelectedWindowsBtn = new Button("Image");
+        Button pushbuttonBtn = new Button("Pushbutton");
         Button playBtn = new Button("Play");
         Button stopBtn = new Button("Stop");
         Button defaultBtn = new Button("Default");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(logIntUserBtn, saveBtn, showSelectedWindowsBtn);
+        HBox thirdHBox = new HBox(logIntUserBtn, saveBtn, showSelectedWindowsBtn, pushbuttonBtn);
         HBox fourthHBox = new HBox(playBtn, stopBtn, defaultBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
@@ -133,6 +134,10 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Image");
 
+        });
+        pushbuttonBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Pushbutton");
         });
         playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
         stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));

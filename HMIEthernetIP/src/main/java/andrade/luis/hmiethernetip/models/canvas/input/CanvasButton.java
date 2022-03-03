@@ -2,17 +2,26 @@ package andrade.luis.hmiethernetip.models.canvas.input;
 
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.controllers.HMIScene;
+import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
+import andrade.luis.hmiethernetip.models.MouseOverMode;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SelectWindowsWindow;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 
 public class CanvasButton extends GraphicalRepresentation {
-    private Button button;
+    protected Button button;
 
     public HMIUser getUser() {
         return user;
@@ -40,7 +49,13 @@ public class CanvasButton extends GraphicalRepresentation {
         setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), 150, 50);
     }
 
+    public CanvasButton(GraphicalRepresentationData graphicalRepresentationData){
+        super(graphicalRepresentationData);
+        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+    }
+
     public void setData(double x, double y, double width, double height) {
+        this.getGraphicalRepresentationData().setType("Button");
         this.button = new Button("Action");
         this.button.setDisable(true);
         this.getGraphicalRepresentationData().setPosition(new CanvasPoint(x, y));
@@ -50,17 +65,28 @@ public class CanvasButton extends GraphicalRepresentation {
         this.button.setPrefHeight(height);
         this.setCenter(this.button);
 
-        MenuItem attachShowHideWindowsActionMI = new MenuItem("Show/Hide Windows");
+        setNewMenuItem();
+    }
+
+    public void setNewMenuItem(){
+        MenuItem attachShowHideWindowsActionMI = new MenuItem("Acción de Mostrar Ocultar Ventana");
         attachShowHideWindowsActionMI.setId("#showHideWindowsMI");
-        attachShowHideWindowsActionMI.setOnAction(actionEvent -> selectWindows());
+        attachShowHideWindowsActionMI.setOnAction(actionEvent -> buttonAction());
         this.getRightClickMenu().getItems().add(attachShowHideWindowsActionMI);
     }
 
-    public void selectWindows() {
+    public void buttonAction() {
         SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(hmiApp.getPages(), selectedPages);
         selectWindowsWindow.showAndWait();
         selectedPages = selectWindowsWindow.getSelectedItems();
         this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(selectedPages));
+    }
+
+    @Override
+    public void resize(){
+        super.resize();
+        this.button.setPrefWidth(this.getGraphicalRepresentationData().getWidth());
+        this.button.setPrefHeight(this.getGraphicalRepresentationData().getHeight());
     }
 
     @Override
@@ -83,4 +109,5 @@ public class CanvasButton extends GraphicalRepresentation {
                 break;
         }
     }
+
 }

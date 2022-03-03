@@ -130,13 +130,18 @@ public class WriteExpressionWindow extends Stage {
     }
 
     protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,false,false);
         selectTagWindow.showAndWait();
         Tag tag = selectTagWindow.getSelectedTag();
         if(tag!=null){
             addedTags.add(tag);
             textField.setText(textField.getText()+tag.getName());
         }
+    }
+
+    protected void clearAll(){
+        this.getTextField().setText("");
+        this.getAddedTags().clear();
     }
 
     private void confirmExit(){

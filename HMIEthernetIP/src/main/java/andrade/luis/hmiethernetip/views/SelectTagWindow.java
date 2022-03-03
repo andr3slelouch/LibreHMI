@@ -43,7 +43,7 @@ public class SelectTagWindow extends Stage {
     }
 
     private Tag selectedTagRow;
-    public SelectTagWindow(boolean inputMode,boolean testMode) {
+    public SelectTagWindow(boolean inputMode,boolean boolOnly,boolean testMode) {
         StackPane root = new StackPane();
 
 
@@ -69,10 +69,10 @@ public class SelectTagWindow extends Stage {
         TableColumn<TagRow, String> valueColumn = new TableColumn<>("Valor");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("tagValue"));
 
-        if(getExistingTags(inputMode).isEmpty() || testMode){
+        if(getExistingTags(inputMode,boolOnly).isEmpty() || testMode){
             setAlertIfTableIsEmpty();
         }else{
-            table.setItems(getExistingTags(inputMode));
+            table.setItems(getExistingTags(inputMode,boolOnly));
         }
         table.setPlaceholder(new Label("No existen Tags definidos en la base de datos"));
 
@@ -105,10 +105,13 @@ public class SelectTagWindow extends Stage {
 
     }
 
-    public ObservableList<TagRow> getExistingTags(boolean inputMode) {
+    public ObservableList<TagRow> getExistingTags(boolean inputMode, boolean boolOnly) {
         String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
         if(inputMode){
-            query = query +"AND t.accion = 'Escritura'";
+            query = query +"AND t.accion = 'Escritura' ";
+        }
+        if(boolOnly){
+            query = query +"AND t.tipoTag = 'Bool' ";
         }
         ObservableList<TagRow> data = FXCollections.observableArrayList();
         try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {

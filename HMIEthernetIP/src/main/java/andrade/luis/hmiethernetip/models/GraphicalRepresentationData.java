@@ -6,7 +6,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Map;
 
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
@@ -96,11 +95,12 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     @SerializedName("hue")
     @Expose
     private double hue;
+    @SerializedName("mode")
+    @Expose
+    private String mode;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
-
-    private final Map<String, String> queries = Map.of("Entero", "select valor from ENTERO where nombreTag=", "Flotante", "select valor from FLOTANTE where nombreTag=", "Bool", "select valor from BOOLEAN where nombreTag=");
 
     public boolean isSelected() {
         return selected;
@@ -276,6 +276,14 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
 
     public void setRotation(double rotation) {
         this.rotation = rotation;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
     @Override

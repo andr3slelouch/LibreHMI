@@ -15,7 +15,7 @@ class SelectTagWindowTestRow {
 
     @Start
     private void start(Stage stage){
-        selectTagWindow = new SelectTagWindow(false,true);
+        selectTagWindow = new SelectTagWindow(false,false,true);
         stage = selectTagWindow;
         stage.setMaximized(true);
         stage.show();
@@ -35,7 +35,7 @@ class SelectTagWindowTestRow {
 
     @Test
     void getTagIfRowIsSelected(FxRobot robot) {
-        selectTagWindow.getTable().setItems(selectTagWindow.getExistingTags(false));
+        selectTagWindow.getTable().setItems(selectTagWindow.getExistingTags(false,false));
         robot.clickOn(selectTagWindow.getTable().getLayoutX()+20,selectTagWindow.getTable().getLayoutY()+100);
         robot.clickOn(selectTagWindow.getFinishSelectionButton());
         Assertions.assertThat(selectTagWindow.getAlert().isShowing()).isFalse();

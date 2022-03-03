@@ -4,6 +4,7 @@ import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.*;
 import andrade.luis.hmiethernetip.models.canvas.*;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasButton;
+import andrade.luis.hmiethernetip.models.canvas.input.CanvasPushbutton;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasSlider;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasTextField;
 import javafx.scene.Node;
@@ -112,6 +113,9 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
             case "Button":
                 addButtonOnCanvasClicked(current);
                 break;
+            case "Pushbutton":
+                addPushbuttonOnCanvasClicked(current);
+                break;
             case "Slider":
                 addSliderOnCanvasClicked(current);
                 break;
@@ -124,6 +128,22 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
             default:
                 break;
         }
+    }
+
+    private void addPushbuttonOnCanvasClicked(CanvasPoint current) {
+        SetColorCommandPushButtonWindow setColorCommandPushButtonWindow = new SetColorCommandPushButtonWindow();
+        setColorCommandPushButtonWindow.showAndWait();
+        CanvasPushbutton canvasPushbutton = new CanvasPushbutton(current);
+        canvasPushbutton.setCanvas(this);
+        canvasPushbutton.setUser(hmiApp.getUser());
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasPushbutton.setId(FIGURE_ID + "0");
+        } else {
+            canvasPushbutton.setId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        canvasPushbutton.setDynamicColors(setColorCommandPushButtonWindow.getButtonLabelTextField().getText(),((RadioButton) setColorCommandPushButtonWindow.getRadioGroup().getSelectedToggle()).getText(),setColorCommandPushButtonWindow.getLocalExpression().getParameters().get(0),new CanvasColor(setColorCommandPushButtonWindow.getPrimaryColorPicker().getValue()),new CanvasColor(setColorCommandPushButtonWindow.getBackgroundColorPicker().getValue()));
+        this.addNewShape(canvasPushbutton);
+        this.getChildren().add(canvasPushbutton);
     }
 
     private void addImageViewOnCanvasClicked(CanvasPoint current) {
@@ -347,6 +367,9 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
                     case "Button":
                         addPastedButtonOnCanvasClicked(graphicalRepresentationData);
                         break;
+                    case "Pushbutton":
+                        addPastedPushbuttonOnCanvasClicked(graphicalRepresentationData);
+                        break;
                     case "Slider":
                         addPastedSliderOnCanvasClicked(graphicalRepresentationData);
                         break;
@@ -363,6 +386,9 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         } catch (ClassNotFoundException | IOException | UnsupportedFlavorException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addPastedPushbuttonOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
     }
 
     private void addPastedImageViewOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {

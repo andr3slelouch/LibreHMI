@@ -71,20 +71,10 @@ public class CanvasRectangle extends GraphicalRepresentation {
         this.setCenter(rectangle);
         this.getGraphicalRepresentationData().setType("Rectangle");
         this.setContextMenu();
-        /*MenuItem linkTagMI = new MenuItem("Link Tag");
-        linkTagMI.setId("#linkTagMI");
-        linkTagMI.setOnAction(actionEvent -> this.getGraphicalRepresentationData().setTag(this.getCanvas().selectTag()));*/
-        //this.setContextMenu();
-        //this.getRightClickMenu().getItems().add(linkTagMI);
         MenuItem percentFillMI = new MenuItem("Percent Fill Animation");
         percentFillMI.setId("#percentFillMI");
         percentFillMI.setOnAction(actionEvent -> this.setPercentFill());
         this.getRightClickMenu().getItems().add(percentFillMI);
-        /*MenuItem resizeMI = new MenuItem("Resize");
-        resizeMI.setId("#resizeMI");
-        resizeMI.setOnAction(actionEvent -> this.resize());
-        this.getRightClickMenu().getItems().add(resizeMI);*/
-
     }
 
     @Override

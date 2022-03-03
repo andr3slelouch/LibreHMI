@@ -94,9 +94,7 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         this.getVbox().getChildren().add(6, maxValueHBox);
         this.getVbox().setSpacing(5);
 
-        this.finishSelectionButton.setOnAction(actionEvent -> {
-            this.finishingAction();
-        });
+        this.finishSelectionButton.setOnAction(actionEvent -> this.finishingAction());
     }
 
     public PercentFillOrientation getSelectedOrientation() {

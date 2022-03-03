@@ -120,14 +120,9 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
         maxValueField.setDisable(disable);
     }
 
-    private void clearAll(){
-        this.getTextField().setText("");
-        this.getAddedTags().clear();
-    }
-
     @Override
     protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),false,false);
         selectTagWindow.showAndWait();
         if(!selectTagWindow.isCancelled()){
             clearAll();
