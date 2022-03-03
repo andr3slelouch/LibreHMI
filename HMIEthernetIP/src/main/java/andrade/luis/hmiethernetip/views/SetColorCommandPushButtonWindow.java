@@ -36,6 +36,7 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
 
         Label actionLabel = new Label("Modo de Acción:");
         RadioButton toggleRadioButton = new RadioButton("Toggle");
+        toggleRadioButton.setSelected(true);
         RadioButton directRadioButton = new RadioButton("Directo");
         RadioButton reverseRadioButton = new RadioButton("Reversa");
 

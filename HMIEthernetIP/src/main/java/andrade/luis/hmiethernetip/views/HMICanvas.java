@@ -389,6 +389,12 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     }
 
     private void addPastedPushbuttonOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
+        CanvasPushbutton canvasPushbutton = new CanvasPushbutton(graphicalRepresentationData);
+        canvasPushbutton.setCanvas(this);
+        canvasPushbutton.setUser(hmiApp.getUser());
+        canvasPushbutton.setId(generateIdForPasteOperation(graphicalRepresentationData));
+        this.addNewShape(canvasPushbutton);
+        this.getChildren().add(canvasPushbutton);
     }
 
     private void addPastedImageViewOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {

@@ -99,7 +99,6 @@ public class Expression implements Serializable {
 
     public String determineResultType() {
         StringBuilder sb = new StringBuilder(this.expressionToEvaluate);
-        String res = null;
 
         for (String stringOperator : stringOperators) {
             if (expressionToEvaluate.contains(stringOperator)) {
@@ -134,16 +133,23 @@ public class Expression implements Serializable {
             }
         }
 
-        /*if(parameters.size()==1){
-            if(parameters.get(0).getTagType().equals(BOOLEAN_STR)){
-                sb.append("&& true");
-            }else if(parameters.get(0).getTagType().equals(FLOAT_STR)){
-                sb.append("*1");
-            }else if(parameters.get(0).getTagType().equals(STRING_STR)){
-                sb.append("+\"\"");
+        if(parameters.size()==1){
+            switch (parameters.get(0).getType()) {
+                case BOOLEAN_STR:
+                    sb.append("&& true");
+                    this.expressionToEvaluate = sb.toString();
+                    return BOOLEAN_STR;
+                case FLOAT_STR:
+                    sb.append("*1");
+                    this.expressionToEvaluate = sb.toString();
+                    return FLOAT_STR;
+                case STRING_STR:
+                    sb.append("+\"\"");
+                    this.expressionToEvaluate = sb.toString();
+                    return STRING_STR;
             }
-            this.expressionToEvaluate = sb.toString();
-        }*/
+
+        }
 
         return FLOAT_STR;
 
