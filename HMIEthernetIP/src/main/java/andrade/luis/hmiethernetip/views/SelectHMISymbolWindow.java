@@ -25,6 +25,9 @@ public class SelectHMISymbolWindow extends Stage {
     private final String resourcesDirectory = getClass().getResource("HMISymbols").toExternalForm().substring(5);
     private Image selectedImage;
     private String selectedImagePath;
+    private boolean mirroringVertical;
+    private boolean mirroringHorizontal;
+    private double rotation;
     private ArrayList<CanvasImage> currentImages = new ArrayList<>();
     private ArrayList<ScrollPane> categoriesPanes = new ArrayList<>();
     Map<String, String> categoriesDirectory = Map.ofEntries(
@@ -55,7 +58,8 @@ public class SelectHMISymbolWindow extends Stage {
                 ArrayList<File> filesArrayList = new ArrayList<>(List.of(Objects.requireNonNull(categoryDirectoryPath.listFiles())));
                 for(File imageFile: filesArrayList){
                     Image image = new Image(new FileInputStream(imageFile.getAbsolutePath()));
-                    CanvasImage canvasImage = new CanvasImage(image,new CanvasPoint(0,0),false,imageFile.getAbsolutePath());
+                    CanvasImage canvasImage = new CanvasImage(image,new CanvasPoint(0,0),false,imageFile.getAbsolutePath(),false,false,0,true);
+                    canvasImage.clearContextMenu();
                     currentImages.add(canvasImage);
                     imagesHBox.getChildren().add(canvasImage);
                 }
@@ -68,10 +72,18 @@ public class SelectHMISymbolWindow extends Stage {
             }
         }
         accordion.getPanes().addAll(tps);
+        Button optionsButton = new Button("Opciones de Imagen");
+        optionsButton.setOnAction(mouseEvent -> {
+            SetImageOptionsWindow setImageOptionsWindow = new SetImageOptionsWindow();
+            setImageOptionsWindow.showAndWait();
+            mirroringVertical = setImageOptionsWindow.isMirroringVertical();
+            mirroringHorizontal = setImageOptionsWindow.isMirroringHorizontal();
+            rotation = Double.parseDouble(setImageOptionsWindow.getRotationValue());
+        });
         Button okButton = new Button("OK");
         okButton.setOnAction(mouseEvent -> this.close());
         HBox okHBox = new HBox();
-        okHBox.getChildren().add(okButton);
+        okHBox.getChildren().addAll(optionsButton,okButton);
         okHBox.setAlignment(Pos.BOTTOM_RIGHT);
         VBox vbox = new VBox();
         root.getChildren().add(accordion);
@@ -86,6 +98,15 @@ public class SelectHMISymbolWindow extends Stage {
     public void updateScrollPanesWidth(double width){
         for(ScrollPane scrollPane : categoriesPanes){
             scrollPane.setMaxWidth(width);
+        }
+    }
+
+    public void updateSelected(String imagePath){
+        for(CanvasImage canvasImage: currentImages){
+            if(canvasImage.getGraphicalRepresentationData().getData().equals(imagePath)){
+                canvasImage.setSelected(true);
+                updateSelected();
+            }
         }
     }
 
@@ -123,5 +144,28 @@ public class SelectHMISymbolWindow extends Stage {
 
     public String getSelectedImagePath() {
         return selectedImagePath;
+    }
+    public boolean isMirroringVertical() {
+        return mirroringVertical;
+    }
+
+    public void setMirroringVertical(boolean mirroringVertical) {
+        this.mirroringVertical = mirroringVertical;
+    }
+
+    public boolean isMirroringHorizontal() {
+        return mirroringHorizontal;
+    }
+
+    public void setMirroringHorizontal(boolean mirroringHorizontal) {
+        this.mirroringHorizontal = mirroringHorizontal;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
     }
 }

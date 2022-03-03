@@ -127,15 +127,21 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     private void addImageViewOnCanvasClicked(CanvasPoint current) {
         Image selectedSymbol = null;
         String selectedSymbolPath = null;
+        boolean isMirroringVertical = false;
+        boolean isMirroringHorizontal = false;
+        double rotation = 0;
         try {
             SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow();
             selectHMISymbolWindow.showAndWait();
             selectedSymbol = selectHMISymbolWindow.getSelectedImage();
             selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
+            isMirroringVertical = selectHMISymbolWindow.isMirroringVertical();
+            isMirroringHorizontal = selectHMISymbolWindow.isMirroringHorizontal();
+            rotation = selectHMISymbolWindow.getRotation();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        CanvasImage canvasImage = new CanvasImage(selectedSymbol,current,true,selectedSymbolPath);
+        CanvasImage canvasImage = new CanvasImage(selectedSymbol,current,true,selectedSymbolPath,isMirroringVertical,isMirroringHorizontal,rotation,true);
         canvasImage.setCanvas(this);
 
         if (this.getShapeArrayList().isEmpty()) {
@@ -354,6 +360,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     }
 
     private void addPastedTextFieldOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
+        logger.log(Level.INFO,"Pasting textfield");
         CanvasTextField canvasTextField = new CanvasTextField(graphicalRepresentationData);
         canvasTextField.setCanvas(this);
         canvasTextField.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));

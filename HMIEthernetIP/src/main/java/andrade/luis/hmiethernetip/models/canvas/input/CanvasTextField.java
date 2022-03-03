@@ -93,7 +93,6 @@ public class CanvasTextField extends GraphicalRepresentation {
         this.getGraphicalRepresentationData().setTag(linkedTag);
         this.getGraphicalRepresentationData().setMinValue(minValue);
         this.getGraphicalRepresentationData().setMaxValue(maxValue);
-        this.getGraphicalRepresentationData().setType(type);
         this.textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.isEmpty() && (this.type.equals("Entero") || this.type.equals("Flotante"))) {
                 double value = Double.parseDouble(newValue);
@@ -147,7 +146,6 @@ public class CanvasTextField extends GraphicalRepresentation {
         this.getGraphicalRepresentationData().setWidth(width);
         this.getGraphicalRepresentationData().setHeight(height);
         this.setCenter(this.textField);
-
     }
 
     @Override

@@ -13,9 +13,8 @@ import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class GraphicalRepresentationData implements Serializable, Transferable
-{
-
+public class GraphicalRepresentationData implements Serializable, Transferable {
+    private static final String NULL_STR = "<null>";
     @SerializedName("selected")
     @Expose
     private boolean selected;
@@ -70,6 +69,18 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     @SerializedName("maxValue")
     @Expose
     private double maxValue;
+    @SerializedName("mirroringHorizontal")
+    @Expose
+    private boolean mirroringHorizontal;
+    @SerializedName("mirroringVertical")
+    @Expose
+    private boolean mirroringVertical;
+    @SerializedName("rotation")
+    @Expose
+    private double rotation;
+    @SerializedName("isImageSymbol")
+    @Expose
+    private boolean imageSymbol;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
@@ -171,6 +182,7 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     public void setExpression(Expression expression) {
         this.expression = expression;
     }
+
     public PercentFillOrientation getOrientation() {
         return orientation;
     }
@@ -178,6 +190,7 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     public void setOrientation(PercentFillOrientation orientation) {
         this.orientation = orientation;
     }
+
     public double getMinValue() {
         return minValue;
     }
@@ -193,6 +206,31 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     public void setMaxValue(double maxValue) {
         this.maxValue = maxValue;
     }
+
+    public boolean isMirroringHorizontal() {
+        return mirroringHorizontal;
+    }
+
+    public void setMirroringHorizontal(boolean mirroringHorizontal) {
+        this.mirroringHorizontal = mirroringHorizontal;
+    }
+
+    public boolean isMirroringVertical() {
+        return mirroringVertical;
+    }
+
+    public void setMirroringVertical(boolean mirroringVertical) {
+        this.mirroringVertical = mirroringVertical;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -215,47 +253,47 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         sb.append(',');
         sb.append("center");
         sb.append('=');
-        sb.append(((this.center == null)?"<null>":this.center));
+        sb.append(((this.center == null) ? NULL_STR : this.center));
         sb.append(',');
         sb.append("position");
         sb.append('=');
-        sb.append(((this.position == null)?"<null>":this.position));
+        sb.append(((this.position == null) ? NULL_STR : this.position));
         sb.append(',');
         sb.append("id");
         sb.append('=');
-        sb.append(((this.id == null)?"<null>":this.id));
+        sb.append(((this.id == null) ? NULL_STR : this.id));
         sb.append(',');
         sb.append("operation");
         sb.append('=');
-        sb.append(((this.operation == null)?"<null>":this.operation));
+        sb.append(((this.operation == null) ? NULL_STR : this.operation));
         sb.append(',');
         sb.append("data");
         sb.append('=');
-        sb.append(((this.data == null)?"<null>":this.data));
+        sb.append(((this.data == null) ? NULL_STR : this.data));
         sb.append(',');
         sb.append("name");
         sb.append('=');
-        sb.append(((this.name == null)?"<null>":this.name));
+        sb.append(((this.name == null) ? NULL_STR : this.name));
         sb.append(',');
         sb.append("tag");
         sb.append('=');
-        sb.append(((this.tag == null)?"<null>":this.tag.toString()));
+        sb.append(((this.tag == null) ? NULL_STR : this.tag.toString()));
         sb.append(',');
         sb.append("refillExpression");
         sb.append('=');
-        sb.append(((this.expression == null)?"<null>":this.expression.toString()));
+        sb.append(((this.expression == null) ? NULL_STR : this.expression.toString()));
         sb.append(',');
         sb.append("primaryColor");
         sb.append('=');
-        sb.append(((this.primaryColor == null)?"<null>":this.primaryColor.toString()));
+        sb.append(((this.primaryColor == null) ? NULL_STR : this.primaryColor.toString()));
         sb.append(',');
         sb.append("backgroundColor");
         sb.append('=');
-        sb.append(((this.backgroundColor == null)?"<null>":this.backgroundColor.toString()));
+        sb.append(((this.backgroundColor == null) ? NULL_STR : this.backgroundColor.toString()));
         sb.append(',');
         sb.append("orientation");
         sb.append('=');
-        sb.append(((this.orientation == null)?"<null>":this.orientation.toString()));
+        sb.append(((this.orientation == null) ? NULL_STR : this.orientation.toString()));
         sb.append(',');
         sb.append("minValue");
         sb.append('=');
@@ -265,8 +303,24 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         sb.append('=');
         sb.append(maxValue);
         sb.append(',');
-        if (sb.charAt((sb.length()- 1)) == ',') {
-            sb.setCharAt((sb.length()- 1), ']');
+        sb.append("mirroringHorizontal");
+        sb.append('=');
+        sb.append(mirroringHorizontal);
+        sb.append(',');
+        sb.append("mirroringVertical");
+        sb.append('=');
+        sb.append(mirroringVertical);
+        sb.append(',');
+        sb.append("rotation");
+        sb.append('=');
+        sb.append(rotation);
+        sb.append(',');
+        sb.append("isImageSymbol");
+        sb.append('=');
+        sb.append(imageSymbol);
+        sb.append(',');
+        if (sb.charAt((sb.length() - 1)) == ',') {
+            sb.setCharAt((sb.length() - 1), ']');
         } else {
             sb.append(']');
         }
@@ -296,9 +350,9 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     }
 
     @Override
-    public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
-        if(!isDataFlavorSupported(dataFlavor)) throw  new UnsupportedFlavorException(dataFlavor);
-        if(DataFlavor.stringFlavor.equals(dataFlavor)) return this.toString();
+    public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException {
+        if (!isDataFlavorSupported(dataFlavor)) throw new UnsupportedFlavorException(dataFlavor);
+        if (DataFlavor.stringFlavor.equals(dataFlavor)) return this.toString();
         return this;
     }
 
@@ -317,6 +371,7 @@ public class GraphicalRepresentationData implements Serializable, Transferable
     public void setOperation(String operation) {
         this.operation = operation;
     }
+
     public String getType() {
         return type;
     }
@@ -327,5 +382,11 @@ public class GraphicalRepresentationData implements Serializable, Transferable
 
     public String readTagFromDatabase() throws SQLException, IOException {
         return this.tag.readFromDatabase();
+    }
+    public boolean isImageSymbol() {
+        return imageSymbol;
+    }
+    public void setImageSymbol(boolean imageSymbol) {
+        this.imageSymbol = imageSymbol;
     }
 }

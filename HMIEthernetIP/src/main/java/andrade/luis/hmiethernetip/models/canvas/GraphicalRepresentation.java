@@ -373,6 +373,10 @@ public class GraphicalRepresentation extends BorderPane {
         setContextMenu();
     }
 
+    public void clearContextMenu() {
+        rightClickMenu.getItems().clear();
+    }
+
     public void setContextMenu() {
         rightClickMenu = new ContextMenu();
         rightClickMenu.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
