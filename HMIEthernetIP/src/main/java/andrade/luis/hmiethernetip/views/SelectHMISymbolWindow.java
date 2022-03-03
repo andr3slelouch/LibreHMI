@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.canvas.CanvasImage;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
@@ -23,11 +24,26 @@ import java.util.*;
 
 public class SelectHMISymbolWindow extends Stage {
     private final String resourcesDirectory = getClass().getResource("HMISymbols").toExternalForm().substring(5);
+
+    public double getHue() {
+        return hue;
+    }
+
+    public void setHue(double hue) {
+        this.hue = hue;
+    }
+
+    private double hue;
     private Image selectedImage;
     private String selectedImagePath;
-    private boolean mirroringVertical;
-    private boolean mirroringHorizontal;
-    private double rotation;
+    private boolean mirroringVertical=false;
+    private boolean mirroringHorizontal=false;
+    private boolean modifyingColor=false;
+    private double rotation=0;
+    private double contrast=0;
+    private double brightness=0;
+    private double saturation=0;
+    private CanvasColor color;
     private ArrayList<CanvasImage> currentImages = new ArrayList<>();
     private ArrayList<ScrollPane> categoriesPanes = new ArrayList<>();
     Map<String, String> categoriesDirectory = Map.ofEntries(
@@ -58,7 +74,7 @@ public class SelectHMISymbolWindow extends Stage {
                 ArrayList<File> filesArrayList = new ArrayList<>(List.of(Objects.requireNonNull(categoryDirectoryPath.listFiles())));
                 for(File imageFile: filesArrayList){
                     Image image = new Image(new FileInputStream(imageFile.getAbsolutePath()));
-                    CanvasImage canvasImage = new CanvasImage(image,new CanvasPoint(0,0),false,imageFile.getAbsolutePath(),false,false,0,true);
+                    CanvasImage canvasImage = new CanvasImage(image,new CanvasPoint(0,0),false,imageFile.getAbsolutePath(),true);
                     canvasImage.clearContextMenu();
                     currentImages.add(canvasImage);
                     imagesHBox.getChildren().add(canvasImage);
@@ -75,10 +91,32 @@ public class SelectHMISymbolWindow extends Stage {
         Button optionsButton = new Button("Opciones de Imagen");
         optionsButton.setOnAction(mouseEvent -> {
             SetImageOptionsWindow setImageOptionsWindow = new SetImageOptionsWindow();
+            if(modifyingColor){
+                setImageOptionsWindow.setModifyingColor(true);
+                setImageOptionsWindow.getBrightnessTextField().setText(String.valueOf(brightness));
+                setImageOptionsWindow.getContrastTextField().setText(String.valueOf(contrast));
+                setImageOptionsWindow.getHueTextField().setText(String.valueOf(hue));
+                setImageOptionsWindow.getSaturationTextField().setText(String.valueOf(saturation));
+                setImageOptionsWindow.getColorPicker().setValue(color.getColor());
+            }
+
+
             setImageOptionsWindow.showAndWait();
             mirroringVertical = setImageOptionsWindow.isMirroringVertical();
             mirroringHorizontal = setImageOptionsWindow.isMirroringHorizontal();
             rotation = Double.parseDouble(setImageOptionsWindow.getRotationValue());
+            if(setImageOptionsWindow.isModifyingColor()){
+                modifyingColor = setImageOptionsWindow.isModifyingColor();
+                color = new CanvasColor(setImageOptionsWindow.getColorPicker().getValue());
+                contrast = Double.parseDouble(setImageOptionsWindow.getContrastTextField().getText());
+                brightness = Double.parseDouble(setImageOptionsWindow.getBrightnessTextField().getText());
+                saturation = Double.parseDouble(setImageOptionsWindow.getSaturationTextField().getText());
+                hue = Double.parseDouble(setImageOptionsWindow.getHueTextField().getText());
+            }
+            setImageOptionsWindow.setMirroringHorizontal(isMirroringHorizontal());
+            setImageOptionsWindow.setMirroringVertical(isMirroringVertical());
+            setImageOptionsWindow.getRotationTextField().setText(String.valueOf(rotation));
+
         });
         Button okButton = new Button("OK");
         okButton.setOnAction(mouseEvent -> this.close());
@@ -167,5 +205,45 @@ public class SelectHMISymbolWindow extends Stage {
 
     public void setRotation(double rotation) {
         this.rotation = rotation;
+    }
+
+    public boolean isModifyingColor() {
+        return modifyingColor;
+    }
+
+    public void setModifyingColor(boolean modifyingColor) {
+        this.modifyingColor = modifyingColor;
+    }
+
+    public double getContrast() {
+        return contrast;
+    }
+
+    public void setContrast(double contrast) {
+        this.contrast = contrast;
+    }
+
+    public double getBrightness() {
+        return brightness;
+    }
+
+    public void setBrightness(double brightness) {
+        this.brightness = brightness;
+    }
+
+    public double getSaturation() {
+        return saturation;
+    }
+
+    public void setSaturation(double saturation) {
+        this.saturation = saturation;
+    }
+
+    public CanvasColor getColor() {
+        return color;
+    }
+
+    public void setColor(CanvasColor color) {
+        this.color = color;
     }
 }

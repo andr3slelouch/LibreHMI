@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 
 import java.awt.*;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 
 public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     Logger logger = Logger.getLogger(this.getClass().getName());
+
     public String getMode() {
         return mode;
     }
@@ -129,7 +131,13 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         String selectedSymbolPath = null;
         boolean isMirroringVertical = false;
         boolean isMirroringHorizontal = false;
+        boolean isModifyingColor = false;
+        double contrast = 0;
+        double brightness = 0;
+        double saturation = 0;
+        double hue = 0;
         double rotation = 0;
+        CanvasColor color = new CanvasColor(Color.WHITE);
         try {
             SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow();
             selectHMISymbolWindow.showAndWait();
@@ -138,10 +146,21 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
             isMirroringVertical = selectHMISymbolWindow.isMirroringVertical();
             isMirroringHorizontal = selectHMISymbolWindow.isMirroringHorizontal();
             rotation = selectHMISymbolWindow.getRotation();
+            isModifyingColor = selectHMISymbolWindow.isModifyingColor();
+            contrast = selectHMISymbolWindow.getContrast();
+            brightness = selectHMISymbolWindow.getBrightness();
+            saturation = selectHMISymbolWindow.getSaturation();
+            hue = selectHMISymbolWindow.getHue();
+            color = selectHMISymbolWindow.getColor();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        CanvasImage canvasImage = new CanvasImage(selectedSymbol,current,true,selectedSymbolPath,isMirroringVertical,isMirroringHorizontal,rotation,true);
+        CanvasImage canvasImage = new CanvasImage(selectedSymbol, current, true, selectedSymbolPath, true);
+        canvasImage.modifyImageViewSizeRotation(isMirroringHorizontal, isMirroringVertical, rotation);
+        logger.log(Level.INFO, String.valueOf(isModifyingColor));
+        if(isModifyingColor){
+            canvasImage.modifyImageViewColors(color,contrast,brightness,saturation,hue);
+        }
         canvasImage.setCanvas(this);
 
         if (this.getShapeArrayList().isEmpty()) {
@@ -156,7 +175,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {
         SetTextFieldPropertiesWindow setTextFieldPropertiesWindow = new SetTextFieldPropertiesWindow();
         setTextFieldPropertiesWindow.showAndWait();
-        CanvasTextField canvasTextField = new CanvasTextField(current,setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0),Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()),Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
+        CanvasTextField canvasTextField = new CanvasTextField(current, setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
         canvasTextField.setCanvas(this);
         canvasTextField.setUser(hmiApp.getUser());
         if (this.getShapeArrayList().isEmpty()) {
@@ -347,20 +366,20 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
     }
 
     private void addPastedImageViewOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
-        try{
+        try {
             CanvasImage canvasImage = new CanvasImage(graphicalRepresentationData);
             canvasImage.setCanvas(this);
             canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
             canvasImage.setId(generateIdForPasteOperation(graphicalRepresentationData));
             this.addNewShape(canvasImage);
             this.getChildren().add(canvasImage);
-        }catch(Exception e){
-            showAlert(Alert.AlertType.ERROR,"Error al agregar imagen","Error:'"+e.getMessage()+"'");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error al agregar imagen", "Error:'" + e.getMessage() + "'");
         }
     }
 
     private void addPastedTextFieldOnCanvasClicked(GraphicalRepresentationData graphicalRepresentationData) {
-        logger.log(Level.INFO,"Pasting textfield");
+        logger.log(Level.INFO, "Pasting textfield");
         CanvasTextField canvasTextField = new CanvasTextField(graphicalRepresentationData);
         canvasTextField.setCanvas(this);
         canvasTextField.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(graphicalRepresentationData.getCenter().getX() + 10, graphicalRepresentationData.getCenter().getY() + 10)));
@@ -453,7 +472,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         return clone;
     }
 
-    private void showAlert(Alert.AlertType type,String title, String message){
+    private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(message);
@@ -463,8 +482,7 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
         alert.getButtonTypes().setAll(okButton);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
+        if (result.isPresent() && result.get() == okButton) {
             alert.close();
         }
     }

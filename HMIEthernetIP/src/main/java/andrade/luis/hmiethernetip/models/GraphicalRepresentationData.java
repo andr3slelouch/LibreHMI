@@ -71,16 +71,31 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     private double maxValue;
     @SerializedName("mirroringHorizontal")
     @Expose
-    private boolean mirroringHorizontal;
+    private boolean mirroringHorizontal = false;
     @SerializedName("mirroringVertical")
     @Expose
-    private boolean mirroringVertical;
+    private boolean mirroringVertical = false;
     @SerializedName("rotation")
     @Expose
-    private double rotation;
+    private double rotation = 0;
     @SerializedName("isImageSymbol")
     @Expose
     private boolean imageSymbol;
+    @SerializedName("isModifyingImage")
+    @Expose
+    private boolean isModifyingImage = false;
+    @SerializedName("contrast")
+    @Expose
+    private double contrast;
+    @SerializedName("brightness")
+    @Expose
+    private double brightness;
+    @SerializedName("saturation")
+    @Expose
+    private double saturation;
+    @SerializedName("hue")
+    @Expose
+    private double hue;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
@@ -205,6 +220,38 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
 
     public void setMaxValue(double maxValue) {
         this.maxValue = maxValue;
+    }
+
+    public boolean isModifyingImage() {
+        return isModifyingImage;
+    }
+
+    public void setModifyingImage(boolean modifyingImage) {
+        isModifyingImage = modifyingImage;
+    }
+
+    public double getContrast() {
+        return contrast;
+    }
+
+    public void setContrast(double contrast) {
+        this.contrast = contrast;
+    }
+
+    public double getBrightness() {
+        return brightness;
+    }
+
+    public void setBrightness(double brightness) {
+        this.brightness = brightness;
+    }
+
+    public double getSaturation() {
+        return saturation;
+    }
+
+    public void setSaturation(double saturation) {
+        this.saturation = saturation;
     }
 
     public boolean isMirroringHorizontal() {
@@ -383,10 +430,20 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     public String readTagFromDatabase() throws SQLException, IOException {
         return this.tag.readFromDatabase();
     }
+
     public boolean isImageSymbol() {
         return imageSymbol;
     }
+
     public void setImageSymbol(boolean imageSymbol) {
         this.imageSymbol = imageSymbol;
+    }
+
+    public double getHue() {
+        return hue;
+    }
+
+    public void setHue(double hue) {
+        this.hue = hue;
     }
 }
