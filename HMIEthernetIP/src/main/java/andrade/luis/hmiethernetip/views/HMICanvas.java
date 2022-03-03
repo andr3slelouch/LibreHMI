@@ -149,8 +149,8 @@ public class HMICanvas extends Pane implements HMICanvasInterface, Cloneable {
 
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {
         SetTextFieldPropertiesWindow setTextFieldPropertiesWindow = new SetTextFieldPropertiesWindow();
-        setTextFieldPropertiesWindow.show();
-        CanvasTextField canvasTextField = new CanvasTextField(current);
+        setTextFieldPropertiesWindow.showAndWait();
+        CanvasTextField canvasTextField = new CanvasTextField(current,setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0),Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()),Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
         canvasTextField.setCanvas(this);
         canvasTextField.setUser(hmiApp.getUser());
         if (this.getShapeArrayList().isEmpty()) {

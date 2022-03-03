@@ -5,11 +5,11 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.Map;
 
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
-import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -325,7 +325,7 @@ public class GraphicalRepresentationData implements Serializable, Transferable
         this.type = type;
     }
 
-    public String readTagFromDatabase(){
-        return DBConnection.readTagValueFromDatabase(this.tag);
+    public String readTagFromDatabase() throws SQLException, IOException {
+        return this.tag.readFromDatabase();
     }
 }

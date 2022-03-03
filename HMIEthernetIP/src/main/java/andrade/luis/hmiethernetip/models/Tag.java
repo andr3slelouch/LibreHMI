@@ -1,11 +1,18 @@
 package andrade.luis.hmiethernetip.models;
 
+import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.sql.*;
+import java.util.Map;
 
 public class Tag implements Serializable {
+    private static final Map<String, String> selectQueries = Map.of("Entero", "select valor from entero where nombreTag=", "Flotante", "select valor from flotante where nombreTag=", "Bool", "select valor from boolean where nombreTag=");
+    private static final Map<String, String> updateQueries = Map.of("Entero", "update entero SET valor=? where nombreTag=", "Flotante", "update flotante SET valor=? where nombreTag=", "Bool", "update boolean SET valor=? where nombreTag=");
+
     public String getPlcName() {
         return plcName;
     }
@@ -30,44 +37,92 @@ public class Tag implements Serializable {
         this.plcDeviceGroup = plcDeviceGroup;
     }
 
-    public String getTagName() {
-        return tagName;
+    public String getName() {
+        return name;
     }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getTagType() {
-        return tagType;
+    public String getType() {
+        return type;
     }
 
-    public void setTagType(String tagType) {
-        this.tagType = tagType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getTagAddress() {
-        return tagAddress;
+    public String getAddress() {
+        return address;
     }
 
-    public void setTagAddress(String tagAddress) {
-        this.tagAddress = tagAddress;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getTagAction() {
-        return tagAction;
+    public String getAction() {
+        return action;
     }
 
-    public void setTagAction(String tagAction) {
-        this.tagAction = tagAction;
+    public void setAction(String action) {
+        this.action = action;
     }
 
-    public String getTagValue() {
-        return tagValue;
+    public String getValue() {
+        return value;
     }
 
-    public void setTagValue(String tagValue) {
-        this.tagValue = tagValue;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String readFromDatabase() throws SQLException, IOException {
+
+        Connection con = DBConnection.createConnectionToBDDriverEIP();
+        Statement statement = con.createStatement();
+        if (this.getType() != null && this.getName() != null) {
+            String query = selectQueries.get(this.getType()) + "'" + this.getName() + "'";
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                if (!resultSet.getString("valor").isEmpty()) {
+                    String result = resultSet.getString("valor");
+                    con.close();
+                    this.value = result;
+                    return result;
+                }
+            }
+        }
+        con.close();
+
+        return "";
+    }
+
+    public boolean updateInDatabase() throws SQLException, IOException {
+        Connection con = DBConnection.createConnectionToBDDriverEIP();
+        if (this.getType() != null && this.getName() != null) {
+            String query = updateQueries.get(this.getType()) + "'" + this.getName() + "'";
+            PreparedStatement preparedStatement = con.prepareStatement(query);
+            String updateValue;
+            switch(this.getType()) {
+                case "Entero":
+                case "Bool":
+                    updateValue = String.valueOf(Integer.parseInt(this.value.isEmpty() ? "0" : this.value ));
+                    break;
+                case "Flotante":
+                    updateValue = String.valueOf(Double.parseDouble(this.value));
+                    break;
+                default:
+                    updateValue = this.value;
+            }
+            preparedStatement.setString(1, updateValue);
+            int insertRowResult = preparedStatement.executeUpdate();
+            con.close();
+            return insertRowResult > 0;
+        }else{
+            con.close();
+            return false;
+        }
     }
 
     @SerializedName("plcName")
@@ -79,71 +134,71 @@ public class Tag implements Serializable {
     @SerializedName("plcDeviceGroup")
     @Expose
     private String plcDeviceGroup;
-    @SerializedName("tagName")
+    @SerializedName("name")
     @Expose
-    private String tagName;
-    @SerializedName("tagType")
+    private String name;
+    @SerializedName("type")
     @Expose
-    private String tagType;
-    @SerializedName("tagAddress")
+    private String type;
+    @SerializedName("address")
     @Expose
-    private String tagAddress;
-    @SerializedName("tagAction")
+    private String address;
+    @SerializedName("action")
     @Expose
-    private String tagAction;
-    @SerializedName("tagValue")
+    private String action;
+    @SerializedName("value")
     @Expose
-    private String tagValue;
+    private String value;
 
-    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction, String tagValue) {
+    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String name, String type, String address, String action, String value) {
         this.plcName = plcName;
         this.plcAddress = plcAddress;
         this.plcDeviceGroup = plcDeviceGroup;
-        this.tagName = tagName;
-        this.tagType = tagType;
-        this.tagAddress = tagAddress;
-        this.tagAction = tagAction;
-        this.tagValue = tagValue;
+        this.name = name;
+        this.type = type;
+        this.address = address;
+        this.action = action;
+        this.value = value;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(GraphicalRepresentationData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("plcName");
         sb.append('=');
-        sb.append(((this.plcName == null)?"<null>":this.plcName));
+        sb.append(((this.plcName == null) ? "<null>" : this.plcName));
         sb.append(',');
         sb.append("plcAddress");
         sb.append('=');
-        sb.append(((this.plcAddress == null)?"<null>":this.plcAddress));
+        sb.append(((this.plcAddress == null) ? "<null>" : this.plcAddress));
         sb.append(',');
         sb.append("plcDeviceGroup");
         sb.append('=');
-        sb.append(((this.plcDeviceGroup == null)?"<null>":this.plcDeviceGroup));
+        sb.append(((this.plcDeviceGroup == null) ? "<null>" : this.plcDeviceGroup));
         sb.append(',');
         sb.append("tagName");
         sb.append('=');
-        sb.append(((this.tagName == null)?"<null>":this.tagName));
+        sb.append(((this.name == null) ? "<null>" : this.name));
         sb.append(',');
         sb.append("tagType");
         sb.append('=');
-        sb.append(((this.tagType == null)?"<null>":this.tagType));
+        sb.append(((this.type == null) ? "<null>" : this.type));
         sb.append(',');
         sb.append("tagAddress");
         sb.append('=');
-        sb.append(((this.tagAddress == null)?"<null>":this.tagAddress));
+        sb.append(((this.address == null) ? "<null>" : this.address));
         sb.append(',');
         sb.append("tagAction");
         sb.append('=');
-        sb.append(((this.tagAction == null)?"<null>":this.tagAction));
+        sb.append(((this.action == null) ? "<null>" : this.action));
         sb.append(',');
         sb.append("tagValue");
         sb.append('=');
-        sb.append(((this.tagValue == null)?"<null>":this.tagValue));
+        sb.append(((this.value == null) ? "<null>" : this.value));
         sb.append(',');
-        if (sb.charAt((sb.length()- 1)) == ',') {
-            sb.setCharAt((sb.length()- 1), ']');
+        if (sb.charAt((sb.length() - 1)) == ',') {
+            sb.setCharAt((sb.length() - 1), ']');
         } else {
             sb.append(']');
         }

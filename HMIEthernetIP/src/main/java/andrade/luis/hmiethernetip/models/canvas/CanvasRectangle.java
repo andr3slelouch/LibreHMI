@@ -22,7 +22,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.codehaus.commons.compiler.CompileException;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 
 import static javafx.geometry.Pos.CENTER;
 
@@ -246,11 +248,10 @@ public class CanvasRectangle extends GraphicalRepresentation {
                                     default:
                                         break;
                                 }
-
                                 double value = calculatePercentFillValue(evaluatedValue);
                                 captionLabel.setText(String.valueOf(evaluatedValue));
                                 life.set(value);
-                            } catch (CompileException | InvocationTargetException e) {
+                            } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
                                 e.printStackTrace();
                             }
                         }), new KeyFrame(Duration.seconds(1)));

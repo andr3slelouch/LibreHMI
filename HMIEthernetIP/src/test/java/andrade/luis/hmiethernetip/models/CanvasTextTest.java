@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.assertions.api.Assertions;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,12 +16,16 @@ import java.util.logging.Logger;
 class CanvasTextTest {
 
     @Test
-    void prepareQueryAndReadFromDatabase() {
+    void prepareQueryAndReadFromDatabase() throws SQLException {
         CanvasText testCanvasText = new CanvasText();
         Tag tag = new Tag("","","","temperatura","Flotante","","","");
         testCanvasText.getGraphicalRepresentationData().setTag(tag);
         String text = "";
-        text = testCanvasText.getGraphicalRepresentationData().readTagFromDatabase();
+        try {
+            text = testCanvasText.getGraphicalRepresentationData().readTagFromDatabase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Logger logger = Logger.getLogger(CanvasText.class.getName());
         logger.log(Level.INFO,text);
         Assertions.assertThat(text).isNotBlank();

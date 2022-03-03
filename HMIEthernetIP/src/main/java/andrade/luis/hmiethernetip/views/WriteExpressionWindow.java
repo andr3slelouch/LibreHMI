@@ -2,8 +2,6 @@ package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.Tag;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,7 +12,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.codehaus.commons.compiler.CompileException;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -135,7 +135,7 @@ public class WriteExpressionWindow extends Stage {
         Tag tag = selectTagWindow.getSelectedTag();
         if(tag!=null){
             addedTags.add(tag);
-            textField.setText(textField.getText()+tag.getTagName());
+            textField.setText(textField.getText()+tag.getName());
         }
     }
 
@@ -158,7 +158,7 @@ public class WriteExpressionWindow extends Stage {
     public void finishingAction(){
         ArrayList<Tag> toDelete = new ArrayList<>();
         for(int i=0;i< getAddedTags().size();i++){
-            if(!textField.getText().contains(getAddedTags().get(i).getTagName())){
+            if(!textField.getText().contains(getAddedTags().get(i).getName())){
                 toDelete.add(getAddedTags().get(i));
             }
         }
@@ -167,7 +167,7 @@ public class WriteExpressionWindow extends Stage {
             this.localExpression = new Expression(textField.getText(),addedTags);
             try{
                 this.localExpression.evaluate();
-            } catch (CompileException | InvocationTargetException e) {
+            } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
                 confirmExit();
             }
             this.close();

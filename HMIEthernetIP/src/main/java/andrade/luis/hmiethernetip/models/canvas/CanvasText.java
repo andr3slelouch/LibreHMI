@@ -12,7 +12,9 @@ import javafx.scene.control.MenuItem;
 import javafx.util.Duration;
 import org.codehaus.commons.compiler.CompileException;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,7 +102,7 @@ public class CanvasText extends CanvasLabel {
                             String evaluatedValue = "";
                             try{
                                 switch (type) {
-                                    case "Booleano":
+                                    case "Bool":
                                         evaluatedValue = String.valueOf((boolean) this.getGraphicalRepresentationData().getExpression().evaluate());
                                         break;
                                     case "Flotante":
@@ -113,6 +115,10 @@ public class CanvasText extends CanvasLabel {
                                         break;
                                 }
                             }catch(CompileException | InvocationTargetException e) {
+                                e.printStackTrace();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                             this.text = evaluatedValue;

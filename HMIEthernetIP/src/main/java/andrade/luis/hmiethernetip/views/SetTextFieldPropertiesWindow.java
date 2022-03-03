@@ -1,8 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.Tag;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -10,8 +8,33 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 
 public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
+    public TextField getMinValueField() {
+        return minValueField;
+    }
+
+    public void setMinValueField(TextField minValueField) {
+        this.minValueField = minValueField;
+    }
+
+    public TextField getMaxValueField() {
+        return maxValueField;
+    }
+
+    public void setMaxValueField(TextField maxValueField) {
+        this.maxValueField = maxValueField;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     private TextField minValueField;
     private TextField maxValueField;
+    private String type = "String";
     private ArrayList<RadioButton> radioButtons;
 
     public SetTextFieldPropertiesWindow(){
@@ -40,6 +63,9 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
         rb1.setSelected(true);
         rb1.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
             disableMaxMinInputs(!newBoolean);
+            if(Boolean.TRUE.equals(newBoolean)){
+                type = rb1.getText();
+            }
         });
         radioButtons.add(rb1);
 
@@ -47,6 +73,9 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
         rb2.setToggleGroup(group);
         rb2.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
             disableMaxMinInputs(!newBoolean);
+            if(Boolean.TRUE.equals(newBoolean)){
+                type = rb1.getText();
+            }
         });
         radioButtons.add(rb2);
 
@@ -54,12 +83,18 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
         rb3.setToggleGroup(group);
         rb3.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
             disableMaxMinInputs(newBoolean);
+            if(Boolean.TRUE.equals(newBoolean)){
+                type = rb1.getText();
+            }
         });
         radioButtons.add(rb3);
 
         RadioButton rb4 = new RadioButton("Bool");
         rb4.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
             disableMaxMinInputs(newBoolean);
+            if(Boolean.TRUE.equals(newBoolean)){
+                type = rb1.getText();
+            }
         });
         rb4.setOnAction(mouseEvent -> disableMaxMinInputs(true));
         rb4.setToggleGroup(group);
@@ -98,9 +133,9 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
             Tag tag = selectTagWindow.getSelectedTag();
             if(tag!=null){
                 this.getAddedTags().add(tag);
-                textField.setText(textField.getText()+tag.getTagName());
+                textField.setText(textField.getText()+tag.getName());
                 for (RadioButton radioButton : radioButtons) {
-                    if (radioButton.getText().equals(tag.getTagType())) {
+                    if (radioButton.getText().equals(tag.getType())) {
                         radioButton.setSelected(true);
                     }
                 }

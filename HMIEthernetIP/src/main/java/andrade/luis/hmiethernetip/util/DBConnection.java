@@ -144,12 +144,12 @@ public class DBConnection {
         return false;
     }
 
-    public static String readTagValueFromDatabase(Tag tag) {
-        try {
+    public static String readTagValueFromDatabase(Tag tag) throws SQLException, IOException {
+
             Connection con = DBConnection.createConnectionToBDDriverEIP();
             Statement statement = con.createStatement();
-            if (tag.getTagType() != null && tag.getTagName() != null) {
-                String query = queries.get(tag.getTagType()) + "'" + tag.getTagName() + "'";
+            if (tag.getType() != null && tag.getName() != null) {
+                String query = queries.get(tag.getType()) + "'" + tag.getName() + "'";
                 ResultSet resultSet = statement.executeQuery(query);
                 while (resultSet.next()) {
                     if (!resultSet.getString("valor").isEmpty()) {
@@ -160,9 +160,7 @@ public class DBConnection {
                 }
             }
             con.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         return "";
     }
 

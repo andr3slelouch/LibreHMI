@@ -1,13 +1,14 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ExpressionEvaluator;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,7 +17,7 @@ public class Expression implements Serializable {
     private static final ArrayList<String> comparisonOperators = new ArrayList<>(Arrays.asList("==", "!=", ">", "<", ">=", "<="));
     private static final ArrayList<String> logicalOperators = new ArrayList<>(Arrays.asList("&&", "||", "!"));
     private static final ArrayList<String> stringOperators = new ArrayList<>(Arrays.asList("\"", "+"));
-    static final String BOOLEAN_STR = "Booleano";
+    static final String BOOLEAN_STR = "Bool";
     static final String INT_STR = "Entero";
     static final String FLOAT_STR = "Flotante";
     static final String STRING_STR = "String";
@@ -90,8 +91,8 @@ public class Expression implements Serializable {
         this.parameterNames = new String[tags.size()];
         this.parameterTypes = new String[tags.size()];
         for (int i = 0; i < parameters.size(); i++) {
-            this.parameterNames[i] = parameters.get(i).getTagName();
-            this.parameterTypes[i] = parameters.get(i).getTagType();
+            this.parameterNames[i] = parameters.get(i).getName();
+            this.parameterTypes[i] = parameters.get(i).getType();
         }
         this.resultType = determineResultType();
     }
@@ -227,17 +228,17 @@ public class Expression implements Serializable {
 
     }
 
-    public Object evaluate() throws CompileException, InvocationTargetException {
+    public Object evaluate() throws CompileException, InvocationTargetException, SQLException, IOException {
         ExpressionEvaluator ee = prepareExpression();
         Object[] valuesToEvaluate = new Object[parameterNames.length];
         for (int i = 0; i < parameters.size(); i++) {
-            switch (parameters.get(i).getTagType()) {
+            switch (parameters.get(i).getType()) {
                 case INT_STR:
                 case FLOAT_STR:
-                    valuesToEvaluate[i] = Double.valueOf(DBConnection.readTagValueFromDatabase(parameters.get(i)));
+                    valuesToEvaluate[i] = Double.valueOf(parameters.get(i).readFromDatabase());
                     break;
                 case BOOLEAN_STR:
-                    valuesToEvaluate[i] = Boolean.valueOf(DBConnection.readTagValueFromDatabase(parameters.get(i)));
+                    valuesToEvaluate[i] = parameters.get(i).readFromDatabase().equals("1");
                     break;
                 default:
                     throw new IllegalArgumentException();
