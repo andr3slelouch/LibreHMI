@@ -53,6 +53,9 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     @SerializedName("expression")
     @Expose
     private Expression expression;
+    @SerializedName("visibilityExpression")
+    @Expose
+    private Expression visibilityExpression;
     @SerializedName("primaryColor")
     @Expose
     private CanvasColor primaryColor;
@@ -103,7 +106,10 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     private String mode;
     @SerializedName("status")
     @Expose
-    private String status;
+    private String status="";
+    @SerializedName("visible")
+    @Expose
+    private boolean visible;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
@@ -476,5 +482,25 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     public void setPreservingRatio(boolean preservingRatio) {
         this.preservingRatio = preservingRatio;
     }
+
+
+    public Expression getVisibilityExpression() {
+        return visibilityExpression;
+    }
+
+    public void setVisibilityExpression(Expression visibilityExpression) {
+        this.visibilityExpression = visibilityExpression;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+
+
 
 }

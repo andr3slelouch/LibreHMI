@@ -19,12 +19,15 @@ import javafx.scene.layout.CornerRadii;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasPushbutton extends CanvasButton {
     Logger logger = Logger.getLogger(this.getClass().getName());
+    private static final String DIRECT_STR = "Directo";
+    private static final String REVERSE_STR = "Reversa";
+    private static final String TOGGLE_STR = "Toggle";
 
     private BooleanProperty selectedProperty = new SimpleBooleanProperty();
 
@@ -76,26 +79,7 @@ public class CanvasPushbutton extends CanvasButton {
         this.getGraphicalRepresentationData().setTag(linkedTag);
         this.getGraphicalRepresentationData().setPrimaryColor(primaryColor);
         this.getGraphicalRepresentationData().setBackgroundColor(backgroundColor);
-        this.button.setOnAction(mouseEvent -> {
-            try {
-                switch (this.getGraphicalRepresentationData().getMode()) {
-                    case "Directo":
-                        changeValues(true);
-                        break;
-                    case "Reversa":
-                        changeValues(false);
-                        break;
-                    case "Toggle":
-                        changeValues(this.getGraphicalRepresentationData().getData().equals("clicked"));
-                        break;
-                    default:
-                        break;
-                }
-            } catch (SQLException | IOException e) {
-                e.printStackTrace();
-            }
-        });
-        this.button.setOnMousePressed(onPushbuttonOnMyMouseDragged);
+        this.button.setOnMousePressed(onPushbuttonOnMyMousePressed);
         this.button.setOnMouseReleased(onPushbuttonOnMyMouseReleased);
     }
 
@@ -120,14 +104,11 @@ public class CanvasPushbutton extends CanvasButton {
     private final EventHandler<MouseEvent> onPushbuttonOnMyMouseReleased = mouseEvent -> {
         try {
             switch (this.getGraphicalRepresentationData().getMode()) {
-                case "Directo":
+                case DIRECT_STR:
                     changeValues(false);
                     break;
-                case "Reversa":
+                case REVERSE_STR:
                     changeValues(true);
-                    break;
-                case "Toggle":
-                    changeValues(!this.getGraphicalRepresentationData().getData().equals("clicked"));
                     break;
                 default:
                     break;
@@ -137,17 +118,17 @@ public class CanvasPushbutton extends CanvasButton {
         }
     };
 
-    private final EventHandler<MouseEvent> onPushbuttonOnMyMouseDragged = mouseEvent -> {
+    private final EventHandler<MouseEvent> onPushbuttonOnMyMousePressed = mouseEvent -> {
         try {
             switch (this.getGraphicalRepresentationData().getMode()) {
-                case "Directo":
+                case DIRECT_STR:
                     changeValues(true);
                     break;
-                case "Reversa":
+                case REVERSE_STR:
                     changeValues(false);
                     break;
-                case "Toggle":
-                    changeValues(this.getGraphicalRepresentationData().getData().equals("clicked"));
+                case TOGGLE_STR:
+                    changeValues(!this.getGraphicalRepresentationData().getStatus().equals("clicked"));
                     break;
                 default:
                     break;

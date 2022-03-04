@@ -144,7 +144,7 @@ public class WriteExpressionWindow extends Stage {
         this.getAddedTags().clear();
     }
 
-    private void confirmExit(){
+    protected void confirmExit(Alert.AlertType type,String title,String message){
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia");
         alert.setHeaderText("Debe escribir una expresión con un Tag añadido a través del botón 'Añadir Tag' ");
@@ -173,15 +173,14 @@ public class WriteExpressionWindow extends Stage {
             try{
                 this.localExpression.evaluate();
             } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
-                confirmExit();
+                confirmExit(Alert.AlertType.ERROR,"Error al agregar expresión","Error:"+e.getMessage());
             }
             this.close();
         } else if(!textField.getText().isEmpty()){
             this.localExpression = new Expression(textField.getText(),addedTags);
             this.close();
         }else{
-            confirmExit();
+            confirmExit(Alert.AlertType.WARNING,"No existe expresión definida","Debe agregar una expresión o un Tag");
         }
-
     }
 }

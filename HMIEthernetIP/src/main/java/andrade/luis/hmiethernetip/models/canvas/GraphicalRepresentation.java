@@ -1,27 +1,43 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
+import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
 import andrade.luis.hmiethernetip.models.MouseOverMode;
 import andrade.luis.hmiethernetip.views.SetSizeWindow;
+import andrade.luis.hmiethernetip.views.SetVisibilityAnimationWindow;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
+import org.codehaus.commons.compiler.CompileException;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DEFAULT;
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DRAG;
 
 public class GraphicalRepresentation extends BorderPane {
+    Logger logger = Logger.getLogger(this.getClass().getName());
+    private Timeline visibilityTimeline;
+
     public GraphicalRepresentation() {
 
     }
@@ -385,19 +401,28 @@ public class GraphicalRepresentation extends BorderPane {
             }
         });
 
-        copyMenuItem = new MenuItem("Copy");
+        copyMenuItem = new MenuItem("Copiar");
         copyMenuItem.setId("#copy");
         copyMenuItem.setOnAction(actionEvent -> copy("Copy"));
-        cutMenuItem = new MenuItem("Cut");
+        cutMenuItem = new MenuItem("Cortar");
         cutMenuItem.setId("#cut");
         cutMenuItem.setOnAction(actionEvent -> cut());
-        deleteMenuItem = new MenuItem("Delete");
+        deleteMenuItem = new MenuItem("Eliminar");
         deleteMenuItem.setId("#delete");
         deleteMenuItem.setOnAction(actionEvent -> delete());
-        MenuItem resizeMI = new MenuItem("Resize");
+        MenuItem resizeMI = new MenuItem("Redimensionar");
         resizeMI.setId("#resizeMI");
         resizeMI.setOnAction(actionEvent -> this.resize());
-        rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, deleteMenuItem, resizeMI);
+        MenuItem visibilityAnimationMI = new MenuItem("Animación de Visibilidad");
+        visibilityAnimationMI.setId("#visibilityMI");
+        visibilityAnimationMI.setOnAction(actionEvent -> {
+            try {
+                this.setVisibilityAnimation();
+            } catch (SQLException | CompileException | IOException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
+        rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, deleteMenuItem, resizeMI, visibilityAnimationMI);
     }
 
     public GraphicalRepresentation(CanvasPoint center) {
@@ -426,6 +451,47 @@ public class GraphicalRepresentation extends BorderPane {
         this.getGraphicalRepresentationData().setWidth(setSizeWindow.getWidthFromField());
         this.getGraphicalRepresentationData().setHeight(setSizeWindow.getHeightFromField());
         this.setSize(this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+    }
+
+    protected void setVisibilityAnimation() throws SQLException, CompileException, IOException, InvocationTargetException {
+        SetVisibilityAnimationWindow setVisibilityAnimationWindow = new SetVisibilityAnimationWindow();
+        if (this.graphicalRepresentationData.getVisibilityExpression() != null) {
+            setVisibilityAnimationWindow.setAddedTags(this.graphicalRepresentationData.getVisibilityExpression().getParameters());
+            setVisibilityAnimationWindow.setLocalExpression(this.graphicalRepresentationData.getVisibilityExpression());
+            setVisibilityAnimationWindow.getTextField().setText(this.graphicalRepresentationData.getVisibilityExpression().getExpressionToEvaluate());
+            if(this.graphicalRepresentationData.isVisible()){
+                setVisibilityAnimationWindow.getTrueRadioButton().setSelected(true);
+            }else{
+                setVisibilityAnimationWindow.getFalseRadioButton().setSelected(true);
+            }
+        }
+        setVisibilityAnimationWindow.showAndWait();
+        this.graphicalRepresentationData.setVisible(setVisibilityAnimationWindow.getTrueRadioButton().isSelected());
+        logger.log(Level.INFO,setVisibilityAnimationWindow.getLocalExpression().getExpressionToEvaluate());
+        Expression expression = setVisibilityAnimationWindow.getLocalExpression();
+        if (expression != null) {
+            expression.evaluate();
+            this.setVisibilityAnimation(expression);
+            this.visibilityTimeline.play();
+        }
+    }
+
+    protected void setVisibilityAnimation(Expression expression) {
+        if (expression != null) {
+            this.getGraphicalRepresentationData().setVisibilityExpression(expression);
+            this.visibilityTimeline = new Timeline(
+                    new KeyFrame(
+                            Duration.seconds(0),
+                            (ActionEvent actionEvent) -> {
+                                try {
+                                    boolean evaluatedValue = (boolean) this.getGraphicalRepresentationData().getVisibilityExpression().evaluate();
+                                    this.setVisible(evaluatedValue == this.getGraphicalRepresentationData().isVisible());
+                                } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }), new KeyFrame(Duration.seconds(1)));
+            this.visibilityTimeline.setCycleCount(Animation.INDEFINITE);
+        }
     }
 
     public void setEnable(String enabled) {
