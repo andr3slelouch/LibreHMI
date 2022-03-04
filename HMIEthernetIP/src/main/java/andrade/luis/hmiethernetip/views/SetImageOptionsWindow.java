@@ -6,9 +6,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
+import java.io.File;
 import java.util.function.UnaryOperator;
 
 public class SetImageOptionsWindow extends Stage {
@@ -20,6 +22,36 @@ public class SetImageOptionsWindow extends Stage {
         }
         return change;
     };
+
+    public CheckBox getPreserveRatioCheckBox() {
+        return preserveRatioCheckBox;
+    }
+
+    public void setPreserveRatioCheckBox(CheckBox preserveRatioCheckBox) {
+        this.preserveRatioCheckBox = preserveRatioCheckBox;
+    }
+
+    private CheckBox preserveRatioCheckBox;
+
+    public Button getImagePathButton() {
+        return imagePathButton;
+    }
+
+    public void setImagePathButton(Button imagePathButton) {
+        this.imagePathButton = imagePathButton;
+    }
+
+    private Button imagePathButton;
+
+    public TextField getImagePathTextField() {
+        return imagePathTextField;
+    }
+
+    public void setImagePathTextField(TextField imagePathTextField) {
+        this.imagePathTextField = imagePathTextField;
+    }
+
+    private TextField imagePathTextField;
 
     public TextField getHueTextField() {
         return hueTextField;
@@ -138,13 +170,54 @@ public class SetImageOptionsWindow extends Stage {
         this.mirrorVerticalCheckBox = mirrorVerticalCheckBox;
     }
 
+    public boolean isPreservingRatio() {
+        return preservingRatio;
+    }
+
+    public void setPreservingRatio(boolean preservingRatio) {
+        this.preservingRatio = preservingRatio;
+    }
+
+    private boolean preservingRatio = false;
     private boolean mirroringHorizontal = false;
     private boolean mirroringVertical = false;
     private String rotationValue = "0";
+    final FileChooser fileChooser = new FileChooser();
+
 
     public SetImageOptionsWindow() {
         StackPane root = new StackPane();
         Label label = new Label("Opciones de Imagen");
+
+        Label imagePathLabel = new Label("Ubicación de Imagen:");
+        imagePathTextField = new TextField();
+        imagePathTextField.setDisable(true);
+        imagePathButton = new Button("Seleccionar");
+        imagePathButton.setOnAction(mouseEvent -> {
+            fileChooser.setTitle("Seleccione una imagen");
+            fileChooser.setInitialDirectory(
+                    new File(System.getProperty("user.home"))
+            );
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Imagen", "*.bmp","*.gif","*.jpg","*.jpeg","*.png","*.BMP","*.GIF","*.JPG","*.JPEG","*.PNG"),
+                    new FileChooser.ExtensionFilter("BMP","*.bmp","*.BMP"),
+                    new FileChooser.ExtensionFilter("GIF", "*.gif","*.GIF"),
+                    new FileChooser.ExtensionFilter("JPG", "*.jpg","*.JPG"),
+                    new FileChooser.ExtensionFilter("JPEG", "*.jpeg","*.JPEG"),
+                    new FileChooser.ExtensionFilter("PNG", "*.png","*.PNG")
+            );
+            File file = fileChooser.showOpenDialog(this);
+            if (file != null) {
+                this.imagePathTextField.setText(file.getAbsolutePath());
+            }
+        });
+        HBox imagePathHBox = new HBox();
+        imagePathHBox.getChildren().addAll(imagePathLabel, imagePathTextField, imagePathButton);
+
+        preserveRatioCheckBox = new CheckBox("Preservar Radio al Redimensionar");
+        preserveRatioCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
+            preservingRatio = newBoolean;
+        });
         mirrorHorizontalCheckBox = new CheckBox("Reflejar Horizontalmente");
         mirrorHorizontalCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
             mirroringHorizontal = newBoolean;
@@ -166,7 +239,7 @@ public class SetImageOptionsWindow extends Stage {
         });
 
         HBox rotationHBox = new HBox();
-        rotationHBox.getChildren().addAll(rotationLabel, rotationTextField, rotationButton);
+        rotationHBox.getChildren().addAll(rotationLabel, preserveRatioCheckBox,rotationTextField, rotationButton);
 
         Label colorMode = new Label("Modo de Color:");
         toggleGroup = new ToggleGroup();
@@ -219,7 +292,7 @@ public class SetImageOptionsWindow extends Stage {
         hueTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox hueHBox = new HBox();
         hueHBox.setSpacing(118);
-        hueHBox.getChildren().addAll(hueLabel,hueTextField);
+        hueHBox.getChildren().addAll(hueLabel, hueTextField);
 
         modColorRB.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
             modifyingColor = Boolean.TRUE.equals(newBoolean);
@@ -237,7 +310,7 @@ public class SetImageOptionsWindow extends Stage {
         okHBox.setAlignment(Pos.BOTTOM_RIGHT);
 
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(label, mirrorHorizontalCheckBox, mirrorVerticalCheckBox, rotationHBox, colorModeHBox, colorHBox, contrastHBox, brightnessHBox, saturationHBox,hueHBox, okHBox);
+        vbox.getChildren().addAll(label, imagePathHBox, preserveRatioCheckBox,mirrorHorizontalCheckBox, mirrorVerticalCheckBox, rotationHBox, colorModeHBox, colorHBox, contrastHBox, brightnessHBox, saturationHBox, hueHBox, okHBox);
 
         root.getChildren().add(vbox);
 

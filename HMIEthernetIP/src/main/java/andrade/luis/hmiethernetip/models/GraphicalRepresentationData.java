@@ -74,6 +74,9 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     @SerializedName("mirroringVertical")
     @Expose
     private boolean mirroringVertical = false;
+    @SerializedName("preservingRatio")
+    @Expose
+    private boolean preservingRatio = false;
     @SerializedName("rotation")
     @Expose
     private double rotation = 0;
@@ -465,4 +468,13 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     public void setHue(double hue) {
         this.hue = hue;
     }
+
+    public boolean isPreservingRatio() {
+        return preservingRatio;
+    }
+
+    public void setPreservingRatio(boolean preservingRatio) {
+        this.preservingRatio = preservingRatio;
+    }
+
 }

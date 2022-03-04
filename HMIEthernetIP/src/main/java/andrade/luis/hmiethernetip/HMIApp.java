@@ -95,14 +95,15 @@ public class HMIApp extends Application {
         Button registerUserBtn = new Button("Register");
         Button logIntUserBtn = new Button("Log In");
         Button saveBtn = new Button("Guardar Propiedades");
-        Button showSelectedWindowsBtn = new Button("Image");
+        Button symbolBtn = new Button("Symbol");
+        Button imageBtn = new Button("Image");
         Button pushbuttonBtn = new Button("Pushbutton");
         Button playBtn = new Button("Play");
         Button stopBtn = new Button("Stop");
         Button defaultBtn = new Button("Default");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(logIntUserBtn, saveBtn, showSelectedWindowsBtn, pushbuttonBtn);
+        HBox thirdHBox = new HBox(logIntUserBtn, saveBtn, imageBtn ,symbolBtn, pushbuttonBtn);
         HBox fourthHBox = new HBox(playBtn, stopBtn, defaultBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
@@ -130,10 +131,13 @@ public class HMIApp extends Application {
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.show();
         });
-        showSelectedWindowsBtn.setOnAction(mouseEvent -> {
+        symbolBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Symbol");
+        });
+        imageBtn.setOnAction(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Image");
-
         });
         pushbuttonBtn.setOnAction(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);

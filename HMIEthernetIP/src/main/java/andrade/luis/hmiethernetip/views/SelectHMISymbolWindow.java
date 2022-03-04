@@ -39,6 +39,7 @@ public class SelectHMISymbolWindow extends Stage {
     private boolean mirroringVertical=false;
     private boolean mirroringHorizontal=false;
     private boolean modifyingColor=false;
+    private boolean preservingRatio = false;
     private double rotation=0;
     private double contrast=0;
     private double brightness=0;
@@ -102,6 +103,7 @@ public class SelectHMISymbolWindow extends Stage {
 
 
             setImageOptionsWindow.showAndWait();
+            preservingRatio = setImageOptionsWindow.isPreservingRatio();
             mirroringVertical = setImageOptionsWindow.isMirroringVertical();
             mirroringHorizontal = setImageOptionsWindow.isMirroringHorizontal();
             rotation = Double.parseDouble(setImageOptionsWindow.getRotationValue());
@@ -246,4 +248,13 @@ public class SelectHMISymbolWindow extends Stage {
     public void setColor(CanvasColor color) {
         this.color = color;
     }
+
+    public boolean isPreservingRatio() {
+        return preservingRatio;
+    }
+
+    public void setPreservingRatio(boolean preservingRatio) {
+        this.preservingRatio = preservingRatio;
+    }
+
 }
