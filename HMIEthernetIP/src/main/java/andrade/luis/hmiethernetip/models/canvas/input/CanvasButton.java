@@ -1,26 +1,15 @@
 package andrade.luis.hmiethernetip.models.canvas.input;
 
 import andrade.luis.hmiethernetip.HMIApp;
-import andrade.luis.hmiethernetip.controllers.HMIScene;
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
-import andrade.luis.hmiethernetip.models.MouseOverMode;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
-import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SelectWindowsWindow;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
-import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.MouseEvent;
 
-import java.util.ArrayList;
-
-public class CanvasButton extends GraphicalRepresentation {
+public class CanvasButton extends CanvasObject {
     protected Button button;
 
     public HMIUser getUser() {
@@ -32,7 +21,6 @@ public class CanvasButton extends GraphicalRepresentation {
     }
 
     private HMIUser user;
-    private ArrayList<HMIScene> selectedPages = new ArrayList<>();
 
     public HMIApp getHmiApp() {
         return hmiApp;
@@ -46,21 +34,21 @@ public class CanvasButton extends GraphicalRepresentation {
 
     public CanvasButton(CanvasPoint center) {
         super(center);
-        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), 150, 50);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 50);
     }
 
-    public CanvasButton(GraphicalRepresentationData graphicalRepresentationData){
-        super(graphicalRepresentationData);
-        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+    public CanvasButton(CanvasObjectData canvasObjectData){
+        super(canvasObjectData);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
     }
 
     public void setData(double x, double y, double width, double height) {
-        this.getGraphicalRepresentationData().setType("Button");
+        this.getCanvasObjectData().setType("Button");
         this.button = new Button("Action");
         this.button.setDisable(true);
-        this.getGraphicalRepresentationData().setPosition(new CanvasPoint(x, y));
-        this.getGraphicalRepresentationData().setWidth(width);
-        this.getGraphicalRepresentationData().setHeight(height);
+        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
+        this.getCanvasObjectData().setWidth(width);
+        this.getCanvasObjectData().setHeight(height);
         this.button.setPrefWidth(width);
         this.button.setPrefHeight(height);
         this.setCenter(this.button);
@@ -76,17 +64,17 @@ public class CanvasButton extends GraphicalRepresentation {
     }
 
     public void buttonAction() {
-        SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(hmiApp.getPages(), selectedPages);
+        SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(hmiApp.getPagesTitles(), this.getCanvasObjectData().getSelectedPages());
         selectWindowsWindow.showAndWait();
-        selectedPages = selectWindowsWindow.getSelectedItems();
-        this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(selectedPages));
+        this.getCanvasObjectData().setSelectedPages(selectWindowsWindow.getSelectedItems());
+        this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(this.getCanvasObjectData().getSelectedPages()));
     }
 
     @Override
     public void resize(){
         super.resize();
-        this.button.setPrefWidth(this.getGraphicalRepresentationData().getWidth());
-        this.button.setPrefHeight(this.getGraphicalRepresentationData().getHeight());
+        this.button.setPrefWidth(this.getCanvasObjectData().getWidth());
+        this.button.setPrefHeight(this.getCanvasObjectData().getHeight());
     }
 
     @Override

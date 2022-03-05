@@ -32,6 +32,8 @@ public class HMIUser {
     @SerializedName("userLoggedIn")
     @Expose
     private boolean userLoggedIn = false;
+    @SerializedName("oldUsername")
+    @Expose
     private String oldUsername;
 
     public boolean isUserLoggedIn() {

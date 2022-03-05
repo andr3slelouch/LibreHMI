@@ -1,7 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.Expression;
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
 import andrade.luis.hmiethernetip.models.MouseOverMode;
 import andrade.luis.hmiethernetip.views.SetSizeWindow;
 import andrade.luis.hmiethernetip.views.SetVisibilityAnimationWindow;
@@ -34,28 +33,28 @@ import java.util.logging.Logger;
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DEFAULT;
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DRAG;
 
-public class GraphicalRepresentation extends BorderPane {
+public class CanvasObject extends BorderPane {
     Logger logger = Logger.getLogger(this.getClass().getName());
     private Timeline visibilityTimeline;
 
-    public GraphicalRepresentation() {
+    public CanvasObject() {
 
     }
 
-    public HMICanvasInterface getCanvas() {
+    public CanvasObjectInterface getCanvas() {
         return canvas;
     }
 
-    public void setCanvas(HMICanvasInterface canvas) {
+    public void setCanvas(CanvasObjectInterface canvas) {
         this.canvas = canvas;
     }
 
-    public GraphicalRepresentationData getGraphicalRepresentationData() {
-        return graphicalRepresentationData;
+    public CanvasObjectData getCanvasObjectData() {
+        return canvasObjectData;
     }
 
-    public void setGraphicalRepresentation(GraphicalRepresentationData graphicalRepresentationData) {
-        this.graphicalRepresentationData = graphicalRepresentationData;
+    public void setGraphicalRepresentation(CanvasObjectData canvasObjectData) {
+        this.canvasObjectData = canvasObjectData;
     }
 
     public PseudoClass getGraphicalRepresentationBorder() {
@@ -119,7 +118,7 @@ public class GraphicalRepresentation extends BorderPane {
     }
 
     public CanvasPoint getPosition() {
-        return graphicalRepresentationData.getPosition();
+        return canvasObjectData.getPosition();
     }
 
     public CanvasPoint getStart() {
@@ -139,7 +138,7 @@ public class GraphicalRepresentation extends BorderPane {
     }
 
     public void setPosition(CanvasPoint position, boolean force) {
-        this.graphicalRepresentationData.setPosition(position);
+        this.canvasObjectData.setPosition(position);
         if (force) {
             this.setLayoutX(position.getX());
             this.setLayoutY(position.getY());
@@ -148,26 +147,26 @@ public class GraphicalRepresentation extends BorderPane {
 
     public void copy(String operation) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        this.graphicalRepresentationData.setId(this.getId());
-        this.graphicalRepresentationData.setOperation(operation);
-        clipboard.setContents(this.graphicalRepresentationData, null);
+        this.canvasObjectData.setId(this.getId());
+        this.canvasObjectData.setOperation(operation);
+        clipboard.setContents(this.canvasObjectData, null);
     }
 
     public void cut() {
         this.copy("Cut");
-        canvas.delete(this.graphicalRepresentationData);
+        canvas.delete(this.canvasObjectData);
     }
 
     public void delete() {
-        this.graphicalRepresentationData.setId(this.getId());
-        canvas.delete(this.graphicalRepresentationData);
+        this.canvasObjectData.setId(this.getId());
+        canvas.delete(this.canvasObjectData);
     }
 
     public void hideBorder() {
-        GraphicalRepresentation.this.borderActive.set(false);
-        GraphicalRepresentation.this.setStyle("");
-        for (int i = 0; i < GraphicalRepresentation.this.getChildren().size(); i++) {
-            Node node = GraphicalRepresentation.this.getChildren().get(i);
+        CanvasObject.this.borderActive.set(false);
+        CanvasObject.this.setStyle("");
+        for (int i = 0; i < CanvasObject.this.getChildren().size(); i++) {
+            Node node = CanvasObject.this.getChildren().get(i);
             if (node.getId() != null && node.getId().length() > 5) {
                 String substring = node.getId().substring(0, 7);
                 if (substring.equals("circle#")) {
@@ -178,9 +177,9 @@ public class GraphicalRepresentation extends BorderPane {
     }
 
     public void showBorder() {
-        GraphicalRepresentation.this.setStyle("-fx-border-color: red;-fx-border-width: 2;");
-        for (int i = 0; i < GraphicalRepresentation.this.getChildren().size(); i++) {
-            Node node = GraphicalRepresentation.this.getChildren().get(i);
+        CanvasObject.this.setStyle("-fx-border-color: red;-fx-border-width: 2;");
+        for (int i = 0; i < CanvasObject.this.getChildren().size(); i++) {
+            Node node = CanvasObject.this.getChildren().get(i);
             if (node.getId() != null && node.getId().length() > 5) {
                 String substring = node.getId().substring(0, 7);
                 if (substring.equals("circle#")) {
@@ -191,7 +190,7 @@ public class GraphicalRepresentation extends BorderPane {
     }
 
     public void showContextMenu(double screenX, double screenY) {
-        rightClickMenu.show(GraphicalRepresentation.this, screenX, screenY);
+        rightClickMenu.show(CanvasObject.this, screenX, screenY);
         showBorder();
     }
 
@@ -205,7 +204,7 @@ public class GraphicalRepresentation extends BorderPane {
             startHeight= GraphicalRepresentation.this.getBoundsInLocal().getHeight();*/
             start = new CanvasPoint(t.getSceneX(), t.getSceneY());
             end = new CanvasPoint(((BorderPane) (t.getSource())).getTranslateX(), ((BorderPane) (t.getSource())).getTranslateY());
-            GraphicalRepresentation.this.setSelected(true);
+            CanvasObject.this.setSelected(true);
             if (t.getButton() == MouseButton.SECONDARY) {
                 showContextMenu(t.getScreenX(), t.getScreenY());
             }
@@ -259,8 +258,8 @@ public class GraphicalRepresentation extends BorderPane {
     };
 
     private EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> {
-        GraphicalRepresentation.this.getGraphicalRepresentationData().setSelected(false);
-        GraphicalRepresentation.this.setCursor(Cursor.DEFAULT);
+        CanvasObject.this.getCanvasObjectData().setSelected(false);
+        CanvasObject.this.setCursor(Cursor.DEFAULT);
         mouseOverMode = MouseOverMode.DEFAULT;
     };
 
@@ -341,8 +340,8 @@ public class GraphicalRepresentation extends BorderPane {
 
 
     public void setSelected(boolean selected) {
-        this.graphicalRepresentationData.setSelected(selected);
-        if (this.graphicalRepresentationData.isSelected()) {
+        this.canvasObjectData.setSelected(selected);
+        if (this.canvasObjectData.isSelected()) {
             showBorder();
             setLastTimeSelected();
         } else {
@@ -351,28 +350,28 @@ public class GraphicalRepresentation extends BorderPane {
     }
 
     public boolean isSelected() {
-        return graphicalRepresentationData.isSelected();
+        return canvasObjectData.isSelected();
     }
 
     public void setCenter(CanvasPoint center) {
-        this.graphicalRepresentationData.setCenter(center);
+        this.canvasObjectData.setCenter(center);
 
         double tempX = center.getX() - getWidth() / 2;
         double tempY = center.getY() - getHeight() / 2;
 
-        this.graphicalRepresentationData.setPosition(new CanvasPoint(tempX, tempY));
+        this.canvasObjectData.setPosition(new CanvasPoint(tempX, tempY));
         setPosition(new CanvasPoint(tempX, tempY), true);
 
         this.border = PseudoClass.getPseudoClass("border");
         this.borderActive = new SimpleBooleanProperty() {
             @Override
             protected void invalidated() {
-                GraphicalRepresentation.this.pseudoClassStateChanged(GraphicalRepresentation.this.border, get());
+                CanvasObject.this.pseudoClassStateChanged(CanvasObject.this.border, get());
             }
         };
     }
 
-    public GraphicalRepresentation(GraphicalRepresentationData graphicalRepresentationData) {
+    public CanvasObject(CanvasObjectData canvasObjectData) {
         super();
 
         this.setOnMousePressed(onMyMousePressed);
@@ -382,9 +381,9 @@ public class GraphicalRepresentation extends BorderPane {
         //this.setOnMouseMoved(onMyMouseMoved);
 
 
-        this.graphicalRepresentationData = graphicalRepresentationData;
+        this.canvasObjectData = canvasObjectData;
 
-        this.setCenter(this.graphicalRepresentationData.getCenter());
+        this.setCenter(this.canvasObjectData.getCenter());
 
         setContextMenu();
     }
@@ -425,7 +424,7 @@ public class GraphicalRepresentation extends BorderPane {
         rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, deleteMenuItem, resizeMI, visibilityAnimationMI);
     }
 
-    public GraphicalRepresentation(CanvasPoint center) {
+    public CanvasObject(CanvasPoint center) {
         super();
 
         this.setOnMousePressed(onMyMousePressed);
@@ -446,27 +445,27 @@ public class GraphicalRepresentation extends BorderPane {
     }
 
     public void resize() {
-        SetSizeWindow setSizeWindow = new SetSizeWindow(this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+        SetSizeWindow setSizeWindow = new SetSizeWindow(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         setSizeWindow.showAndWait();
-        this.getGraphicalRepresentationData().setWidth(setSizeWindow.getWidthFromField());
-        this.getGraphicalRepresentationData().setHeight(setSizeWindow.getHeightFromField());
-        this.setSize(this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight());
+        this.getCanvasObjectData().setWidth(setSizeWindow.getWidthFromField());
+        this.getCanvasObjectData().setHeight(setSizeWindow.getHeightFromField());
+        this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
     }
 
     protected void setVisibilityAnimation() throws SQLException, CompileException, IOException, InvocationTargetException {
         SetVisibilityAnimationWindow setVisibilityAnimationWindow = new SetVisibilityAnimationWindow();
-        if (this.graphicalRepresentationData.getVisibilityExpression() != null) {
-            setVisibilityAnimationWindow.setAddedTags(this.graphicalRepresentationData.getVisibilityExpression().getParameters());
-            setVisibilityAnimationWindow.setLocalExpression(this.graphicalRepresentationData.getVisibilityExpression());
-            setVisibilityAnimationWindow.getTextField().setText(this.graphicalRepresentationData.getVisibilityExpression().getExpressionToEvaluate());
-            if(this.graphicalRepresentationData.isVisible()){
+        if (this.canvasObjectData.getVisibilityExpression() != null) {
+            setVisibilityAnimationWindow.setAddedTags(this.canvasObjectData.getVisibilityExpression().getParameters());
+            setVisibilityAnimationWindow.setLocalExpression(this.canvasObjectData.getVisibilityExpression());
+            setVisibilityAnimationWindow.getTextField().setText(this.canvasObjectData.getVisibilityExpression().getExpressionToEvaluate());
+            if(this.canvasObjectData.isVisible()){
                 setVisibilityAnimationWindow.getTrueRadioButton().setSelected(true);
             }else{
                 setVisibilityAnimationWindow.getFalseRadioButton().setSelected(true);
             }
         }
         setVisibilityAnimationWindow.showAndWait();
-        this.graphicalRepresentationData.setVisible(setVisibilityAnimationWindow.getTrueRadioButton().isSelected());
+        this.canvasObjectData.setVisible(setVisibilityAnimationWindow.getTrueRadioButton().isSelected());
         logger.log(Level.INFO,setVisibilityAnimationWindow.getLocalExpression().getExpressionToEvaluate());
         Expression expression = setVisibilityAnimationWindow.getLocalExpression();
         if (expression != null) {
@@ -478,14 +477,14 @@ public class GraphicalRepresentation extends BorderPane {
 
     protected void setVisibilityAnimation(Expression expression) {
         if (expression != null) {
-            this.getGraphicalRepresentationData().setVisibilityExpression(expression);
+            this.getCanvasObjectData().setVisibilityExpression(expression);
             this.visibilityTimeline = new Timeline(
                     new KeyFrame(
                             Duration.seconds(0),
                             (ActionEvent actionEvent) -> {
                                 try {
-                                    boolean evaluatedValue = (boolean) this.getGraphicalRepresentationData().getVisibilityExpression().evaluate();
-                                    this.setVisible(evaluatedValue == this.getGraphicalRepresentationData().isVisible());
+                                    boolean evaluatedValue = (boolean) this.getCanvasObjectData().getVisibilityExpression().evaluate();
+                                    this.setVisible(evaluatedValue == this.getCanvasObjectData().isVisible());
                                 } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
                                     e.printStackTrace();
                                 }
@@ -498,8 +497,8 @@ public class GraphicalRepresentation extends BorderPane {
         this.setDisable(enabled.equals("Stop"));
     }
 
-    private HMICanvasInterface canvas;
-    private GraphicalRepresentationData graphicalRepresentationData = new GraphicalRepresentationData();
+    private CanvasObjectInterface canvas;
+    private CanvasObjectData canvasObjectData = new CanvasObjectData();
     private PseudoClass border;
     private SimpleBooleanProperty borderActive;
     private LocalDateTime lastTimeSelected;

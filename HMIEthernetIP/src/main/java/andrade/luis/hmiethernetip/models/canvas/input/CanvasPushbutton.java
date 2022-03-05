@@ -1,6 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas.input;
 
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasPushbutton extends CanvasButton {
@@ -33,15 +32,15 @@ public class CanvasPushbutton extends CanvasButton {
 
     public CanvasPushbutton(CanvasPoint center) {
         super(center);
-        this.getGraphicalRepresentationData().setType("Pushbutton");
+        this.getCanvasObjectData().setType("Pushbutton");
     }
 
-    public CanvasPushbutton(GraphicalRepresentationData graphicalRepresentationData){
-        super(graphicalRepresentationData);
-        if(this.getGraphicalRepresentationData().getPrimaryColor()!=null && this.getGraphicalRepresentationData().getBackgroundColor()!=null && this.getGraphicalRepresentationData().getMode()!=null){
-            setDynamicColors(this.getGraphicalRepresentationData().getData(),this.getGraphicalRepresentationData().getMode(),this.getGraphicalRepresentationData().getTag(),this.getGraphicalRepresentationData().getPrimaryColor(),this.getGraphicalRepresentationData().getBackgroundColor());
+    public CanvasPushbutton(CanvasObjectData canvasObjectData){
+        super(canvasObjectData);
+        if(this.getCanvasObjectData().getPrimaryColor()!=null && this.getCanvasObjectData().getBackgroundColor()!=null && this.getCanvasObjectData().getMode()!=null){
+            setDynamicColors(this.getCanvasObjectData().getData(),this.getCanvasObjectData().getMode(),this.getCanvasObjectData().getTag(),this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getBackgroundColor());
         }
-        this.getGraphicalRepresentationData().setType("Pushbutton");
+        this.getCanvasObjectData().setType("Pushbutton");
     }
 
     @Override
@@ -55,13 +54,13 @@ public class CanvasPushbutton extends CanvasButton {
     @Override
     public void buttonAction() {
         SetColorCommandPushButtonWindow setColorCommandPushButtonWindow = new SetColorCommandPushButtonWindow();
-        if(this.getGraphicalRepresentationData().getPrimaryColor()!=null && this.getGraphicalRepresentationData().getBackgroundColor()!=null && this.getGraphicalRepresentationData().getMode()!=null){
-            setColorCommandPushButtonWindow.setAddedTags(new ArrayList<>(List.of(this.getGraphicalRepresentationData().getTag())));
-            setColorCommandPushButtonWindow.getTextField().setText(this.getGraphicalRepresentationData().getTag().getName());
-            setColorCommandPushButtonWindow.getBackgroundColorPicker().setValue(this.getGraphicalRepresentationData().getBackgroundColor().getColor());
-            setColorCommandPushButtonWindow.getPrimaryColorPicker().setValue(this.getGraphicalRepresentationData().getPrimaryColor().getColor());
+        if(this.getCanvasObjectData().getPrimaryColor()!=null && this.getCanvasObjectData().getBackgroundColor()!=null && this.getCanvasObjectData().getMode()!=null){
+            setColorCommandPushButtonWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
+            setColorCommandPushButtonWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
+            setColorCommandPushButtonWindow.getBackgroundColorPicker().setValue(this.getCanvasObjectData().getBackgroundColor().getColor());
+            setColorCommandPushButtonWindow.getPrimaryColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
             for(Toggle toggle : setColorCommandPushButtonWindow.getRadioGroup().getToggles()){
-                if(((RadioButton) toggle).getText().equals(this.getGraphicalRepresentationData().getMode())){
+                if(((RadioButton) toggle).getText().equals(this.getCanvasObjectData().getMode())){
                     toggle.setSelected(true);
                 }
             }
@@ -71,39 +70,39 @@ public class CanvasPushbutton extends CanvasButton {
     }
 
     public void setDynamicColors(String buttonText, String mode, Tag linkedTag, CanvasColor primaryColor, CanvasColor backgroundColor) {
-        this.getGraphicalRepresentationData().setData(buttonText);
+        this.getCanvasObjectData().setData(buttonText);
         this.button.setText(buttonText);
         this.button.setStyle("-fx-font-family: \"Verdana\"; -fx-font-size: 18px;-fx-font-weight: bold;");
         this.button.setBackground(new Background(new BackgroundFill(backgroundColor.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
-        this.getGraphicalRepresentationData().setMode(mode);
-        this.getGraphicalRepresentationData().setTag(linkedTag);
-        this.getGraphicalRepresentationData().setPrimaryColor(primaryColor);
-        this.getGraphicalRepresentationData().setBackgroundColor(backgroundColor);
+        this.getCanvasObjectData().setMode(mode);
+        this.getCanvasObjectData().setTag(linkedTag);
+        this.getCanvasObjectData().setPrimaryColor(primaryColor);
+        this.getCanvasObjectData().setBackgroundColor(backgroundColor);
         this.button.setOnMousePressed(onPushbuttonOnMyMousePressed);
         this.button.setOnMouseReleased(onPushbuttonOnMyMouseReleased);
     }
 
     private void changeValues(boolean clicked) throws SQLException, IOException {
         if (clicked) {
-            this.getGraphicalRepresentationData().setStatus("clicked");
-            this.button.setBackground(new Background(new BackgroundFill(this.getGraphicalRepresentationData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
-            if (this.getGraphicalRepresentationData().getTag() != null) {
-                this.getGraphicalRepresentationData().getTag().setValue("1");
-                this.getGraphicalRepresentationData().getTag().updateInDatabase();
+            this.getCanvasObjectData().setStatus("clicked");
+            this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+            if (this.getCanvasObjectData().getTag() != null) {
+                this.getCanvasObjectData().getTag().setValue("1");
+                this.getCanvasObjectData().getTag().updateInDatabase();
             }
         } else {
-            this.getGraphicalRepresentationData().setStatus("");
-            this.button.setBackground(new Background(new BackgroundFill(this.getGraphicalRepresentationData().getBackgroundColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
-            if (this.getGraphicalRepresentationData().getTag() != null) {
-                this.getGraphicalRepresentationData().getTag().setValue("0");
-                this.getGraphicalRepresentationData().getTag().updateInDatabase();
+            this.getCanvasObjectData().setStatus("");
+            this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getBackgroundColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+            if (this.getCanvasObjectData().getTag() != null) {
+                this.getCanvasObjectData().getTag().setValue("0");
+                this.getCanvasObjectData().getTag().updateInDatabase();
             }
         }
     }
 
     private final EventHandler<MouseEvent> onPushbuttonOnMyMouseReleased = mouseEvent -> {
         try {
-            switch (this.getGraphicalRepresentationData().getMode()) {
+            switch (this.getCanvasObjectData().getMode()) {
                 case DIRECT_STR:
                     changeValues(false);
                     break;
@@ -120,7 +119,7 @@ public class CanvasPushbutton extends CanvasButton {
 
     private final EventHandler<MouseEvent> onPushbuttonOnMyMousePressed = mouseEvent -> {
         try {
-            switch (this.getGraphicalRepresentationData().getMode()) {
+            switch (this.getCanvasObjectData().getMode()) {
                 case DIRECT_STR:
                     changeValues(true);
                     break;
@@ -128,7 +127,7 @@ public class CanvasPushbutton extends CanvasButton {
                     changeValues(false);
                     break;
                 case TOGGLE_STR:
-                    changeValues(!this.getGraphicalRepresentationData().getStatus().equals("clicked"));
+                    changeValues(!this.getCanvasObjectData().getStatus().equals("clicked"));
                     break;
                 default:
                     break;

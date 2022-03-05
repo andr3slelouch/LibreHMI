@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.models;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.codehaus.commons.compiler.CompileException;
@@ -37,6 +38,10 @@ public class Expression implements Serializable {
     @SerializedName("parameters")
     @Expose
     private ArrayList<Tag> parameters;
+
+    public Expression() {
+
+    }
 
     public ArrayList<Tag> getParameters() {
         return parameters;
@@ -158,7 +163,7 @@ public class Expression implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(GraphicalRepresentationData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(CanvasObjectData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("expressionToEvaluate");
         sb.append('=');
         sb.append(((this.expressionToEvaluate == null) ? NULL_STR : this.expressionToEvaluate));

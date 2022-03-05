@@ -1,9 +1,9 @@
 package andrade.luis.hmiethernetip.models.canvas.input;
 
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
-import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -14,16 +14,14 @@ import javafx.scene.control.TextFormatter;
 import javafx.util.Duration;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
-import org.codehaus.commons.compiler.CompileException;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CanvasTextField extends GraphicalRepresentation {
+public class CanvasTextField extends CanvasObject {
     private TextField textField;
     private String type;
     private Tag linkedTag;
@@ -74,14 +72,14 @@ public class CanvasTextField extends GraphicalRepresentation {
 
     public CanvasTextField(CanvasPoint center, Tag linkedTag, double minValue, double maxValue, String type) {
         super(center);
-        this.getGraphicalRepresentationData().setType("TextField");
-        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), 150, 150, linkedTag, minValue, maxValue);
+        this.getCanvasObjectData().setType("TextField");
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150, linkedTag, minValue, maxValue);
     }
 
-    public CanvasTextField(GraphicalRepresentationData graphicalRepresentationData) {
-        super(graphicalRepresentationData);
-        this.getGraphicalRepresentationData().setType("TextField");
-        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight(), this.getGraphicalRepresentationData().getTag(), this.getGraphicalRepresentationData().getMinValue(), this.getGraphicalRepresentationData().getMaxValue());
+    public CanvasTextField(CanvasObjectData canvasObjectData) {
+        super(canvasObjectData);
+        this.getCanvasObjectData().setType("TextField");
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue());
     }
 
     private void setData(double x, double y, double width, double height, Tag linkedTag, double minValue, double maxValue) {
@@ -90,24 +88,24 @@ public class CanvasTextField extends GraphicalRepresentation {
         this.maxValue = maxValue;
         this.type = this.linkedTag.getType();
         this.textField = new TextField();
-        this.getGraphicalRepresentationData().setTag(linkedTag);
-        this.getGraphicalRepresentationData().setMinValue(minValue);
-        this.getGraphicalRepresentationData().setMaxValue(maxValue);
+        this.getCanvasObjectData().setTag(linkedTag);
+        this.getCanvasObjectData().setMinValue(minValue);
+        this.getCanvasObjectData().setMaxValue(maxValue);
         this.textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.isEmpty() && (this.type.equals("Entero") || this.type.equals("Flotante"))) {
                 double value = Double.parseDouble(newValue);
                 if (value < this.minValue || value > this.maxValue) {
                     this.textField.setText(oldValue);
-                    this.getGraphicalRepresentationData().setData(oldValue);
+                    this.getCanvasObjectData().setData(oldValue);
                 } else {
                     logger.log(Level.INFO,this.type);
-                    this.getGraphicalRepresentationData().setData(newValue);
+                    this.getCanvasObjectData().setData(newValue);
                 }
             }else{
-                this.getGraphicalRepresentationData().setData(newValue);
+                this.getCanvasObjectData().setData(newValue);
             }
             if (linkedTag != null && timeline!=null) {
-                linkedTag.setValue(this.getGraphicalRepresentationData().getData());
+                linkedTag.setValue(this.getCanvasObjectData().getData());
                 try {
                     timeline.pause();
                     linkedTag.updateInDatabase();
@@ -135,16 +133,16 @@ public class CanvasTextField extends GraphicalRepresentation {
                 this.textField.setTextFormatter(null);
                 break;
         }
-        if (this.getGraphicalRepresentationData().getData() != null) {
-            this.textField.setText(this.getGraphicalRepresentationData().getData());
+        if (this.getCanvasObjectData().getData() != null) {
+            this.textField.setText(this.getCanvasObjectData().getData());
         }
         if (this.linkedTag != null) {
             this.textField.setText(this.linkedTag.getValue());
             this.setTimeline();
         }
-        this.getGraphicalRepresentationData().setPosition(new CanvasPoint(x, y));
-        this.getGraphicalRepresentationData().setWidth(width);
-        this.getGraphicalRepresentationData().setHeight(height);
+        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
+        this.getCanvasObjectData().setWidth(width);
+        this.getCanvasObjectData().setHeight(height);
         this.setCenter(this.textField);
     }
 

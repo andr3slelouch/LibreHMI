@@ -1,11 +1,11 @@
 package andrade.luis.hmiethernetip.models.canvas.input;
 
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
-import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import javafx.scene.control.Slider;
 
-public class CanvasSlider extends GraphicalRepresentation {
+public class CanvasSlider extends CanvasObject {
     private Slider slider;
     public HMIUser getUser() {
         return user;
@@ -18,7 +18,7 @@ public class CanvasSlider extends GraphicalRepresentation {
     private HMIUser user;
     public CanvasSlider(CanvasPoint center){
         super(center);
-        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), 150, 150);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150);
 
     }
     public void setData(double x, double y, double width, double height) {
@@ -34,7 +34,7 @@ public class CanvasSlider extends GraphicalRepresentation {
         this.slider.setDisable(true);
         this.slider.setPrefWidth(width);
         this.slider.setPrefHeight(height);
-        this.getGraphicalRepresentationData().setPosition(new CanvasPoint(x, y));
+        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.setCenter(this.slider);
     }
     @Override

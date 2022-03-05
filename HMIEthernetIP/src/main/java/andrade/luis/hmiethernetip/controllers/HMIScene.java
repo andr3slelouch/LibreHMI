@@ -1,7 +1,8 @@
 package andrade.luis.hmiethernetip.controllers;
 
 import andrade.luis.hmiethernetip.HMIApp;
-import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.HMISceneData;
+import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.collections.FXCollections;
@@ -38,6 +39,15 @@ public class HMIScene extends Scene implements Cloneable {
     private String sceneCommentary;
     private Color background;
     private HMICanvas hmiCanvas;
+    private HMISceneData hmiSceneData = new HMISceneData();
+
+    public HMISceneData getHmiSceneData() {
+        return hmiSceneData;
+    }
+
+    public void setHmiSceneData(HMISceneData hmiSceneData) {
+        this.hmiSceneData = hmiSceneData;
+    }
 
     public String getTitle() {
         return title;
@@ -174,8 +184,11 @@ public class HMIScene extends Scene implements Cloneable {
         scrollPane.setBackground(new Background(new BackgroundFill(paint, CornerRadii.EMPTY, Insets.EMPTY)));
         this.background = (Color) paint;
         this.title = title;
+        this.hmiSceneData.setTitle(title);
         this.sceneCommentary = sceneCommentary;
+        this.hmiSceneData.setSceneCommentary(sceneCommentary);
         this.hmiCanvas = hmiCanvas;
+        this.hmiSceneData.setBackground(new CanvasColor((Color) paint));
         this.setOnMouseClicked(mouseEvent -> {
             if (this.hmiCanvas.isAddOnClickEnabled()) {
                 hmiCanvas.addFigureOnCanvasClicked(new CanvasPoint(mouseEvent.getX(), mouseEvent.getY()));
@@ -187,29 +200,29 @@ public class HMIScene extends Scene implements Cloneable {
         });
         this.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.DELETE) {
-                GraphicalRepresentation selected = getCanvas().getSelectedFigure();
+                andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
                 if (selected != null) {
                     selected.delete();
                 }
             }
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), () -> {
-            GraphicalRepresentation selected = getCanvas().getSelectedFigure();
+            andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
             selected.copy("Copy");
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY), () -> {
-            GraphicalRepresentation selected = getCanvas().getSelectedFigure();
+            andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
             selected.cut();
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), () -> {
-            GraphicalRepresentation selected = getCanvas().getSelectedFigure();
+            andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
             getCanvas().paste();
         });
 
     }
 
     public void updateSelected(){
-        ArrayList<GraphicalRepresentation> canvasObjects = getCanvas().getCurrentCanvasObjects();
+        ArrayList<andrade.luis.hmiethernetip.models.canvas.CanvasObject> canvasObjects = getCanvas().getCurrentCanvasObjects();
         LocalDateTime max = null;
         int index = -1;
         for (int i = 0; i < canvasObjects.size(); i++) {
@@ -217,7 +230,7 @@ public class HMIScene extends Scene implements Cloneable {
                 max = canvasObjects.get(i).getLastTimeSelected();
                 index = i;
             } else {
-                GraphicalRepresentation rectangle = canvasObjects.get(i);
+                andrade.luis.hmiethernetip.models.canvas.CanvasObject rectangle = canvasObjects.get(i);
                 if (rectangle.getLastTimeSelected() != null && max != null) {
                     if (max.isBefore(rectangle.getLastTimeSelected())) {
                         max = canvasObjects.get(i).getLastTimeSelected();

@@ -1,4 +1,4 @@
-package andrade.luis.hmiethernetip.models;
+package andrade.luis.hmiethernetip.models.canvas;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -6,13 +6,16 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
-import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
-import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
+import andrade.luis.hmiethernetip.models.Expression;
+import andrade.luis.hmiethernetip.models.PercentFillOrientation;
+import andrade.luis.hmiethernetip.models.Tag;
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class GraphicalRepresentationData implements Serializable, Transferable {
+public class CanvasObjectData implements Serializable, Transferable {
     private static final String NULL_STR = "<null>";
     @SerializedName("selected")
     @Expose
@@ -110,6 +113,9 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
     @SerializedName("visible")
     @Expose
     private boolean visible;
+    @SerializedName("selectedPages")
+    @Expose
+    private ArrayList<String> selectedPages;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
@@ -306,10 +312,20 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
         this.status = status;
     }
 
+    public ArrayList<String> getSelectedPages() {
+        return selectedPages;
+    }
+
+    public void setSelectedPages(ArrayList<String> selectedPages) {
+        this.selectedPages = selectedPages;
+    }
+
+
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(GraphicalRepresentationData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(CanvasObjectData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("selected");
         sb.append('=');
         sb.append(this.selected);
@@ -394,6 +410,38 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
         sb.append('=');
         sb.append(imageSymbol);
         sb.append(',');
+        sb.append("isModifyingImage");
+        sb.append('=');
+        sb.append(isModifyingImage);
+        sb.append(',');
+        sb.append("contrast");
+        sb.append('=');
+        sb.append(contrast);
+        sb.append(',');
+        sb.append("brightness");
+        sb.append('=');
+        sb.append(brightness);
+        sb.append(',');
+        sb.append("saturation");
+        sb.append('=');
+        sb.append(saturation);
+        sb.append(',');
+        sb.append("hue");
+        sb.append('=');
+        sb.append(hue);
+        sb.append(',');
+        sb.append("mode");
+        sb.append('=');
+        sb.append(mode);
+        sb.append(',');
+        sb.append("status");
+        sb.append('=');
+        sb.append(status);
+        sb.append(',');
+        sb.append("isVisible");
+        sb.append('=');
+        sb.append(visible);
+        sb.append(',');
         if (sb.charAt((sb.length() - 1)) == ',') {
             sb.setCharAt((sb.length() - 1), ']');
         } else {
@@ -429,6 +477,11 @@ public class GraphicalRepresentationData implements Serializable, Transferable {
         if (!isDataFlavorSupported(dataFlavor)) throw new UnsupportedFlavorException(dataFlavor);
         if (DataFlavor.stringFlavor.equals(dataFlavor)) return this.toString();
         return this;
+    }
+
+    public String generateJSONString(){
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 
     public String getId() {

@@ -15,19 +15,19 @@ import java.util.ArrayList;
 public class SelectWindowsWindow extends Stage {
     private final StackPane root;
     private ArrayList<SceneItem> items = new ArrayList<>();
-    private ArrayList<HMIScene> selectedItems = new ArrayList<>();
+    private ArrayList<String> selectedItems = new ArrayList<String>();
     private int height = 50;
 
-    public SelectWindowsWindow(ArrayList<HMIScene> itemsForList, ArrayList<HMIScene> selectedItems) {
+    public SelectWindowsWindow(ArrayList<String> itemsForList, ArrayList<String> selectedItems) {
         root = new StackPane();
         final Label label = new Label("Seleccione una Ventana");
 
         VBox checkBoxesVBox = new VBox();
         checkBoxesVBox.setSpacing(15);
 
-        for (HMIScene hmiScene : itemsForList) {
+        for (String hmiScene : itemsForList) {
             CheckBox box = new CheckBox();
-            Label sceneName = new Label(hmiScene.getTitle());
+            Label sceneName = new Label(hmiScene);
             HBox checkBoxHBox = new HBox();
             checkBoxHBox.setSpacing(15);
             checkBoxHBox.getChildren().addAll(box, sceneName);
@@ -37,8 +37,8 @@ public class SelectWindowsWindow extends Stage {
         }
 
         for(SceneItem item : items) {
-            for(HMIScene selectedScene : selectedItems) {
-                if(selectedScene.getTitle().equals(item.getScene().getTitle())){
+            for(String selectedScene : selectedItems) {
+                if(selectedScene.equals(item.getScene())){
                     item.setSelected(true);
                 }
             }
@@ -85,7 +85,7 @@ public class SelectWindowsWindow extends Stage {
         }
     }
 
-    public ArrayList<HMIScene> getSelectedItems() {
+    public ArrayList<String> getSelectedItems() {
         return selectedItems;
     }
 }

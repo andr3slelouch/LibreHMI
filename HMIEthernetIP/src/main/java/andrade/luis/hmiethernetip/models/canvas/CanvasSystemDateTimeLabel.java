@@ -1,8 +1,5 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
-import andrade.luis.hmiethernetip.models.canvas.CanvasLabel;
-import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -18,14 +15,14 @@ public class CanvasSystemDateTimeLabel extends CanvasLabel {
     }
 
     private Timeline timeline;
-    public CanvasSystemDateTimeLabel(GraphicalRepresentationData graphicalRepresentationData) {
-        super(graphicalRepresentationData);
-        this.getGraphicalRepresentationData().setType("SystemDateTimeLabel");
+    public CanvasSystemDateTimeLabel(CanvasObjectData canvasObjectData) {
+        super(canvasObjectData);
+        this.getCanvasObjectData().setType("SystemDateTimeLabel");
     }
 
     public CanvasSystemDateTimeLabel(String content, CanvasPoint center) {
         super(content, center);
-        this.getGraphicalRepresentationData().setType("SystemDateTimeLabel");
+        this.getCanvasObjectData().setType("SystemDateTimeLabel");
     }
 
     public void setTimeline() {

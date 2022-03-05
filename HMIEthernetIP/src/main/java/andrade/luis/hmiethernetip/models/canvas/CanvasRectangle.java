@@ -1,9 +1,9 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
-import andrade.luis.hmiethernetip.models.Expression;
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
-import andrade.luis.hmiethernetip.models.PercentFillOrientation;
+import andrade.luis.hmiethernetip.models.*;
 import andrade.luis.hmiethernetip.views.SetPercentFillPropertiesWindow;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -25,10 +25,11 @@ import org.codehaus.commons.compiler.CompileException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.logging.Level;
 
 import static javafx.geometry.Pos.CENTER;
 
-public class CanvasRectangle extends GraphicalRepresentation {
+public class CanvasRectangle extends CanvasObject {
     private PercentFillOrientation perfectFillOrientation;
     private Timeline refillRectangleTimeline;
     private Label captionLabel;
@@ -40,14 +41,14 @@ public class CanvasRectangle extends GraphicalRepresentation {
 
     private Rectangle rectangle;
 
-    public CanvasRectangle(GraphicalRepresentationData graphicalRepresentationData) {
-        super(graphicalRepresentationData);
-        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), graphicalRepresentationData.getWidth(), graphicalRepresentationData.getHeight());
+    public CanvasRectangle(CanvasObjectData canvasObjectData) {
+        super(canvasObjectData);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), canvasObjectData.getWidth(), canvasObjectData.getHeight());
     }
 
     public CanvasRectangle(CanvasPoint center) {
         super(center);
-        setData(this.getGraphicalRepresentationData().getPosition().getX(), this.getGraphicalRepresentationData().getPosition().getY(), 150, 150);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150);
     }
 
     public CanvasRectangle() {
@@ -63,13 +64,13 @@ public class CanvasRectangle extends GraphicalRepresentation {
 
     public void setData(double x, double y, double width, double height) {
         this.rectangle = new Rectangle(x, y);
-        this.getGraphicalRepresentationData().setPosition(new CanvasPoint(x, y));
+        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.rectangle.setWidth(width);
-        this.getGraphicalRepresentationData().setWidth(width);
+        this.getCanvasObjectData().setWidth(width);
         this.rectangle.setHeight(height);
-        this.getGraphicalRepresentationData().setHeight(height);
+        this.getCanvasObjectData().setHeight(height);
         this.setCenter(rectangle);
-        this.getGraphicalRepresentationData().setType("Rectangle");
+        this.getCanvasObjectData().setType("Rectangle");
         this.setContextMenu();
         MenuItem percentFillMI = new MenuItem("Percent Fill Animation");
         percentFillMI.setId("#percentFillMI");
@@ -84,29 +85,34 @@ public class CanvasRectangle extends GraphicalRepresentation {
             if (refillRectangleTimeline.getStatus().toString().equals("RUNNING")) {
                 refillRectangleTimeline.stop();
                 refillRectangleTimeline = null;
-                setPercentFill(this.getGraphicalRepresentationData().getExpression(), this.getGraphicalRepresentationData().getPrimaryColor(), this.getGraphicalRepresentationData().getBackgroundColor(), this.getGraphicalRepresentationData().getOrientation());
+                setPercentFill(this.getCanvasObjectData().getExpression(), this.getCanvasObjectData().getPrimaryColor(), this.getCanvasObjectData().getBackgroundColor(), this.getCanvasObjectData().getOrientation());
             }
         } else {
-            this.rectangle.setWidth(this.getGraphicalRepresentationData().getWidth());
-            this.rectangle.setHeight(this.getGraphicalRepresentationData().getHeight());
+            this.rectangle.setWidth(this.getCanvasObjectData().getWidth());
+            this.rectangle.setHeight(this.getCanvasObjectData().getHeight());
         }
     }
 
     private void setPercentFill() {
         SetPercentFillPropertiesWindow writeExpressionWindow;
-        if (this.getGraphicalRepresentationData().getExpression() != null) {
-            writeExpressionWindow = new SetPercentFillPropertiesWindow(this.getGraphicalRepresentationData().getPrimaryColor().getColor(), this.getGraphicalRepresentationData().getBackgroundColor().getColor());
-            writeExpressionWindow.setAddedTags(this.getGraphicalRepresentationData().getExpression().getParameters());
-            writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getExpression());
-            writeExpressionWindow.getTextField().setText(this.getGraphicalRepresentationData().getExpression().getExpressionToEvaluate());
-            writeExpressionWindow.setSelectedOrientation(this.getGraphicalRepresentationData().getOrientation().toString().toLowerCase());
-            writeExpressionWindow.getMinValueField().setText(this.getGraphicalRepresentationData().getMinValue() + "");
-            writeExpressionWindow.getMaxValueField().setText(this.getGraphicalRepresentationData().getMaxValue() + "");
+        if (this.getCanvasObjectData().getExpression() != null) {
+            writeExpressionWindow = new SetPercentFillPropertiesWindow(this.getCanvasObjectData().getPrimaryColor().getColor(), this.getCanvasObjectData().getBackgroundColor().getColor());
+            writeExpressionWindow.setAddedTags(this.getCanvasObjectData().getExpression().getParameters());
+            writeExpressionWindow.setLocalExpression(this.getCanvasObjectData().getExpression());
+            writeExpressionWindow.getTextField().setText(this.getCanvasObjectData().getExpression().getExpressionToEvaluate());
+            writeExpressionWindow.setSelectedOrientation(this.getCanvasObjectData().getOrientation().toString().toLowerCase());
+            writeExpressionWindow.getMinValueField().setText(this.getCanvasObjectData().getMinValue() + "");
+            writeExpressionWindow.getMaxValueField().setText(this.getCanvasObjectData().getMaxValue() + "");
         } else {
             writeExpressionWindow = new SetPercentFillPropertiesWindow();
         }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(Expression.class, new ExpressionAdapter());
+        builder.setPrettyPrinting();
+        Gson gson = builder.create();
+        logger.log(Level.INFO,gson.toJson(expression));
         try {
             if (expression != null) {
                 expression.evaluate();
@@ -116,8 +122,8 @@ public class CanvasRectangle extends GraphicalRepresentation {
                         writeExpressionWindow.getBackgroundColor(),
                         writeExpressionWindow.getSelectedOrientation()
                 );
-                this.getGraphicalRepresentationData().setMinValue(writeExpressionWindow.getMinValue());
-                this.getGraphicalRepresentationData().setMaxValue(writeExpressionWindow.getMaxValue());
+                this.getCanvasObjectData().setMinValue(writeExpressionWindow.getMinValue());
+                this.getCanvasObjectData().setMaxValue(writeExpressionWindow.getMaxValue());
             }
         } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -131,18 +137,18 @@ public class CanvasRectangle extends GraphicalRepresentation {
 
     public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor, PercentFillOrientation orientation) {
         if (exp != null) {
-            this.getGraphicalRepresentationData().setExpression(exp);
-            double width = this.getGraphicalRepresentationData().getWidth();
-            double height = this.getGraphicalRepresentationData().getHeight();
+            this.getCanvasObjectData().setExpression(exp);
+            double width = this.getCanvasObjectData().getWidth();
+            double height = this.getCanvasObjectData().getHeight();
             life = new SimpleDoubleProperty(width);
             this.rectangle = new Rectangle();
 
-            this.getGraphicalRepresentationData().setPrimaryColor(primaryColor);
+            this.getCanvasObjectData().setPrimaryColor(primaryColor);
 
             Rectangle rightRect = new Rectangle();
 
-            this.getGraphicalRepresentationData().setBackgroundColor(backgroundColor);
-            this.getGraphicalRepresentationData().setOrientation(orientation);
+            this.getCanvasObjectData().setBackgroundColor(backgroundColor);
+            this.getCanvasObjectData().setOrientation(orientation);
             Pane solutionPane2;
             switch (orientation) {
                 case HORIZONTAL:
@@ -150,9 +156,9 @@ public class CanvasRectangle extends GraphicalRepresentation {
                     rightRect.setFill(backgroundColor.getColor());
 
                     this.rectangle.widthProperty().bind(life.multiply(width * 0.01));
-                    this.rectangle.setHeight(this.getGraphicalRepresentationData().getHeight());
+                    this.rectangle.setHeight(this.getCanvasObjectData().getHeight());
 
-                    rightRect.setHeight(this.getGraphicalRepresentationData().getHeight());
+                    rightRect.setHeight(this.getCanvasObjectData().getHeight());
                     rightRect.xProperty().bind(this.rectangle.widthProperty());
                     rightRect.widthProperty().bind(life.multiply(-width * 0.01).add(width));
                     solutionPane2 = new Pane(this.rectangle, rightRect);
@@ -165,9 +171,9 @@ public class CanvasRectangle extends GraphicalRepresentation {
                     this.rectangle.setFill(primaryColor.getColor());
 
                     rightRect.widthProperty().bind(life.multiply(width * 0.01));
-                    rightRect.setHeight(this.getGraphicalRepresentationData().getHeight());
+                    rightRect.setHeight(this.getCanvasObjectData().getHeight());
 
-                    this.rectangle.setHeight(this.getGraphicalRepresentationData().getHeight());
+                    this.rectangle.setHeight(this.getCanvasObjectData().getHeight());
                     this.rectangle.xProperty().bind(rightRect.widthProperty());
                     this.rectangle.widthProperty().bind(life.multiply(-width * 0.01).add(width));
                     solutionPane2 = new Pane(this.rectangle, rightRect);
@@ -180,9 +186,9 @@ public class CanvasRectangle extends GraphicalRepresentation {
                     this.rectangle.setFill(backgroundColor.getColor());
 
                     this.rectangle.heightProperty().bind(life.multiply(height * 0.01));
-                    this.rectangle.setWidth(this.getGraphicalRepresentationData().getWidth());
+                    this.rectangle.setWidth(this.getCanvasObjectData().getWidth());
 
-                    rightRect.setWidth(this.getGraphicalRepresentationData().getWidth());
+                    rightRect.setWidth(this.getCanvasObjectData().getWidth());
 
                     rightRect.yProperty().bind(this.rectangle.heightProperty());
                     rightRect.heightProperty().bind(life.multiply(-height * 0.01).add(height));
@@ -196,9 +202,9 @@ public class CanvasRectangle extends GraphicalRepresentation {
                     this.rectangle.setFill(backgroundColor.getColor());
 
                     rightRect.heightProperty().bind(life.multiply(height * 0.01));
-                    rightRect.setWidth(this.getGraphicalRepresentationData().getWidth());
+                    rightRect.setWidth(this.getCanvasObjectData().getWidth());
 
-                    this.rectangle.setWidth(this.getGraphicalRepresentationData().getWidth());
+                    this.rectangle.setWidth(this.getCanvasObjectData().getWidth());
                     this.rectangle.yProperty().bind(rightRect.heightProperty());
                     this.rectangle.heightProperty().bind(life.multiply(-height * 0.01).add(height));
                     solutionPane2 = new Pane(rightRect, this.rectangle);
@@ -226,14 +232,14 @@ public class CanvasRectangle extends GraphicalRepresentation {
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
                             try {
-                                String type = this.getGraphicalRepresentationData().getExpression().getResultType() != null ? this.getGraphicalRepresentationData().getExpression().getResultType() : "";
+                                String type = this.getCanvasObjectData().getExpression().getResultType() != null ? this.getCanvasObjectData().getExpression().getResultType() : "";
                                 double evaluatedValue = 0;
                                 switch (type) {
                                     case "Booleano":
-                                        evaluatedValue = (boolean) this.getGraphicalRepresentationData().getExpression().evaluate() ? 100 : 0;
+                                        evaluatedValue = (boolean) this.getCanvasObjectData().getExpression().evaluate() ? 100 : 0;
                                         break;
                                     case "Flotante":
-                                        evaluatedValue = (double) this.getGraphicalRepresentationData().getExpression().evaluate();
+                                        evaluatedValue = (double) this.getCanvasObjectData().getExpression().evaluate();
                                         break;
                                     default:
                                         break;
@@ -249,13 +255,13 @@ public class CanvasRectangle extends GraphicalRepresentation {
     }
 
     private double calculatePercentFillValue(double evaluatedValue) {
-        if (evaluatedValue < this.getGraphicalRepresentationData().getMinValue()) {
+        if (evaluatedValue < this.getCanvasObjectData().getMinValue()) {
             return 0;
-        } else if (evaluatedValue > this.getGraphicalRepresentationData().getMaxValue()) {
+        } else if (evaluatedValue > this.getCanvasObjectData().getMaxValue()) {
             return 100;
         }
-        double multiplication = ((evaluatedValue - this.getGraphicalRepresentationData().getMinValue()) * 100);
-        double difference = (this.getGraphicalRepresentationData().getMaxValue() - this.getGraphicalRepresentationData().getMinValue());
+        double multiplication = ((evaluatedValue - this.getCanvasObjectData().getMinValue()) * 100);
+        double difference = (this.getCanvasObjectData().getMaxValue() - this.getCanvasObjectData().getMinValue());
         if (perfectFillOrientation == PercentFillOrientation.HORIZONTAL || perfectFillOrientation == PercentFillOrientation.VERTICAL_REVERSED) {
             return (multiplication / difference);
 

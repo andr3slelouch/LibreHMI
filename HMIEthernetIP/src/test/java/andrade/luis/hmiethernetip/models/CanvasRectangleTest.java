@@ -15,9 +15,9 @@ class CanvasRectangleTest {
         CanvasRectangle rectangleTest = new CanvasRectangle();
         CanvasPoint center = new CanvasPoint(150,150);
         rectangleTest.setCenter(center);
-        Assertions.assertThat(rectangleTest.getGraphicalRepresentationData().getCenter()).isEqualTo(center);
+        Assertions.assertThat(rectangleTest.getCanvasObjectData().getCenter()).isEqualTo(center);
         Assertions.assertThat(rectangleTest.getRectangle()).isNotNull();
         Assertions.assertThat(rectangleTest.getCenter()).isEqualTo(rectangleTest.getRectangle());
-        Assertions.assertThat(rectangleTest.getGraphicalRepresentationData().getType()).isEqualTo("Rectangle");
+        Assertions.assertThat(rectangleTest.getCanvasObjectData().getType()).isEqualTo("Rectangle");
     }
 }

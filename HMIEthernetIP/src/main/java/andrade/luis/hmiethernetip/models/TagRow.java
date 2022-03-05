@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.models;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.SimpleStringProperty;
@@ -142,7 +143,7 @@ public class TagRow implements Serializable {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(GraphicalRepresentationData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(CanvasObjectData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("plcName");
         sb.append('=');
         sb.append(((this.plcName == null)?"<null>":this.plcName));

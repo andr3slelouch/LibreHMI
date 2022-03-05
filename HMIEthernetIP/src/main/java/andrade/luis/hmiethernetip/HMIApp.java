@@ -1,9 +1,14 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
+import andrade.luis.hmiethernetip.models.HMIAppData;
+import andrade.luis.hmiethernetip.models.HMISceneData;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import andrade.luis.hmiethernetip.views.*;
+import com.google.gson.Gson;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
@@ -14,7 +19,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,8 +38,26 @@ public class HMIApp extends Application {
     }
 
     private final ArrayList<HMIScene> pages = new ArrayList<>();
-    private ArrayList<HMIScene> selectedPages = new ArrayList<>();
     private ArrayList<Stage> createdWindows = new ArrayList<>();
+
+    public HMIAppData getHmiAppData() {
+        return hmiAppData;
+    }
+
+    public void setHmiAppData(HMIAppData hmiAppData) {
+        this.hmiAppData = hmiAppData;
+    }
+
+    private HMIAppData hmiAppData = new HMIAppData();
+
+    public ArrayList<String> getPagesTitles() {
+        return pagesTitles;
+    }
+
+    public void setPagesTitles(ArrayList<String> pagesTitles) {
+        this.pagesTitles = pagesTitles;
+    }
+
     private ArrayList<String> pagesTitles = new ArrayList<>();
     private static final String HMI_TITLE = "HMI: ";
     private HMIUser user;
@@ -94,24 +116,27 @@ public class HMIApp extends Application {
         Button manageUsersBtn = new Button("Manage Users");
         Button registerUserBtn = new Button("Register");
         Button logIntUserBtn = new Button("Log In");
-        Button saveBtn = new Button("Guardar Propiedades");
+        Button propertiesBtn = new Button("Guardar Propiedades");
         Button symbolBtn = new Button("Symbol");
         Button imageBtn = new Button("Image");
         Button pushbuttonBtn = new Button("Pushbutton");
         Button playBtn = new Button("Play");
         Button stopBtn = new Button("Stop");
         Button defaultBtn = new Button("Default");
+        Button saveBtn = new Button("Guardar");
+        Button loadBtn = new Button("Cargar");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(logIntUserBtn, saveBtn, imageBtn ,symbolBtn, pushbuttonBtn);
-        HBox fourthHBox = new HBox(playBtn, stopBtn, defaultBtn);
+        HBox thirdHBox = new HBox(saveBtn,loadBtn);
+        HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn ,symbolBtn, pushbuttonBtn);
+        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
         scene.setListViewReference(listViewReference);
         scene.setItems(itemsForComboBox);
 
-        VBox vbox = new VBox(hbox, secondHBox, thirdHBox, fourthHBox, scene.getListViewReference());
+        VBox vbox = new VBox(hbox, secondHBox, thirdHBox, fourthHBox,fifthHBox, scene.getListViewReference());
         root.getChildren().add(vbox);
 
         manageUsersBtn.setOnMouseClicked(mouseEvent -> {
@@ -127,7 +152,7 @@ public class HMIApp extends Application {
             logInWindow.showAndWait();
             user = logInWindow.getLoggedUser();
         });
-        saveBtn.setOnAction(mouseEvent -> {
+        propertiesBtn.setOnAction(mouseEvent -> {
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.show();
         });
@@ -146,12 +171,33 @@ public class HMIApp extends Application {
         playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
         stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
         defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
+        saveBtn.setOnAction(mouseEvent -> this.saveHMIData());
 
         scene.setHmiApp(this);
 
         return scene;
     }
 
+    private void saveHMIData(){
+        ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
+        for(HMIScene hmiScene: pages){
+            ArrayList<CanvasObjectData> shapeArrayList = new ArrayList<>();
+            for(CanvasObject canvasObject : hmiScene.getCanvas().getShapeArrayList()){
+                shapeArrayList.add(canvasObject.getCanvasObjectData());
+            }
+            hmiScene.getHmiSceneData().setShapeArrayList(shapeArrayList);
+            hmiSceneDataArrayList.add(hmiScene.getHmiSceneData());
+        }
+        this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
+        Gson gson = new Gson();
+        logger.log(Level.INFO,gson.toJson(this.hmiAppData));
+    }
+
+    /**
+     * Este método permite cambiar de estados a los objetos de entrada de datos,
+     * como un Button, Pushbutton, TextField, o Slider
+     * @param value Valor del estado, puede ser "Play","Stop","Default"
+     */
     public void enableInputRepresentations(String value) {
         for (HMIScene page : this.pages) {
             for (int i = 0; i < page.getCanvas().getShapeArrayList().size(); i++) {
@@ -160,17 +206,23 @@ public class HMIApp extends Application {
         }
     }
 
-    public void generateStagesForPages(ArrayList<HMIScene> selectedPages) {
+    /**
+     * Este método permite la creación de ventanas para las Escenas si son mayores que uno,
+     * si es solo uno solamente cambia la Escena de la Ventana mostrada a la seleccionada
+     * Además de crear ventanas(Stage) adicionales también las muestra
+     * @param selectedPages ArrayList de los títulos de las Páginas Seleccionadas
+     */
+    public void generateStagesForPages(ArrayList<String> selectedPages) {
         boolean mainStageWasUpdated = false;
         if (!selectedPages.isEmpty()) {
-            for (HMIScene selectedPage : selectedPages) {
-                int index = getIndexForStageWithScene(selectedPage.getTitle());
+            for (String selectedPage : selectedPages) {
+                int index = getIndexForStageWithScene(selectedPage);
                 if (index == -1) {
                     if (!mainStageWasUpdated) {
-                        changeSelectedScene(selectedPage.getTitle());
+                        changeSelectedScene(selectedPage);
                         mainStageWasUpdated = true;
                     } else {
-                        generateStage(selectedPage);
+                        generateStage(pages.get(index));
                     }
                 } else {
                     if(createdWindows.get(index).isShowing()){

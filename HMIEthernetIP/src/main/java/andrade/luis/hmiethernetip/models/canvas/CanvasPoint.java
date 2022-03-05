@@ -15,6 +15,10 @@ public class CanvasPoint implements Serializable
     private double y;
     private final static long serialVersionUID = 5746411212501079397L;
 
+    public CanvasPoint() {
+
+    }
+
     public double getX() {
         return x;
     }

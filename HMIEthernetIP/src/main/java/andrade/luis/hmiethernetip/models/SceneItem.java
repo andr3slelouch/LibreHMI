@@ -1,20 +1,19 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.controllers.HMIScene;
 import javafx.scene.control.CheckBox;
 
 public class SceneItem {
     private CheckBox checkBox;
-    private HMIScene scene;
-    public HMIScene getScene() {
+    private String scene;
+    public String getScene() {
         return scene;
     }
 
-    public void setScene(HMIScene scene) {
+    public void setScene(String scene) {
         this.scene = scene;
     }
 
-    public SceneItem(HMIScene scene, CheckBox checkBox) {
+    public SceneItem(String scene, CheckBox checkBox) {
         this.scene = scene;
         this.checkBox = checkBox;
     }

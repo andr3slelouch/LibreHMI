@@ -15,7 +15,7 @@ class CanvasLabelTest {
         CanvasLabel labelTest = new CanvasLabel();
         CanvasPoint center = new CanvasPoint(150,150);
         labelTest.setCenter(center);
-        Assertions.assertThat(labelTest.getGraphicalRepresentationData().getCenter()).isEqualTo(center);
+        Assertions.assertThat(labelTest.getCanvasObjectData().getCenter()).isEqualTo(center);
     }
 
     @Test
@@ -23,6 +23,6 @@ class CanvasLabelTest {
         CanvasLabel labelTest = new CanvasLabel();
         labelTest.setData("Test");
         Assertions.assertThat(labelTest.getLabel().getText()).isEqualTo("Test");
-        Assertions.assertThat(labelTest.getGraphicalRepresentationData().getType()).isEqualTo("Label");
+        Assertions.assertThat(labelTest.getCanvasObjectData().getType()).isEqualTo("Label");
     }
 }

@@ -1,9 +1,8 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
 import javafx.scene.control.Label;
 
-public class CanvasLabel extends GraphicalRepresentation {
+public class CanvasLabel extends CanvasObject {
     public Label getLabel() {
         return label;
     }
@@ -13,13 +12,13 @@ public class CanvasLabel extends GraphicalRepresentation {
     }
 
     private Label label;
-    public CanvasLabel(GraphicalRepresentationData graphicalRepresentationData){
-        super(graphicalRepresentationData);
-        this.setData(graphicalRepresentationData.getData());
+    public CanvasLabel(CanvasObjectData canvasObjectData){
+        super(canvasObjectData);
+        this.setData(canvasObjectData.getData());
     }
     public CanvasLabel(String content, CanvasPoint center){
         super(center);
-        this.getGraphicalRepresentationData().setData(content);
+        this.getCanvasObjectData().setData(content);
         this.setData(content);
     }
     public CanvasLabel(){
@@ -34,9 +33,9 @@ public class CanvasLabel extends GraphicalRepresentation {
     public void setData(String content){
         this.label = new Label(content);
         this.setCenter(this.label);
-        this.getGraphicalRepresentationData().setType("Label");
-        this.getGraphicalRepresentationData().setData(content);
-        this.getGraphicalRepresentationData().setWidth(this.label.getWidth());
-        this.getGraphicalRepresentationData().setHeight(this.label.getHeight());
+        this.getCanvasObjectData().setType("Label");
+        this.getCanvasObjectData().setData(content);
+        this.getCanvasObjectData().setWidth(this.label.getWidth());
+        this.getCanvasObjectData().setHeight(this.label.getHeight());
     }
 }

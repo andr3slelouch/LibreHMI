@@ -3,7 +3,7 @@ package andrade.luis.hmiethernetip.views;
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.canvas.CanvasImage;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
-import andrade.luis.hmiethernetip.models.canvas.GraphicalRepresentation;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -143,7 +143,7 @@ public class SelectHMISymbolWindow extends Stage {
 
     public void updateSelected(String imagePath){
         for(CanvasImage canvasImage: currentImages){
-            if(canvasImage.getGraphicalRepresentationData().getData().equals(imagePath)){
+            if(canvasImage.getCanvasObjectData().getData().equals(imagePath)){
                 canvasImage.setSelected(true);
                 updateSelected();
             }
@@ -158,7 +158,7 @@ public class SelectHMISymbolWindow extends Stage {
                 max = currentImages.get(i).getLastTimeSelected();
                 index = i;
             } else {
-                GraphicalRepresentation canvasImage = currentImages.get(i);
+                CanvasObject canvasImage = currentImages.get(i);
                 if (canvasImage.getLastTimeSelected() != null && max != null) {
                     if (max.isBefore(canvasImage.getLastTimeSelected())) {
                         max = currentImages.get(i).getLastTimeSelected();
@@ -175,7 +175,7 @@ public class SelectHMISymbolWindow extends Stage {
             }
         }
         this.selectedImage = currentImages.get(index).getImage();
-        this.selectedImagePath = currentImages.get(index).getGraphicalRepresentationData().getData();
+        this.selectedImagePath = currentImages.get(index).getCanvasObjectData().getData();
     }
 
     public Image getSelectedImage() {

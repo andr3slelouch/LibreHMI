@@ -1,9 +1,22 @@
 package andrade.luis.hmiethernetip.models;
 
-public enum PercentFillOrientation {
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public enum PercentFillOrientation implements Serializable {
+    @SerializedName("HORIZONTAL")
+    @Expose
     HORIZONTAL,
+    @SerializedName("HORIZONTAL_REVERSED")
+    @Expose
     HORIZONTAL_REVERSED,
+    @SerializedName("VERTICAL")
+    @Expose
     VERTICAL,
+    @SerializedName("VERTICAL_REVERSED")
+    @Expose
     VERTICAL_REVERSED;
 
     PercentFillOrientation(){

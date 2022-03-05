@@ -1,7 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.Expression;
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
 import andrade.luis.hmiethernetip.views.WriteExpressionWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -15,7 +14,6 @@ import org.codehaus.commons.compiler.CompileException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasText extends CanvasLabel {
@@ -40,17 +38,17 @@ public class CanvasText extends CanvasLabel {
         this.text = text;
     }
 
-    public CanvasText(GraphicalRepresentationData graphicalRepresentationData) {
-        super(graphicalRepresentationData);
-        this.getGraphicalRepresentationData().setType("Text");
+    public CanvasText(CanvasObjectData canvasObjectData) {
+        super(canvasObjectData);
+        this.getCanvasObjectData().setType("Text");
         setData();
     }
 
     public CanvasText(String content, CanvasPoint center) {
         super(content, center);
-        this.getGraphicalRepresentationData().setType("Text");
-        this.getGraphicalRepresentationData().setWidth(this.getWidth());
-        this.getGraphicalRepresentationData().setHeight(this.getHeight());
+        this.getCanvasObjectData().setType("Text");
+        this.getCanvasObjectData().setWidth(this.getWidth());
+        this.getCanvasObjectData().setHeight(this.getHeight());
         setData();
     }
 
@@ -64,10 +62,10 @@ public class CanvasText extends CanvasLabel {
 
     private void setExpression(){
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
-        if (this.getGraphicalRepresentationData().getExpression() != null) {
-            writeExpressionWindow.setAddedTags(this.getGraphicalRepresentationData().getExpression().getParameters());
-            writeExpressionWindow.setLocalExpression(this.getGraphicalRepresentationData().getExpression());
-            writeExpressionWindow.getTextField().setText(this.getGraphicalRepresentationData().getExpression().getExpressionToEvaluate());
+        if (this.getCanvasObjectData().getExpression() != null) {
+            writeExpressionWindow.setAddedTags(this.getCanvasObjectData().getExpression().getParameters());
+            writeExpressionWindow.setLocalExpression(this.getCanvasObjectData().getExpression());
+            writeExpressionWindow.getTextField().setText(this.getCanvasObjectData().getExpression().getExpressionToEvaluate());
         }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();
@@ -88,7 +86,7 @@ public class CanvasText extends CanvasLabel {
 
     public void setExpression(Expression expression) {
         if(expression!=null){
-            this.getGraphicalRepresentationData().setExpression(expression);
+            this.getCanvasObjectData().setExpression(expression);
             this.setTimeline();
         }
     }
@@ -98,18 +96,18 @@ public class CanvasText extends CanvasLabel {
                 new KeyFrame(
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
-                            String type = this.getGraphicalRepresentationData().getExpression().getResultType() != null ? this.getGraphicalRepresentationData().getExpression().getResultType() : "";
+                            String type = this.getCanvasObjectData().getExpression().getResultType() != null ? this.getCanvasObjectData().getExpression().getResultType() : "";
                             String evaluatedValue = "";
                             try{
                                 switch (type) {
                                     case "Bool":
-                                        evaluatedValue = String.valueOf((boolean) this.getGraphicalRepresentationData().getExpression().evaluate());
+                                        evaluatedValue = String.valueOf((boolean) this.getCanvasObjectData().getExpression().evaluate());
                                         break;
                                     case "Flotante":
-                                        evaluatedValue = String.valueOf((double) this.getGraphicalRepresentationData().getExpression().evaluate());
+                                        evaluatedValue = String.valueOf((double) this.getCanvasObjectData().getExpression().evaluate());
                                         break;
                                     case "String":
-                                        evaluatedValue = (String) this.getGraphicalRepresentationData().getExpression().evaluate();
+                                        evaluatedValue = (String) this.getCanvasObjectData().getExpression().evaluate();
                                         break;
                                     default:
                                         break;
@@ -123,8 +121,8 @@ public class CanvasText extends CanvasLabel {
                             }
                             this.text = evaluatedValue;
                             this.getLabel().setText(this.text);
-                            this.getGraphicalRepresentationData().setWidth(this.getLabel().getWidth()*2);
-                            this.getGraphicalRepresentationData().setHeight(this.getLabel().getHeight());
+                            this.getCanvasObjectData().setWidth(this.getLabel().getWidth()*2);
+                            this.getCanvasObjectData().setHeight(this.getLabel().getHeight());
                         }), new KeyFrame(Duration.seconds(1)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();

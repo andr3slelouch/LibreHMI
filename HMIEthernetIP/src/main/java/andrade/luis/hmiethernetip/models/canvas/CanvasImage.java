@@ -1,6 +1,5 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
-import andrade.luis.hmiethernetip.models.GraphicalRepresentationData;
 import andrade.luis.hmiethernetip.views.SelectHMISymbolWindow;
 import andrade.luis.hmiethernetip.views.SetImageOptionsWindow;
 import javafx.scene.control.MenuItem;
@@ -14,7 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
-public class CanvasImage extends GraphicalRepresentation {
+public class CanvasImage extends CanvasObject {
     Logger logger = Logger.getLogger(this.getClass().getName());
     private ImageView imageView;
     private Image image;
@@ -24,13 +23,13 @@ public class CanvasImage extends GraphicalRepresentation {
         this.setData(image, imagePath, isOnCanvas, 100, 100, isImageSymbol);
     }
 
-    public CanvasImage(GraphicalRepresentationData graphicalRepresentationData) throws FileNotFoundException {
-        super(graphicalRepresentationData);
-        this.image = new Image(new FileInputStream(graphicalRepresentationData.getData()));
-        this.setData(this.image, this.getGraphicalRepresentationData().getData(), true, this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight(), this.getGraphicalRepresentationData().isImageSymbol());
-        this.modifyImageViewSizeRotation(this.getGraphicalRepresentationData().isMirroringHorizontal(),this.getGraphicalRepresentationData().isMirroringVertical(),this.getGraphicalRepresentationData().getRotation());
-        if(this.getGraphicalRepresentationData().isModifyingImage()){
-            this.modifyImageViewColors(this.getGraphicalRepresentationData().getPrimaryColor(),this.getGraphicalRepresentationData().getContrast(),this.getGraphicalRepresentationData().getBrightness(),this.getGraphicalRepresentationData().getSaturation(),this.getGraphicalRepresentationData().getHue());
+    public CanvasImage(CanvasObjectData canvasObjectData) throws FileNotFoundException {
+        super(canvasObjectData);
+        this.image = new Image(new FileInputStream(canvasObjectData.getData()));
+        this.setData(this.image, this.getCanvasObjectData().getData(), true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().isImageSymbol());
+        this.modifyImageViewSizeRotation(this.getCanvasObjectData().isMirroringHorizontal(),this.getCanvasObjectData().isMirroringVertical(),this.getCanvasObjectData().getRotation());
+        if(this.getCanvasObjectData().isModifyingImage()){
+            this.modifyImageViewColors(this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getContrast(),this.getCanvasObjectData().getBrightness(),this.getCanvasObjectData().getSaturation(),this.getCanvasObjectData().getHue());
         }
     }
 
@@ -46,24 +45,24 @@ public class CanvasImage extends GraphicalRepresentation {
             lighting.setContentInput(bright);
             lighting.setSurfaceScale(0.0);
             this.imageView.setEffect(lighting);
-            this.getGraphicalRepresentationData().setModifyingImage(true);
-            this.getGraphicalRepresentationData().setPrimaryColor(color);
-            this.getGraphicalRepresentationData().setContrast(contrast);
-            this.getGraphicalRepresentationData().setBrightness(brightness);
-            this.getGraphicalRepresentationData().setHue(hue);
+            this.getCanvasObjectData().setModifyingImage(true);
+            this.getCanvasObjectData().setPrimaryColor(color);
+            this.getCanvasObjectData().setContrast(contrast);
+            this.getCanvasObjectData().setBrightness(brightness);
+            this.getCanvasObjectData().setHue(hue);
         }
     }
 
     public void modifyImageViewSizeRotation(boolean isMirroringHorizontal, boolean isMirroringVertical, double rotation){
         if (this.imageView != null) {
             this.imageView.setRotate(rotation);
-            this.getGraphicalRepresentationData().setRotation(rotation);
+            this.getCanvasObjectData().setRotation(rotation);
             if (isMirroringHorizontal) {
-                this.getGraphicalRepresentationData().setMirroringHorizontal(true);
+                this.getCanvasObjectData().setMirroringHorizontal(true);
                 this.imageView.setScaleX(-1);
             }
             if (isMirroringVertical) {
-                this.getGraphicalRepresentationData().setMirroringVertical(true);
+                this.getCanvasObjectData().setMirroringVertical(true);
                 this.imageView.setScaleY(-1);
             }
         }
@@ -75,12 +74,12 @@ public class CanvasImage extends GraphicalRepresentation {
         this.imageView.setFitWidth(width);
         this.imageView.setFitHeight(height);
         this.imageView.setPreserveRatio(true);
-        this.getGraphicalRepresentationData().setImageSymbol(isImageSymbol);
+        this.getCanvasObjectData().setImageSymbol(isImageSymbol);
         this.setCenter(this.imageView);
-        this.getGraphicalRepresentationData().setType("Image");
-        this.getGraphicalRepresentationData().setWidth(width);
-        this.getGraphicalRepresentationData().setHeight(height);
-        this.getGraphicalRepresentationData().setData(imagePath);
+        this.getCanvasObjectData().setType("Image");
+        this.getCanvasObjectData().setWidth(width);
+        this.getCanvasObjectData().setHeight(height);
+        this.getCanvasObjectData().setData(imagePath);
         if (!isOnCanvas) {
             this.setOnMouseDragged(mouseEvent -> {
             });
@@ -100,7 +99,7 @@ public class CanvasImage extends GraphicalRepresentation {
     }
 
     private void setCanvasImage() throws FileNotFoundException {
-        if (this.getGraphicalRepresentationData().isImageSymbol()) {
+        if (this.getCanvasObjectData().isImageSymbol()) {
             setSymbolImageProcess();
         } else {
             setImageViewProcess();
@@ -109,18 +108,18 @@ public class CanvasImage extends GraphicalRepresentation {
 
     private void setSymbolImageProcess() throws FileNotFoundException {
         SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow();
-        if (this.getGraphicalRepresentationData() != null) {
-            selectHMISymbolWindow.setMirroringHorizontal(this.getGraphicalRepresentationData().isMirroringHorizontal());
-            selectHMISymbolWindow.setMirroringVertical(this.getGraphicalRepresentationData().isMirroringHorizontal());
-            selectHMISymbolWindow.setRotation(this.getGraphicalRepresentationData().getRotation());
-            selectHMISymbolWindow.updateSelected(this.getGraphicalRepresentationData().getData());
-            if(this.getGraphicalRepresentationData().isModifyingImage()){
-                selectHMISymbolWindow.setColor(this.getGraphicalRepresentationData().getPrimaryColor());
-                selectHMISymbolWindow.setContrast(this.getGraphicalRepresentationData().getContrast());
-                selectHMISymbolWindow.setBrightness(this.getGraphicalRepresentationData().getBrightness());
-                selectHMISymbolWindow.setSaturation(this.getGraphicalRepresentationData().getSaturation());
-                selectHMISymbolWindow.setHue(this.getGraphicalRepresentationData().getHue());
-                selectHMISymbolWindow.setModifyingColor(this.getGraphicalRepresentationData().isModifyingImage());
+        if (this.getCanvasObjectData() != null) {
+            selectHMISymbolWindow.setMirroringHorizontal(this.getCanvasObjectData().isMirroringHorizontal());
+            selectHMISymbolWindow.setMirroringVertical(this.getCanvasObjectData().isMirroringHorizontal());
+            selectHMISymbolWindow.setRotation(this.getCanvasObjectData().getRotation());
+            selectHMISymbolWindow.updateSelected(this.getCanvasObjectData().getData());
+            if(this.getCanvasObjectData().isModifyingImage()){
+                selectHMISymbolWindow.setColor(this.getCanvasObjectData().getPrimaryColor());
+                selectHMISymbolWindow.setContrast(this.getCanvasObjectData().getContrast());
+                selectHMISymbolWindow.setBrightness(this.getCanvasObjectData().getBrightness());
+                selectHMISymbolWindow.setSaturation(this.getCanvasObjectData().getSaturation());
+                selectHMISymbolWindow.setHue(this.getCanvasObjectData().getHue());
+                selectHMISymbolWindow.setModifyingColor(this.getCanvasObjectData().isModifyingImage());
             }
         }
         selectHMISymbolWindow.showAndWait();
@@ -136,8 +135,8 @@ public class CanvasImage extends GraphicalRepresentation {
         double saturation = selectHMISymbolWindow.getSaturation();
         double hue = selectHMISymbolWindow.getHue();
         CanvasColor color = selectHMISymbolWindow.getColor();
-        this.getGraphicalRepresentationData().setPreservingRatio(isPreservingRatio);
-        setData(selectedSymbol, selectedSymbolPath, true, this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight(), true);
+        this.getCanvasObjectData().setPreservingRatio(isPreservingRatio);
+        setData(selectedSymbol, selectedSymbolPath, true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), true);
         modifyImageViewSizeRotation(isMirroringHorizontal,isMirroringVertical,rotation);
         if(isModifyingColor){
             modifyImageViewColors(color,contrast,brightness,saturation,hue);
@@ -146,19 +145,19 @@ public class CanvasImage extends GraphicalRepresentation {
 
     private void setImageViewProcess() throws FileNotFoundException {
         SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow();
-        if(this.getGraphicalRepresentationData().isModifyingImage()){
+        if(this.getCanvasObjectData().isModifyingImage()){
             imageOptionsWindow.setModifyingColor(true);
-            imageOptionsWindow.getBrightnessTextField().setText(String.valueOf(this.getGraphicalRepresentationData().getBrightness()));
-            imageOptionsWindow.getContrastTextField().setText(String.valueOf(this.getGraphicalRepresentationData().getContrast()));
-            imageOptionsWindow.getHueTextField().setText(String.valueOf(this.getGraphicalRepresentationData().getHue()));
-            imageOptionsWindow.getSaturationTextField().setText(String.valueOf(this.getGraphicalRepresentationData().getSaturation()));
-            imageOptionsWindow.getColorPicker().setValue(this.getGraphicalRepresentationData().getPrimaryColor().getColor());
+            imageOptionsWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
+            imageOptionsWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
+            imageOptionsWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
+            imageOptionsWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
+            imageOptionsWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
         }
-        imageOptionsWindow.getImagePathTextField().setText(this.getGraphicalRepresentationData().getData());
-        imageOptionsWindow.getMirrorHorizontalCheckBox().setSelected(this.getGraphicalRepresentationData().isMirroringHorizontal());
-        imageOptionsWindow.getMirrorVerticalCheckBox().setSelected(this.getGraphicalRepresentationData().isMirroringVertical());
-        imageOptionsWindow.getPreserveRatioCheckBox().setSelected(this.getGraphicalRepresentationData().isPreservingRatio());
-        imageOptionsWindow.getRotationTextField().setText(String.valueOf(this.getGraphicalRepresentationData().getRotation()));
+        imageOptionsWindow.getImagePathTextField().setText(this.getCanvasObjectData().getData());
+        imageOptionsWindow.getMirrorHorizontalCheckBox().setSelected(this.getCanvasObjectData().isMirroringHorizontal());
+        imageOptionsWindow.getMirrorVerticalCheckBox().setSelected(this.getCanvasObjectData().isMirroringVertical());
+        imageOptionsWindow.getPreserveRatioCheckBox().setSelected(this.getCanvasObjectData().isPreservingRatio());
+        imageOptionsWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
         imageOptionsWindow.showAndWait();
 
         String selectedImagePath = imageOptionsWindow.getImagePathTextField().getText();
@@ -173,8 +172,8 @@ public class CanvasImage extends GraphicalRepresentation {
         double saturation = Double.parseDouble(imageOptionsWindow.getSaturationTextField().getText());
         double hue = Double.parseDouble(imageOptionsWindow.getHueTextField().getText());
         CanvasColor color = new CanvasColor(imageOptionsWindow.getColorPicker().getValue());
-        this.getGraphicalRepresentationData().setPreservingRatio(isPreservingRatio);
-        setData(selectedImage, selectedImagePath , true, this.getGraphicalRepresentationData().getWidth(), this.getGraphicalRepresentationData().getHeight(), false);
+        this.getCanvasObjectData().setPreservingRatio(isPreservingRatio);
+        setData(selectedImage, selectedImagePath , true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), false);
         modifyImageViewSizeRotation(isMirroringHorizontal,isMirroringVertical,rotation);
         if(isModifyingColor){
             modifyImageViewColors(color,contrast,brightness,saturation,hue);
@@ -188,8 +187,8 @@ public class CanvasImage extends GraphicalRepresentation {
     @Override
     public void resize() {
         super.resize();
-        this.imageView.setFitWidth(this.getGraphicalRepresentationData().getWidth());
-        this.imageView.setFitHeight(this.getGraphicalRepresentationData().getHeight());
-        this.imageView.setPreserveRatio(this.getGraphicalRepresentationData().isPreservingRatio());
+        this.imageView.setFitWidth(this.getCanvasObjectData().getWidth());
+        this.imageView.setFitHeight(this.getCanvasObjectData().getHeight());
+        this.imageView.setPreserveRatio(this.getCanvasObjectData().isPreservingRatio());
     }
 }
