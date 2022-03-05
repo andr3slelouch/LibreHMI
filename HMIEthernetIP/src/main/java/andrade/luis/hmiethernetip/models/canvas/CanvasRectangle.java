@@ -108,11 +108,6 @@ public class CanvasRectangle extends CanvasObject {
         }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Expression.class, new ExpressionAdapter());
-        builder.setPrettyPrinting();
-        Gson gson = builder.create();
-        logger.log(Level.INFO,gson.toJson(expression));
         try {
             if (expression != null) {
                 expression.evaluate();
