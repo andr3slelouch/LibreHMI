@@ -40,7 +40,7 @@ public class CanvasObjectData implements Serializable, Transferable {
     private String id;
     @SerializedName("operation")
     @Expose
-    private String operation;
+    private String operation="";
     @SerializedName("data")
     @Expose
     private String data;

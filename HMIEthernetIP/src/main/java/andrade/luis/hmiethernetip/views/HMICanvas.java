@@ -7,8 +7,6 @@ import andrade.luis.hmiethernetip.models.canvas.input.CanvasButton;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasPushbutton;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasSlider;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasTextField;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
@@ -29,17 +27,61 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HMICanvas extends Pane implements CanvasObjectInterface, Cloneable {
+public class HMICanvas extends Pane implements CanvasObjectInterface {
     Logger logger = Logger.getLogger(this.getClass().getName());
     private String mode;
     private String type;
     private boolean addOnClickEnabled;
+    private static final String RECTANGLE_STR = "Rectangle";
+    private static final String SYS_DATE_TIME_STR = "SystemDateTime";
+    private static final String TEXT_STR = "Text";
+    private static final String IMAGE_STR = "Image";
+    private static final String SYMBOL_STR = "Symbol";
+    private static final String BUTTON_STR = "Button";
+    private static final String PUSHBUTTON_STR = "Pushbutton";
+    private static final String SLIDER_STR = "Slider";
+    private static final String TEXTFIELD_STR = "TextField";
     private static final String FIGURE_ID = "#createdShape";
     private ContextMenu rightClickMenu;
-    private ArrayList<CanvasObject> shapeArrayList = new ArrayList<>();
+
+    public void setShapeArrayList(ArrayList<CanvasObjectData> shapeArrayList) {
+        for(CanvasObjectData canvasObjectData : shapeArrayList){
+            switch(canvasObjectData.getType()){
+                case RECTANGLE_STR:
+                    addPastedRectangle(canvasObjectData);
+                    continue;
+                case SYS_DATE_TIME_STR:
+                    addPastedSystemDateTimeLabel(canvasObjectData);
+                    continue;
+                case TEXT_STR:
+                    addPastedTextOnCanvasClicked(canvasObjectData);
+                    continue;
+                case IMAGE_STR:
+                    addPastedImageViewOnCanvasClicked(canvasObjectData);
+                    continue;
+                case BUTTON_STR:
+                    addPastedButtonOnCanvasClicked(canvasObjectData);
+                    continue;
+                case PUSHBUTTON_STR:
+                    addPastedPushbuttonOnCanvasClicked(canvasObjectData);
+                    continue;
+                case SLIDER_STR:
+                    addPastedSliderOnCanvasClicked(canvasObjectData);
+                    continue;
+                case TEXTFIELD_STR:
+                    addPastedTextFieldOnCanvasClicked(canvasObjectData);
+                    continue;
+                case SYMBOL_STR:
+                    addPastedSymbolViewOnCanvasClicked(canvasObjectData);
+                    continue;
+                default:
+            }
+        }
+    }
+
+    private final ArrayList<CanvasObject> shapeArrayList = new ArrayList<>();
     private CanvasPoint currentMousePosition;
     private HMIApp hmiApp;
 
@@ -97,34 +139,31 @@ public class HMICanvas extends Pane implements CanvasObjectInterface, Cloneable 
 
     public void addFigureOnCanvasClicked(CanvasPoint current) {
         switch (type) {
-            case "Rectangle":
+            case RECTANGLE_STR:
                 addRectangleOnCanvasClicked(current);
                 break;
-            case "Label":
-                addLabelOnCanvasClicked(current);
-                break;
-            case "SystemDateTimeLabel":
+            case SYS_DATE_TIME_STR:
                 addSystemDateTimeLabelOnCanvasClicked(current);
                 break;
-            case "Text":
+            case TEXT_STR:
                 addTextOnCanvasClicked(current);
                 break;
-            case "Button":
+            case BUTTON_STR:
                 addButtonOnCanvasClicked(current);
                 break;
-            case "Pushbutton":
+            case PUSHBUTTON_STR:
                 addPushbuttonOnCanvasClicked(current);
                 break;
-            case "Slider":
+            case SLIDER_STR:
                 addSliderOnCanvasClicked(current);
                 break;
-            case "TextField":
+            case TEXTFIELD_STR:
                 addTextFieldOnCanvasClicked(current);
                 break;
-            case "Symbol":
+            case SYMBOL_STR:
                 addSymbolViewOnCanvasClicked(current);
                 break;
-            case "Image":
+            case IMAGE_STR:
                 addImageViewOnCanvasClicked(current);
                 break;
             default:
@@ -224,7 +263,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface, Cloneable 
         }
         CanvasImage canvasImage = new CanvasImage(selectedSymbol, current, true, selectedSymbolPath, true);
         canvasImage.modifyImageViewSizeRotation(isMirroringHorizontal, isMirroringVertical, rotation);
-        logger.log(Level.INFO, String.valueOf(isModifyingColor));
         if(isModifyingColor){
             canvasImage.modifyImageViewColors(color,contrast,brightness,saturation,hue);
         }
@@ -291,18 +329,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface, Cloneable 
         }
         this.addNewShape(newCreatedRectangle);
         this.getChildren().add(newCreatedRectangle);
-    }
-
-    public void addLabelOnCanvasClicked(CanvasPoint current) {
-        CanvasLabel canvasLabel = new CanvasLabel("Test", current);
-        canvasLabel.setCanvas(this);
-        if (this.getShapeArrayList().isEmpty()) {
-            canvasLabel.setId(FIGURE_ID + "0");
-        } else {
-            canvasLabel.setId(FIGURE_ID + this.getShapeArrayList().size());
-        }
-        this.addNewShape(canvasLabel);
-        this.getChildren().add(canvasLabel);
     }
 
     public void addSystemDateTimeLabelOnCanvasClicked(CanvasPoint current) {
@@ -399,34 +425,31 @@ public class HMICanvas extends Pane implements CanvasObjectInterface, Cloneable 
             if (clipboard.isDataFlavorAvailable(flavor)) {
                 CanvasObjectData canvasObjectData = (CanvasObjectData) clipboard.getData(flavor);
                 switch (canvasObjectData.getType()) {
-                    case "Rectangle":
+                    case RECTANGLE_STR:
                         addPastedRectangle(canvasObjectData);
                         break;
-                    case "Label":
-                        addPastedLabel(canvasObjectData);
-                        break;
-                    case "SystemDateTimeLabel":
+                    case SYS_DATE_TIME_STR:
                         addPastedSystemDateTimeLabel(canvasObjectData);
                         break;
-                    case "Text":
+                    case TEXT_STR:
                         addPastedTextOnCanvasClicked(canvasObjectData);
                         break;
-                    case "Button":
+                    case BUTTON_STR:
                         addPastedButtonOnCanvasClicked(canvasObjectData);
                         break;
-                    case "Pushbutton":
+                    case PUSHBUTTON_STR:
                         addPastedPushbuttonOnCanvasClicked(canvasObjectData);
                         break;
-                    case "Slider":
+                    case SLIDER_STR:
                         addPastedSliderOnCanvasClicked(canvasObjectData);
                         break;
-                    case "TextField":
+                    case TEXTFIELD_STR:
                         addPastedTextFieldOnCanvasClicked(canvasObjectData);
                         break;
-                    case "Symbol":
+                    case SYMBOL_STR:
                         addPastedSymbolViewOnCanvasClicked(canvasObjectData);
                         break;
-                    case "Image":
+                    case IMAGE_STR:
                         addPastedImageViewOnCanvasClicked(canvasObjectData);
                         break;
                     default:
@@ -508,18 +531,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface, Cloneable 
         this.addNewShape(canvasRectangle);
         this.getChildren().add(canvasRectangle);
         canvasRectangle.setPercentFill(canvasObjectData.getExpression(), canvasObjectData.getPrimaryColor(), canvasObjectData.getBackgroundColor(), canvasObjectData.getOrientation());
-
-        Gson gson = new Gson();
-        logger.log(Level.INFO,gson.toJson(canvasObjectData));
-    }
-
-    public void addPastedLabel(CanvasObjectData canvasObjectData) {
-        CanvasLabel canvasLabel = new CanvasLabel(canvasObjectData);
-        canvasLabel.setCanvas(this);
-        canvasLabel.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + 10, canvasObjectData.getCenter().getY() + 10)));
-        canvasLabel.setId(generateIdForPasteOperation(canvasObjectData));
-        this.addNewShape(canvasLabel);
-        this.getChildren().add(canvasLabel);
     }
 
     public void addPastedSystemDateTimeLabel(CanvasObjectData canvasObjectData) {
@@ -562,12 +573,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface, Cloneable 
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @Override
-    public HMICanvas clone() throws CloneNotSupportedException {
-        HMICanvas clone = (HMICanvas) super.clone();
-        return clone;
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

@@ -105,21 +105,6 @@ public class Expression implements Serializable {
     public String determineResultType() {
         StringBuilder sb = new StringBuilder(this.expressionToEvaluate);
 
-        for (String stringOperator : stringOperators) {
-            if (expressionToEvaluate.contains(stringOperator)) {
-                if(parameters.isEmpty()){
-                    this.expressionToEvaluate = expressionToEvaluate + "+\"\"";
-                }else{
-                    for(int i = 0; i < parameters.size(); i++) {
-                        if(!this.expressionToEvaluate.contains("String.valueOf("+parameterNames[i]+")")){
-                            this.expressionToEvaluate = this.expressionToEvaluate.replace(parameterNames[i],"String.valueOf("+parameterNames[i]+")");
-                        }
-                    }
-                }
-                return STRING_STR;
-            }
-        }
-
         for (String comparisonOperator : comparisonOperators) {
             if (expressionToEvaluate.contains(comparisonOperator)) {
                 return BOOLEAN_STR;
@@ -133,8 +118,26 @@ public class Expression implements Serializable {
         }
 
         for (String arithmeticOperator : arithmeticOperators) {
+            for(String parameterType : parameterTypes){
+                if(parameterType.equals("String")) break;
+            }
             if (expressionToEvaluate.contains(arithmeticOperator)) {
                 return FLOAT_STR;
+            }
+        }
+
+        for (String stringOperator : stringOperators) {
+            if (expressionToEvaluate.contains(stringOperator)) {
+                if(parameters.isEmpty()){
+                    this.expressionToEvaluate = expressionToEvaluate + "+\"\"";
+                }else{
+                    for(int i = 0; i < parameters.size(); i++) {
+                        if(!this.expressionToEvaluate.contains("String.valueOf("+parameterNames[i]+")")){
+                            this.expressionToEvaluate = this.expressionToEvaluate.replace(parameterNames[i],"String.valueOf("+parameterNames[i]+")");
+                        }
+                    }
+                }
+                return STRING_STR;
             }
         }
 
@@ -152,6 +155,8 @@ public class Expression implements Serializable {
                     sb.append("+\"\"");
                     this.expressionToEvaluate = sb.toString();
                     return STRING_STR;
+                default:
+                    return "Void";
             }
 
         }

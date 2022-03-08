@@ -3,6 +3,8 @@ package andrade.luis.hmiethernetip.controllers;
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.HMISceneData;
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.collections.FXCollections;
@@ -47,6 +49,8 @@ public class HMIScene extends Scene implements Cloneable {
 
     public void setHmiSceneData(HMISceneData hmiSceneData) {
         this.hmiSceneData = hmiSceneData;
+        ArrayList<CanvasObjectData> shapeArrayList = this.hmiSceneData.getShapeArrayList();
+        this.hmiCanvas.setShapeArrayList(shapeArrayList);
     }
 
     public String getTitle() {

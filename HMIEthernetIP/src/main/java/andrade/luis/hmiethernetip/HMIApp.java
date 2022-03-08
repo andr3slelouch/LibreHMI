@@ -9,6 +9,7 @@ import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import andrade.luis.hmiethernetip.views.*;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
@@ -16,10 +17,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +50,14 @@ public class HMIApp extends Application {
 
     public void setHmiAppData(HMIAppData hmiAppData) {
         this.hmiAppData = hmiAppData;
+        this.pages.clear();
+        this.pagesTitles.clear();
+        for(int i = 0; i < this.hmiAppData.getHmiAppPages().size(); i++){
+            HMISceneData hmiSceneData = this.hmiAppData.getHmiAppPages().get(i);
+            HMIScene hmiScene = generatePage(hmiSceneData.getTitle(),hmiSceneData.getSceneCommentary(),hmiSceneData.getBackground().getColor());
+            addScene(hmiScene);
+            hmiScene.setHmiSceneData(hmiSceneData);
+        }
     }
 
     private HMIAppData hmiAppData = new HMIAppData();
@@ -74,6 +86,14 @@ public class HMIApp extends Application {
         mainStage.show();
     }
 
+    /**
+     * Este método permite la generación de páginas que contienen los botones y donde se pueden agregar objetos a partir
+     * de dichos botones, cuando se crea una nueva página se utiliza este método y se guarda en un ArrayList.
+     * @param sceneTitle Título de la página, mostrado en el título de la ventana.
+     * @param sceneCommentary Comentario de la página puede ser utilizada como una pequeña documentación.
+     * @param backgroundColor Color de fondo de la página
+     * @return La página(del Tipo HMIScene, heredera de una Scene de JavaFx)
+     */
     private HMIScene generatePage(String sceneTitle, String sceneCommentary, Color backgroundColor) {
         var canvas = new Canvas(300, 300);
         HMICanvas root = new HMICanvas();
@@ -171,14 +191,56 @@ public class HMIApp extends Application {
         playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
         stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
         defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
-        saveBtn.setOnAction(mouseEvent -> this.saveHMIData());
+        saveBtn.setOnAction(mouseEvent -> {
+            try {
+                this.saveHMIData();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        loadBtn.setOnAction(mouseEvent -> {
+            try {
+                loadHMIData();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
 
         scene.setHmiApp(this);
 
         return scene;
     }
 
-    private void saveHMIData(){
+    private void loadHMIData() throws FileNotFoundException {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.setTitle("Seleccione un archivo de configuración");
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.home"))
+        );
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON", "*.json","*.JSON")
+        );
+        File file = fileChooser.showOpenDialog(null);
+
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
+
+        HMIAppData localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
+        logger.log(Level.INFO, String.valueOf(localHmiAppData.getHmiAppPages().size()));
+        this.setHmiAppData(localHmiAppData);
+    }
+
+    /**
+     * Este método inicia el proceso para guardar el proyecto dentro de un archivo json.
+     * @throws IOException Si hay algun problema en la lectura o escritura.
+     */
+    private void saveHMIData() throws IOException {
+        CreateNewFileWindow createNewFileWindow = new CreateNewFileWindow();
+        createNewFileWindow.showAndWait();
+        String filename = createNewFileWindow.getFilename() + File.separator +createNewFileWindow.getFilenameTextField().getText();
         ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
         for(HMIScene hmiScene: pages){
             ArrayList<CanvasObjectData> shapeArrayList = new ArrayList<>();
@@ -190,7 +252,10 @@ public class HMIApp extends Application {
         }
         this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
         Gson gson = new Gson();
-        logger.log(Level.INFO,gson.toJson(this.hmiAppData));
+        logger.log(Level.INFO, filename);
+        Writer writer = Files.newBufferedWriter(Path.of(filename));
+        gson.toJson(this.hmiAppData, writer);
+        writer.close();
     }
 
     /**
@@ -235,6 +300,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Este método permite la creación de una nueva ventana a partir de una HMIScene previamente existente.
+     * @param scene La página creada del tipo HMIScene
+     */
     private void generateStage(HMIScene scene){
         Stage stage = new Stage();
         stage.setScene(scene);
@@ -243,6 +312,11 @@ public class HMIApp extends Application {
         createdWindows.add(stage);
     }
 
+    /**
+     * Buscar el índice de una determinada Ventana basada en su título.
+     * @param title Título de la página
+     * @return El índice de la página en el ArrayList
+     */
     private int getIndexForStageWithScene(String title) {
         int index = -1;
         for (int i = 0; i < createdWindows.size(); i++) {
@@ -253,6 +327,11 @@ public class HMIApp extends Application {
         return index;
     }
 
+    /**
+     * Si se solicita el cambio de una sola página esta no generará una ventana nueva sino que cambiará la escena actual
+     * de la aplicación a la seleccionada basada en su título
+     * @param sceneTitle Título de la página a seleccionarse
+     */
     public void changeSelectedScene(String sceneTitle) {
         int index = findSceneIndex(sceneTitle);
         mainStage.setScene(pages.get(index));
@@ -260,6 +339,10 @@ public class HMIApp extends Application {
         pages.get(index).getListViewReference().getSelectionModel().select(index);
     }
 
+    /**
+     * Cuando se crea una nueva página todas las demás requieren actualizar la lista de páginas disponibles.
+     * @param itemsForComboBox ArrayList que contiene todos los títulos de las páginas.
+     */
     private void updateScenesInListView(ArrayList<String> itemsForComboBox) {
         for (HMIScene page : pages) {
             page.setItems(itemsForComboBox);
@@ -287,6 +370,11 @@ public class HMIApp extends Application {
 
     }
 
+    /**
+     * Elimina la página seleccionada basada en el título, la elimina del arraylist de páginas y de los títulos de
+     * páginas disponibles en las páginas restantes.
+     * @param sceneTitle Título de la Escena a eliminarse.
+     */
     public void deleteScene(String sceneTitle) {
         int index = findSceneIndex(sceneTitle);
         if (confirmDelete(sceneTitle)) {
@@ -297,6 +385,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Actualiza las propiedades de una escena seleccionada basada en su título
+     * @param sceneTitle Título de la escena a actualizar atributos.
+     */
     public void updateScene(String sceneTitle) {
         int index = findSceneIndex(sceneTitle);
         HMIScene scene = (index != -1 && index < pages.size()) ? pages.get(index) : null;
@@ -316,7 +408,9 @@ public class HMIApp extends Application {
         }
     }
 
-
+    /**
+     * Permite iniciar el proceso para añadir una nueva página.
+     */
     public void addNewScene() {
         SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow();
         setWindowPropertiesWindow.setPagesTitles(pagesTitles);
@@ -327,6 +421,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Este método añade una nueva página creada previamente por el proceso addNewScene.
+     * @param newScene HMIScene creada a través del proceso addNewScene
+     */
     private void addScene(HMIScene newScene) {
         this.pages.add(newScene);
         this.pagesTitles.add(newScene.getTitle());
@@ -336,6 +434,11 @@ public class HMIApp extends Application {
         mainStage.setTitle(HMI_TITLE + newScene.getTitle());
     }
 
+    /**
+     * Busca el índice de la Escena basada en su título
+     * @param sceneTitle Título de la escena buscada
+     * @return El indice de la escena en el arrayList
+     */
     private int findSceneIndex(String sceneTitle) {
         for (int i = 0; i < pages.size(); i++) {
             if (pages.get(i).getTitle().equals(sceneTitle)) {
@@ -345,6 +448,12 @@ public class HMIApp extends Application {
         return -1;
     }
 
+    /**
+     * Muestra una Alerta de confirmación de eliminación de la una página
+     * @param sceneTitle Título de la Escena a eliminarse
+     * @return Booleano: - True si se confirma eliminación
+     * - False si se cancela
+     */
     private boolean confirmDelete(String sceneTitle) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar eliminación");
