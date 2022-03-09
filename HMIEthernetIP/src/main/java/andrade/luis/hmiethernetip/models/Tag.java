@@ -112,7 +112,7 @@ public class Tag implements Serializable {
             switch(this.getType()) {
                 case "Entero":
                 case "Bool":
-                    updateValue = String.valueOf(Integer.parseInt(this.value.isEmpty() ? "0" : this.value ));
+                    updateValue = String.valueOf((int) Double.parseDouble(this.value.isEmpty() ? "0" : this.value ));
                     break;
                 case "Flotante":
                     updateValue = String.valueOf(Double.parseDouble(this.value));

@@ -9,6 +9,8 @@ import andrade.luis.hmiethernetip.views.SelectWindowsWindow;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 
+import java.util.ArrayList;
+
 public class CanvasButton extends CanvasObject {
     protected Button button;
 
@@ -40,6 +42,7 @@ public class CanvasButton extends CanvasObject {
     public CanvasButton(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
+        this.setSelectedPages(this.getCanvasObjectData().getSelectedPages());
     }
 
     public void setData(double x, double y, double width, double height) {
@@ -66,7 +69,11 @@ public class CanvasButton extends CanvasObject {
     public void buttonAction() {
         SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(hmiApp.getPagesTitles(), this.getCanvasObjectData().getSelectedPages());
         selectWindowsWindow.showAndWait();
-        this.getCanvasObjectData().setSelectedPages(selectWindowsWindow.getSelectedItems());
+        this.setSelectedPages(selectWindowsWindow.getSelectedItems());
+    }
+
+    public void setSelectedPages(ArrayList<String> selectedPages) {
+        this.getCanvasObjectData().setSelectedPages(selectedPages);
         this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(this.getCanvasObjectData().getSelectedPages()));
     }
 

@@ -130,7 +130,7 @@ public class WriteExpressionWindow extends Stage {
     }
 
     protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,false,false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,"",false);
         selectTagWindow.showAndWait();
         Tag tag = selectTagWindow.getSelectedTag();
         if(tag!=null){

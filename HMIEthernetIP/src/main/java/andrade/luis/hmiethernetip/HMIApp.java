@@ -111,7 +111,7 @@ public class HMIApp extends Application {
         Button systemDateTimeLabelBtn = new Button("DateTime Label");
         systemDateTimeLabelBtn.setOnMouseClicked(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
-            root.setType("SystemDateTimeLabel");
+            root.setType("SystemDateTime");
         });
         Button textBtn = new Button("Text");
         textBtn.setOnMouseClicked(mouseEvent -> {
@@ -222,7 +222,8 @@ public class HMIApp extends Application {
                 new File(System.getProperty("user.home"))
         );
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("JSON", "*.json","*.JSON")
+                new FileChooser.ExtensionFilter("JSON", "*.json","*.JSON"),
+                new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
         );
         File file = fileChooser.showOpenDialog(null);
 

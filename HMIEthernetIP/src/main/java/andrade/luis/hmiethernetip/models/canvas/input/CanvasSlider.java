@@ -1,12 +1,31 @@
 package andrade.luis.hmiethernetip.models.canvas.input;
 
+import andrade.luis.hmiethernetip.models.Tag;
+import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
+import andrade.luis.hmiethernetip.views.SetSliderOptionsWindow;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.util.Duration;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CanvasSlider extends CanvasObject {
     private Slider slider;
+    private Timeline timeline;
+    Logger logger = Logger.getLogger(this.getClass().getName());
+
     public HMIUser getUser() {
         return user;
     }
@@ -16,30 +35,100 @@ public class CanvasSlider extends CanvasObject {
     }
 
     private HMIUser user;
-    public CanvasSlider(CanvasPoint center){
+
+    public CanvasSlider(CanvasObjectData canvasObjectData) throws SQLException, IOException {
+        super(canvasObjectData);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue(), this.getCanvasObjectData().getMinorTickValue(), this.getCanvasObjectData().getMajorTickValue(), this.getCanvasObjectData().isSnapHandleToTick(), this.getCanvasObjectData().isShowingTicks(), this.getCanvasObjectData().isShowingLabelsTicks());
+    }
+
+    public CanvasSlider(CanvasPoint center, Tag linkedTag, double minValue, double maxValue, double minorTickValue, double majorTickValue, boolean snapHandleToTick, boolean showTicks, boolean showLabelsTicks) throws SQLException, IOException {
         super(center);
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150, linkedTag, minValue, maxValue, minorTickValue, majorTickValue, snapHandleToTick, showTicks, showLabelsTicks);
 
     }
-    public void setData(double x, double y, double width, double height) {
+
+    public void setData(double x, double y, double width, double height, Tag linkedTag, double minValue, double maxValue, double minorTickValue, double majorTickValue, boolean snapHandleToTick, boolean showTicks, boolean showLabelsTicks) throws SQLException, IOException {
         this.slider = new Slider();
-        slider.setMin(0);
-        slider.setMax(100);
-        slider.setValue(40);
-        slider.setShowTickLabels(true);
-        slider.setShowTickMarks(true);
-        slider.setMajorTickUnit(50);
-        slider.setMinorTickCount(5);
-        slider.setBlockIncrement(10);
+        slider.setMin(minValue);
+        slider.setMax(maxValue);
+        if (linkedTag != null) {
+            linkedTag.readFromDatabase();
+            slider.setValue(Double.parseDouble(linkedTag.getValue()));
+            this.setTimeline();
+        }
+        slider.setShowTickLabels(showLabelsTicks);
+        slider.setShowTickMarks(showTicks);
+        slider.setMajorTickUnit(majorTickValue);
+        slider.setMinorTickCount((int) minorTickValue);
+        slider.setSnapToTicks(snapHandleToTick);
         this.slider.setDisable(true);
         this.slider.setPrefWidth(width);
         this.slider.setPrefHeight(height);
         this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
+        this.getCanvasObjectData().setWidth(width);
+        this.getCanvasObjectData().setHeight(height);
+        this.getCanvasObjectData().setMaxValue(maxValue);
+        this.getCanvasObjectData().setMinValue(minValue);
+        this.getCanvasObjectData().setMinorTickValue(minorTickValue);
+        this.getCanvasObjectData().setMajorTickValue(majorTickValue);
+        this.getCanvasObjectData().setSnapHandleToTick(snapHandleToTick);
+        this.getCanvasObjectData().setShowingTicks(showTicks);
+        this.getCanvasObjectData().setShowingLabelsTicks(showLabelsTicks);
+        this.getCanvasObjectData().setTag(linkedTag);
+        this.getCanvasObjectData().setType("Slider");
         this.setCenter(this.slider);
+        slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            if ((double) newValue < this.getCanvasObjectData().getMinValue() || (double) newValue > this.getCanvasObjectData().getMaxValue()) {
+                this.slider.setValue((double) oldValue);
+                this.getCanvasObjectData().setData(String.valueOf(oldValue));
+            } else {
+                this.getCanvasObjectData().setData(String.valueOf(newValue));
+            }
+            if (linkedTag != null && timeline != null) {
+                linkedTag.setValue(this.getCanvasObjectData().getData());
+                try {
+                    timeline.pause();
+                    linkedTag.updateInDatabase();
+                    timeline.play();
+                } catch (SQLException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        setNewMenuItem();
     }
+
+    public void setNewMenuItem(){
+        MenuItem attachShowHideWindowsActionMI = new MenuItem("Editar");
+        attachShowHideWindowsActionMI.setId("#editMI");
+        attachShowHideWindowsActionMI.setOnAction(actionEvent -> {
+            try {
+                buttonAction();
+            } catch (SQLException | IOException e) {
+                e.printStackTrace();
+            }
+        });
+        this.getRightClickMenu().getItems().add(attachShowHideWindowsActionMI);
+    }
+
+    private void buttonAction() throws SQLException, IOException {
+        SetSliderOptionsWindow sliderOptionsWindow = new SetSliderOptionsWindow();
+        sliderOptionsWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
+        sliderOptionsWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
+        sliderOptionsWindow.getMinorTickField().setText(String.valueOf(this.getCanvasObjectData().getMinorTickValue()));
+        sliderOptionsWindow.getMajorTickField().setText(String.valueOf(this.getCanvasObjectData().getMajorTickValue()));
+        sliderOptionsWindow.getSnapHandleToTick().setSelected(this.getCanvasObjectData().isSnapHandleToTick());
+        sliderOptionsWindow.getShowTicks().setSelected(this.getCanvasObjectData().isShowingTicks());
+        sliderOptionsWindow.getShowLabelsTicks().setSelected(this.getCanvasObjectData().isShowingLabelsTicks());
+        sliderOptionsWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
+        sliderOptionsWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
+        sliderOptionsWindow.showAndWait();
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(),this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),this.getCanvasObjectData().getTag(),this.getCanvasObjectData().getMinValue(),this.getCanvasObjectData().getMaxValue(),this.getCanvasObjectData().getMinorTickValue(),this.getCanvasObjectData().getMajorTickValue(),this.getCanvasObjectData().isSnapHandleToTick(),this.getCanvasObjectData().isShowingTicks(),this.getCanvasObjectData().isShowingLabelsTicks());
+    }
+
     @Override
     public void setEnable(String enabled) {
-        if(user.getRole().equals("Operador")){
+        if (user.getRole().equals("Operador")) {
             enabled = "Stop";
         }
         switch (enabled) {
@@ -57,4 +146,25 @@ public class CanvasSlider extends CanvasObject {
                 break;
         }
     }
+
+    public void setTimeline() {
+        timeline = new Timeline(
+                new KeyFrame(
+                        Duration.seconds(0),
+                        (ActionEvent actionEvent) -> {
+                            double evaluatedValue = 0;
+                            try {
+                                String value = this.getCanvasObjectData().getTag().readFromDatabase();
+                                if(value != null){
+                                    evaluatedValue = Double.parseDouble(value);
+                                }
+                            } catch (IOException | SQLException e) {
+                                e.printStackTrace();
+                            }
+                            this.slider.setValue(evaluatedValue);
+                        }), new KeyFrame(Duration.seconds(5)));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
 }
+

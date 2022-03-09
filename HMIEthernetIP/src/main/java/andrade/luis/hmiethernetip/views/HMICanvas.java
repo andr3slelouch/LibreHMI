@@ -24,6 +24,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +34,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     Logger logger = Logger.getLogger(this.getClass().getName());
     private String mode;
     private String type;
+    private int pasteOffset = 10;
     private boolean addOnClickEnabled;
     private static final String RECTANGLE_STR = "Rectangle";
     private static final String SYS_DATE_TIME_STR = "SystemDateTime";
@@ -44,9 +46,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private static final String SLIDER_STR = "Slider";
     private static final String TEXTFIELD_STR = "TextField";
     private static final String FIGURE_ID = "#createdShape";
-    private ContextMenu rightClickMenu;
+    private final ContextMenu rightClickMenu;
 
     public void setShapeArrayList(ArrayList<CanvasObjectData> shapeArrayList) {
+        pasteOffset = 0;
         for(CanvasObjectData canvasObjectData : shapeArrayList){
             switch(canvasObjectData.getType()){
                 case RECTANGLE_STR:
@@ -79,6 +82,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                 default:
             }
         }
+        pasteOffset = 10;
     }
 
     private final ArrayList<CanvasObject> shapeArrayList = new ArrayList<>();
@@ -293,16 +297,30 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addSliderOnCanvasClicked(CanvasPoint current) {
-        CanvasSlider canvasSlider = new CanvasSlider(current);
-        canvasSlider.setCanvas(this);
-        canvasSlider.setUser(hmiApp.getUser());
-        if (this.getShapeArrayList().isEmpty()) {
-            canvasSlider.setId(FIGURE_ID + "0");
-        } else {
-            canvasSlider.setId(FIGURE_ID + this.getShapeArrayList().size());
+        SetSliderOptionsWindow setSliderOptionsWindow = new SetSliderOptionsWindow();
+        setSliderOptionsWindow.showAndWait();
+        double minValue = Double.parseDouble(setSliderOptionsWindow.getMinValueField().getText());
+        double maxValue = Double.parseDouble(setSliderOptionsWindow.getMaxValueField().getText());
+        double minorTickValue = Double.parseDouble(setSliderOptionsWindow.getMinorTickField().getText());
+        double majorTickValue = Double.parseDouble(setSliderOptionsWindow.getMajorTickField().getText());
+        boolean snapHandleToTick = setSliderOptionsWindow.getSnapHandleToTick().isSelected();
+        boolean showTicks = setSliderOptionsWindow.getShowTicks().isSelected();
+        boolean showLabelsTicks = setSliderOptionsWindow.getShowLabelsTicks().isSelected();
+        CanvasSlider canvasSlider = null;
+        try {
+            canvasSlider = new CanvasSlider(current,setSliderOptionsWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks);
+            canvasSlider.setCanvas(this);
+            canvasSlider.setUser(hmiApp.getUser());
+            if (this.getShapeArrayList().isEmpty()) {
+                canvasSlider.setId(FIGURE_ID + "0");
+            } else {
+                canvasSlider.setId(FIGURE_ID + this.getShapeArrayList().size());
+            }
+            this.addNewShape(canvasSlider);
+            this.getChildren().add(canvasSlider);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
         }
-        this.addNewShape(canvasSlider);
-        this.getChildren().add(canvasSlider);
     }
 
     private void addButtonOnCanvasClicked(CanvasPoint current) {
@@ -465,7 +483,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         try {
             CanvasImage canvasImage = new CanvasImage(canvasObjectData);
             canvasImage.setCanvas(this);
-            canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + 10, canvasObjectData.getCenter().getY() + 10)));
+            canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
             canvasImage.setId(generateIdForPasteOperation(canvasObjectData));
             this.addNewShape(canvasImage);
             this.getChildren().add(canvasImage);
@@ -488,7 +506,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         try {
             CanvasImage canvasImage = new CanvasImage(canvasObjectData);
             canvasImage.setCanvas(this);
-            canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + 10, canvasObjectData.getCenter().getY() + 10)));
+            canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
             canvasImage.setId(generateIdForPasteOperation(canvasObjectData));
             this.addNewShape(canvasImage);
             this.getChildren().add(canvasImage);
@@ -500,7 +518,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private void addPastedTextFieldOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasTextField canvasTextField = new CanvasTextField(canvasObjectData);
         canvasTextField.setCanvas(this);
-        canvasTextField.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + 10, canvasObjectData.getCenter().getY() + 10)));
+        canvasTextField.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
         canvasTextField.setUser(hmiApp.getUser());
         canvasTextField.setId(generateIdForPasteOperation(canvasObjectData));
         this.addNewShape(canvasTextField);
@@ -508,15 +526,35 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addPastedSliderOnCanvasClicked(CanvasObjectData canvasObjectData) {
+        CanvasSlider canvasSlider = null;
+        try {
+            canvasSlider = new CanvasSlider(canvasObjectData);
+            canvasSlider.setCanvas(this);
+            canvasSlider.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+            canvasSlider.setUser(hmiApp.getUser());
+            canvasSlider.setId(generateIdForPasteOperation(canvasObjectData));
+            this.addNewShape(canvasSlider);
+            this.getChildren().add(canvasSlider);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void addPastedButtonOnCanvasClicked(CanvasObjectData canvasObjectData) {
+        CanvasButton canvasButton = new CanvasButton(canvasObjectData);
+        canvasButton.setHmiApp(hmiApp);
+        canvasButton.setCanvas(this);
+        canvasButton.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+        canvasButton.setUser(hmiApp.getUser());
+        canvasButton.setId(generateIdForPasteOperation(canvasObjectData));
+        this.addNewShape(canvasButton);
+        this.getChildren().add(canvasButton);
     }
 
     private void addPastedTextOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasText canvasText = new CanvasText(canvasObjectData);
         canvasText.setCanvas(this);
-        canvasText.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + 10, canvasObjectData.getCenter().getY() + 10)));
+        canvasText.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
         canvasText.setId(generateIdForPasteOperation(canvasObjectData));
         this.addNewShape(canvasText);
         this.getChildren().add(canvasText);
@@ -526,7 +564,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     public void addPastedRectangle(CanvasObjectData canvasObjectData) {
         CanvasRectangle canvasRectangle = new CanvasRectangle(canvasObjectData);
         canvasRectangle.setCanvas(this);
-        canvasRectangle.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + 10, canvasObjectData.getCenter().getY() + 10)));
+        canvasRectangle.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
         canvasRectangle.setId(generateIdForPasteOperation(canvasObjectData));
         this.addNewShape(canvasRectangle);
         this.getChildren().add(canvasRectangle);
@@ -536,7 +574,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     public void addPastedSystemDateTimeLabel(CanvasObjectData canvasObjectData) {
         CanvasSystemDateTimeLabel canvasSystemDateTimeLabel = new CanvasSystemDateTimeLabel(canvasObjectData);
         canvasSystemDateTimeLabel.setCanvas(this);
-        canvasSystemDateTimeLabel.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + 10, canvasObjectData.getCenter().getY() + 10)));
+        canvasSystemDateTimeLabel.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
         canvasSystemDateTimeLabel.setId(generateIdForPasteOperation(canvasObjectData));
         this.addNewShape(canvasSystemDateTimeLabel);
         this.getChildren().add(canvasSystemDateTimeLabel);

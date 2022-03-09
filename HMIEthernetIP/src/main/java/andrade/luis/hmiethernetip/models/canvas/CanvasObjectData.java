@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.PercentFillOrientation;
 import andrade.luis.hmiethernetip.models.Tag;
+import andrade.luis.hmiethernetip.models.users.HMIUser;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -74,6 +75,21 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("maxValue")
     @Expose
     private double maxValue;
+    @SerializedName("minorTickValue")
+    @Expose
+    private double minorTickValue;
+    @SerializedName("majorTickValue")
+    @Expose
+    private double majorTickValue;
+    @SerializedName("snapHandleToTick")
+    @Expose
+    private boolean snapHandleToTick;
+    @SerializedName("showTicks")
+    @Expose
+    private boolean showingTicks;
+    @SerializedName("showLabelsTicks")
+    @Expose
+    private boolean showingLabelsTicks;
     @SerializedName("mirroringHorizontal")
     @Expose
     private boolean mirroringHorizontal = false;
@@ -320,7 +336,45 @@ public class CanvasObjectData implements Serializable, Transferable {
         this.selectedPages = selectedPages;
     }
 
+    public double getMinorTickValue() {
+        return minorTickValue;
+    }
 
+    public void setMinorTickValue(double minorTickValue) {
+        this.minorTickValue = minorTickValue;
+    }
+
+    public double getMajorTickValue() {
+        return majorTickValue;
+    }
+
+    public void setMajorTickValue(double majorTickValue) {
+        this.majorTickValue = majorTickValue;
+    }
+
+    public boolean isSnapHandleToTick() {
+        return snapHandleToTick;
+    }
+
+    public void setSnapHandleToTick(boolean snapHandleToTick) {
+        this.snapHandleToTick = snapHandleToTick;
+    }
+
+    public boolean isShowingTicks() {
+        return showingTicks;
+    }
+
+    public void setShowingTicks(boolean showingTicks) {
+        this.showingTicks = showingTicks;
+    }
+
+    public boolean isShowingLabelsTicks() {
+        return showingLabelsTicks;
+    }
+
+    public void setShowingLabelsTicks(boolean showingLabelsTicks) {
+        this.showingLabelsTicks = showingLabelsTicks;
+    }
 
     @Override
     public String toString() {

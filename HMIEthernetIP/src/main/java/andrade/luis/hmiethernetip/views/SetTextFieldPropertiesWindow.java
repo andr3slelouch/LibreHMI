@@ -122,7 +122,7 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
 
     @Override
     protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),false,false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),"",false);
         selectTagWindow.showAndWait();
         if(!selectTagWindow.isCancelled()){
             clearAll();

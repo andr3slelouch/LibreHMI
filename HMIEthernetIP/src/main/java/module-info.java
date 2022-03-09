@@ -29,5 +29,5 @@ module andrade.luis.hmiethernetip {
     opens andrade.luis.hmiethernetip.models.canvas to javafx.base, com.google.gson;
     exports andrade.luis.hmiethernetip.models.canvas.input;
     opens andrade.luis.hmiethernetip.models.canvas.input to javafx.base;
-    opens andrade.luis.hmiethernetip.models.users to javafx.base;
+    opens andrade.luis.hmiethernetip.models.users to javafx.base, com.google.gson;
 }

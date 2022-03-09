@@ -43,7 +43,7 @@ public class SelectTagWindow extends Stage {
     }
 
     private Tag selectedTagRow;
-    public SelectTagWindow(boolean inputMode,boolean boolOnly,boolean testMode) {
+    public SelectTagWindow(boolean inputMode,String filter,boolean testMode) {
         StackPane root = new StackPane();
 
 
@@ -69,10 +69,10 @@ public class SelectTagWindow extends Stage {
         TableColumn<TagRow, String> valueColumn = new TableColumn<>("Valor");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("tagValue"));
 
-        if(getExistingTags(inputMode,boolOnly).isEmpty() || testMode){
+        if(getExistingTags(inputMode,filter).isEmpty() || testMode){
             setAlertIfTableIsEmpty();
         }else{
-            table.setItems(getExistingTags(inputMode,boolOnly));
+            table.setItems(getExistingTags(inputMode,filter));
         }
         table.setPlaceholder(new Label("No existen Tags definidos en la base de datos"));
 
@@ -105,13 +105,21 @@ public class SelectTagWindow extends Stage {
 
     }
 
-    public ObservableList<TagRow> getExistingTags(boolean inputMode, boolean boolOnly) {
+    public ObservableList<TagRow> getExistingTags(boolean inputMode, String boolOnly) {
         String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
         if(inputMode){
             query = query +"AND t.accion = 'Escritura' ";
         }
-        if(boolOnly){
-            query = query +"AND t.tipoTag = 'Bool' ";
+
+        switch(boolOnly){
+            case "bool":
+                query = query +"AND t.tipoTag = 'Bool' ";
+                break;
+            case "numbers":
+                query = query +"AND t.tipoTag != 'Bool' ";
+                break;
+            default:
+                break;
         }
         ObservableList<TagRow> data = FXCollections.observableArrayList();
         try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
