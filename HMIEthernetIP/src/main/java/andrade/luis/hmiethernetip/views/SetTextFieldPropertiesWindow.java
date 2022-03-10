@@ -25,6 +25,11 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
     }
 
     public String getType() {
+        for (RadioButton radioButton : radioButtons) {
+            if (radioButton.isSelected()) {
+                type = radioButton.getText();
+            }
+        }
         return type;
     }
 
@@ -61,41 +66,17 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
         RadioButton rb1 = new RadioButton("Entero");
         rb1.setToggleGroup(group);
         rb1.setSelected(true);
-        rb1.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
-            disableMaxMinInputs(!newBoolean);
-            if(Boolean.TRUE.equals(newBoolean)){
-                type = rb1.getText();
-            }
-        });
         radioButtons.add(rb1);
 
         RadioButton rb2 = new RadioButton("Flotante");
         rb2.setToggleGroup(group);
-        rb2.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
-            disableMaxMinInputs(!newBoolean);
-            if(Boolean.TRUE.equals(newBoolean)){
-                type = rb1.getText();
-            }
-        });
         radioButtons.add(rb2);
 
         RadioButton rb3 = new RadioButton("String");
         rb3.setToggleGroup(group);
-        rb3.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
-            disableMaxMinInputs(newBoolean);
-            if(Boolean.TRUE.equals(newBoolean)){
-                type = rb1.getText();
-            }
-        });
         radioButtons.add(rb3);
 
         RadioButton rb4 = new RadioButton("Bool");
-        rb4.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
-            disableMaxMinInputs(newBoolean);
-            if(Boolean.TRUE.equals(newBoolean)){
-                type = rb1.getText();
-            }
-        });
         rb4.setOnAction(mouseEvent -> disableMaxMinInputs(true));
         rb4.setToggleGroup(group);
         radioButtons.add(rb4);
@@ -118,6 +99,14 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
     private void disableMaxMinInputs(boolean disable) {
         minValueField.setDisable(disable);
         maxValueField.setDisable(disable);
+    }
+
+    public void setSelectedRadioButton(String buttonName) {
+        for (RadioButton radioButton : radioButtons) {
+            if (radioButton.getText().equals(buttonName)) {
+                radioButton.setSelected(true);
+            }
+        }
     }
 
     @Override

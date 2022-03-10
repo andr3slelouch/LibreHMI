@@ -9,6 +9,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasPushbutton extends CanvasButton {
@@ -28,8 +30,6 @@ public class CanvasPushbutton extends CanvasButton {
     private static final String REVERSE_STR = "Reversa";
     private static final String TOGGLE_STR = "Toggle";
 
-    private BooleanProperty selectedProperty = new SimpleBooleanProperty();
-
     public CanvasPushbutton(CanvasPoint center) {
         super(center);
         this.getCanvasObjectData().setType("Pushbutton");
@@ -37,6 +37,7 @@ public class CanvasPushbutton extends CanvasButton {
 
     public CanvasPushbutton(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
+        logger.log(Level.INFO,canvasObjectData.getType());
         if(this.getCanvasObjectData().getPrimaryColor()!=null && this.getCanvasObjectData().getBackgroundColor()!=null && this.getCanvasObjectData().getMode()!=null){
             setDynamicColors(this.getCanvasObjectData().getData(),this.getCanvasObjectData().getMode(),this.getCanvasObjectData().getTag(),this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getBackgroundColor());
         }
@@ -88,14 +89,24 @@ public class CanvasPushbutton extends CanvasButton {
             this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
             if (this.getCanvasObjectData().getTag() != null) {
                 this.getCanvasObjectData().getTag().setValue("1");
-                this.getCanvasObjectData().getTag().updateInDatabase();
+                if(!this.getCanvasObjectData().getTag().updateInDatabase()){
+                    this.errorLabel = new Label("Error en Tag de Escritura");
+                    this.setTop(this.errorLabel);
+                }else{
+                    this.setTop(null);
+                }
             }
         } else {
             this.getCanvasObjectData().setStatus("");
             this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getBackgroundColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
             if (this.getCanvasObjectData().getTag() != null) {
                 this.getCanvasObjectData().getTag().setValue("0");
-                this.getCanvasObjectData().getTag().updateInDatabase();
+                if(!this.getCanvasObjectData().getTag().updateInDatabase()){
+                    this.errorLabel = new Label("Error en Tag de Escritura");
+                    this.setTop(this.errorLabel);
+                }else{
+                    this.setTop(null);
+                }
             }
         }
     }

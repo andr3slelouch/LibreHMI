@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
+import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.views.SelectHMISymbolWindow;
 import andrade.luis.hmiethernetip.views.SetImageOptionsWindow;
 import javafx.scene.control.MenuItem;
@@ -11,11 +12,19 @@ import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasImage extends CanvasObject {
-    Logger logger = Logger.getLogger(this.getClass().getName());
+    Logger logger
+            = Logger.getLogger(
+            HMIApp.class.getName());
     private ImageView imageView;
+    /**
+     * Image Not found attribution:
+     * <a href="https://www.flaticon.com/free-icons/page-not-found" title="page-not-found icons">Page-not-found icons created by Pixel perfect - Flaticon</a>
+     */
+    private final Image imageNotFound = new Image(getClass().getResource("not-found.png").toExternalForm());
     private Image image;
 
     public CanvasImage(Image image, CanvasPoint center, boolean isOnCanvas, String imagePath, boolean isImageSymbol) {
@@ -23,9 +32,15 @@ public class CanvasImage extends CanvasObject {
         this.setData(image, imagePath, isOnCanvas, 100, 100, isImageSymbol);
     }
 
-    public CanvasImage(CanvasObjectData canvasObjectData) throws FileNotFoundException {
+    public CanvasImage(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
-        this.image = new Image(new FileInputStream(canvasObjectData.getData()));
+
+        try {
+            this.image = new Image(new FileInputStream(canvasObjectData.getData()));
+        } catch (FileNotFoundException e) {
+            this.image = imageNotFound;
+        }
+
         this.setData(this.image, this.getCanvasObjectData().getData(), true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().isImageSymbol());
         this.modifyImageViewSizeRotation(this.getCanvasObjectData().isMirroringHorizontal(),this.getCanvasObjectData().isMirroringVertical(),this.getCanvasObjectData().getRotation());
         if(this.getCanvasObjectData().isModifyingImage()){
@@ -69,7 +84,11 @@ public class CanvasImage extends CanvasObject {
     }
 
     private void setData(Image image, String imagePath, boolean isOnCanvas, double width, double height, boolean isImageSymbol) {
-        this.image = image;
+        if(imagePath != null) {
+            this.image = image;
+        }else{
+            this.image = imageNotFound;
+        }
         this.imageView = new ImageView(this.image);
         this.imageView.setFitWidth(width);
         this.imageView.setFitHeight(height);

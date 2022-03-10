@@ -51,6 +51,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("type")
     @Expose
     private String type;
+    @SerializedName("dataType")
+    @Expose
+    private String dataType;
     @SerializedName("tag")
     @Expose
     private Tag tag;
@@ -375,6 +378,15 @@ public class CanvasObjectData implements Serializable, Transferable {
     public void setShowingLabelsTicks(boolean showingLabelsTicks) {
         this.showingLabelsTicks = showingLabelsTicks;
     }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
+
 
     @Override
     public String toString() {

@@ -7,6 +7,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.util.Duration;
 import org.codehaus.commons.compiler.CompileException;
@@ -54,6 +55,7 @@ public class CanvasText extends CanvasLabel {
 
     private void setData(){
         this.setContextMenu();
+        this.setExpression(this.getCanvasObjectData().getExpression());
         MenuItem editMI = new MenuItem("Editar");
         editMI.setId("#editMI");
         editMI.setOnAction(actionEvent -> this.setExpression());
@@ -112,11 +114,10 @@ public class CanvasText extends CanvasLabel {
                                     default:
                                         break;
                                 }
-                            }catch(CompileException | InvocationTargetException e) {
-                                e.printStackTrace();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
+                                this.setTop(null);
+                            }catch(CompileException | InvocationTargetException | NullPointerException | SQLException | IOException e) {
+                                this.errorLabel = new Label("Error en Tag de Lectura");
+                                this.setTop(this.errorLabel);
                                 e.printStackTrace();
                             }
                             this.text = evaluatedValue;

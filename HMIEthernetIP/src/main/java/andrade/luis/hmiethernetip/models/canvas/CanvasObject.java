@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -37,6 +38,7 @@ public class CanvasObject extends BorderPane {
     Logger logger = Logger.getLogger(this.getClass().getName());
     private Timeline visibilityTimeline;
 
+    protected Label errorLabel = new Label();
     public CanvasObject() {
 
     }
@@ -384,6 +386,10 @@ public class CanvasObject extends BorderPane {
         this.canvasObjectData = canvasObjectData;
 
         this.setCenter(this.canvasObjectData.getCenter());
+        if(this.getCanvasObjectData().getVisibilityExpression() != null){
+            this.setVisibilityAnimation(this.canvasObjectData.getVisibilityExpression());
+            this.visibilityTimeline.play();
+        }
 
         setContextMenu();
     }
@@ -469,7 +475,7 @@ public class CanvasObject extends BorderPane {
         logger.log(Level.INFO,setVisibilityAnimationWindow.getLocalExpression().getExpressionToEvaluate());
         Expression expression = setVisibilityAnimationWindow.getLocalExpression();
         if (expression != null) {
-            expression.evaluate();
+            //expression.evaluate();
             this.setVisibilityAnimation(expression);
             this.visibilityTimeline.play();
         }
@@ -485,7 +491,10 @@ public class CanvasObject extends BorderPane {
                                 try {
                                     boolean evaluatedValue = (boolean) this.getCanvasObjectData().getVisibilityExpression().evaluate();
                                     this.setVisible(evaluatedValue == this.getCanvasObjectData().isVisible());
-                                } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
+                                    this.setTop(null);
+                                } catch (CompileException | InvocationTargetException | SQLException | IOException | NullPointerException e) {
+                                    this.errorLabel = new Label("Error de Tag de Animación");
+                                    this.setTop(errorLabel);
                                     e.printStackTrace();
                                 }
                             }), new KeyFrame(Duration.seconds(1)));

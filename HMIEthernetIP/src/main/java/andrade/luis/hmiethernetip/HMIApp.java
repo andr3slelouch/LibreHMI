@@ -334,7 +334,7 @@ public class HMIApp extends Application {
      * @param sceneTitle Título de la página a seleccionarse
      */
     public void changeSelectedScene(String sceneTitle) {
-        int index = findSceneIndex(sceneTitle);
+        int index = getIndexForScene(sceneTitle);
         mainStage.setScene(pages.get(index));
         mainStage.setTitle(HMI_TITLE + pages.get(index).getTitle());
         pages.get(index).getListViewReference().getSelectionModel().select(index);
@@ -351,7 +351,7 @@ public class HMIApp extends Application {
     }
 
     public void duplicateScene(String sceneTitle) {
-        int index = findSceneIndex(sceneTitle);
+        int index = getIndexForScene(sceneTitle);
         try {
             HMIScene duplicateScene = pages.get(index).clone();
             if (duplicateScene != null) {
@@ -377,7 +377,7 @@ public class HMIApp extends Application {
      * @param sceneTitle Título de la Escena a eliminarse.
      */
     public void deleteScene(String sceneTitle) {
-        int index = findSceneIndex(sceneTitle);
+        int index = getIndexForScene(sceneTitle);
         if (confirmDelete(sceneTitle)) {
             pages.remove(index);
             pagesTitles.remove(index);
@@ -391,7 +391,7 @@ public class HMIApp extends Application {
      * @param sceneTitle Título de la escena a actualizar atributos.
      */
     public void updateScene(String sceneTitle) {
-        int index = findSceneIndex(sceneTitle);
+        int index = getIndexForScene(sceneTitle);
         HMIScene scene = (index != -1 && index < pages.size()) ? pages.get(index) : null;
 
         if (scene != null) {
@@ -440,7 +440,7 @@ public class HMIApp extends Application {
      * @param sceneTitle Título de la escena buscada
      * @return El indice de la escena en el arrayList
      */
-    private int findSceneIndex(String sceneTitle) {
+    public int getIndexForScene(String sceneTitle) {
         for (int i = 0; i < pages.size(); i++) {
             if (pages.get(i).getTitle().equals(sceneTitle)) {
                 return i;

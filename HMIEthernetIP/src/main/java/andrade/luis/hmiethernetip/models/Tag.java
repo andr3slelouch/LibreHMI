@@ -9,11 +9,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Tag implements Serializable {
     private static final Map<String, String> selectQueries = Map.of("Entero", "select valor from entero where nombreTag=", "Flotante", "select valor from flotante where nombreTag=", "Bool", "select valor from boolean where nombreTag=");
     private static final Map<String, String> updateQueries = Map.of("Entero", "update entero SET valor=? where nombreTag=", "Flotante", "update flotante SET valor=? where nombreTag=", "Bool", "update boolean SET valor=? where nombreTag=");
-
     public Tag() {
 
     }
@@ -100,7 +101,7 @@ public class Tag implements Serializable {
         }
         con.close();
 
-        return "";
+        return null;
     }
 
     public boolean updateInDatabase() throws SQLException, IOException {
@@ -122,6 +123,8 @@ public class Tag implements Serializable {
             }
             preparedStatement.setString(1, updateValue);
             int insertRowResult = preparedStatement.executeUpdate();
+            Logger logger = Logger.getLogger(this.getClass().getName());
+            logger.log(Level.INFO, String.valueOf(insertRowResult));
             con.close();
             return insertRowResult > 0;
         }else{

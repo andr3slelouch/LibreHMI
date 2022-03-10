@@ -36,13 +36,16 @@ public class SelectWindowsWindow extends Stage {
             height= height + 50;
         }
 
-        for(SceneItem item : items) {
-            for(String selectedScene : selectedItems) {
-                if(selectedScene.equals(item.getScene())){
-                    item.setSelected(true);
+        if(selectedItems!=null){
+            for(SceneItem item : items) {
+                for(String selectedScene : selectedItems) {
+                    if(selectedScene.equals(item.getScene())){
+                        item.setSelected(true);
+                    }
                 }
             }
         }
+
         
         setSelectedItems();
 

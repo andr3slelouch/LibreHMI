@@ -5,10 +5,13 @@ import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
+import andrade.luis.hmiethernetip.views.SetTextFieldPropertiesWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.Duration;
@@ -17,8 +20,9 @@ import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.UnaryOperator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasTextField extends CanvasObject {
@@ -73,24 +77,27 @@ public class CanvasTextField extends CanvasObject {
     public CanvasTextField(CanvasPoint center, Tag linkedTag, double minValue, double maxValue, String type) {
         super(center);
         this.getCanvasObjectData().setType("TextField");
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150, linkedTag, minValue, maxValue);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150, linkedTag, minValue, maxValue,type);
+        setNewMenuItem();
     }
 
     public CanvasTextField(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("TextField");
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue());
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue(),this.getCanvasObjectData().getType());
+        setNewMenuItem();
     }
 
-    private void setData(double x, double y, double width, double height, Tag linkedTag, double minValue, double maxValue) {
+    private void setData(double x, double y, double width, double height, Tag linkedTag, double minValue, double maxValue, String type) {
         this.linkedTag = linkedTag;
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.type = this.linkedTag.getType();
+        this.type = type;
         this.textField = new TextField();
         this.getCanvasObjectData().setTag(linkedTag);
         this.getCanvasObjectData().setMinValue(minValue);
         this.getCanvasObjectData().setMaxValue(maxValue);
+        this.getCanvasObjectData().setDataType(type);
         this.textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.isEmpty() && (this.type.equals("Entero") || this.type.equals("Flotante"))) {
                 double value = Double.parseDouble(newValue);
@@ -98,7 +105,6 @@ public class CanvasTextField extends CanvasObject {
                     this.textField.setText(oldValue);
                     this.getCanvasObjectData().setData(oldValue);
                 } else {
-                    logger.log(Level.INFO,this.type);
                     this.getCanvasObjectData().setData(newValue);
                 }
             }else{
@@ -108,10 +114,17 @@ public class CanvasTextField extends CanvasObject {
                 linkedTag.setValue(this.getCanvasObjectData().getData());
                 try {
                     timeline.pause();
-                    linkedTag.updateInDatabase();
+                    if (!linkedTag.updateInDatabase()) {
+                        this.errorLabel = new Label("Error en Tag de Escritura");
+                        this.setTop(errorLabel);
+                    } else {
+                        this.setTop(null);
+                    }
                     timeline.play();
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();
+                    this.errorLabel = new Label("Error en Tag de Escritura");
+                    this.setTop(errorLabel);
                 }
             }
 
@@ -144,6 +157,23 @@ public class CanvasTextField extends CanvasObject {
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
         this.setCenter(this.textField);
+    }
+    public void setNewMenuItem() {
+        MenuItem attachShowHideWindowsActionMI = new MenuItem("Editar");
+        attachShowHideWindowsActionMI.setId("#editMI");
+        attachShowHideWindowsActionMI.setOnAction(actionEvent -> buttonAction());
+        this.getRightClickMenu().getItems().add(attachShowHideWindowsActionMI);
+    }
+
+    private void buttonAction() {
+        SetTextFieldPropertiesWindow setTextFieldPropertiesWindow = new SetTextFieldPropertiesWindow();
+        setTextFieldPropertiesWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
+        setTextFieldPropertiesWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
+        setTextFieldPropertiesWindow.setSelectedRadioButton(this.getCanvasObjectData().getType());
+        setTextFieldPropertiesWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
+        setTextFieldPropertiesWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
+        setTextFieldPropertiesWindow.showAndWait();
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
     }
 
     @Override

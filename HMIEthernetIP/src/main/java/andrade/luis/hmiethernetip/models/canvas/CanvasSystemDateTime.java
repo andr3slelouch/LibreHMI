@@ -9,20 +9,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javafx.animation.Animation;
 
-public class CanvasSystemDateTimeLabel extends CanvasLabel {
+public class CanvasSystemDateTime extends CanvasLabel {
     public Timeline getTimeline() {
         return timeline;
     }
 
     private Timeline timeline;
-    public CanvasSystemDateTimeLabel(CanvasObjectData canvasObjectData) {
+    public CanvasSystemDateTime(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
-        this.getCanvasObjectData().setType("SystemDateTimeLabel");
+        this.getCanvasObjectData().setType("SystemDateTime");
     }
 
-    public CanvasSystemDateTimeLabel(String content, CanvasPoint center) {
+    public CanvasSystemDateTime(String content, CanvasPoint center) {
         super(content, center);
-        this.getCanvasObjectData().setType("SystemDateTimeLabel");
+        this.getCanvasObjectData().setType("SystemDateTime");
     }
 
     public void setTimeline() {

@@ -244,7 +244,7 @@ public class Expression implements Serializable {
 
     }
 
-    public Object evaluate() throws CompileException, InvocationTargetException, SQLException, IOException {
+    public Object evaluate() throws CompileException, InvocationTargetException, SQLException, IOException, NullPointerException{
         ExpressionEvaluator ee = prepareExpression();
         Object[] valuesToEvaluate = new Object[parameterNames.length];
         for (int i = 0; i < parameters.size(); i++) {

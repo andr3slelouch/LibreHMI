@@ -350,16 +350,16 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     public void addSystemDateTimeLabelOnCanvasClicked(CanvasPoint current) {
-        CanvasSystemDateTimeLabel canvasSystemDateTimeLabel = new CanvasSystemDateTimeLabel("yyyy/MM/dd HH:mm:ss", current);
-        canvasSystemDateTimeLabel.setCanvas(this);
+        CanvasSystemDateTime canvasSystemDateTime = new CanvasSystemDateTime("yyyy/MM/dd HH:mm:ss", current);
+        canvasSystemDateTime.setCanvas(this);
         if (this.getShapeArrayList().isEmpty()) {
-            canvasSystemDateTimeLabel.setId(FIGURE_ID + "0");
+            canvasSystemDateTime.setId(FIGURE_ID + "0");
         } else {
-            canvasSystemDateTimeLabel.setId(FIGURE_ID + this.getShapeArrayList().size());
+            canvasSystemDateTime.setId(FIGURE_ID + this.getShapeArrayList().size());
         }
-        this.addNewShape(canvasSystemDateTimeLabel);
-        this.getChildren().add(canvasSystemDateTimeLabel);
-        canvasSystemDateTimeLabel.setTimeline();
+        this.addNewShape(canvasSystemDateTime);
+        this.getChildren().add(canvasSystemDateTime);
+        canvasSystemDateTime.setTimeline();
     }
 
     public void addTextOnCanvasClicked(CanvasPoint current) {
@@ -543,6 +543,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private void addPastedButtonOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasButton canvasButton = new CanvasButton(canvasObjectData);
         canvasButton.setHmiApp(hmiApp);
+        canvasButton.setSelectedPages(canvasObjectData.getSelectedPages());
         canvasButton.setCanvas(this);
         canvasButton.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
         canvasButton.setUser(hmiApp.getUser());
@@ -558,7 +559,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasText.setId(generateIdForPasteOperation(canvasObjectData));
         this.addNewShape(canvasText);
         this.getChildren().add(canvasText);
-        canvasText.setExpression(canvasObjectData.getExpression());
     }
 
     public void addPastedRectangle(CanvasObjectData canvasObjectData) {
@@ -572,13 +572,13 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     public void addPastedSystemDateTimeLabel(CanvasObjectData canvasObjectData) {
-        CanvasSystemDateTimeLabel canvasSystemDateTimeLabel = new CanvasSystemDateTimeLabel(canvasObjectData);
-        canvasSystemDateTimeLabel.setCanvas(this);
-        canvasSystemDateTimeLabel.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
-        canvasSystemDateTimeLabel.setId(generateIdForPasteOperation(canvasObjectData));
-        this.addNewShape(canvasSystemDateTimeLabel);
-        this.getChildren().add(canvasSystemDateTimeLabel);
-        canvasSystemDateTimeLabel.setTimeline();
+        CanvasSystemDateTime canvasSystemDateTime = new CanvasSystemDateTime(canvasObjectData);
+        canvasSystemDateTime.setCanvas(this);
+        canvasSystemDateTime.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+        canvasSystemDateTime.setId(generateIdForPasteOperation(canvasObjectData));
+        this.addNewShape(canvasSystemDateTime);
+        this.getChildren().add(canvasSystemDateTime);
+        canvasSystemDateTime.setTimeline();
     }
 
     public String generateIdForPasteOperation(CanvasObjectData canvasObjectData) {

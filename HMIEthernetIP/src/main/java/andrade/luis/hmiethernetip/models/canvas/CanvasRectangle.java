@@ -242,7 +242,10 @@ public class CanvasRectangle extends CanvasObject {
                                 double value = calculatePercentFillValue(evaluatedValue);
                                 captionLabel.setText(String.valueOf(evaluatedValue));
                                 life.set(value);
-                            } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
+                                this.setTop(null);
+                            } catch (CompileException | InvocationTargetException | SQLException | IOException | NullPointerException e) {
+                                this.errorLabel = new Label("Error en Tag de Relleno");
+                                this.setTop(this.errorLabel);
                                 e.printStackTrace();
                             }
                         }), new KeyFrame(Duration.seconds(1)));

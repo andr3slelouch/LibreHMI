@@ -7,11 +7,15 @@ import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SelectWindowsWindow;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CanvasButton extends CanvasObject {
+    Logger logger = Logger.getLogger(this.getClass().getName());
     protected Button button;
 
     public HMIUser getUser() {
@@ -41,8 +45,8 @@ public class CanvasButton extends CanvasObject {
 
     public CanvasButton(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
+        logger.log(Level.INFO,canvasObjectData.getType());
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
-        this.setSelectedPages(this.getCanvasObjectData().getSelectedPages());
     }
 
     public void setData(double x, double y, double width, double height) {
@@ -73,8 +77,20 @@ public class CanvasButton extends CanvasObject {
     }
 
     public void setSelectedPages(ArrayList<String> selectedPages) {
-        this.getCanvasObjectData().setSelectedPages(selectedPages);
-        this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(this.getCanvasObjectData().getSelectedPages()));
+        if(selectedPages != null){
+            this.getCanvasObjectData().setSelectedPages(selectedPages);
+            boolean pagesReadyState = true;
+            for (String selectedPage : selectedPages) {
+                pagesReadyState = pagesReadyState && (this.hmiApp.getIndexForScene(selectedPage) != -1);
+            }
+            if(pagesReadyState){
+                this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(this.getCanvasObjectData().getSelectedPages()));
+                this.setTop(null);
+            }else{
+                this.errorLabel = new Label("Error en páginas asociadas");
+                this.setTop(errorLabel);
+            }
+        }
     }
 
     @Override

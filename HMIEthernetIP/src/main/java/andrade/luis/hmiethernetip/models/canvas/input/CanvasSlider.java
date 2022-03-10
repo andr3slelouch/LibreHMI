@@ -10,6 +10,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.util.Duration;
@@ -51,11 +52,6 @@ public class CanvasSlider extends CanvasObject {
         this.slider = new Slider();
         slider.setMin(minValue);
         slider.setMax(maxValue);
-        if (linkedTag != null) {
-            linkedTag.readFromDatabase();
-            slider.setValue(Double.parseDouble(linkedTag.getValue()));
-            this.setTimeline();
-        }
         slider.setShowTickLabels(showLabelsTicks);
         slider.setShowTickMarks(showTicks);
         slider.setMajorTickUnit(majorTickValue);
@@ -88,17 +84,29 @@ public class CanvasSlider extends CanvasObject {
                 linkedTag.setValue(this.getCanvasObjectData().getData());
                 try {
                     timeline.pause();
-                    linkedTag.updateInDatabase();
+                    if (!linkedTag.updateInDatabase()) {
+                        this.errorLabel = new Label("Error en Tag de Escritura");
+                        this.setTop(errorLabel);
+                    } else {
+                        this.setTop(null);
+                    }
                     timeline.play();
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();
+                    this.errorLabel = new Label("Error en Tag de Escritura");
+                    this.setTop(errorLabel);
                 }
             }
         });
+        if (linkedTag != null) {
+            linkedTag.readFromDatabase();
+            slider.setValue(Double.parseDouble(linkedTag.getValue()));
+            this.setTimeline();
+        }
         setNewMenuItem();
     }
 
-    public void setNewMenuItem(){
+    public void setNewMenuItem() {
         MenuItem attachShowHideWindowsActionMI = new MenuItem("Editar");
         attachShowHideWindowsActionMI.setId("#editMI");
         attachShowHideWindowsActionMI.setOnAction(actionEvent -> {
@@ -112,18 +120,27 @@ public class CanvasSlider extends CanvasObject {
     }
 
     private void buttonAction() throws SQLException, IOException {
-        SetSliderOptionsWindow sliderOptionsWindow = new SetSliderOptionsWindow();
-        sliderOptionsWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
-        sliderOptionsWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
-        sliderOptionsWindow.getMinorTickField().setText(String.valueOf(this.getCanvasObjectData().getMinorTickValue()));
-        sliderOptionsWindow.getMajorTickField().setText(String.valueOf(this.getCanvasObjectData().getMajorTickValue()));
-        sliderOptionsWindow.getSnapHandleToTick().setSelected(this.getCanvasObjectData().isSnapHandleToTick());
-        sliderOptionsWindow.getShowTicks().setSelected(this.getCanvasObjectData().isShowingTicks());
-        sliderOptionsWindow.getShowLabelsTicks().setSelected(this.getCanvasObjectData().isShowingLabelsTicks());
-        sliderOptionsWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
-        sliderOptionsWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
-        sliderOptionsWindow.showAndWait();
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(),this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),this.getCanvasObjectData().getTag(),this.getCanvasObjectData().getMinValue(),this.getCanvasObjectData().getMaxValue(),this.getCanvasObjectData().getMinorTickValue(),this.getCanvasObjectData().getMajorTickValue(),this.getCanvasObjectData().isSnapHandleToTick(),this.getCanvasObjectData().isShowingTicks(),this.getCanvasObjectData().isShowingLabelsTicks());
+        SetSliderOptionsWindow setSliderOptionsWindow = new SetSliderOptionsWindow();
+        setSliderOptionsWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
+        setSliderOptionsWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
+        setSliderOptionsWindow.getMinorTickField().setText(String.valueOf(this.getCanvasObjectData().getMinorTickValue()));
+        setSliderOptionsWindow.getMajorTickField().setText(String.valueOf(this.getCanvasObjectData().getMajorTickValue()));
+        setSliderOptionsWindow.getSnapHandleToTick().setSelected(this.getCanvasObjectData().isSnapHandleToTick());
+        setSliderOptionsWindow.getShowTicks().setSelected(this.getCanvasObjectData().isShowingTicks());
+        setSliderOptionsWindow.getShowLabelsTicks().setSelected(this.getCanvasObjectData().isShowingLabelsTicks());
+        setSliderOptionsWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
+        setSliderOptionsWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
+        setSliderOptionsWindow.showAndWait();
+
+        double minValue = Double.parseDouble(setSliderOptionsWindow.getMinValueField().getText());
+        double maxValue = Double.parseDouble(setSliderOptionsWindow.getMaxValueField().getText());
+        double minorTickValue = Double.parseDouble(setSliderOptionsWindow.getMinorTickField().getText());
+        double majorTickValue = Double.parseDouble(setSliderOptionsWindow.getMajorTickField().getText());
+        boolean snapHandleToTick = setSliderOptionsWindow.getSnapHandleToTick().isSelected();
+        boolean showTicks = setSliderOptionsWindow.getShowTicks().isSelected();
+        boolean showLabelsTicks = setSliderOptionsWindow.getShowLabelsTicks().isSelected();
+
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(),this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),setSliderOptionsWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks);
     }
 
     @Override
@@ -155,7 +172,7 @@ public class CanvasSlider extends CanvasObject {
                             double evaluatedValue = 0;
                             try {
                                 String value = this.getCanvasObjectData().getTag().readFromDatabase();
-                                if(value != null){
+                                if (value != null) {
                                     evaluatedValue = Double.parseDouble(value);
                                 }
                             } catch (IOException | SQLException e) {
