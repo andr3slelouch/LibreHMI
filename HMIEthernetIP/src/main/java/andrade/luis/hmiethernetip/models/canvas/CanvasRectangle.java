@@ -43,6 +43,7 @@ public class CanvasRectangle extends CanvasObject {
 
     public CanvasRectangle(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
+        logger.log(Level.INFO,canvasObjectData.getPosition().toString());
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), canvasObjectData.getWidth(), canvasObjectData.getHeight());
     }
 
@@ -58,6 +59,9 @@ public class CanvasRectangle extends CanvasObject {
     @Override
     public void setCenter(CanvasPoint center) {
         super.setCenter(center);
+        this.getCanvasObjectData().setPosition(this.getCanvasObjectData().getCenter());
+        //setPosition(this.getCanvasObjectData().getCenter(), true);
+        logger.log(Level.INFO,this.getCanvasObjectData().getPosition().toString());
         setData(this.getPosition().getX(), this.getPosition().getY(), 150, 150);
         super.setCenter(this.rectangle);
     }
@@ -117,6 +121,7 @@ public class CanvasRectangle extends CanvasObject {
                         writeExpressionWindow.getBackgroundColor(),
                         writeExpressionWindow.getSelectedOrientation()
                 );
+                this.getHmiApp().setWasModified(true);
                 this.getCanvasObjectData().setMinValue(writeExpressionWindow.getMinValue());
                 this.getCanvasObjectData().setMaxValue(writeExpressionWindow.getMaxValue());
             }

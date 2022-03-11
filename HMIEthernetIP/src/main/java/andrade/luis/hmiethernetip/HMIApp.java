@@ -11,6 +11,8 @@ import andrade.luis.hmiethernetip.views.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -37,30 +39,49 @@ public class HMIApp extends Application {
             = Logger.getLogger(
             HMIApp.class.getName());
 
-    public ArrayList<HMIScene> getPages() {
-        return pages;
-    }
-
     private final ArrayList<HMIScene> pages = new ArrayList<>();
     private ArrayList<Stage> createdWindows = new ArrayList<>();
+    private String currentProjectFilePath = null;
+    private boolean wasModified = false;
+    private BooleanProperty updateTitleFlag = new SimpleBooleanProperty(false);
+    private HMIAppData hmiAppData = new HMIAppData();
+
+    public String getCurrentProjectFilePath() {
+        return currentProjectFilePath;
+    }
+
+    public void setCurrentProjectFilePath(String currentProjectFilePath) {
+        this.currentProjectFilePath = currentProjectFilePath;
+    }
+
+    public boolean isWasModified() {
+        return wasModified;
+    }
+
+    public void setWasModified(boolean wasModified) {
+        this.wasModified = wasModified;
+        this.updateTitleFlag.setValue(this.wasModified);
+    }
 
     public HMIAppData getHmiAppData() {
         return hmiAppData;
+    }
+
+    public ArrayList<HMIScene> getPages() {
+        return pages;
     }
 
     public void setHmiAppData(HMIAppData hmiAppData) {
         this.hmiAppData = hmiAppData;
         this.pages.clear();
         this.pagesTitles.clear();
-        for(int i = 0; i < this.hmiAppData.getHmiAppPages().size(); i++){
+        for (int i = 0; i < this.hmiAppData.getHmiAppPages().size(); i++) {
             HMISceneData hmiSceneData = this.hmiAppData.getHmiAppPages().get(i);
-            HMIScene hmiScene = generatePage(hmiSceneData.getTitle(),hmiSceneData.getSceneCommentary(),hmiSceneData.getBackground().getColor());
+            HMIScene hmiScene = generatePage(hmiSceneData.getTitle(), hmiSceneData.getSceneCommentary(), hmiSceneData.getBackground().getColor());
             addScene(hmiScene);
             hmiScene.setHmiSceneData(hmiSceneData);
         }
     }
-
-    private HMIAppData hmiAppData = new HMIAppData();
 
     public ArrayList<String> getPagesTitles() {
         return pagesTitles;
@@ -78,18 +99,39 @@ public class HMIApp extends Application {
     public void start(Stage stage) {
 
         mainStage = stage;
+        mainStage.setOnCloseRequest(windowEvent -> {
+            logger.log(Level.INFO,"Closing...");
+            if(wasModified){
+                if(showAlert(Alert.AlertType.CONFIRMATION,"El proyecto actual no ha sido guardado","Salir?",false, true)){
+                    logger.log(Level.INFO,"CANCELED");
+                }else{
+                    windowEvent.consume();
+                }
+            }else{
+                logger.log(Level.INFO,"CLOSED...");
+            }
+        });
         generateDatabase();
         HMIScene scene = generatePage("Página 1", "", Color.WHITESMOKE);
         addScene(scene);
         mainStage.setTitle(HMI_TITLE + scene.getTitle());
         mainStage.setScene(scene);
         mainStage.show();
+
+        updateTitleFlag.addListener((observableValue, oldBoolean, newBoolean) -> {
+            if(Boolean.TRUE.equals(newBoolean)){
+                mainStage.setTitle(mainStage.getTitle()+"*");
+            }else if(Boolean.FALSE.equals(newBoolean) && mainStage.getTitle().endsWith("*")){
+                mainStage.setTitle(mainStage.getTitle().substring(0,mainStage.getTitle().length()-1));
+            }
+        });
     }
 
     /**
      * Este método permite la generación de páginas que contienen los botones y donde se pueden agregar objetos a partir
      * de dichos botones, cuando se crea una nueva página se utiliza este método y se guarda en un ArrayList.
-     * @param sceneTitle Título de la página, mostrado en el título de la ventana.
+     *
+     * @param sceneTitle      Título de la página, mostrado en el título de la ventana.
      * @param sceneCommentary Comentario de la página puede ser utilizada como una pequeña documentación.
      * @param backgroundColor Color de fondo de la página
      * @return La página(del Tipo HMIScene, heredera de una Scene de JavaFx)
@@ -144,11 +186,12 @@ public class HMIApp extends Application {
         Button stopBtn = new Button("Stop");
         Button defaultBtn = new Button("Default");
         Button saveBtn = new Button("Guardar");
+        Button saveAsBtn = new Button("Guardar Como");
         Button loadBtn = new Button("Cargar");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(saveBtn,loadBtn);
-        HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn ,symbolBtn, pushbuttonBtn);
+        HBox thirdHBox = new HBox(saveBtn,saveAsBtn ,loadBtn);
+        HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn, symbolBtn, pushbuttonBtn);
         HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
@@ -156,7 +199,8 @@ public class HMIApp extends Application {
         scene.setListViewReference(listViewReference);
         scene.setItems(itemsForComboBox);
 
-        VBox vbox = new VBox(hbox, secondHBox, thirdHBox, fourthHBox,fifthHBox, scene.getListViewReference());
+        VBox vbox = new VBox(hbox, secondHBox, thirdHBox, fourthHBox, fifthHBox, scene.getListViewReference());
+        vbox.setSpacing(10);
         root.getChildren().add(vbox);
 
         manageUsersBtn.setOnMouseClicked(mouseEvent -> {
@@ -193,8 +237,17 @@ public class HMIApp extends Application {
         defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
         saveBtn.setOnAction(mouseEvent -> {
             try {
-                this.saveHMIData();
+                this.saveHMIDataProcess();
             } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR,"Error al Guardar","Error:"+e.getMessage(),false,false);
+                e.printStackTrace();
+            }
+        });
+        saveAsBtn.setOnAction(mouseEvent -> {
+            try {
+                this.saveAsHMIData();
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR,"Error al Guardar Como","Error:"+e.getMessage(),false,false);
                 e.printStackTrace();
             }
         });
@@ -202,6 +255,7 @@ public class HMIApp extends Application {
             try {
                 loadHMIData();
             } catch (FileNotFoundException e) {
+                showAlert(Alert.AlertType.ERROR,"Error al Cargar Proyecto","Error:"+e.getMessage(),false,false);
                 e.printStackTrace();
             }
         });
@@ -209,6 +263,14 @@ public class HMIApp extends Application {
         scene.setHmiApp(this);
 
         return scene;
+    }
+
+    private void saveHMIDataProcess() throws IOException {
+        if(currentProjectFilePath!=null){
+            this.saveHMIData(currentProjectFilePath);
+        }else{
+            this.saveAsHMIData();
+        }
     }
 
     private void loadHMIData() throws FileNotFoundException {
@@ -222,7 +284,7 @@ public class HMIApp extends Application {
                 new File(System.getProperty("user.home"))
         );
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("JSON", "*.json","*.JSON"),
+                new FileChooser.ExtensionFilter("JSON", "*.json", "*.JSON"),
                 new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
         );
         File file = fileChooser.showOpenDialog(null);
@@ -230,22 +292,39 @@ public class HMIApp extends Application {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
 
         HMIAppData localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
-        logger.log(Level.INFO, String.valueOf(localHmiAppData.getHmiAppPages().size()));
-        this.setHmiAppData(localHmiAppData);
+        if(localHmiAppData != null){
+            this.setHmiAppData(localHmiAppData);
+            this.currentProjectFilePath = file.getAbsolutePath();
+            this.setWasModified(false);
+        }
+    }
+
+    private void saveAsHMIData() throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON", "*.json", "*.JSON")
+        );
+        fileChooser.setTitle("Guardar Proyecto");
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.home"))
+        );
+
+        File file = fileChooser.showSaveDialog(null);
+        if(file!=null){
+            saveHMIData(file.getAbsolutePath());
+        }
     }
 
     /**
      * Este método inicia el proceso para guardar el proyecto dentro de un archivo json.
+     *
      * @throws IOException Si hay algun problema en la lectura o escritura.
      */
-    private void saveHMIData() throws IOException {
-        CreateNewFileWindow createNewFileWindow = new CreateNewFileWindow();
-        createNewFileWindow.showAndWait();
-        String filename = createNewFileWindow.getFilename() + File.separator +createNewFileWindow.getFilenameTextField().getText();
+    private void saveHMIData(String filenamePath) throws IOException {
         ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
-        for(HMIScene hmiScene: pages){
+        for (HMIScene hmiScene : pages) {
             ArrayList<CanvasObjectData> shapeArrayList = new ArrayList<>();
-            for(CanvasObject canvasObject : hmiScene.getCanvas().getShapeArrayList()){
+            for (CanvasObject canvasObject : hmiScene.getCanvas().getCurrentCanvasObjects()) {
                 shapeArrayList.add(canvasObject.getCanvasObjectData());
             }
             hmiScene.getHmiSceneData().setShapeArrayList(shapeArrayList);
@@ -253,15 +332,19 @@ public class HMIApp extends Application {
         }
         this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
         Gson gson = new Gson();
-        logger.log(Level.INFO, filename);
-        Writer writer = Files.newBufferedWriter(Path.of(filename));
-        gson.toJson(this.hmiAppData, writer);
-        writer.close();
+        if(filenamePath != null){
+            Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
+            gson.toJson(this.hmiAppData, writer);
+            writer.close();
+            this.currentProjectFilePath = filenamePath;
+            this.setWasModified(false);
+        }
     }
 
     /**
      * Este método permite cambiar de estados a los objetos de entrada de datos,
      * como un Button, Pushbutton, TextField, o Slider
+     *
      * @param value Valor del estado, puede ser "Play","Stop","Default"
      */
     public void enableInputRepresentations(String value) {
@@ -276,6 +359,7 @@ public class HMIApp extends Application {
      * Este método permite la creación de ventanas para las Escenas si son mayores que uno,
      * si es solo uno solamente cambia la Escena de la Ventana mostrada a la seleccionada
      * Además de crear ventanas(Stage) adicionales también las muestra
+     *
      * @param selectedPages ArrayList de los títulos de las Páginas Seleccionadas
      */
     public void generateStagesForPages(ArrayList<String> selectedPages) {
@@ -291,9 +375,9 @@ public class HMIApp extends Application {
                         generateStage(pages.get(index));
                     }
                 } else {
-                    if(createdWindows.get(index).isShowing()){
+                    if (createdWindows.get(index).isShowing()) {
                         createdWindows.get(index).requestFocus();
-                    }else{
+                    } else {
                         createdWindows.get(index).show();
                     }
                 }
@@ -303,9 +387,10 @@ public class HMIApp extends Application {
 
     /**
      * Este método permite la creación de una nueva ventana a partir de una HMIScene previamente existente.
+     *
      * @param scene La página creada del tipo HMIScene
      */
-    private void generateStage(HMIScene scene){
+    private void generateStage(HMIScene scene) {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle(HMI_TITLE + scene.getTitle());
@@ -315,6 +400,7 @@ public class HMIApp extends Application {
 
     /**
      * Buscar el índice de una determinada Ventana basada en su título.
+     *
      * @param title Título de la página
      * @return El índice de la página en el ArrayList
      */
@@ -331,17 +417,20 @@ public class HMIApp extends Application {
     /**
      * Si se solicita el cambio de una sola página esta no generará una ventana nueva sino que cambiará la escena actual
      * de la aplicación a la seleccionada basada en su título
+     *
      * @param sceneTitle Título de la página a seleccionarse
      */
     public void changeSelectedScene(String sceneTitle) {
         int index = getIndexForScene(sceneTitle);
         mainStage.setScene(pages.get(index));
-        mainStage.setTitle(HMI_TITLE + pages.get(index).getTitle());
+        String compliment = wasModified ? "*" : "";
+        mainStage.setTitle(HMI_TITLE + pages.get(index).getTitle()+compliment);
         pages.get(index).getListViewReference().getSelectionModel().select(index);
     }
 
     /**
      * Cuando se crea una nueva página todas las demás requieren actualizar la lista de páginas disponibles.
+     *
      * @param itemsForComboBox ArrayList que contiene todos los títulos de las páginas.
      */
     private void updateScenesInListView(ArrayList<String> itemsForComboBox) {
@@ -374,6 +463,7 @@ public class HMIApp extends Application {
     /**
      * Elimina la página seleccionada basada en el título, la elimina del arraylist de páginas y de los títulos de
      * páginas disponibles en las páginas restantes.
+     *
      * @param sceneTitle Título de la Escena a eliminarse.
      */
     public void deleteScene(String sceneTitle) {
@@ -388,6 +478,7 @@ public class HMIApp extends Application {
 
     /**
      * Actualiza las propiedades de una escena seleccionada basada en su título
+     *
      * @param sceneTitle Título de la escena a actualizar atributos.
      */
     public void updateScene(String sceneTitle) {
@@ -398,7 +489,7 @@ public class HMIApp extends Application {
             SetWindowPropertiesWindow setWindowPropertiesWindow = new SetWindowPropertiesWindow(scene.getTitle(), scene.getSceneCommentary(), scene.getBackground());
             setWindowPropertiesWindow.setPagesTitles(pagesTitles);
             setWindowPropertiesWindow.showAndWait();
-            if(!setWindowPropertiesWindow.isCancelled()){
+            if (!setWindowPropertiesWindow.isCancelled()) {
                 scene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
                 pages.set(index, scene);
                 for (HMIScene page : pages) {
@@ -424,6 +515,7 @@ public class HMIApp extends Application {
 
     /**
      * Este método añade una nueva página creada previamente por el proceso addNewScene.
+     *
      * @param newScene HMIScene creada a través del proceso addNewScene
      */
     private void addScene(HMIScene newScene) {
@@ -437,6 +529,7 @@ public class HMIApp extends Application {
 
     /**
      * Busca el índice de la Escena basada en su título
+     *
      * @param sceneTitle Título de la escena buscada
      * @return El indice de la escena en el arrayList
      */
@@ -451,6 +544,7 @@ public class HMIApp extends Application {
 
     /**
      * Muestra una Alerta de confirmación de eliminación de la una página
+     *
      * @param sceneTitle Título de la Escena a eliminarse
      * @return Booleano: - True si se confirma eliminación
      * - False si se cancela
@@ -486,10 +580,10 @@ public class HMIApp extends Application {
                 DBConnection.generateSchemaHMIUsers();
             }
         } catch (SQLException sqlException) {
-            showAlertForGeneratingSchemas(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", sqlException.getMessage(),false);
+            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", sqlException.getMessage(), false,false);
             sqlException.printStackTrace();
-        } catch (IOException e){
-            if(!showAlertForGeneratingSchemas(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", e.getMessage()+"; pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos",true)){
+        } catch (IOException e) {
+            if (!showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", e.getMessage() + "; pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos", true,false)) {
                 generateDatabase();
             }
             e.printStackTrace();
@@ -497,23 +591,46 @@ public class HMIApp extends Application {
 
     }
 
-    public boolean showAlertForGeneratingSchemas(Alert.AlertType type, String title, String message, boolean showCredentialsWindow) {
+    public boolean showAlert(Alert.AlertType type, String title, String message, boolean showCredentialsWindow, boolean isSaveDialog) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(message);
 
+        ButtonType saveButton = new ButtonType("Guardar",ButtonBar.ButtonData.YES);
+        ButtonType dontSaveButton = new ButtonType("No Guardar",ButtonBar.ButtonData.NO);
         ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        alert.getButtonTypes().setAll(okButton);
+        if(isSaveDialog){
+            alert.getButtonTypes().setAll(dontSaveButton,cancelButton, saveButton);
+        }else {
+            alert.getButtonTypes().setAll(cancelButton, okButton);
+        }
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == okButton) {
             alert.close();
-            if(showCredentialsWindow){
+            if (showCredentialsWindow) {
                 SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
                 saveDatabaseCredentialsWindow.showAndWait();
                 return saveDatabaseCredentialsWindow.isCancelled();
             }
+            return true;
+        }else if(result.isPresent() && result.get() == cancelButton){
+            alert.close();
+            return false;
+        } else if(result.isPresent() && result.get() == saveButton){
+            alert.close();
+            try {
+                saveHMIDataProcess();
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR,"Error al Guardar","Error:"+e.getMessage(),false,false);
+                e.printStackTrace();
+            }
+            return true;
+        } else if(result.isPresent() && result.get() == dontSaveButton){
+            alert.close();
+            return true;
         }
         return true;
     }
@@ -525,4 +642,6 @@ public class HMIApp extends Application {
     public void setUser(HMIUser user) {
         this.user = user;
     }
+
+
 }

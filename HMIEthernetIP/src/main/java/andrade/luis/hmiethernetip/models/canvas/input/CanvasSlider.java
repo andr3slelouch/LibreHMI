@@ -141,6 +141,7 @@ public class CanvasSlider extends CanvasObject {
         boolean showLabelsTicks = setSliderOptionsWindow.getShowLabelsTicks().isSelected();
 
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(),this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),setSliderOptionsWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks);
+        this.getHmiApp().setWasModified(true);
     }
 
     @Override

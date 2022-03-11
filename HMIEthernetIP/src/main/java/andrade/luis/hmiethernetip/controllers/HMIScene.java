@@ -23,6 +23,7 @@ import javafx.scene.paint.Paint;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HMIScene extends Scene implements Cloneable {
@@ -124,9 +125,7 @@ public class HMIScene extends Scene implements Cloneable {
 
                     MenuItem newItem = new MenuItem();
                     newItem.setText("New...");
-                    newItem.setOnAction(event -> {
-                        hmiApp.addNewScene();
-                    });
+                    newItem.setOnAction(event -> hmiApp.addNewScene());
                     MenuItem saveItem = new MenuItem();
                     saveItem.setText("Save");
                     saveItem.setOnAction(event -> {
@@ -194,6 +193,7 @@ public class HMIScene extends Scene implements Cloneable {
         this.hmiCanvas = hmiCanvas;
         this.hmiSceneData.setBackground(new CanvasColor((Color) paint));
         this.setOnMouseClicked(mouseEvent -> {
+            logger.log(Level.INFO,"Mouse CLICKED:"+new CanvasPoint(mouseEvent.getX(), mouseEvent.getY()).toString());
             if (this.hmiCanvas.isAddOnClickEnabled()) {
                 hmiCanvas.addFigureOnCanvasClicked(new CanvasPoint(mouseEvent.getX(), mouseEvent.getY()));
                 this.hmiCanvas.setAddOnClickEnabled(false);
@@ -211,22 +211,21 @@ public class HMIScene extends Scene implements Cloneable {
             }
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), () -> {
-            andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
+            CanvasObject selected = getCanvas().getSelectedFigure();
             selected.copy("Copy");
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY), () -> {
-            andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
+            CanvasObject selected = getCanvas().getSelectedFigure();
             selected.cut();
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), () -> {
-            andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
             getCanvas().paste();
         });
 
     }
 
     public void updateSelected(){
-        ArrayList<andrade.luis.hmiethernetip.models.canvas.CanvasObject> canvasObjects = getCanvas().getCurrentCanvasObjects();
+        ArrayList<CanvasObject> canvasObjects = getCanvas().getShapeArrayList();
         LocalDateTime max = null;
         int index = -1;
         for (int i = 0; i < canvasObjects.size(); i++) {

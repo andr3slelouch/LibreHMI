@@ -28,16 +28,6 @@ public class CanvasButton extends CanvasObject {
 
     private HMIUser user;
 
-    public HMIApp getHmiApp() {
-        return hmiApp;
-    }
-
-    public void setHmiApp(HMIApp hmiApp) {
-        this.hmiApp = hmiApp;
-    }
-
-    private HMIApp hmiApp;
-
     public CanvasButton(CanvasPoint center) {
         super(center);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 50);
@@ -71,7 +61,7 @@ public class CanvasButton extends CanvasObject {
     }
 
     public void buttonAction() {
-        SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(hmiApp.getPagesTitles(), this.getCanvasObjectData().getSelectedPages());
+        SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(this.getHmiApp().getPagesTitles(), this.getCanvasObjectData().getSelectedPages());
         selectWindowsWindow.showAndWait();
         this.setSelectedPages(selectWindowsWindow.getSelectedItems());
     }
@@ -81,15 +71,16 @@ public class CanvasButton extends CanvasObject {
             this.getCanvasObjectData().setSelectedPages(selectedPages);
             boolean pagesReadyState = true;
             for (String selectedPage : selectedPages) {
-                pagesReadyState = pagesReadyState && (this.hmiApp.getIndexForScene(selectedPage) != -1);
+                pagesReadyState = pagesReadyState && (this.getHmiApp().getIndexForScene(selectedPage) != -1);
             }
             if(pagesReadyState){
-                this.button.setOnAction(mouseEvent -> this.hmiApp.generateStagesForPages(this.getCanvasObjectData().getSelectedPages()));
+                this.button.setOnAction(mouseEvent -> this.getHmiApp().generateStagesForPages(this.getCanvasObjectData().getSelectedPages()));
                 this.setTop(null);
             }else{
                 this.errorLabel = new Label("Error en páginas asociadas");
                 this.setTop(errorLabel);
             }
+            this.getHmiApp().setWasModified(true);
         }
     }
 

@@ -75,6 +75,7 @@ public class CanvasText extends CanvasLabel {
             if (expression != null) {
                 expression.evaluate();
                 this.setExpression(expression);
+                this.getHmiApp().setWasModified(true);
             }
         } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);

@@ -201,6 +201,7 @@ public class CanvasObjectData implements Serializable, Transferable {
 
     public void setPosition(CanvasPoint position) {
         this.position = position;
+        //this.center = determineCenterFromPosition(position);
     }
 
     public Tag getTag() {
@@ -387,6 +388,11 @@ public class CanvasObjectData implements Serializable, Transferable {
         this.dataType = dataType;
     }
 
+    public CanvasPoint determineCenterFromPosition(CanvasPoint position) {
+        double tempX = position.getX() + getWidth()/2;
+        double tempY = position.getY() + getHeight()/2;
+        return new CanvasPoint(tempX, tempY);
+    }
 
     @Override
     public String toString() {

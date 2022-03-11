@@ -123,6 +123,7 @@ public class CanvasImage extends CanvasObject {
         } else {
             setImageViewProcess();
         }
+        this.getHmiApp().setWasModified(true);
     }
 
     private void setSymbolImageProcess() throws FileNotFoundException {

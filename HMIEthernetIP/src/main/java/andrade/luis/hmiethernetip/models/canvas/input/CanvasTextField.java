@@ -174,6 +174,7 @@ public class CanvasTextField extends CanvasObject {
         setTextFieldPropertiesWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
         setTextFieldPropertiesWindow.showAndWait();
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
+        this.getHmiApp().setWasModified(true);
     }
 
     @Override

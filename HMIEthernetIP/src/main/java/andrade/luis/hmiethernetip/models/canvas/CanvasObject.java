@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
+import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.MouseOverMode;
 import andrade.luis.hmiethernetip.views.SetSizeWindow;
@@ -39,6 +40,17 @@ public class CanvasObject extends BorderPane {
     private Timeline visibilityTimeline;
 
     protected Label errorLabel = new Label();
+
+    public HMIApp getHmiApp() {
+        return hmiApp;
+    }
+
+    public void setHmiApp(HMIApp hmiApp) {
+        this.hmiApp = hmiApp;
+    }
+
+    private HMIApp hmiApp;
+
     public CanvasObject() {
 
     }
@@ -160,7 +172,7 @@ public class CanvasObject extends BorderPane {
     }
 
     public void delete() {
-        this.canvasObjectData.setId(this.getId());
+        //this.canvasObjectData.setId(this.getId());
         canvas.delete(this.canvasObjectData);
     }
 
@@ -210,6 +222,7 @@ public class CanvasObject extends BorderPane {
             if (t.getButton() == MouseButton.SECONDARY) {
                 showContextMenu(t.getScreenX(), t.getScreenY());
             }
+            logger.log(Level.INFO,"\nPressed - Object ID:"+CanvasObject.this.getObjectId()+"\nPosition:"+CanvasObject.this.getCanvasObjectData().getPosition().toString());
         }
     };
 
@@ -225,7 +238,11 @@ public class CanvasObject extends BorderPane {
             ((BorderPane) (t.getSource())).setTranslateX(newTranslateX);
             ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
 
-            setPosition(new CanvasPoint(newTranslateX, newTranslateY), false);
+            setPosition(new CanvasPoint(((BorderPane) (t.getSource())).getBoundsInParent().getMinX(), ((BorderPane) (t.getSource())).getBoundsInParent().getMinY()), false);
+            setCenter(new CanvasPoint(((BorderPane) (t.getSource())).getBoundsInParent().getMinX(), ((BorderPane) (t.getSource())).getBoundsInParent().getMinY()));
+            if(CanvasObject.this.hmiApp != null){
+                CanvasObject.this.hmiApp.setWasModified(true);
+            }
             /*}else if(mouseOverMode != DEFAULT){
                 double newTranslateX = start.getX();
                 double newTranslateY = start.getY();
@@ -255,7 +272,6 @@ public class CanvasObject extends BorderPane {
                 GraphicalRepresentation.this.setWidth(newW);
                 GraphicalRepresentation.this.setHeight(newH);
             }*/
-
         }
     };
 
@@ -356,13 +372,21 @@ public class CanvasObject extends BorderPane {
     }
 
     public void setCenter(CanvasPoint center) {
+        /**
+         * PROBLEMAS
+         */
         this.canvasObjectData.setCenter(center);
+        /**
+         * PROBLEMAS
+         */
+        //double tempX = center.getX() - getWidth() / 2;
+        //double tempY = center.getY() - getHeight() / 2;
 
-        double tempX = center.getX() - getWidth() / 2;
-        double tempY = center.getY() - getHeight() / 2;
-
-        this.canvasObjectData.setPosition(new CanvasPoint(tempX, tempY));
-        setPosition(new CanvasPoint(tempX, tempY), true);
+        //this.canvasObjectData.setPosition(new CanvasPoint(tempX, tempY));
+        logger.log(Level.INFO,"Center Position;"+this.getCanvasObjectData().getCenter());
+        //logger.log(Level.INFO,"Position:X="+tempX+"Y="+tempY+"Width:"+getWidth()+"Height:"+getHeight());
+        //logger.log(Level.INFO,"Determine Center"+determineCenterFromPosition(this.getCanvasObjectData().getPosition()));
+        // setPosition(new CanvasPoint(tempX, tempY), true);
 
         this.border = PseudoClass.getPseudoClass("border");
         this.borderActive = new SimpleBooleanProperty() {
@@ -371,6 +395,12 @@ public class CanvasObject extends BorderPane {
                 CanvasObject.this.pseudoClassStateChanged(CanvasObject.this.border, get());
             }
         };
+    }
+
+    public CanvasPoint determineCenterFromPosition(CanvasPoint position) {
+        double tempX = position.getX() + getWidth()/2;
+        double tempY = position.getY() + getHeight()/2;
+        return new CanvasPoint(tempX, tempY);
     }
 
     public CanvasObject(CanvasObjectData canvasObjectData) {
@@ -385,7 +415,16 @@ public class CanvasObject extends BorderPane {
 
         this.canvasObjectData = canvasObjectData;
 
+        /**
+         * PROBLEMAS
+         */
         this.setCenter(this.canvasObjectData.getCenter());
+        this.canvasObjectData.setPosition(this.canvasObjectData.getCenter());
+        setPosition(this.canvasObjectData.getCenter(), true);
+        /**
+         * PROBLEMAS
+         */
+
         if(this.getCanvasObjectData().getVisibilityExpression() != null){
             this.setVisibilityAnimation(this.canvasObjectData.getVisibilityExpression());
             this.visibilityTimeline.play();
@@ -439,7 +478,14 @@ public class CanvasObject extends BorderPane {
         this.setOnMouseClicked(onMyMouseClicked);
         //this.setOnMouseMoved(onMyMouseMoved);
 
+        /**
+         * PROBLEMAS
+         */
         setCenter(center);
+        setPosition(center, true);
+        /**
+         * PROBLEMAS
+         */
         setSelected(true);
 
         setContextMenu();
@@ -456,6 +502,7 @@ public class CanvasObject extends BorderPane {
         this.getCanvasObjectData().setWidth(setSizeWindow.getWidthFromField());
         this.getCanvasObjectData().setHeight(setSizeWindow.getHeightFromField());
         this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
+        this.getHmiApp().setWasModified(true);
     }
 
     protected void setVisibilityAnimation() throws SQLException, CompileException, IOException, InvocationTargetException {
@@ -475,9 +522,9 @@ public class CanvasObject extends BorderPane {
         logger.log(Level.INFO,setVisibilityAnimationWindow.getLocalExpression().getExpressionToEvaluate());
         Expression expression = setVisibilityAnimationWindow.getLocalExpression();
         if (expression != null) {
-            //expression.evaluate();
             this.setVisibilityAnimation(expression);
             this.visibilityTimeline.play();
+            this.getHmiApp().setWasModified(true);
         }
     }
 
@@ -500,6 +547,15 @@ public class CanvasObject extends BorderPane {
                             }), new KeyFrame(Duration.seconds(1)));
             this.visibilityTimeline.setCycleCount(Animation.INDEFINITE);
         }
+    }
+
+    public String getObjectId() {
+        return this.getCanvasObjectData().getId();
+    }
+
+    public void setObjectId(String id){
+        this.setId(id);
+        this.getCanvasObjectData().setId(id);
     }
 
     public void setEnable(String enabled) {
