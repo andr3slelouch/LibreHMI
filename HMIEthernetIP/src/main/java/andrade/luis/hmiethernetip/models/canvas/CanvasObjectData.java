@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.PercentFillOrientation;
 import andrade.luis.hmiethernetip.models.Tag;
-import andrade.luis.hmiethernetip.models.users.HMIUser;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -30,9 +29,6 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("height")
     @Expose
     private double height;
-    @SerializedName("center")
-    @Expose
-    private CanvasPoint center;
     @SerializedName("position")
     @Expose
     private CanvasPoint position;
@@ -187,21 +183,12 @@ public class CanvasObjectData implements Serializable, Transferable {
         this.name = name;
     }
 
-    public CanvasPoint getCenter() {
-        return center;
-    }
-
-    public void setCenter(CanvasPoint center) {
-        this.center = center;
-    }
-
     public CanvasPoint getPosition() {
         return position;
     }
 
     public void setPosition(CanvasPoint position) {
         this.position = position;
-        //this.center = determineCenterFromPosition(position);
     }
 
     public Tag getTag() {
@@ -415,10 +402,6 @@ public class CanvasObjectData implements Serializable, Transferable {
         sb.append(this.height);
         sb.append(',');
         sb.append("center");
-        sb.append('=');
-        sb.append(((this.center == null) ? NULL_STR : this.center));
-        sb.append(',');
-        sb.append("position");
         sb.append('=');
         sb.append(((this.position == null) ? NULL_STR : this.position));
         sb.append(',');

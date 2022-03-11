@@ -2,8 +2,6 @@ package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.*;
 import andrade.luis.hmiethernetip.views.SetPercentFillPropertiesWindow;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -43,7 +41,6 @@ public class CanvasRectangle extends CanvasObject {
 
     public CanvasRectangle(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
-        logger.log(Level.INFO,canvasObjectData.getPosition().toString());
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), canvasObjectData.getWidth(), canvasObjectData.getHeight());
     }
 
@@ -57,18 +54,15 @@ public class CanvasRectangle extends CanvasObject {
     }
 
     @Override
-    public void setCenter(CanvasPoint center) {
-        super.setCenter(center);
-        this.getCanvasObjectData().setPosition(this.getCanvasObjectData().getCenter());
-        //setPosition(this.getCanvasObjectData().getCenter(), true);
+    public void setPosition(CanvasPoint center) {
+        super.setPosition(center);
         logger.log(Level.INFO,this.getCanvasObjectData().getPosition().toString());
-        setData(this.getPosition().getX(), this.getPosition().getY(), 150, 150);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150);
         super.setCenter(this.rectangle);
     }
 
     public void setData(double x, double y, double width, double height) {
         this.rectangle = new Rectangle(x, y);
-        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.rectangle.setWidth(width);
         this.getCanvasObjectData().setWidth(width);
         this.rectangle.setHeight(height);

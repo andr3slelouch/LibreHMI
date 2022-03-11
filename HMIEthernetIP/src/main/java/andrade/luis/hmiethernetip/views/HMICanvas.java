@@ -497,10 +497,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             CanvasImage canvasImage = new CanvasImage(canvasObjectData);
             canvasImage.setCanvas(this);
             canvasImage.setHmiApp(this.hmiApp);
-            canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
-            if(pasteOffset==0){
-                canvasImage.setPosition(canvasObjectData.getPosition(),true);
-            }
+            canvasImage.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
             canvasImage.setObjectId(generateIdForPasteOperation(canvasObjectData));
             this.addNewShape(canvasImage);
             this.getChildren().add(canvasImage);
@@ -517,9 +514,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasPushbutton.setHmiApp(hmiApp);
         canvasPushbutton.setUser(hmiApp.getUser());
         canvasPushbutton.setObjectId(generateIdForPasteOperation(canvasObjectData));
-        if(pasteOffset==0){
-            canvasPushbutton.setPosition(canvasObjectData.getPosition(),true);
-        }
         this.addNewShape(canvasPushbutton);
         this.getChildren().add(canvasPushbutton);
         canvasPushbutton.getHmiApp().setWasModified(true);
@@ -530,11 +524,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             CanvasImage canvasImage = new CanvasImage(canvasObjectData);
             canvasImage.setCanvas(this);
             canvasImage.setHmiApp(hmiApp);
-            canvasImage.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+            canvasImage.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
             canvasImage.setObjectId(generateIdForPasteOperation(canvasObjectData));
-            if(pasteOffset==0){
-                canvasImage.setPosition(canvasObjectData.getPosition(),true);
-            }
             this.addNewShape(canvasImage);
             this.getChildren().add(canvasImage);
             canvasImage.getHmiApp().setWasModified(true);
@@ -547,12 +538,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         CanvasTextField canvasTextField = new CanvasTextField(canvasObjectData);
         canvasTextField.setCanvas(this);
         canvasTextField.setHmiApp(hmiApp);
-        canvasTextField.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+        canvasTextField.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         canvasTextField.setUser(hmiApp.getUser());
         canvasTextField.setObjectId(generateIdForPasteOperation(canvasObjectData));
-        if(pasteOffset==0){
-            canvasTextField.setPosition(canvasObjectData.getPosition(),true);
-        }
         this.addNewShape(canvasTextField);
         this.getChildren().add(canvasTextField);
         canvasTextField.getHmiApp().setWasModified(true);
@@ -564,12 +552,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             canvasSlider = new CanvasSlider(canvasObjectData);
             canvasSlider.setCanvas(this);
             canvasSlider.setHmiApp(hmiApp);
-            canvasSlider.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+            canvasSlider.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
             canvasSlider.setUser(hmiApp.getUser());
             canvasSlider.setObjectId(generateIdForPasteOperation(canvasObjectData));
-            if(pasteOffset==0){
-                canvasSlider.setPosition(canvasObjectData.getPosition(),true);
-            }
             this.addNewShape(canvasSlider);
             this.getChildren().add(canvasSlider);
             canvasSlider.getHmiApp().setWasModified(true);
@@ -583,12 +568,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasButton.setHmiApp(hmiApp);
         canvasButton.setSelectedPages(canvasObjectData.getSelectedPages());
         canvasButton.setCanvas(this);
-        canvasButton.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+        canvasButton.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         canvasButton.setUser(hmiApp.getUser());
         canvasButton.setObjectId(generateIdForPasteOperation(canvasObjectData));
-        if(pasteOffset==0){
-            canvasButton.setPosition(canvasObjectData.getPosition(),true);
-        }
         this.addNewShape(canvasButton);
         this.getChildren().add(canvasButton);
         canvasButton.getHmiApp().setWasModified(true);
@@ -598,11 +580,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         CanvasText canvasText = new CanvasText(canvasObjectData);
         canvasText.setCanvas(this);
         canvasText.setHmiApp(hmiApp);
-        canvasText.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+        canvasText.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         canvasText.setObjectId(generateIdForPasteOperation(canvasObjectData));
-        if(pasteOffset==0){
-            canvasText.setPosition(canvasObjectData.getPosition(),true);
-        }
         this.addNewShape(canvasText);
         this.getChildren().add(canvasText);
         canvasText.getHmiApp().setWasModified(true);
@@ -610,17 +589,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     public void addPastedRectangle(CanvasObjectData canvasObjectData) {
         CanvasRectangle canvasRectangle = new CanvasRectangle(canvasObjectData);
-        logger.log(Level.INFO,"After constructor:"+canvasObjectData.getPosition().toString());
         canvasRectangle.setCanvas(this);
         canvasRectangle.setHmiApp(hmiApp);
         canvasRectangle.setObjectId(generateIdForPasteOperation(canvasObjectData));
-        logger.log(Level.INFO,"Before if:"+canvasObjectData.getPosition().toString());
-        if(pasteOffset==0){
-            canvasRectangle.setPosition(canvasObjectData.getPosition(),true);
-            logger.log(Level.INFO,"Offset was 0:"+canvasObjectData.getPosition().toString());
-        }else{
-            canvasRectangle.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
-        }
+        canvasRectangle.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         this.addNewShape(canvasRectangle);
         this.getChildren().add(canvasRectangle);
         canvasRectangle.setPercentFill(canvasObjectData.getExpression(), canvasObjectData.getPrimaryColor(), canvasObjectData.getBackgroundColor(), canvasObjectData.getOrientation());
@@ -631,11 +603,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         CanvasSystemDateTime canvasSystemDateTime = new CanvasSystemDateTime(canvasObjectData);
         canvasSystemDateTime.setCanvas(this);
         canvasSystemDateTime.setHmiApp(hmiApp);
-        canvasSystemDateTime.setCenter(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getCenter().getX() + pasteOffset, canvasObjectData.getCenter().getY() + pasteOffset)));
+        canvasSystemDateTime.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         canvasSystemDateTime.setObjectId(generateIdForPasteOperation(canvasObjectData));
-        if(pasteOffset==0){
-            canvasSystemDateTime.setPosition(canvasObjectData.getPosition(),true);
-        }
         this.addNewShape(canvasSystemDateTime);
         this.getChildren().add(canvasSystemDateTime);
         canvasSystemDateTime.setTimeline();

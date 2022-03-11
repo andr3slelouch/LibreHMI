@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasSlider extends CanvasObject {
@@ -60,7 +59,6 @@ public class CanvasSlider extends CanvasObject {
         this.slider.setDisable(true);
         this.slider.setPrefWidth(width);
         this.slider.setPrefHeight(height);
-        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
         this.getCanvasObjectData().setMaxValue(maxValue);

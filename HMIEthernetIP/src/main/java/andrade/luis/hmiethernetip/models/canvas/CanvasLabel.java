@@ -25,8 +25,8 @@ public class CanvasLabel extends CanvasObject {
         super();
     }
     @Override
-    public void setCenter(CanvasPoint center){
-        super.setCenter(center);
+    public void setPosition(CanvasPoint center){
+        super.setPosition(center);
         this.setCenter(this.label);
     }
 

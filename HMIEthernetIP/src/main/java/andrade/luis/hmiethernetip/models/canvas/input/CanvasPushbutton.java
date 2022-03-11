@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Esta es la clase que contiene define a un CanvasPushbutton, se utiliza para cambiar el valor de un Tag del tipo
+ * Booleano asociado al hacer clic en él cambia el valor del Tag Booleano asociado
+ */
 public class CanvasPushbutton extends CanvasButton {
     Logger logger = Logger.getLogger(this.getClass().getName());
     private static final String DIRECT_STR = "Directo";

@@ -14,8 +14,8 @@ class CanvasLabelTest {
     void setCenter() {
         CanvasLabel labelTest = new CanvasLabel();
         CanvasPoint center = new CanvasPoint(150,150);
-        labelTest.setCenter(center);
-        Assertions.assertThat(labelTest.getCanvasObjectData().getCenter()).isEqualTo(center);
+        labelTest.setPosition(center);
+        Assertions.assertThat(labelTest.getCanvasObjectData().getPosition()).isEqualTo(center);
     }
 
     @Test

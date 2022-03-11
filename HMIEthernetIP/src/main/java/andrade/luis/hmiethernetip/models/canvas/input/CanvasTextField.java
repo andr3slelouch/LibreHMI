@@ -153,7 +153,6 @@ public class CanvasTextField extends CanvasObject {
             this.textField.setText(this.linkedTag.getValue());
             this.setTimeline();
         }
-        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
         this.setCenter(this.textField);

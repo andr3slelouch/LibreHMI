@@ -125,14 +125,14 @@ class HMICanvasTest {
         andrade.luis.hmiethernetip.models.canvas.CanvasObject rectangle = getAddedGraphicalRepresentation("#createdShape0");
         Assertions.assertThat(rectangle).isNotNull();
 
-        CanvasPoint firstPosition = rectangle.getPosition();
+        CanvasPoint firstPosition = rectangle.getCanvasObjectData().getPosition();
 
         robot.drag(rectangle, MouseButton.PRIMARY);
-        robot.dropBy(rectangle.getPosition().getX() + 10, rectangle.getPosition().getY() + 10);
+        robot.dropBy(rectangle.getCanvasObjectData().getPosition().getX() + 10, rectangle.getCanvasObjectData().getPosition().getY() + 10);
 
         rectangle = getAddedGraphicalRepresentation("#createdShape0");
 
-        CanvasPoint newPosition = rectangle.getPosition();
+        CanvasPoint newPosition = rectangle.getCanvasObjectData().getPosition();
 
         Assertions.assertThat(newPosition.getX()).isNotEqualTo(firstPosition.getX());
         Assertions.assertThat(newPosition.getY()).isNotEqualTo(firstPosition.getY());
