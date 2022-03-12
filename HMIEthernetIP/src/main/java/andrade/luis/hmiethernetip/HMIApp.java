@@ -39,12 +39,18 @@ public class HMIApp extends Application {
             = Logger.getLogger(
             HMIApp.class.getName());
 
+    private static final String DEFAULT_PAGE_NAME = "Página 1";
     private final ArrayList<HMIScene> pages = new ArrayList<>();
-    private ArrayList<Stage> createdWindows = new ArrayList<>();
+    private final ArrayList<Stage> createdWindows = new ArrayList<>();
     private String currentProjectFilePath = null;
     private boolean wasModified = false;
-    private BooleanProperty updateTitleFlag = new SimpleBooleanProperty(false);
+    private final BooleanProperty updateTitleFlag = new SimpleBooleanProperty(false);
     private HMIAppData hmiAppData = new HMIAppData();
+    private ArrayList<String> pagesTitles = new ArrayList<>();
+    private static final String HMI_TITLE = "HMI";
+    private static final String ALERT_SAVE_TITLE = "¿Desea guardar los cambios del proyecto actual?";
+    private static final String ALERT_SAVE_DESCRIPTION = "Los cambios se perderán si elige No Guardar";
+    private HMIUser user;
 
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
@@ -73,14 +79,36 @@ public class HMIApp extends Application {
 
     public void setHmiAppData(HMIAppData hmiAppData) {
         this.hmiAppData = hmiAppData;
-        this.pages.clear();
-        this.pagesTitles.clear();
+        clearProject();
         for (int i = 0; i < this.hmiAppData.getHmiAppPages().size(); i++) {
             HMISceneData hmiSceneData = this.hmiAppData.getHmiAppPages().get(i);
             HMIScene hmiScene = generatePage(hmiSceneData.getTitle(), hmiSceneData.getSceneCommentary(), hmiSceneData.getBackground().getColor());
             addScene(hmiScene);
             hmiScene.setHmiSceneData(hmiSceneData);
         }
+    }
+
+    public void clearProject() {
+        this.pages.clear();
+        this.pagesTitles.clear();
+        this.wasModified=false;
+        this.currentProjectFilePath=null;
+    }
+
+    public void createNewProject() {
+        logger.log(Level.INFO,"Closing Project...");
+        if(wasModified){
+            if(showAlert(Alert.AlertType.CONFIRMATION,ALERT_SAVE_TITLE,ALERT_SAVE_DESCRIPTION,false, true)){
+                this.clearProject();
+                HMIScene scene = generatePage(DEFAULT_PAGE_NAME, "", Color.WHITESMOKE);
+                addScene(scene);
+            }
+        }else{
+            this.clearProject();
+            HMIScene scene = generatePage(DEFAULT_PAGE_NAME, "", Color.WHITESMOKE);
+            addScene(scene);
+        }
+
     }
 
     public ArrayList<String> getPagesTitles() {
@@ -91,10 +119,6 @@ public class HMIApp extends Application {
         this.pagesTitles = pagesTitles;
     }
 
-    private ArrayList<String> pagesTitles = new ArrayList<>();
-    private static final String HMI_TITLE = "HMI: ";
-    private HMIUser user;
-
     @Override
     public void start(Stage stage) {
 
@@ -102,7 +126,7 @@ public class HMIApp extends Application {
         mainStage.setOnCloseRequest(windowEvent -> {
             logger.log(Level.INFO,"Closing...");
             if(wasModified){
-                if(showAlert(Alert.AlertType.CONFIRMATION,"El proyecto actual no ha sido guardado","Salir?",false, true)){
+                if(showAlert(Alert.AlertType.CONFIRMATION,ALERT_SAVE_TITLE,ALERT_SAVE_DESCRIPTION,false, true)){
                     logger.log(Level.INFO,"CANCELED");
                 }else{
                     windowEvent.consume();
@@ -112,9 +136,9 @@ public class HMIApp extends Application {
             }
         });
         generateDatabase();
-        HMIScene scene = generatePage("Página 1", "", Color.WHITESMOKE);
+        HMIScene scene = generatePage(DEFAULT_PAGE_NAME, "", Color.WHITESMOKE);
         addScene(scene);
-        mainStage.setTitle(HMI_TITLE + scene.getTitle());
+        mainStage.setTitle(scene.getTitle() +" - "+ HMI_TITLE);
         mainStage.setScene(scene);
         mainStage.show();
 
@@ -188,9 +212,10 @@ public class HMIApp extends Application {
         Button saveBtn = new Button("Guardar");
         Button saveAsBtn = new Button("Guardar Como");
         Button loadBtn = new Button("Cargar");
+        Button newBtn = new Button("Nuevo");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(saveBtn,saveAsBtn ,loadBtn);
+        HBox thirdHBox = new HBox(saveBtn,saveAsBtn ,loadBtn, newBtn);
         HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn, symbolBtn, pushbuttonBtn);
         HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn);
 
@@ -253,12 +278,20 @@ public class HMIApp extends Application {
         });
         loadBtn.setOnAction(mouseEvent -> {
             try {
-                loadHMIData();
+                logger.log(Level.INFO,"Closing Project...");
+                if(wasModified){
+                    if(showAlert(Alert.AlertType.CONFIRMATION,ALERT_SAVE_TITLE,ALERT_SAVE_DESCRIPTION,false, true)){
+                        loadHMIData();
+                    }
+                }else{
+                    loadHMIData();
+                }
             } catch (FileNotFoundException e) {
                 showAlert(Alert.AlertType.ERROR,"Error al Cargar Proyecto","Error:"+e.getMessage(),false,false);
                 e.printStackTrace();
             }
         });
+        newBtn.setOnAction(mouseEvent -> this.createNewProject());
 
         scene.setHmiApp(this);
 
@@ -296,6 +329,9 @@ public class HMIApp extends Application {
             this.setHmiAppData(localHmiAppData);
             this.currentProjectFilePath = file.getAbsolutePath();
             this.setWasModified(false);
+            if(!mainStage.getTitle().contains(file.getName())){
+                mainStage.setTitle(file.getName()+" - "+mainStage.getTitle());
+            }
         }
     }
 
@@ -333,11 +369,16 @@ public class HMIApp extends Application {
         this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
         Gson gson = new Gson();
         if(filenamePath != null){
+            String[] filenameArr = filenamePath.split(File.separator);
+            String filename = filenameArr[filenameArr.length - 1];
             Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
             gson.toJson(this.hmiAppData, writer);
             writer.close();
             this.currentProjectFilePath = filenamePath;
             this.setWasModified(false);
+            if(!mainStage.getTitle().contains(filename)){
+                mainStage.setTitle(filename+" - "+mainStage.getTitle());
+            }
         }
     }
 
@@ -393,7 +434,7 @@ public class HMIApp extends Application {
     private void generateStage(HMIScene scene) {
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.setTitle(HMI_TITLE + scene.getTitle());
+        stage.setTitle(scene.getTitle()+" - "+HMI_TITLE);
         stage.show();
         createdWindows.add(stage);
     }
@@ -424,7 +465,7 @@ public class HMIApp extends Application {
         int index = getIndexForScene(sceneTitle);
         mainStage.setScene(pages.get(index));
         String compliment = wasModified ? "*" : "";
-        mainStage.setTitle(HMI_TITLE + pages.get(index).getTitle()+compliment);
+        mainStage.setTitle(pages.get(index).getTitle()+ " - " +HMI_TITLE +compliment);
         pages.get(index).getListViewReference().getSelectionModel().select(index);
     }
 
@@ -510,6 +551,7 @@ public class HMIApp extends Application {
         if (!setWindowPropertiesWindow.isCancelled()) {
             HMIScene newScene = generatePage(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
             addScene(newScene);
+            setWasModified(true);
         }
     }
 
@@ -524,7 +566,7 @@ public class HMIApp extends Application {
         updateScenesInListView(pagesTitles);
 
         mainStage.setScene(newScene);
-        mainStage.setTitle(HMI_TITLE + newScene.getTitle());
+        mainStage.setTitle(newScene.getTitle()+" - "+HMI_TITLE);
     }
 
     /**

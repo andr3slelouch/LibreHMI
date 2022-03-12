@@ -114,7 +114,7 @@ public class CanvasImage extends CanvasObject {
                 e.printStackTrace();
             }
         });
-        this.getRightClickMenu().getItems().add(editMI);
+        this.getRightClickMenu().getItems().set(4,editMI);
     }
 
     private void setCanvasImage() throws FileNotFoundException {
@@ -132,7 +132,8 @@ public class CanvasImage extends CanvasObject {
             selectHMISymbolWindow.setMirroringHorizontal(this.getCanvasObjectData().isMirroringHorizontal());
             selectHMISymbolWindow.setMirroringVertical(this.getCanvasObjectData().isMirroringHorizontal());
             selectHMISymbolWindow.setRotation(this.getCanvasObjectData().getRotation());
-            selectHMISymbolWindow.updateSelected(this.getCanvasObjectData().getData());
+            selectHMISymbolWindow.setSymbolCategory(this.getCanvasObjectData().getSymbolCategory());
+            selectHMISymbolWindow.setSelectedImagePath(this.getCanvasObjectData().getData());
             if(this.getCanvasObjectData().isModifyingImage()){
                 selectHMISymbolWindow.setColor(this.getCanvasObjectData().getPrimaryColor());
                 selectHMISymbolWindow.setContrast(this.getCanvasObjectData().getContrast());
@@ -143,8 +144,9 @@ public class CanvasImage extends CanvasObject {
             }
         }
         selectHMISymbolWindow.showAndWait();
-        Image selectedSymbol = selectHMISymbolWindow.getSelectedImage();
+
         String selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
+        Image selectedSymbol = new Image(new FileInputStream(selectedSymbolPath));
         boolean isMirroringVertical = selectHMISymbolWindow.isMirroringVertical();
         boolean isMirroringHorizontal = selectHMISymbolWindow.isMirroringHorizontal();
         boolean isPreservingRatio = selectHMISymbolWindow.isPreservingRatio();

@@ -41,13 +41,19 @@ public class DBConnection {
         return getWorkingDirectory() + File.separator + "HMIEthernetIP.properties";
     }
 
-    public static void writePropertiesFile(String username, String password, String hostname, String port) throws IOException {
+    public static void writePropertiesFile(String username, String password, String hostname, String port, boolean boilerFurnace, boolean conveyorBelts, boolean motorPumps, boolean others,boolean pipesValues,boolean tanks) throws IOException {
         Properties properties = new Properties();
 
         properties.setProperty("username", username);
         properties.setProperty("password", password);
         properties.setProperty("hostname", hostname);
-        properties.setProperty("port", port);
+        properties.setProperty("BoilerFurnace", String.valueOf(boilerFurnace));
+        properties.setProperty("ConveyorBelts", String.valueOf(conveyorBelts));
+        properties.setProperty("MotorPumps", String.valueOf(motorPumps));
+        properties.setProperty("Others", String.valueOf(others));
+        properties.setProperty("PipesValves", String.valueOf(pipesValues));
+        properties.setProperty("Tanks", String.valueOf(tanks));
+
         FileOutputStream out = new FileOutputStream(getPropertiesFileName());
         properties.store(out, "HMIEthernetIP properties file");
         out.close();

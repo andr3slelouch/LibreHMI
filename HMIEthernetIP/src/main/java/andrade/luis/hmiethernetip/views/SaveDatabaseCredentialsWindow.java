@@ -32,12 +32,17 @@ public class SaveDatabaseCredentialsWindow extends Stage {
         StackPane root = new StackPane();
         final Label label = new Label("Registro de credenciales");
         Properties properties = null;
-
+        boolean boilerFurnace=false;
+        boolean conveyorBelts=false;
+        boolean motorPumps=false;
+        boolean others=false;
+        boolean pipesValues=false;
+        boolean tanks=false;
         try{
             properties = DBConnection.readPropertiesFile();
         }catch (IOException e) {
             try {
-                DBConnection.writePropertiesFile("","","","");
+                DBConnection.writePropertiesFile("","","","",false,false,false,false,false,false);
             } catch (IOException ex) {
                 showAlert(Alert.AlertType.ERROR,"Error al leer el archivo de configuración","No se pudo leer el archivo de configuración, Error:'"+e.getMessage()+"'");
             }
@@ -68,6 +73,12 @@ public class SaveDatabaseCredentialsWindow extends Stage {
             portField.setText(properties.getProperty("port"));
             usernameField.setText(properties.getProperty("username"));
             passwordField.setText(properties.getProperty("password"));
+            boilerFurnace = Boolean.parseBoolean(properties.getProperty("boilerFurnace"));
+            conveyorBelts = Boolean.parseBoolean(properties.getProperty("conveyorBelts"));
+            motorPumps=Boolean.parseBoolean(properties.getProperty("motorPumps"));
+            others=Boolean.parseBoolean(properties.getProperty("others"));
+            pipesValues=Boolean.parseBoolean(properties.getProperty("pipesValues"));
+            tanks=Boolean.parseBoolean(properties.getProperty("tanks"));
         }
 
         Button testConnectionButton = new Button("Verificar Conexión");
@@ -83,10 +94,16 @@ public class SaveDatabaseCredentialsWindow extends Stage {
         Button cancelButton = new Button("Cancelar");
         cancelButton.setOnAction(mouseEvent -> this.close());
         Button saveButton = new Button("Guardar");
-        saveButton.setOnAction(mouseEvent ->{
+        boolean finalBoilerFurnace = boilerFurnace;
+        boolean finalConveyorBelts = conveyorBelts;
+        boolean finalMotorPumps = motorPumps;
+        boolean finalOthers = others;
+        boolean finalPipesValues = pipesValues;
+        boolean finalTanks = tanks;
+        saveButton.setOnAction(mouseEvent -> {
             try {
                 if(showAlert(Alert.AlertType.CONFIRMATION,"Precaución","Precaución el archivo de configuración se guarda en texto plano, presione OK para terminar el proceso")){
-                    DBConnection.writePropertiesFile(usernameField.getText(),passwordField.getText(),hostnameField.getText(),portField.getText());
+                    DBConnection.writePropertiesFile(usernameField.getText(),passwordField.getText(),hostnameField.getText(),portField.getText(), finalBoilerFurnace, finalConveyorBelts, finalMotorPumps, finalOthers, finalPipesValues, finalTanks);
                     this.close();
                     cancelled=false;
                 }

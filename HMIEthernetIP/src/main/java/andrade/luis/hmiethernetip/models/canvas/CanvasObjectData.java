@@ -104,6 +104,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("isImageSymbol")
     @Expose
     private boolean imageSymbol;
+    @SerializedName("symbolCategory")
+    @Expose
+    private String symbolCategory = "";
     @SerializedName("isModifyingImage")
     @Expose
     private boolean isModifyingImage = false;
@@ -373,6 +376,14 @@ public class CanvasObjectData implements Serializable, Transferable {
 
     public void setDataType(String dataType) {
         this.dataType = dataType;
+    }
+
+    public String getSymbolCategory() {
+        return symbolCategory;
+    }
+
+    public void setSymbolCategory(String symbolCategory) {
+        this.symbolCategory = symbolCategory;
     }
 
     public CanvasPoint determineCenterFromPosition(CanvasPoint position) {

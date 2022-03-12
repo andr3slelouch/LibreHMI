@@ -109,7 +109,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     public void addNewShape(CanvasObject shape) {
-        logger.log(Level.INFO,shape.getId());
         this.shapeArrayList.add(shape);
     }
 
@@ -242,6 +241,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private void addSymbolViewOnCanvasClicked(CanvasPoint current) {
         Image selectedSymbol = null;
         String selectedSymbolPath = null;
+        String selectedSymbolCategory = null;
         boolean isMirroringVertical = false;
         boolean isMirroringHorizontal = false;
         boolean isModifyingColor = false;
@@ -250,12 +250,14 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         double saturation = 0;
         double hue = 0;
         double rotation = 0;
+
         CanvasColor color = new CanvasColor(Color.WHITE);
         try {
             SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow();
             selectHMISymbolWindow.showAndWait();
             selectedSymbol = selectHMISymbolWindow.getSelectedImage();
             selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
+            selectedSymbolCategory = selectHMISymbolWindow.getSymbolCategory();
             isMirroringVertical = selectHMISymbolWindow.isMirroringVertical();
             isMirroringHorizontal = selectHMISymbolWindow.isMirroringHorizontal();
             rotation = selectHMISymbolWindow.getRotation();
@@ -268,21 +270,24 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        CanvasImage canvasImage = new CanvasImage(selectedSymbol, current, true, selectedSymbolPath, true);
-        canvasImage.modifyImageViewSizeRotation(isMirroringHorizontal, isMirroringVertical, rotation);
-        if(isModifyingColor){
-            canvasImage.modifyImageViewColors(color,contrast,brightness,saturation,hue);
+        if(selectedSymbolPath!=null){
+            CanvasImage canvasImage = new CanvasImage(selectedSymbol, current, true, selectedSymbolPath, true);
+            canvasImage.getCanvasObjectData().setSymbolCategory(selectedSymbolCategory);
+            canvasImage.modifyImageViewSizeRotation(isMirroringHorizontal, isMirroringVertical, rotation);
+            if(isModifyingColor){
+                canvasImage.modifyImageViewColors(color,contrast,brightness,saturation,hue);
+            }
+            canvasImage.setCanvas(this);
+            canvasImage.setHmiApp(hmiApp);
+            if (this.getShapeArrayList().isEmpty()) {
+                canvasImage.setObjectId(FIGURE_ID + "0");
+            } else {
+                canvasImage.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
+            }
+            this.addNewShape(canvasImage);
+            this.getChildren().add(canvasImage);
+            canvasImage.getHmiApp().setWasModified(true);
         }
-        canvasImage.setCanvas(this);
-        canvasImage.setHmiApp(hmiApp);
-        if (this.getShapeArrayList().isEmpty()) {
-            canvasImage.setObjectId(FIGURE_ID + "0");
-        } else {
-            canvasImage.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
-        }
-        this.addNewShape(canvasImage);
-        this.getChildren().add(canvasImage);
-        canvasImage.getHmiApp().setWasModified(true);
     }
 
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {

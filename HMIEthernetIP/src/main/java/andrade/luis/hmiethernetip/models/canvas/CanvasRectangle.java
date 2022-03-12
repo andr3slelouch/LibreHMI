@@ -56,7 +56,6 @@ public class CanvasRectangle extends CanvasObject {
     @Override
     public void setPosition(CanvasPoint center) {
         super.setPosition(center);
-        logger.log(Level.INFO,this.getCanvasObjectData().getPosition().toString());
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150);
         super.setCenter(this.rectangle);
     }
