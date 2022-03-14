@@ -39,40 +39,47 @@ public class SelectHMISymbolWindow extends Stage {
     private double hue;
     private Image selectedImage;
     private String selectedImagePath;
-    private boolean mirroringVertical=false;
-    private boolean mirroringHorizontal=false;
-    private boolean modifyingColor=false;
+    private boolean mirroringVertical = false;
+    private boolean mirroringHorizontal = false;
+    private boolean modifyingColor = false;
     private boolean preservingRatio = false;
-    private double rotation=0;
-    private double contrast=0;
-    private double brightness=0;
-    private double saturation=0;
-    private String symbolCategory="";
+    private double rotation = 0;
+    private double contrast = 0;
+    private double brightness = 0;
+    private double saturation = 0;
+    private String symbolCategory = "";
     private CanvasColor color;
     private final ArrayList<CanvasImage> currentImages = new ArrayList<>();
     private ArrayList<ScrollPane> categoriesPanes = new ArrayList<>();
     private ArrayList<HBox> categoriesHBoxes = new ArrayList<>();
     private final ArrayList<TitledPane> categoriesTitlePanes = new ArrayList<>();
+    private static final String PIPES_VALVES = "PipesValves";
+    private static final String MOTOR_PUMPS = "MotorsPumps";
+    private static final String BOILER_FURNACE = "BoilerFurnace";
+    private static final String CONVEYOR_BELTS = "ConveyorBelts";
+    private static final String TANKS = "Tanks";
+    private static final String OTHERS = "Others";
     Map<String, ArrayList<String>> directoryFileNames = new HashMap<>();
     Map<String, String> categoriesDirectory = Map.ofEntries(
-            new AbstractMap.SimpleEntry<>("1. Tuberías", "PipesValves"),
-            new AbstractMap.SimpleEntry<>("2. Motores y bombas", "MotorsPumps"),
-            new AbstractMap.SimpleEntry<>("3. Hornos, calderas, etc", "BoilerFurnace"),
-            new AbstractMap.SimpleEntry<>("4. Cintas transportadoras", "ConveyorBelts"),
-            new AbstractMap.SimpleEntry<>("5. Tanques", "Tanks"),
-            new AbstractMap.SimpleEntry<>("6. Otros", "Others")
+            new AbstractMap.SimpleEntry<>("1. Tuberías", PIPES_VALVES),
+            new AbstractMap.SimpleEntry<>("2. Motores y bombas", MOTOR_PUMPS),
+            new AbstractMap.SimpleEntry<>("3. Hornos, calderas, etc", BOILER_FURNACE),
+            new AbstractMap.SimpleEntry<>("4. Cintas transportadoras", CONVEYOR_BELTS),
+            new AbstractMap.SimpleEntry<>("5. Tanques", TANKS),
+            new AbstractMap.SimpleEntry<>("6. Otros", OTHERS)
     );
-    Map<String, Boolean> categoriesDirectoriesFlags = Map.ofEntries(
-            new AbstractMap.SimpleEntry<>("pipesValves",false),
-            new AbstractMap.SimpleEntry<>("motorsPumps",false),
-            new AbstractMap.SimpleEntry<>("boilerFurnace",false),
-            new AbstractMap.SimpleEntry<>("conveyorBelts",false),
-            new AbstractMap.SimpleEntry<>("tanks",false),
-            new AbstractMap.SimpleEntry<>("others",false)
-    );
+    HashMap<String, Boolean> categoriesDirectoriesFlags = new HashMap<>();
     ArrayList<String> categories = new ArrayList<>(categoriesDirectory.keySet());
 
     public SelectHMISymbolWindow() throws FileNotFoundException {
+
+        categoriesDirectoriesFlags.put(PIPES_VALVES, false);
+        categoriesDirectoriesFlags.put(MOTOR_PUMPS, false);
+        categoriesDirectoriesFlags.put(BOILER_FURNACE, false);
+        categoriesDirectoriesFlags.put(CONVEYOR_BELTS, false);
+        categoriesDirectoriesFlags.put(TANKS, false);
+        categoriesDirectoriesFlags.put(OTHERS, false);
+
         Collections.sort(categories);
         StackPane superRoot = new StackPane();
         Group root = new Group();
@@ -88,10 +95,10 @@ public class SelectHMISymbolWindow extends Stage {
         }
         accordion.getPanes().addAll(categoriesTitlePanes);
         accordion.expandedPaneProperty().addListener((observableValue, oldTitledPane, newTitledPane) -> {
-            if(newTitledPane != null){
+            if (newTitledPane != null) {
                 logger.log(Level.INFO, newTitledPane.getText());
                 try {
-                    if(newTitledPane.getContent()==null){
+                    if (newTitledPane.getContent() == null) {
                         ScrollPane scrollPane = generateSymbolsScrollPaneByCategory(newTitledPane.getText());
                         newTitledPane.setContent(scrollPane);
                         updateSelected(selectedImagePath);
@@ -105,7 +112,7 @@ public class SelectHMISymbolWindow extends Stage {
         Button optionsButton = new Button("Opciones de Imagen");
         optionsButton.setOnAction(mouseEvent -> {
             SetImageOptionsWindow setImageOptionsWindow = new SetImageOptionsWindow();
-            if(modifyingColor){
+            if (modifyingColor) {
                 setImageOptionsWindow.setModifyingColor(true);
                 setImageOptionsWindow.getBrightnessTextField().setText(String.valueOf(brightness));
                 setImageOptionsWindow.getContrastTextField().setText(String.valueOf(contrast));
@@ -118,7 +125,7 @@ public class SelectHMISymbolWindow extends Stage {
             mirroringVertical = setImageOptionsWindow.isMirroringVertical();
             mirroringHorizontal = setImageOptionsWindow.isMirroringHorizontal();
             rotation = Double.parseDouble(setImageOptionsWindow.getRotationValue());
-            if(setImageOptionsWindow.isModifyingColor()){
+            if (setImageOptionsWindow.isModifyingColor()) {
                 modifyingColor = setImageOptionsWindow.isModifyingColor();
                 color = new CanvasColor(setImageOptionsWindow.getColorPicker().getValue());
                 contrast = Double.parseDouble(setImageOptionsWindow.getContrastTextField().getText());
@@ -134,39 +141,41 @@ public class SelectHMISymbolWindow extends Stage {
         Button okButton = new Button("OK");
         okButton.setOnAction(mouseEvent -> this.close());
         HBox okHBox = new HBox();
-        okHBox.getChildren().addAll(optionsButton,okButton);
+        okHBox.getChildren().addAll(optionsButton, okButton);
         okHBox.setAlignment(Pos.BOTTOM_RIGHT);
         VBox vbox = new VBox();
         root.getChildren().add(accordion);
-        vbox.getChildren().addAll(label,root,okHBox);
+        vbox.getChildren().addAll(label, root, okHBox);
         superRoot.getChildren().add(vbox);
-        Scene scene = new Scene(superRoot,500,350);
+        Scene scene = new Scene(superRoot, 500, 350);
         this.setScene(scene);
         this.widthProperty().addListener((obs, oldVal, newVal) -> updateScrollPanesWidth(newVal.doubleValue()));
 
     }
 
     private ScrollPane generateSymbolsScrollPaneByCategory(String category) throws IOException {
-        File localCategoryDirectoryPath = new File(resourcesDirectory+File.separator+categoriesDirectory.get(category));
-        File importedCategoryDirectoryPath = new File(DBConnection.getWorkingDirectory()+File.separator+categoriesDirectory.get(category));
-        if(localCategoryDirectoryPath.listFiles() != null){
+        File localCategoryDirectoryPath = new File(resourcesDirectory + File.separator + categoriesDirectory.get(category));
+        File importedCategoryDirectoryPath = new File(DBConnection.getWorkingDirectory() + File.separator + categoriesDirectory.get(category));
+        if (localCategoryDirectoryPath.listFiles() != null) {
             HBox imagesHBox = new HBox(4);
             ArrayList<File> filesArrayList = new ArrayList<>(List.of(Objects.requireNonNull(localCategoryDirectoryPath.listFiles())));
             ArrayList<String> imagesFilenames = new ArrayList<>();
-            for(File imageFile: filesArrayList){
+            for (File imageFile : filesArrayList) {
                 imagesFilenames.add(imageFile.getAbsolutePath());
                 Image image = new Image(new FileInputStream(imageFile.getAbsolutePath()));
-                CanvasImage canvasImage = new CanvasImage(image,new CanvasPoint(0,0),false,imageFile.getAbsolutePath(),true);
+                CanvasImage canvasImage = new CanvasImage(image, new CanvasPoint(0, 0), false, imageFile.getAbsolutePath(), true);
                 canvasImage.clearContextMenu();
                 currentImages.add(canvasImage);
                 imagesHBox.getChildren().add(canvasImage);
             }
-            if(Boolean.parseBoolean(DBConnection.readPropertiesFile().getProperty(categoriesDirectory.get(category),String.valueOf(false)))){
+            logger.log(Level.INFO, categoriesDirectory.get(category));
+            logger.log(Level.INFO, DBConnection.readPropertiesFile().getProperty(categoriesDirectory.get(category)));
+            if (Boolean.parseBoolean(DBConnection.readPropertiesFile().getProperty(categoriesDirectory.get(category), String.valueOf(false)))) {
                 ArrayList<File> importedFilesArrayList = new ArrayList<>(List.of(Objects.requireNonNull(importedCategoryDirectoryPath.listFiles())));
-                for(File imageFile : importedFilesArrayList){
+                for (File imageFile : importedFilesArrayList) {
                     imagesFilenames.add(imageFile.getAbsolutePath());
                     Image image = new Image(new FileInputStream(imageFile.getAbsolutePath()));
-                    CanvasImage canvasImage = new CanvasImage(image,new CanvasPoint(0,0),false,imageFile.getAbsolutePath(),true);
+                    CanvasImage canvasImage = new CanvasImage(image, new CanvasPoint(0, 0), false, imageFile.getAbsolutePath(), true);
                     canvasImage.clearContextMenu();
                     currentImages.add(canvasImage);
                     imagesHBox.getChildren().add(canvasImage);
@@ -183,7 +192,7 @@ public class SelectHMISymbolWindow extends Stage {
                     e.printStackTrace();
                 }
             });
-            directoryFileNames.put(category,imagesFilenames);
+            directoryFileNames.put(category, imagesFilenames);
             imagesHBox.setOnMouseClicked(mouseEvent -> updateSelected());
             ScrollPane scrollPane = new ScrollPane(imagesHBox);
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -201,22 +210,23 @@ public class SelectHMISymbolWindow extends Stage {
                 new File(System.getProperty("user.home"))
         );
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Imagen", "*.bmp","*.gif","*.jpg","*.jpeg","*.png","*.BMP","*.GIF","*.JPG","*.JPEG","*.PNG"),
-                new FileChooser.ExtensionFilter("BMP","*.bmp","*.BMP"),
-                new FileChooser.ExtensionFilter("GIF", "*.gif","*.GIF"),
-                new FileChooser.ExtensionFilter("JPG", "*.jpg","*.JPG"),
-                new FileChooser.ExtensionFilter("JPEG", "*.jpeg","*.JPEG"),
-                new FileChooser.ExtensionFilter("PNG", "*.png","*.PNG")
+                new FileChooser.ExtensionFilter("Imagen", "*.bmp", "*.gif", "*.jpg", "*.jpeg", "*.png", "*.BMP", "*.GIF", "*.JPG", "*.JPEG", "*.PNG"),
+                new FileChooser.ExtensionFilter("BMP", "*.bmp", "*.BMP"),
+                new FileChooser.ExtensionFilter("GIF", "*.gif", "*.GIF"),
+                new FileChooser.ExtensionFilter("JPG", "*.jpg", "*.JPG"),
+                new FileChooser.ExtensionFilter("JPEG", "*.jpeg", "*.JPEG"),
+                new FileChooser.ExtensionFilter("PNG", "*.png", "*.PNG")
         );
         File file = fileChooser.showOpenDialog(this);
         if (file != null) {
-            String categoryDirectory = DBConnection.getWorkingDirectory()+File.separator+category;
+            String categoryDirectory = DBConnection.getWorkingDirectory() + File.separator + category;
             File directory = new File(categoryDirectory);
             if (!directory.exists()) {
                 directory.mkdir();
             }
+            String outputPath = categoryDirectory + File.separator + file.getName();
             FileInputStream is = new FileInputStream(file.getAbsolutePath());
-            FileOutputStream out = new FileOutputStream(categoryDirectory+File.separator+file.getName());
+            FileOutputStream out = new FileOutputStream(outputPath);
             int c;
 
             while ((c = is.read()) != -1) {
@@ -224,48 +234,56 @@ public class SelectHMISymbolWindow extends Stage {
             }
             is.close();
             out.close();
+            updateCategoryDirectoryInProperties(category);
+            setResultValues(new Image(new FileInputStream(outputPath)), outputPath);
+            this.close();
         }
 
     }
 
     private void updateCategoryDirectoryInProperties(String category) throws IOException {
         Properties properties = DBConnection.readPropertiesFile();
-        String hostname="", port="",username="",password="";
-        if(properties!= null){
-            hostname = properties.getProperty("hostname","");
-            port = properties.getProperty("port");
-            username = properties.getProperty("username");
-            password = properties.getProperty("password");
-            categoriesDirectoriesFlags.put("boilerFurnace",Boolean.parseBoolean(properties.getProperty("boilerFurnace")));
-            categoriesDirectoriesFlags.put("conveyorBelts",Boolean.parseBoolean(properties.getProperty("conveyorBelts")));
-            categoriesDirectoriesFlags.put("motorPumps",Boolean.parseBoolean(properties.getProperty("motorPumps")));
-            categoriesDirectoriesFlags.put("others",Boolean.parseBoolean(properties.getProperty("others")));
-            categoriesDirectoriesFlags.put("pipesValues",Boolean.parseBoolean(properties.getProperty("pipesValues")));
-            categoriesDirectoriesFlags.put("tanks",Boolean.parseBoolean(properties.getProperty("tanks")));
+        String hostname = "";
+        String port = "";
+        String username = "";
+        String password = "";
+        if (properties != null) {
+            hostname = properties.getProperty("hostname", "");
+            port = properties.getProperty("port","");
+            username = properties.getProperty("username","");
+            password = properties.getProperty("password","");
+            categoriesDirectoriesFlags.put(BOILER_FURNACE, Boolean.parseBoolean(properties.getProperty(BOILER_FURNACE)));
+            categoriesDirectoriesFlags.put(CONVEYOR_BELTS, Boolean.parseBoolean(properties.getProperty(CONVEYOR_BELTS)));
+            categoriesDirectoriesFlags.put(MOTOR_PUMPS, Boolean.parseBoolean(properties.getProperty(MOTOR_PUMPS)));
+            categoriesDirectoriesFlags.put(OTHERS, Boolean.parseBoolean(properties.getProperty(OTHERS)));
+            categoriesDirectoriesFlags.put(PIPES_VALVES, Boolean.parseBoolean(properties.getProperty(PIPES_VALVES)));
+            categoriesDirectoriesFlags.put(TANKS, Boolean.parseBoolean(properties.getProperty(TANKS)));
         }
-        categoriesDirectoriesFlags.put(category,true);
-        DBConnection.writePropertiesFile(username,password,hostname,port,categoriesDirectoriesFlags.get("boilerFurnace"),categoriesDirectoriesFlags.get("conveyorBelts"),categoriesDirectoriesFlags.get("motorPumps"),categoriesDirectoriesFlags.get("others"),categoriesDirectoriesFlags.get("pipesValues"),categoriesDirectoriesFlags.get("tanks"));
+        logger.log(Level.INFO,category);
+        categoriesDirectoriesFlags.put(category, true);
+        logger.log(Level.INFO, String.valueOf(categoriesDirectoriesFlags.get(category)));
+        DBConnection.writePropertiesFile(username, password, hostname, port, categoriesDirectoriesFlags.get(BOILER_FURNACE), categoriesDirectoriesFlags.get(CONVEYOR_BELTS), categoriesDirectoriesFlags.get(MOTOR_PUMPS), categoriesDirectoriesFlags.get(OTHERS), categoriesDirectoriesFlags.get(PIPES_VALVES), categoriesDirectoriesFlags.get(TANKS));
     }
 
-    public void updateScrollPanesWidth(double width){
-        for(ScrollPane scrollPane : categoriesPanes){
+    public void updateScrollPanesWidth(double width) {
+        for (ScrollPane scrollPane : categoriesPanes) {
             scrollPane.setMaxWidth(width);
         }
-        for(TitledPane categoriesTitlePane : categoriesTitlePanes){
+        for (TitledPane categoriesTitlePane : categoriesTitlePanes) {
             categoriesTitlePane.setPrefWidth(width);
         }
     }
 
     public void updateSelected(String imagePath) throws FileNotFoundException {
-        for(CanvasImage canvasImage: currentImages){
-            if(canvasImage.getCanvasObjectData().getData().equals(imagePath)){
+        for (CanvasImage canvasImage : currentImages) {
+            if (canvasImage.getCanvasObjectData().getData().equals(imagePath)) {
                 canvasImage.setSelected(true);
                 updateSelected();
             }
         }
     }
 
-    public void updateSelected(){
+    public void updateSelected() {
         LocalDateTime max = null;
         int index = -1;
         for (int i = 0; i < currentImages.size(); i++) {
@@ -289,8 +307,12 @@ public class SelectHMISymbolWindow extends Stage {
                 }
             }
         }
-        this.selectedImage = currentImages.get(index).getImage();
-        this.selectedImagePath = currentImages.get(index).getCanvasObjectData().getData();
+        setResultValues(currentImages.get(index).getImage(),currentImages.get(index).getCanvasObjectData().getData());
+    }
+
+    public void setResultValues(Image image, String imagePath){
+        this.selectedImage = image;
+        this.selectedImagePath = imagePath;
         for (TitledPane categoriesTitlePane : categoriesTitlePanes) {
             if (categoriesTitlePane.isExpanded()) {
                 this.symbolCategory = categoriesTitlePane.getText();
@@ -305,6 +327,7 @@ public class SelectHMISymbolWindow extends Stage {
     public String getSelectedImagePath() {
         return selectedImagePath;
     }
+
     public boolean isMirroringVertical() {
         return mirroringVertical;
     }
@@ -384,6 +407,7 @@ public class SelectHMISymbolWindow extends Stage {
     public void setSymbolCategory(String symbolCategory) {
         this.symbolCategory = symbolCategory;
     }
+
     public void setSelectedImagePath(String selectedImagePath) {
         this.selectedImagePath = selectedImagePath;
     }

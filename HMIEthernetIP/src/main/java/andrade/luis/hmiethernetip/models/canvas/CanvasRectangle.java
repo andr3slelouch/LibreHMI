@@ -23,6 +23,7 @@ import org.codehaus.commons.compiler.CompileException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.logging.Level;
 
 import static javafx.geometry.Pos.CENTER;
@@ -100,6 +101,7 @@ public class CanvasRectangle extends CanvasObject {
             writeExpressionWindow.setSelectedOrientation(this.getCanvasObjectData().getOrientation().toString().toLowerCase());
             writeExpressionWindow.getMinValueField().setText(this.getCanvasObjectData().getMinValue() + "");
             writeExpressionWindow.getMaxValueField().setText(this.getCanvasObjectData().getMaxValue() + "");
+            writeExpressionWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getExpression().getFloatPrecision()));
         } else {
             writeExpressionWindow = new SetPercentFillPropertiesWindow();
         }
@@ -238,7 +240,12 @@ public class CanvasRectangle extends CanvasObject {
                                         break;
                                 }
                                 double value = calculatePercentFillValue(evaluatedValue);
-                                captionLabel.setText(String.valueOf(evaluatedValue));
+                                String captionValue =String.valueOf(evaluatedValue);
+                                if(this.getCanvasObjectData().getExpression().getFloatPrecision()>-1){
+                                    DecimalFormat decimalFormat = this.getCanvasObjectData().getExpression().generateDecimalFormat();
+                                    captionValue = decimalFormat.format(value);
+                                }
+                                captionLabel.setText(captionValue);
                                 life.set(value);
                                 this.setTop(null);
                             } catch (CompileException | InvocationTargetException | SQLException | IOException | NullPointerException e) {

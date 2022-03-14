@@ -148,7 +148,7 @@ public class SelectTagWindow extends Stage {
 
         if(!selected.isEmpty()){
             logger.log(Level.INFO,selected.get(0).getTagName());
-            this.selectedTagRow = new Tag(selected.get(0).getPlcName(),selected.get(0).getPlcAddress(),selected.get(0).getPlcDeviceGroup(),selected.get(0).getTagName(),selected.get(0).getTagType(),selected.get(0).getTagAddress(),selected.get(0).getTagAction(),selected.get(0).getTagValue());
+            this.selectedTagRow = new Tag(selected.get(0).getPlcName(),selected.get(0).getPlcAddress(),selected.get(0).getPlcDeviceGroup(),selected.get(0).getTagName(),selected.get(0).getTagType(),selected.get(0).getTagAddress(),selected.get(0).getTagAction(),selected.get(0).getTagValue(),0);
             this.cancelled = false;
             this.close();
         }else{

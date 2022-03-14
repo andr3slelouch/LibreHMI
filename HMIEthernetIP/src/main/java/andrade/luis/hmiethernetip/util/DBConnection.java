@@ -47,9 +47,10 @@ public class DBConnection {
         properties.setProperty("username", username);
         properties.setProperty("password", password);
         properties.setProperty("hostname", hostname);
+        properties.setProperty("port", port);
         properties.setProperty("BoilerFurnace", String.valueOf(boilerFurnace));
         properties.setProperty("ConveyorBelts", String.valueOf(conveyorBelts));
-        properties.setProperty("MotorPumps", String.valueOf(motorPumps));
+        properties.setProperty("MotorsPumps", String.valueOf(motorPumps));
         properties.setProperty("Others", String.valueOf(others));
         properties.setProperty("PipesValves", String.valueOf(pipesValues));
         properties.setProperty("Tanks", String.valueOf(tanks));

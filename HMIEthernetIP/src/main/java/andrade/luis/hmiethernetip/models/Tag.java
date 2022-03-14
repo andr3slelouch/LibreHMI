@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,6 +84,14 @@ public class Tag implements Serializable {
         this.value = value;
     }
 
+    public int getFloatPrecision() {
+        return floatPrecision;
+    }
+
+    public void setFloatPrecision(int floatPrecision) {
+        this.floatPrecision = floatPrecision;
+    }
+
     public String readFromDatabase() throws SQLException, IOException {
 
         Connection con = DBConnection.createConnectionToBDDriverEIP();
@@ -133,6 +142,14 @@ public class Tag implements Serializable {
         }
     }
 
+    public DecimalFormat generateDecimalFormat(){
+        String precisionStr = "#.";
+        for(int i=0;i<floatPrecision;i++){
+            precisionStr = precisionStr.concat("#");
+        }
+        return new DecimalFormat(precisionStr);
+    }
+
     @SerializedName("plcName")
     @Expose
     private String plcName;
@@ -157,8 +174,11 @@ public class Tag implements Serializable {
     @SerializedName("value")
     @Expose
     private String value;
+    @SerializedName("floatPrecision")
+    @Expose
+    private int floatPrecision=-1;
 
-    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String name, String type, String address, String action, String value) {
+    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String name, String type, String address, String action, String value,int floatPrecision) {
         this.plcName = plcName;
         this.plcAddress = plcAddress;
         this.plcDeviceGroup = plcDeviceGroup;
@@ -167,6 +187,7 @@ public class Tag implements Serializable {
         this.address = address;
         this.action = action;
         this.value = value;
+        this.floatPrecision = floatPrecision;
     }
 
     @Override

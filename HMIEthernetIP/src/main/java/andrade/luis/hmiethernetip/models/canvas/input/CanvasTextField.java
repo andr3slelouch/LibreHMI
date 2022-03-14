@@ -20,6 +20,7 @@ import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -171,6 +172,7 @@ public class CanvasTextField extends CanvasObject {
         setTextFieldPropertiesWindow.setSelectedRadioButton(this.getCanvasObjectData().getType());
         setTextFieldPropertiesWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
         setTextFieldPropertiesWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
+        setTextFieldPropertiesWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getTag().getFloatPrecision()));
         setTextFieldPropertiesWindow.showAndWait();
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
         this.getHmiApp().setWasModified(true);
@@ -212,6 +214,10 @@ public class CanvasTextField extends CanvasObject {
                                         break;
                                     case "Flotante":
                                         evaluatedValue = String.valueOf(Double.parseDouble(this.linkedTag.readFromDatabase()));
+                                        if(this.linkedTag.getFloatPrecision()>-1){
+                                            DecimalFormat decimalFormat = this.linkedTag.generateDecimalFormat();
+                                            evaluatedValue = decimalFormat.format(Double.parseDouble(evaluatedValue));
+                                        }
                                         break;
                                     case "String":
                                         evaluatedValue = this.linkedTag.readFromDatabase();

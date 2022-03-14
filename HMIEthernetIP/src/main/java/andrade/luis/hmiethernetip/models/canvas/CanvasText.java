@@ -15,6 +15,7 @@ import org.codehaus.commons.compiler.CompileException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
 public class CanvasText extends CanvasLabel {
@@ -68,6 +69,7 @@ public class CanvasText extends CanvasLabel {
             writeExpressionWindow.setAddedTags(this.getCanvasObjectData().getExpression().getParameters());
             writeExpressionWindow.setLocalExpression(this.getCanvasObjectData().getExpression());
             writeExpressionWindow.getTextField().setText(this.getCanvasObjectData().getExpression().getExpressionToEvaluate());
+            writeExpressionWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getExpression().getFloatPrecision()));
         }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();
@@ -108,6 +110,10 @@ public class CanvasText extends CanvasLabel {
                                         break;
                                     case "Flotante":
                                         evaluatedValue = String.valueOf((double) this.getCanvasObjectData().getExpression().evaluate());
+                                        if(this.getCanvasObjectData().getExpression().getFloatPrecision()>-1){
+                                            DecimalFormat decimalFormat = this.getCanvasObjectData().getExpression().generateDecimalFormat();
+                                            evaluatedValue = decimalFormat.format(Double.parseDouble(evaluatedValue));
+                                        }
                                         break;
                                     case "String":
                                         evaluatedValue = (String) this.getCanvasObjectData().getExpression().evaluate();

@@ -18,7 +18,7 @@ class CanvasTextTest {
     @Test
     void prepareQueryAndReadFromDatabase() throws SQLException {
         CanvasText testCanvasText = new CanvasText();
-        Tag tag = new Tag("","","","temperatura","Flotante","","","");
+        Tag tag = new Tag("","","","temperatura","Flotante","","","",0);
         testCanvasText.getCanvasObjectData().setTag(tag);
         String text = "";
         try {
@@ -35,7 +35,7 @@ class CanvasTextTest {
     void setTimeline() {
         CanvasText testCanvasText = new CanvasText();
         testCanvasText.setLabel(new Label(""));
-        Tag tag = new Tag("","","","temperatura","Flotante","","","");
+        Tag tag = new Tag("","","","temperatura","Flotante","","","",0);
         testCanvasText.getCanvasObjectData().setTag(tag);
         testCanvasText.setTimeline();
         Assertions.assertThat(testCanvasText.getTimeline()).isNotNull();

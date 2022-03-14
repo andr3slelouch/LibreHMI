@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -38,6 +39,9 @@ public class Expression implements Serializable {
     @SerializedName("parameters")
     @Expose
     private ArrayList<Tag> parameters;
+    @SerializedName("floatPrecision")
+    @Expose
+    private int floatPrecision=-1;
 
     public Expression() {
 
@@ -83,6 +87,14 @@ public class Expression implements Serializable {
         this.parameterTypes = parameterTypes;
     }
 
+    public int getFloatPrecision() {
+        return floatPrecision;
+    }
+
+    public void setFloatPrecision(int floatPrecision) {
+        this.floatPrecision = floatPrecision;
+    }
+
     public Expression(String expressionToEvaluate, String resultType, String[] parameterNames, String[] parameterTypes) {
         this.expressionToEvaluate = expressionToEvaluate;
         this.resultType = resultType;
@@ -90,11 +102,12 @@ public class Expression implements Serializable {
         this.parameterTypes = parameterTypes;
     }
 
-    public Expression(String expressionToEvaluate, ArrayList<Tag> tags) {
+    public Expression(String expressionToEvaluate, ArrayList<Tag> tags, int floatPrecision) {
         this.expressionToEvaluate = expressionToEvaluate;
         this.parameters = tags;
         this.parameterNames = new String[tags.size()];
         this.parameterTypes = new String[tags.size()];
+        this.floatPrecision = floatPrecision;
         for (int i = 0; i < parameters.size(); i++) {
             this.parameterNames[i] = parameters.get(i).getName();
             this.parameterTypes[i] = parameters.get(i).getType();
@@ -242,6 +255,14 @@ public class Expression implements Serializable {
         ee.cook(this.expressionToEvaluate);
         return ee;
 
+    }
+
+    public DecimalFormat generateDecimalFormat(){
+        String precisionStr = "#.";
+        for(int i=0;i<floatPrecision;i++){
+            precisionStr = precisionStr.concat("#");
+        }
+        return new DecimalFormat(precisionStr);
     }
 
     public Object evaluate() throws CompileException, InvocationTargetException, SQLException, IOException, NullPointerException{
