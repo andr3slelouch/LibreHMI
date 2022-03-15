@@ -21,6 +21,16 @@ import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 public class WriteExpressionWindow extends Stage {
+    public HBox getFloatPrecisionHBox() {
+        return floatPrecisionHBox;
+    }
+
+    public void setFloatPrecisionHBox(HBox floatPrecisionHBox) {
+        this.floatPrecisionHBox = floatPrecisionHBox;
+    }
+
+    private HBox floatPrecisionHBox;
+
     public TextField getFloatPrecisionTextField() {
         return floatPrecisionTextField;
     }
@@ -132,7 +142,7 @@ public class WriteExpressionWindow extends Stage {
         };
         floatPrecisionTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 3, integerFilter));
         floatPrecisionTextField.setPromptText("# decimales");
-        HBox floatPrecisionHBox = new HBox();
+        floatPrecisionHBox = new HBox();
         floatPrecisionHBox.getChildren().addAll(floatPrecision,floatPrecisionTextField);
 
         textField.textProperty().addListener((observableValue,oldValue,newValue) ->{
@@ -156,6 +166,10 @@ public class WriteExpressionWindow extends Stage {
         buttonsHBox.getChildren().add(addTagButton);
         buttonsHBox.getChildren().add(finishSelectionButton);
         buttonsHBox.setAlignment(Pos.BASELINE_RIGHT);
+        Button clearAllButton = new Button("Limpiar Tags");
+
+        buttonsHBox.getChildren().add(0,clearAllButton);
+        clearAllButton.setOnAction(mouseEvent -> clearAll());
         vbox.getChildren().add(buttonsHBox);
         root.getChildren().add(vbox);
         mainScene = new Scene(root,width,height);
@@ -202,7 +216,7 @@ public class WriteExpressionWindow extends Stage {
         }
     }
 
-    private void deleteUnneededTags(){
+    protected void deleteUnneededTags(){
         ArrayList<Tag> toDelete = new ArrayList<>();
         for(int i=0;i< getAddedTags().size();i++){
             if(!textField.getText().contains(getAddedTags().get(i).getName())){
@@ -212,7 +226,7 @@ public class WriteExpressionWindow extends Stage {
         getAddedTags().removeAll(toDelete);
     }
 
-    private boolean prepareExpression(boolean test){
+    protected boolean prepareExpression(boolean test){
         for (Tag addedTag : addedTags) {
             addedTag.setFloatPrecision(Integer.parseInt(floatPrecisionTextField.getText()));
         }

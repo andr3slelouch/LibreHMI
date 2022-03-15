@@ -213,11 +213,12 @@ public class HMIApp extends Application {
         Button saveAsBtn = new Button("Guardar Como");
         Button loadBtn = new Button("Cargar");
         Button newBtn = new Button("Nuevo");
+        Button alarmBtn = new Button("Alarma");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
         HBox thirdHBox = new HBox(saveBtn,saveAsBtn ,loadBtn, newBtn);
         HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn, symbolBtn, pushbuttonBtn);
-        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn);
+        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn,alarmBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
@@ -292,6 +293,10 @@ public class HMIApp extends Application {
             }
         });
         newBtn.setOnAction(mouseEvent -> this.createNewProject());
+        alarmBtn.setOnAction(mouseEvent -> {
+           SetAlarmWindow setAlarmWindow = new SetAlarmWindow();
+           setAlarmWindow.show();
+        });
 
         scene.setHmiApp(this);
 

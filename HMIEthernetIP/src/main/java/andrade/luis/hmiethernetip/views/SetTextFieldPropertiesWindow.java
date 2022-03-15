@@ -90,10 +90,7 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
         this.getVbox().setSpacing(5);
         this.setInputMode(true);
 
-        Button clearAllButton = new Button("Quitar Tag");
 
-        this.getButtonsHBox().getChildren().add(0,clearAllButton);
-        clearAllButton.setOnAction(mouseEvent -> clearAll());
     }
 
     private void disableMaxMinInputs(boolean disable) {
