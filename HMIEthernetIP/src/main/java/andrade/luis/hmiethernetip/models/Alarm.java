@@ -1,39 +1,130 @@
 package andrade.luis.hmiethernetip.models;
 
+import org.codehaus.commons.compiler.CompileException;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Alarm implements Serializable {
+    Logger logger = Logger.getLogger(getClass().getName());
+    private static final String ACTIVATED_STR = "Activada";
+    private static final String DEACTIVATED_STR = "Desactivada";
+    private static final String UNACKNOWLEDGED_STATUS_STR = "No Reconocida";
     private Expression expression;
-    private Double highLimit=0.0;
-    private Double hiHiLimit=0.0;
-    private Double lowLimit=0.0;
-    private Double loloLimit=0.0;
+    private double highLimit=0.0;
+    private double hiHiLimit=0.0;
+    private double lowLimit=0.0;
+    private double loloLimit=0.0;
     private boolean highAlarmEnabled=false;
     private boolean hiHiAlarmEnabled=false;
     private boolean lowAlarmEnabled=false;
     private boolean loloAlarmEnabled=false;
+    private boolean conditionEnabled=false;
     private boolean condition;
     private String status;
     private String acknowledgement;
     private String comment;
+    private String type;
+    private String name;
+    private String value;
     private LocalDateTime alarmExecutionDateTime;
 
-    public Alarm(Expression expression, Double highLimit, Double hiHiLimit, Double lowLimit, Double loloLimit, String status, String acknowledgement) {
+    public Alarm(
+            Expression expression,
+            double highLimit,
+            double hiHiLimit,
+            double lowLimit,
+            double loloLimit,
+            boolean highAlarmEnabled,
+            boolean hiHiAlarmEnabled,
+            boolean lowAlarmEnabled,
+            boolean loloAlarmEnabled,
+            String name,
+            String comment) {
         this.expression = expression;
         this.highLimit = highLimit;
         this.hiHiLimit = hiHiLimit;
         this.lowLimit = lowLimit;
         this.loloLimit = loloLimit;
-        this.status = status;
-        this.acknowledgement = acknowledgement;
+        this.loloAlarmEnabled = loloAlarmEnabled;
+        this.lowAlarmEnabled = lowAlarmEnabled;
+        this.hiHiAlarmEnabled = hiHiAlarmEnabled;
+        this.highAlarmEnabled = highAlarmEnabled;
+        this.name = name;
+        this.comment = comment;
     }
 
-    public Alarm(Expression expression, boolean condition, String status, String acknowledgement) {
+    public Alarm(Expression expression, boolean condition, boolean conditionEnabled,String name, String comment) {
         this.expression = expression;
         this.condition = condition;
-        this.status = status;
-        this.acknowledgement = acknowledgement;
+        this.conditionEnabled = conditionEnabled;
+        this.name = name;
+        this.comment = comment;
+    }
+
+    public boolean checkAlarm() throws SQLException, CompileException, IOException, InvocationTargetException {
+        logger.log(Level.INFO,this.getAcknowledgement());
+        if(conditionEnabled){
+            boolean localValue = (boolean) this.expression.evaluate();
+            this.value = String.valueOf(localValue);
+            if(localValue == condition){
+                this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
+                this.type="Condición: "+ this.condition;
+                this.status=ACTIVATED_STR;
+                return true;
+            }else{
+                this.status=DEACTIVATED_STR;
+                return false;
+            }
+        }else{
+            if(hiHiAlarmEnabled){
+                double localValue = (double) this.expression.evaluate();
+                this.value = String.valueOf(localValue);
+                if(localValue > hiHiLimit){
+                    this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
+                    this.type="Condición: Alto Alto";
+                    this.status=ACTIVATED_STR;
+                    return true;
+                }
+            }
+            if(highAlarmEnabled){
+                double localValue = (double) this.expression.evaluate();
+                this.value = String.valueOf(localValue);
+                if(localValue> highLimit){
+                    this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
+                    this.type="Condición: Alto";
+                    this.status=ACTIVATED_STR;
+                    return true;
+                }
+            }
+            if(loloAlarmEnabled){
+                double localValue = (double) this.expression.evaluate();
+                this.value = String.valueOf(localValue);
+                if(localValue < loloLimit){
+                    this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
+                    this.type="Condición: Bajo Bajo";
+                    this.status=ACTIVATED_STR;
+                    return true;
+                }
+            }
+            if(lowAlarmEnabled){
+                double localValue = (double) this.expression.evaluate();
+                this.value = String.valueOf(localValue);
+                if(localValue < lowLimit){
+                    this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
+                    this.type="Condición: Bajo";
+                    this.status=ACTIVATED_STR;
+                    return true;
+                }
+            }
+            this.status=DEACTIVATED_STR;
+            return false;
+        }
     }
 
     public Expression getExpression() {
@@ -44,7 +135,7 @@ public class Alarm implements Serializable {
         this.expression = expression;
     }
 
-    public Double getHighLimit() {
+    public double getHighLimit() {
         return highLimit;
     }
 
@@ -52,7 +143,7 @@ public class Alarm implements Serializable {
         this.highLimit = highLimit;
     }
 
-    public Double getHiHiLimit() {
+    public double getHiHiLimit() {
         return hiHiLimit;
     }
 
@@ -60,7 +151,7 @@ public class Alarm implements Serializable {
         this.hiHiLimit = hiHiLimit;
     }
 
-    public Double getLowLimit() {
+    public double getLowLimit() {
         return lowLimit;
     }
 
@@ -68,7 +159,7 @@ public class Alarm implements Serializable {
         this.lowLimit = lowLimit;
     }
 
-    public Double getLoloLimit() {
+    public double getLoloLimit() {
         return loloLimit;
     }
 
@@ -150,5 +241,28 @@ public class Alarm implements Serializable {
 
     public void setLoloAlarmEnabled(boolean loloAlarmEnabled) {
         this.loloAlarmEnabled = loloAlarmEnabled;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

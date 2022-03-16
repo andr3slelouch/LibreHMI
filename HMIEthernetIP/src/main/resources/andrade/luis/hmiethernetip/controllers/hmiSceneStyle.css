@@ -1,0 +1,9 @@
+.unacknowledgedAlarm {
+    -fx-text-background-color: red;
+}
+.acknowledgedAlarm{
+    -fx-text-background-color: blue;
+}
+.deactivatedAlarm{
+    -fx-text-background-color: black;
+}

@@ -1,6 +1,7 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
+import andrade.luis.hmiethernetip.models.Alarm;
 import andrade.luis.hmiethernetip.models.HMIAppData;
 import andrade.luis.hmiethernetip.models.HMISceneData;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
@@ -47,6 +48,7 @@ public class HMIApp extends Application {
     private final BooleanProperty updateTitleFlag = new SimpleBooleanProperty(false);
     private HMIAppData hmiAppData = new HMIAppData();
     private ArrayList<String> pagesTitles = new ArrayList<>();
+    private ArrayList<Alarm> projectAlarms = new ArrayList<>();
     private static final String HMI_TITLE = "HMI";
     private static final String ALERT_SAVE_TITLE = "¿Desea guardar los cambios del proyecto actual?";
     private static final String ALERT_SAVE_DESCRIPTION = "Los cambios se perderán si elige No Guardar";
@@ -199,6 +201,11 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("TextField");
         });
+        Button alarmDisplayBtn = new Button("Alarm Display");
+        alarmDisplayBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("AlarmDisplay");
+        });
         Button manageUsersBtn = new Button("Manage Users");
         Button registerUserBtn = new Button("Register");
         Button logIntUserBtn = new Button("Log In");
@@ -214,7 +221,7 @@ public class HMIApp extends Application {
         Button loadBtn = new Button("Cargar");
         Button newBtn = new Button("Nuevo");
         Button alarmBtn = new Button("Alarma");
-        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn);
+        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn,alarmDisplayBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
         HBox thirdHBox = new HBox(saveBtn,saveAsBtn ,loadBtn, newBtn);
         HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn, symbolBtn, pushbuttonBtn);
@@ -295,7 +302,36 @@ public class HMIApp extends Application {
         newBtn.setOnAction(mouseEvent -> this.createNewProject());
         alarmBtn.setOnAction(mouseEvent -> {
            SetAlarmWindow setAlarmWindow = new SetAlarmWindow();
-           setAlarmWindow.show();
+           setAlarmWindow.showAndWait();
+           if(setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")){
+               Alarm alarm = new Alarm(
+                       setAlarmWindow.getLocalExpression(),
+                       Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
+                       Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
+                       Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
+                       Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
+                       setAlarmWindow.getHighLimitCheckBox().isSelected(),
+                       setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
+                       setAlarmWindow.getLowLimitCheckBox().isSelected(),
+                       setAlarmWindow.getLoloLimitCheckBox().isSelected(),
+                       setAlarmWindow.getAlarmNameTF().getText(),
+                       setAlarmWindow.getAlarmCommentTF().getText()
+               );
+               projectAlarms.add(alarm);
+               logger.log(Level.INFO, String.valueOf(projectAlarms.size()));
+           }else if(setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")){
+
+               Alarm alarm = new Alarm(
+                       setAlarmWindow.getLocalExpression(),
+                       setAlarmWindow.getHighLimitCheckBox().isSelected(),
+                       setAlarmWindow.getTrueRadioButton().isSelected(),
+                       setAlarmWindow.getAlarmNameTF().getText(),
+                       setAlarmWindow.getAlarmCommentTF().getText()
+               );
+               projectAlarms.add(alarm);
+               logger.log(Level.INFO, String.valueOf(projectAlarms.size()));
+
+           }
         });
 
         scene.setHmiApp(this);
@@ -690,5 +726,11 @@ public class HMIApp extends Application {
         this.user = user;
     }
 
+    public ArrayList<Alarm> getProjectAlarms() {
+        return projectAlarms;
+    }
 
+    public void setProjectAlarms(ArrayList<Alarm> projectAlarms) {
+        this.projectAlarms = projectAlarms;
+    }
 }

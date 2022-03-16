@@ -10,6 +10,13 @@ import java.util.function.UnaryOperator;
 public class SetAlarmWindow extends WriteExpressionWindow{
     private final HBox doubleLimitHBox;
     private final HBox booleanConditionsHBox;
+    private RadioButton falseRadioButton;
+    private RadioButton trueRadioButton;
+    private TextField alarmNameTF;
+    private CheckBox hiHiLimitCheckBox;
+    private CheckBox highLimitCheckBox;
+    private CheckBox loloLimitCheckBox;
+    private CheckBox lowLimitCheckBox;
     private TextField alarmCommentTF;
     private TextField hiHiLimitTF;
     private TextField highLimitTF;
@@ -28,12 +35,17 @@ public class SetAlarmWindow extends WriteExpressionWindow{
             }
         });
 
+        Label alarmName = new Label("Nombre de Alarma:");
+        alarmNameTF = new TextField();
+        HBox alarmNameHBox = new HBox();
+        alarmNameHBox.getChildren().addAll(alarmName,alarmNameTF);
+
         Label alarmComment = new Label("Comentario de Alarma:");
         alarmCommentTF = new TextField();
         HBox alarmCommentHBox = new HBox();
         alarmCommentHBox.getChildren().addAll(alarmComment,alarmCommentTF);
 
-        CheckBox hiHiLimitCheckBox = new CheckBox("HiHi");
+        hiHiLimitCheckBox = new CheckBox("HiHi");
         hiHiLimitTF = new TextField("0");
         UnaryOperator<TextFormatter.Change> numberFilter = change -> {
             String newText = change.getControlNewText();
@@ -50,7 +62,7 @@ public class SetAlarmWindow extends WriteExpressionWindow{
         hiHiLimitHBox.getChildren().addAll(hiHiLimitCheckBox,hiHiLimitTF);
         hiHiLimitHBox.setSpacing(10);
 
-        CheckBox highLimitCheckBox = new CheckBox("High");
+        highLimitCheckBox = new CheckBox("High");
         highLimitTF = new TextField("0");
         highLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         highLimitTF.setDisable(true);
@@ -59,7 +71,7 @@ public class SetAlarmWindow extends WriteExpressionWindow{
         highLimitHBox.getChildren().addAll(highLimitCheckBox,highLimitTF);
         highLimitHBox.setSpacing(6);
 
-        CheckBox loloLimitCheckBox = new CheckBox("LoLo");
+        loloLimitCheckBox = new CheckBox("LoLo");
         loloLimitTF = new TextField("0");
         loloLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         loloLimitTF.setDisable(true);
@@ -68,7 +80,7 @@ public class SetAlarmWindow extends WriteExpressionWindow{
         loloLimitHBox.getChildren().addAll(loloLimitCheckBox,loloLimitTF);
         loloLimitHBox.setSpacing(5);
 
-        CheckBox lowLimitCheckBox = new CheckBox("Low");
+        lowLimitCheckBox = new CheckBox("Low");
         lowLimitTF = new TextField("0");
         lowLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         lowLimitTF.setDisable(true);
@@ -89,33 +101,34 @@ public class SetAlarmWindow extends WriteExpressionWindow{
 
         Label visibilityLabel = new Label("Alarma en el estado:");
         toggleGroup = new ToggleGroup();
-        RadioButton trueRadioButton = new RadioButton("Verdadero");
+        trueRadioButton = new RadioButton("Verdadero");
         trueRadioButton.setToggleGroup(toggleGroup);
         trueRadioButton.setSelected(true);
-        RadioButton falseRadioButton = new RadioButton("Falso");
+        falseRadioButton = new RadioButton("Falso");
         falseRadioButton.setToggleGroup(toggleGroup);
         booleanConditionsHBox = new HBox();
         booleanConditionsHBox.getChildren().addAll(visibilityLabel,trueRadioButton,falseRadioButton);
         booleanConditionsHBox.setVisible(false);
 
-        this.getVbox().getChildren().add(3,alarmCommentHBox);
-        this.getVbox().getChildren().add(4,doubleLimitHBox);
-        this.getVbox().getChildren().add(5,booleanConditionsHBox);
+        this.getVbox().getChildren().add(3,alarmNameHBox);
+        this.getVbox().getChildren().add(4,alarmCommentHBox);
+        this.getVbox().getChildren().add(5,doubleLimitHBox);
+        this.getVbox().getChildren().add(6,booleanConditionsHBox);
     }
 
     private void enableInputs(String type){
         if(type.equals("Flotante") || type.equals("Entero")){
             this.getVbox().getChildren().remove(doubleLimitHBox);
             this.getVbox().getChildren().remove(booleanConditionsHBox);
-            this.getVbox().getChildren().add(4,doubleLimitHBox);
-            this.getVbox().getChildren().add(5,booleanConditionsHBox);
+            this.getVbox().getChildren().add(5,doubleLimitHBox);
+            this.getVbox().getChildren().add(6,booleanConditionsHBox);
             doubleLimitHBox.setVisible(true);
             booleanConditionsHBox.setVisible(false);
         }else if(type.equals("Bool")){
             this.getVbox().getChildren().remove(doubleLimitHBox);
             this.getVbox().getChildren().remove(booleanConditionsHBox);
-            this.getVbox().getChildren().add(4,booleanConditionsHBox);
-            this.getVbox().getChildren().add(5,doubleLimitHBox);
+            this.getVbox().getChildren().add(5,booleanConditionsHBox);
+            this.getVbox().getChildren().add(6,doubleLimitHBox);
             doubleLimitHBox.setVisible(false);
             booleanConditionsHBox.setVisible(true);
         }else{
@@ -170,6 +183,62 @@ public class SetAlarmWindow extends WriteExpressionWindow{
 
     public void setToggleGroup(ToggleGroup toggleGroup) {
         this.toggleGroup = toggleGroup;
+    }
+
+    public CheckBox getHiHiLimitCheckBox() {
+        return hiHiLimitCheckBox;
+    }
+
+    public void setHiHiLimitCheckBox(CheckBox hiHiLimitCheckBox) {
+        this.hiHiLimitCheckBox = hiHiLimitCheckBox;
+    }
+
+    public CheckBox getHighLimitCheckBox() {
+        return highLimitCheckBox;
+    }
+
+    public void setHighLimitCheckBox(CheckBox highLimitCheckBox) {
+        this.highLimitCheckBox = highLimitCheckBox;
+    }
+
+    public CheckBox getLoloLimitCheckBox() {
+        return loloLimitCheckBox;
+    }
+
+    public void setLoloLimitCheckBox(CheckBox loloLimitCheckBox) {
+        this.loloLimitCheckBox = loloLimitCheckBox;
+    }
+
+    public CheckBox getLowLimitCheckBox() {
+        return lowLimitCheckBox;
+    }
+
+    public void setLowLimitCheckBox(CheckBox lowLimitCheckBox) {
+        this.lowLimitCheckBox = lowLimitCheckBox;
+    }
+
+    public TextField getAlarmNameTF() {
+        return alarmNameTF;
+    }
+
+    public void setAlarmNameTF(TextField alarmNameTF) {
+        this.alarmNameTF = alarmNameTF;
+    }
+
+    public RadioButton getFalseRadioButton() {
+        return falseRadioButton;
+    }
+
+    public void setFalseRadioButton(RadioButton falseRadioButton) {
+        this.falseRadioButton = falseRadioButton;
+    }
+
+    public RadioButton getTrueRadioButton() {
+        return trueRadioButton;
+    }
+
+    public void setTrueRadioButton(RadioButton trueRadioButton) {
+        this.trueRadioButton = trueRadioButton;
     }
 
 }

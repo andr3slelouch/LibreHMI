@@ -44,6 +44,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private static final String PUSHBUTTON_STR = "Pushbutton";
     private static final String SLIDER_STR = "Slider";
     private static final String TEXTFIELD_STR = "TextField";
+    private static final String ALARM_DISPLAY_STR = "AlarmDisplay";
     private static final String FIGURE_ID = "#createdShape";
     private final ContextMenu rightClickMenu;
 
@@ -169,9 +170,30 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             case IMAGE_STR:
                 addImageViewOnCanvasClicked(current);
                 break;
+            case ALARM_DISPLAY_STR:
+                addAlarmDisplayOnCanvasClicked(current);
+                break;
             default:
                 break;
         }
+    }
+
+    private void addAlarmDisplayOnCanvasClicked(CanvasPoint current) {
+        CanvasAlarmDisplay canvasAlarmDisplay = new CanvasAlarmDisplay(current);
+        canvasAlarmDisplay.setCanvas(this);
+        canvasAlarmDisplay.setHmiApp(hmiApp);
+        canvasAlarmDisplay.setUser(hmiApp.getUser());
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasAlarmDisplay.setObjectId(FIGURE_ID + "0");
+        } else {
+            canvasAlarmDisplay.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+
+        this.addNewShape(canvasAlarmDisplay);
+        this.getChildren().add(canvasAlarmDisplay);
+        //canvasAlarmDisplay.setTimeline();
+        canvasAlarmDisplay.getHmiApp().setWasModified(true);
+        canvasAlarmDisplay.setUpdateTableTimeline();
     }
 
     private void addImageViewOnCanvasClicked(CanvasPoint current) {

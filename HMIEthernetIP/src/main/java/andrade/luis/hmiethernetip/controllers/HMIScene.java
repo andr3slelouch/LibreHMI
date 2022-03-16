@@ -192,8 +192,8 @@ public class HMIScene extends Scene implements Cloneable {
         this.hmiSceneData.setSceneCommentary(sceneCommentary);
         this.hmiCanvas = hmiCanvas;
         this.hmiSceneData.setBackground(new CanvasColor((Color) paint));
+        this.getStylesheets().add(getClass().getResource("hmiSceneStyle.css").toExternalForm());
         this.setOnMouseClicked(mouseEvent -> {
-            logger.log(Level.INFO,"Mouse CLICKED:"+new CanvasPoint(mouseEvent.getX(), mouseEvent.getY()).toString());
             if (this.hmiCanvas.isAddOnClickEnabled()) {
                 hmiCanvas.addFigureOnCanvasClicked(new CanvasPoint(mouseEvent.getX(), mouseEvent.getY()));
                 this.hmiCanvas.setAddOnClickEnabled(false);
