@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class CanvasImage extends CanvasObject {
     Logger logger
             = Logger.getLogger(
-            HMIApp.class.getName());
+            getClass().getName());
     private ImageView imageView;
     /**
      * Image Not found attribution:

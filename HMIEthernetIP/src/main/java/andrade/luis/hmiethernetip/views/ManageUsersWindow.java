@@ -35,7 +35,7 @@ public class ManageUsersWindow extends Stage {
     public ManageUsersWindow(HMIUser adminUser){
         StackPane root = new StackPane();
 
-        final Label label = new Label("Seleccione el Tag a ser asociado");
+        final Label label = new Label("Seleccione el Usuario a administrar");
         label.setFont(new Font("Arial", 20));
 
         TableView<HMIUserRow> table= new TableView<>();;

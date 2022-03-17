@@ -16,22 +16,22 @@ public class Alarm implements Serializable {
     private static final String DEACTIVATED_STR = "Desactivada";
     private static final String UNACKNOWLEDGED_STATUS_STR = "No Reconocida";
     private Expression expression;
-    private double highLimit=0.0;
-    private double hiHiLimit=0.0;
-    private double lowLimit=0.0;
-    private double loloLimit=0.0;
+    private Double highLimit=null;
+    private Double hiHiLimit=null;
+    private Double lowLimit=null;
+    private Double loloLimit=null;
     private boolean highAlarmEnabled=false;
     private boolean hiHiAlarmEnabled=false;
     private boolean lowAlarmEnabled=false;
     private boolean loloAlarmEnabled=false;
     private boolean conditionEnabled=false;
     private boolean condition;
-    private String status;
-    private String acknowledgement;
-    private String comment;
-    private String type;
-    private String name;
-    private String value;
+    private String status=DEACTIVATED_STR;
+    private String acknowledgement="";
+    private String comment="";
+    private String type="";
+    private String name="";
+    private String value="";
     private LocalDateTime alarmExecutionDateTime;
 
     public Alarm(
@@ -68,11 +68,13 @@ public class Alarm implements Serializable {
     }
 
     public boolean checkAlarm() throws SQLException, CompileException, IOException, InvocationTargetException {
-        logger.log(Level.INFO,this.getAcknowledgement());
         if(conditionEnabled){
             boolean localValue = (boolean) this.expression.evaluate();
             this.value = String.valueOf(localValue);
             if(localValue == condition){
+                if(this.status.equals(DEACTIVATED_STR)){
+                    this.acknowledgement = UNACKNOWLEDGED_STATUS_STR;
+                }
                 this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                 this.type="Condición: "+ this.condition;
                 this.status=ACTIVATED_STR;
@@ -86,6 +88,9 @@ public class Alarm implements Serializable {
                 double localValue = (double) this.expression.evaluate();
                 this.value = String.valueOf(localValue);
                 if(localValue > hiHiLimit){
+                    if(this.status.equals(DEACTIVATED_STR)){
+                        this.acknowledgement = UNACKNOWLEDGED_STATUS_STR;
+                    }
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Alto Alto";
                     this.status=ACTIVATED_STR;
@@ -96,6 +101,9 @@ public class Alarm implements Serializable {
                 double localValue = (double) this.expression.evaluate();
                 this.value = String.valueOf(localValue);
                 if(localValue> highLimit){
+                    if(this.status.equals(DEACTIVATED_STR)){
+                        this.acknowledgement = UNACKNOWLEDGED_STATUS_STR;
+                    }
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Alto";
                     this.status=ACTIVATED_STR;
@@ -106,6 +114,9 @@ public class Alarm implements Serializable {
                 double localValue = (double) this.expression.evaluate();
                 this.value = String.valueOf(localValue);
                 if(localValue < loloLimit){
+                    if(this.status.equals(DEACTIVATED_STR)){
+                        this.acknowledgement = UNACKNOWLEDGED_STATUS_STR;
+                    }
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Bajo Bajo";
                     this.status=ACTIVATED_STR;
@@ -116,6 +127,9 @@ public class Alarm implements Serializable {
                 double localValue = (double) this.expression.evaluate();
                 this.value = String.valueOf(localValue);
                 if(localValue < lowLimit){
+                    if(this.status.equals(DEACTIVATED_STR)){
+                        this.acknowledgement = UNACKNOWLEDGED_STATUS_STR;
+                    }
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Bajo";
                     this.status=ACTIVATED_STR;
@@ -135,7 +149,7 @@ public class Alarm implements Serializable {
         this.expression = expression;
     }
 
-    public double getHighLimit() {
+    public Double getHighLimit() {
         return highLimit;
     }
 
@@ -143,7 +157,7 @@ public class Alarm implements Serializable {
         this.highLimit = highLimit;
     }
 
-    public double getHiHiLimit() {
+    public Double getHiHiLimit() {
         return hiHiLimit;
     }
 
@@ -151,7 +165,7 @@ public class Alarm implements Serializable {
         this.hiHiLimit = hiHiLimit;
     }
 
-    public double getLowLimit() {
+    public Double getLowLimit() {
         return lowLimit;
     }
 
@@ -159,7 +173,7 @@ public class Alarm implements Serializable {
         this.lowLimit = lowLimit;
     }
 
-    public double getLoloLimit() {
+    public Double getLoloLimit() {
         return loloLimit;
     }
 

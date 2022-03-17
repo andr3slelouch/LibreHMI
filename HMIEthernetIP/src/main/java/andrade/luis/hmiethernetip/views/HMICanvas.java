@@ -179,7 +179,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addAlarmDisplayOnCanvasClicked(CanvasPoint current) {
-        CanvasAlarmDisplay canvasAlarmDisplay = new CanvasAlarmDisplay(current);
+        CanvasAlarmDisplay canvasAlarmDisplay = new CanvasAlarmDisplay(current,true);
         canvasAlarmDisplay.setCanvas(this);
         canvasAlarmDisplay.setHmiApp(hmiApp);
         canvasAlarmDisplay.setUser(hmiApp.getUser());

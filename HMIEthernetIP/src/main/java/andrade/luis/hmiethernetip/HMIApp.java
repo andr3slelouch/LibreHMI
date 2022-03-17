@@ -49,6 +49,7 @@ public class HMIApp extends Application {
     private HMIAppData hmiAppData = new HMIAppData();
     private ArrayList<String> pagesTitles = new ArrayList<>();
     private ArrayList<Alarm> projectAlarms = new ArrayList<>();
+    private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
     private static final String HMI_TITLE = "HMI";
     private static final String ALERT_SAVE_TITLE = "¿Desea guardar los cambios del proyecto actual?";
     private static final String ALERT_SAVE_DESCRIPTION = "Los cambios se perderán si elige No Guardar";
@@ -221,11 +222,12 @@ public class HMIApp extends Application {
         Button loadBtn = new Button("Cargar");
         Button newBtn = new Button("Nuevo");
         Button alarmBtn = new Button("Alarma");
+        Button manageAlarmBtn = new Button("Administrar Alarmas");
         HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn,alarmDisplayBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
         HBox thirdHBox = new HBox(saveBtn,saveAsBtn ,loadBtn, newBtn);
         HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn, symbolBtn, pushbuttonBtn);
-        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn,alarmBtn);
+        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn,alarmBtn,manageAlarmBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
@@ -317,10 +319,9 @@ public class HMIApp extends Application {
                        setAlarmWindow.getAlarmNameTF().getText(),
                        setAlarmWindow.getAlarmCommentTF().getText()
                );
-               projectAlarms.add(alarm);
-               logger.log(Level.INFO, String.valueOf(projectAlarms.size()));
+               manageableAlarms.add(alarm);
+               generateDoubleProjectAlarms(alarm);
            }else if(setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")){
-
                Alarm alarm = new Alarm(
                        setAlarmWindow.getLocalExpression(),
                        setAlarmWindow.getHighLimitCheckBox().isSelected(),
@@ -328,15 +329,86 @@ public class HMIApp extends Application {
                        setAlarmWindow.getAlarmNameTF().getText(),
                        setAlarmWindow.getAlarmCommentTF().getText()
                );
+               manageableAlarms.add(alarm);
                projectAlarms.add(alarm);
                logger.log(Level.INFO, String.valueOf(projectAlarms.size()));
-
            }
         });
-
+        manageAlarmBtn.setOnAction(mouseEvent ->{
+           ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow(projectAlarms);
+           manageAlarmsWindow.showAndWait();
+        });
         scene.setHmiApp(this);
 
         return scene;
+    }
+
+    private void generateDoubleProjectAlarms(Alarm manageableAlarm) {
+        if(manageableAlarm.isHighAlarmEnabled()){
+            Alarm alarm = new Alarm(
+                    manageableAlarm.getExpression(),
+                    manageableAlarm.getHighLimit(),
+                    manageableAlarm.getHiHiLimit(),
+                    manageableAlarm.getLowLimit(),
+                    manageableAlarm.getLoloLimit(),
+                    manageableAlarm.isHighAlarmEnabled(),
+                    false,
+                    false,
+                    false,
+                    manageableAlarm.getName(),
+                    manageableAlarm.getComment()
+            );
+            projectAlarms.add(alarm);
+        }
+        if(manageableAlarm.isHiHiAlarmEnabled()){
+            Alarm alarm = new Alarm(
+                    manageableAlarm.getExpression(),
+                    manageableAlarm.getHighLimit(),
+                    manageableAlarm.getHiHiLimit(),
+                    manageableAlarm.getLowLimit(),
+                    manageableAlarm.getLoloLimit(),
+                    false,
+                    manageableAlarm.isHiHiAlarmEnabled(),
+                    false,
+                    false,
+                    manageableAlarm.getName(),
+                    manageableAlarm.getComment()
+
+            );
+            projectAlarms.add(alarm);
+        }
+        if(manageableAlarm.isLoloAlarmEnabled()){
+            Alarm alarm = new Alarm(
+                    manageableAlarm.getExpression(),
+                    manageableAlarm.getHighLimit(),
+                    manageableAlarm.getHiHiLimit(),
+                    manageableAlarm.getLowLimit(),
+                    manageableAlarm.getLoloLimit(),
+                    false,
+                    false,
+                    false,
+                    manageableAlarm.isLoloAlarmEnabled(),
+                    manageableAlarm.getName(),
+                    manageableAlarm.getComment()
+            );
+            projectAlarms.add(alarm);
+        }
+        if(manageableAlarm.isLowAlarmEnabled()){
+            Alarm alarm = new Alarm(
+                    manageableAlarm.getExpression(),
+                    manageableAlarm.getHighLimit(),
+                    manageableAlarm.getHiHiLimit(),
+                    manageableAlarm.getLowLimit(),
+                    manageableAlarm.getLoloLimit(),
+                    false,
+                    false,
+                    manageableAlarm.isLowAlarmEnabled(),
+                    false,
+                    manageableAlarm.getName(),
+                    manageableAlarm.getComment()
+            );
+            projectAlarms.add(alarm);
+        }
     }
 
     private void saveHMIDataProcess() throws IOException {
@@ -732,5 +804,13 @@ public class HMIApp extends Application {
 
     public void setProjectAlarms(ArrayList<Alarm> projectAlarms) {
         this.projectAlarms = projectAlarms;
+    }
+
+    public ArrayList<Alarm> getManageableAlarms() {
+        return manageableAlarms;
+    }
+
+    public void setManageableAlarms(ArrayList<Alarm> manageableAlarms) {
+        this.manageableAlarms = manageableAlarms;
     }
 }
