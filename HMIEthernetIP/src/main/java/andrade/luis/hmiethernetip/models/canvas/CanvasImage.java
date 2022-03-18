@@ -1,6 +1,5 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
-import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.views.SelectHMISymbolWindow;
 import andrade.luis.hmiethernetip.views.SetImageOptionsWindow;
 import javafx.scene.control.MenuItem;
@@ -12,13 +11,9 @@ import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasImage extends CanvasObject {
-    Logger logger
-            = Logger.getLogger(
-            getClass().getName());
     private ImageView imageView;
     /**
      * Image Not found attribution:

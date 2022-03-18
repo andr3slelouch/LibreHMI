@@ -16,10 +16,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.logging.Logger;
 
 public class CanvasText extends CanvasLabel {
-    Logger logger = Logger.getLogger(getClass().getName());
     private String text;
 
     public Timeline getTimeline() {

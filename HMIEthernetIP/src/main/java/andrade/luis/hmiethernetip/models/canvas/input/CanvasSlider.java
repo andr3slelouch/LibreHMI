@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 public class CanvasSlider extends CanvasObject {
     private Slider slider;
     private Timeline timeline;
-    Logger logger = Logger.getLogger(this.getClass().getName());
 
     public HMIUser getUser() {
         return user;
@@ -49,6 +48,7 @@ public class CanvasSlider extends CanvasObject {
 
     public void setData(double x, double y, double width, double height, Tag linkedTag, double minValue, double maxValue, double minorTickValue, double majorTickValue, boolean snapHandleToTick, boolean showTicks, boolean showLabelsTicks) throws SQLException, IOException {
         this.slider = new Slider();
+        this.getCanvasObjectData().setPosition(new CanvasPoint(x,y));
         slider.setMin(minValue);
         slider.setMax(maxValue);
         slider.setShowTickLabels(showLabelsTicks);

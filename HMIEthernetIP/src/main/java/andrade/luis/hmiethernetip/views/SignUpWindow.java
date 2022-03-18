@@ -1,10 +1,7 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.users.HMIUser;
-import andrade.luis.hmiethernetip.util.DBConnection;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -12,11 +9,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,6 +93,8 @@ public class SignUpWindow extends Stage {
             rolesComboBox.getSelectionModel().select(this.hmiUser.getRole());
             passwordField.setPromptText("Deje en blanco para no cambiar, la contraseña");
             repeatPasswordField.setPromptText("Deje en blanco para no cambiar, la contraseña");
+        }else{
+            this.hmiUser=new HMIUser();
         }
 
         Button cancelButton = new Button("Cancelar");
@@ -167,9 +164,9 @@ public class SignUpWindow extends Stage {
             message = "Existen campos vacíos";
         }else if(!validateEmailAddress(email.getText())){
             message = "Ingrese un correo electrónico válido";
-        }else if(HMIUser.existsEmail(email.getText(),(this.hmiUser!=null)? this.hmiUser.getUsername() : "")){
+        }else if(HMIUser.existsEmail(email.getText(), this.hmiUser.getUsername() )){
             message = "El correo electrónico ya se encuentra asociado a una cuenta";
-        }else if((this.hmiUser!=null)? !this.hmiUser.getUsername().equals(username.getText()) : false){
+        }else if(!this.hmiUser.getUsername().equals(username.getText())){
             if(HMIUser.existsUsername(username.getText())){
                 message = "El nombre de usuario ya existe";
             }

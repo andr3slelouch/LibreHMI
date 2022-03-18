@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.logging.Level;
 
 import static javafx.geometry.Pos.CENTER;
 

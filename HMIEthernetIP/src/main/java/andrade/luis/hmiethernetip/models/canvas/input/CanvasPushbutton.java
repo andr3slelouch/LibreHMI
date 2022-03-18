@@ -27,7 +27,6 @@ import java.util.logging.Logger;
  * Booleano asociado al hacer clic en él cambia el valor del Tag Booleano asociado
  */
 public class CanvasPushbutton extends CanvasButton {
-    Logger logger = Logger.getLogger(this.getClass().getName());
     private static final String DIRECT_STR = "Directo";
     private static final String REVERSE_STR = "Reversa";
     private static final String TOGGLE_STR = "Toggle";

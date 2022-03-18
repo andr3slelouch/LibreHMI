@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 public class CanvasAlarmDisplay extends CanvasObject {
+    private static final String DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
     private static final String ACKNOWLEDGED_STATE = "Reconocida";
     private static final String ACKNOWLEDGED_ALARM_STYLE = "acknowledgedAlarm";
     private static final String UNACKNOWLEDGED_ALARM_STYLE = "unacknowledgedAlarm";
@@ -34,7 +35,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
 
     public CanvasAlarmDisplay(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
-        setData(canvasObjectData.getPosition().getX(), canvasObjectData.getPosition().getY(),canvasObjectData.getWidth(),canvasObjectData.getHeight(),true);
+        setData(canvasObjectData.getPosition().getX(), canvasObjectData.getPosition().getY(), canvasObjectData.getWidth(), canvasObjectData.getHeight(), true);
     }
 
     public HMIUser getUser() {
@@ -54,6 +55,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
 
     private void setData(double x, double y, double width, double height, boolean isOnCanvas) {
         this.getCanvasObjectData().setType("AlarmDisplay");
+        this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.alarmsTable = new TableView<>();
 
         TableColumn<AlarmRow, String> rowNumberColumn = new TableColumn<>("#");
@@ -100,62 +102,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
                 acknowledgementColumn
         );
 
-        this.alarmsTable.setRowFactory(alarmsTableView -> new TableRow<>() {
-            @Override
-            protected void updateItem(AlarmRow item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item != null && !empty) {
-                    if (item.getStatus().equals("Activada")) {
-                        if (item.getAcknowledgement().equals("No Reconocida")) {
-                            getStyleClass().remove(ACKNOWLEDGED_ALARM_STYLE);
-                            getStyleClass().remove(DEACTIVATED_ALARM_STYLE);
-                            getStyleClass().add(UNACKNOWLEDGED_ALARM_STYLE);
-                        } else if (item.getAcknowledgement().equals(ACKNOWLEDGED_STATE)) {
-                            getStyleClass().remove(UNACKNOWLEDGED_ALARM_STYLE);
-                            getStyleClass().remove(DEACTIVATED_ALARM_STYLE);
-                            getStyleClass().add(ACKNOWLEDGED_ALARM_STYLE);
-                        }
-                    } else {
-                        getStyleClass().remove(ACKNOWLEDGED_ALARM_STYLE);
-                        getStyleClass().remove(UNACKNOWLEDGED_ALARM_STYLE);
-                        getStyleClass().add(DEACTIVATED_ALARM_STYLE);
-                    }
-
-                    if (item.getAcknowledgement().equals("No Reconocida")) {
-                        ContextMenu contextMenu = new ContextMenu();
-
-                        MenuItem newItem = new MenuItem();
-                        newItem.setText("Reconocer");
-                        newItem.setOnAction(event -> {
-                            this.getTableView().getItems().add(new AlarmRow(
-                                    String.valueOf(this.getTableView().getItems().size() + 1),
-                                    item.getName(),
-                                    item.getExpression(),
-                                    DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()),
-                                    item.getType(),
-                                    item.getMaxValue(),
-                                    item.getHiHiValue(),
-                                    item.getMinValue(),
-                                    item.getLoLoValue(),
-                                    item.getValue(),
-                                    item.getStatus(),
-                                    ACKNOWLEDGED_STATE
-                            ));
-                            for (int i = 0; i < CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().size(); i++) {
-                                if (item.getName().equals(CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().get(i).getName())) {
-                                    CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().get(i).setAcknowledgement(ACKNOWLEDGED_STATE);
-                                    logger.log(Level.INFO, "CHANGED STATE TO ACKNOWLEDGED");
-                                }
-                            }
-                        });
-                        contextMenu.getItems().addAll(newItem);
-                        setContextMenu(contextMenu);
-                    }
-                } else {
-                    setItem(null);
-                }
-            }
-        });
+        setRowFactory();
         this.alarmsTable.setPlaceholder(new Label("No existen Alarmas iniciadas"));
         this.alarmsTable.setPrefWidth(width);
         this.alarmsTable.setPrefHeight(height);
@@ -176,65 +123,99 @@ public class CanvasAlarmDisplay extends CanvasObject {
         this.setCenter(this.alarmsTable);
     }
 
+    public void setRowFactory() {
+        this.alarmsTable.setRowFactory(alarmsTableView -> new TableRow<>() {
+            @Override
+            protected void updateItem(AlarmRow item, boolean empty) {
+                super.updateItem(item, empty);
+                if (!empty) {
+                    if (item.getStatus().equals("Activada")) {
+                        if (item.getAcknowledgement().equals("No Reconocida")) {
+                            getStyleClass().remove(ACKNOWLEDGED_ALARM_STYLE);
+                            getStyleClass().remove(DEACTIVATED_ALARM_STYLE);
+                            getStyleClass().add(UNACKNOWLEDGED_ALARM_STYLE);
+
+                            ContextMenu contextMenu = new ContextMenu();
+
+                            MenuItem newItem = new MenuItem();
+                            newItem.setText("Reconocer");
+                            newItem.setOnAction(event -> addAcknowledgedAlarm(item));
+                            contextMenu.getItems().addAll(newItem);
+                            setContextMenu(contextMenu);
+
+                        } else if (item.getAcknowledgement().equals(ACKNOWLEDGED_STATE)) {
+                            getStyleClass().remove(UNACKNOWLEDGED_ALARM_STYLE);
+                            getStyleClass().remove(DEACTIVATED_ALARM_STYLE);
+                            getStyleClass().add(ACKNOWLEDGED_ALARM_STYLE);
+                        }
+                    } else {
+                        getStyleClass().remove(ACKNOWLEDGED_ALARM_STYLE);
+                        getStyleClass().remove(UNACKNOWLEDGED_ALARM_STYLE);
+                        getStyleClass().add(DEACTIVATED_ALARM_STYLE);
+                    }
+                } else {
+                    setItem(null);
+                }
+            }
+        });
+    }
+
+    private void addAcknowledgedAlarm(AlarmRow item){
+        this.alarmsTable.getItems().add(new AlarmRow(
+                String.valueOf(this.alarmsTable.getItems().size() + 1),
+                item.getName(),
+                item.getExpression(),
+                DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(LocalDateTime.now()),
+                item.getType(),
+                item.getMaxValue(),
+                item.getHiHiValue(),
+                item.getMinValue(),
+                item.getLoLoValue(),
+                item.getValue(),
+                item.getStatus(),
+                ACKNOWLEDGED_STATE
+        ));
+        for (int i = 0; i < CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().size(); i++) {
+            if (item.getName().equals(CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().get(i).getName())) {
+                CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().get(i).setAcknowledgement(ACKNOWLEDGED_STATE);
+            }
+        }
+    }
+
     public void setUpdateTableTimeline() {
         this.updateTableTimeline = new Timeline(
                 new KeyFrame(
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
                             for (int i = 0; i < this.getHmiApp().getProjectAlarms().size(); i++) {
-                                try {
-                                    Alarm alarm = this.getHmiApp().getProjectAlarms().get(i);
-                                    logger.log(Level.INFO, alarm.getAcknowledgement());
-                                    boolean alarmStatus = alarm.checkAlarm();
-                                    int alarmIndex = -1;
-                                    for (int j = 0; j < activatedAlarms.size(); j++) {
-                                        if (activatedAlarms.get(j).getName().equals(alarm.getName()) && activatedAlarms.get(j).getType().equals(alarm.getType())) {
-                                            alarmIndex = j;
-                                        }
-                                    }
-                                    if (alarmStatus && alarmIndex == -1) {
-                                        this.activatedAlarms.add(alarm);
-                                        AlarmRow alarmRow = new AlarmRow(
-                                                String.valueOf(this.alarmsTable.getItems().size() + 1),
-                                                alarm.getName(),
-                                                alarm.getExpression().getExpressionToEvaluate(),
-                                                DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()),
-                                                alarm.getType(),
-                                                alarm.getHighLimit() != null ? String.valueOf(alarm.getHighLimit()) : "-",
-                                                alarm.getHiHiLimit() != null ? String.valueOf(alarm.getHiHiLimit()) : "-",
-                                                alarm.getLowLimit() != null ? String.valueOf(alarm.getLowLimit()) : "-",
-                                                alarm.getLoloLimit() != null ? String.valueOf(alarm.getLoloLimit()) : "-",
-                                                alarm.getValue(),
-                                                alarm.getStatus(),
-                                                alarm.getAcknowledgement()
-                                        );
-                                        this.alarmsTable.getItems().add(alarmRow);
-                                    } else if (!alarmStatus && alarmIndex != -1) {
-                                        this.activatedAlarms.remove(alarmIndex);
-                                        AlarmRow alarmRow = new AlarmRow(
-                                                String.valueOf(this.alarmsTable.getItems().size() + 1),
-                                                alarm.getName(),
-                                                alarm.getExpression().getExpressionToEvaluate(),
-                                                DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()),
-                                                alarm.getType(),
-                                                alarm.getHighLimit() != null ? String.valueOf(alarm.getHighLimit()) : "-",
-                                                alarm.getHiHiLimit() != null ? String.valueOf(alarm.getHiHiLimit()) : "-",
-                                                alarm.getLowLimit() != null ? String.valueOf(alarm.getLowLimit()) : "-",
-                                                alarm.getLoloLimit() != null ? String.valueOf(alarm.getLoloLimit()) : "-",
-                                                alarm.getValue(),
-                                                alarm.getStatus(),
-                                                alarm.getAcknowledgement()
-                                        );
-                                        this.alarmsTable.getItems().add(alarmRow);
-                                    }
-                                } catch (SQLException | CompileException | IOException | InvocationTargetException e) {
-                                    e.printStackTrace();
-                                }
+                                addAlarmFromTimeline(this.getHmiApp().getProjectAlarms().get(i));
                             }
 
                         }), new KeyFrame(Duration.seconds(1)));
         this.updateTableTimeline.setCycleCount(Animation.INDEFINITE);
         this.updateTableTimeline.play();
+    }
+
+    private void addAlarmFromTimeline(Alarm alarm) {
+        try {
+            logger.log(Level.INFO, alarm.getAcknowledgement());
+            boolean alarmStatus = alarm.checkAlarm();
+            int alarmIndex = -1;
+            for (int j = 0; j < activatedAlarms.size(); j++) {
+                if (activatedAlarms.get(j).getName().equals(alarm.getName()) && activatedAlarms.get(j).getType().equals(alarm.getType())) {
+                    alarmIndex = j;
+                }
+            }
+            if (alarmStatus && alarmIndex == -1) {
+                this.activatedAlarms.add(alarm);
+                addTableItem(alarm);
+            } else if (!alarmStatus && alarmIndex != -1) {
+                this.activatedAlarms.remove(alarmIndex);
+                addTableItem(alarm);
+            }
+        } catch (SQLException | CompileException | IOException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -297,10 +278,10 @@ public class CanvasAlarmDisplay extends CanvasObject {
         this.activatedAlarms = activatedAlarms;
     }
 
-    public void updateTableItem(String oldName,Alarm tableItem){
+    public void updateTableItem(String oldName, Alarm tableItem) {
         int index = getAlarmIndex(oldName);
         AlarmRow updatedAlarm = new AlarmRow(
-                String.valueOf(index+1),
+                String.valueOf(index + 1),
                 tableItem.getName(),
                 tableItem.getExpression().getExpressionToEvaluate(),
                 tableItem.getAlarmExecutionDateTime() != null ? tableItem.getAlarmExecutionDateTime() : "-",
@@ -316,9 +297,9 @@ public class CanvasAlarmDisplay extends CanvasObject {
         this.alarmsTable.getItems().set(index, updatedAlarm);
     }
 
-    public void removeTableItem(String name){
+    public void removeTableItem(String name) {
         int index = getAlarmIndex(name);
-        if(index >= 0){
+        if (index >= 0) {
             this.alarmsTable.getItems().remove(index);
         }
     }
@@ -347,10 +328,10 @@ public class CanvasAlarmDisplay extends CanvasObject {
         }
     }
 
-    private int getAlarmIndex(String name){
+    private int getAlarmIndex(String name) {
         int res = -1;
-        for(int i=0;i< alarmsTable.getItems().size(); i++){
-            if(name.equals(alarmsTable.getItems().get(i).getName())){
+        for (int i = 0; i < alarmsTable.getItems().size(); i++) {
+            if (name.equals(alarmsTable.getItems().get(i).getName())) {
                 res = i;
             }
         }

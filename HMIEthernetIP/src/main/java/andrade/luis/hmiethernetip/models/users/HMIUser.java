@@ -19,7 +19,7 @@ public class HMIUser {
     private String email;
     @SerializedName("username")
     @Expose
-    private String username;
+    private String username="";
     @SerializedName("role")
     @Expose
     private String role;
@@ -35,6 +35,10 @@ public class HMIUser {
     @SerializedName("oldUsername")
     @Expose
     private String oldUsername;
+
+    public HMIUser() {
+
+    }
 
     public boolean isUserLoggedIn() {
         return userLoggedIn;

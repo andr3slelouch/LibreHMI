@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Tag implements Serializable {
+    private static final String NULL_STR = "<null>";
     private static final Map<String, String> selectQueries = Map.of("Entero", "select valor from entero where nombreTag=", "Flotante", "select valor from flotante where nombreTag=", "Bool", "select valor from boolean where nombreTag=");
     private static final Map<String, String> updateQueries = Map.of("Entero", "update entero SET valor=? where nombreTag=", "Flotante", "update flotante SET valor=? where nombreTag=", "Bool", "update boolean SET valor=? where nombreTag=");
 
@@ -203,35 +204,35 @@ public class Tag implements Serializable {
         sb.append(CanvasObjectData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("plcName");
         sb.append('=');
-        sb.append(((this.plcName == null) ? "<null>" : this.plcName));
+        sb.append(((this.plcName == null) ? NULL_STR : this.plcName));
         sb.append(',');
         sb.append("plcAddress");
         sb.append('=');
-        sb.append(((this.plcAddress == null) ? "<null>" : this.plcAddress));
+        sb.append(((this.plcAddress == null) ? NULL_STR : this.plcAddress));
         sb.append(',');
         sb.append("plcDeviceGroup");
         sb.append('=');
-        sb.append(((this.plcDeviceGroup == null) ? "<null>" : this.plcDeviceGroup));
+        sb.append(((this.plcDeviceGroup == null) ? NULL_STR : this.plcDeviceGroup));
         sb.append(',');
         sb.append("tagName");
         sb.append('=');
-        sb.append(((this.name == null) ? "<null>" : this.name));
+        sb.append(((this.name == null) ? NULL_STR : this.name));
         sb.append(',');
         sb.append("tagType");
         sb.append('=');
-        sb.append(((this.type == null) ? "<null>" : this.type));
+        sb.append(((this.type == null) ? NULL_STR : this.type));
         sb.append(',');
         sb.append("tagAddress");
         sb.append('=');
-        sb.append(((this.address == null) ? "<null>" : this.address));
+        sb.append(((this.address == null) ? NULL_STR : this.address));
         sb.append(',');
         sb.append("tagAction");
         sb.append('=');
-        sb.append(((this.action == null) ? "<null>" : this.action));
+        sb.append(((this.action == null) ? NULL_STR : this.action));
         sb.append(',');
         sb.append("tagValue");
         sb.append('=');
-        sb.append(((this.value == null) ? "<null>" : this.value));
+        sb.append(((this.value == null) ? NULL_STR : this.value));
         sb.append(',');
         if (sb.charAt((sb.length() - 1)) == ',') {
             sb.setCharAt((sb.length() - 1), ']');

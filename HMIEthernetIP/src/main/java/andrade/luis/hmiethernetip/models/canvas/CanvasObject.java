@@ -28,7 +28,6 @@ import java.awt.datatransfer.Clipboard;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +50,7 @@ public class CanvasObject extends BorderPane {
     private MenuItem deleteMenuItem;
     private CanvasPoint start;
     private CanvasPoint end;
-    private static final int borderMargin = 10;
+    private static final int BORDER_MARGIN = 10;
     private MouseOverMode mouseOverMode;
     private double startWidth;
     private double startHeight;
@@ -258,7 +257,7 @@ public class CanvasObject extends BorderPane {
     }
 
     private boolean intersectOperation(double side, double point) {
-        return side + borderMargin > point && side - borderMargin < point;
+        return side + BORDER_MARGIN > point && side - BORDER_MARGIN < point;
     }
 
 

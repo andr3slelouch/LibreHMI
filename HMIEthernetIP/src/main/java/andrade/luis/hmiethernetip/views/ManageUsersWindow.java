@@ -1,17 +1,14 @@
 package andrade.luis.hmiethernetip.views;
 
-import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.models.users.HMIUserRow;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -23,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
