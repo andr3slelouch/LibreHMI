@@ -123,7 +123,15 @@ public class SelectTagWindow extends Stage {
         }
         ObservableList<TagRow> data = FXCollections.observableArrayList();
         try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
-            Statement statement = con.createStatement();
+            readTags(con,data,query);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+    private ObservableList<TagRow> readTags(Connection con, ObservableList<TagRow> data, String query){
+        try(Statement statement = con.createStatement()){
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 data.add(new TagRow(
@@ -136,7 +144,7 @@ public class SelectTagWindow extends Stage {
                         resultSet.getString("accion"),
                         ""));
             }
-        } catch (SQLException | IOException e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
         return data;

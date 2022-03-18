@@ -115,7 +115,16 @@ public class ManageUsersWindow extends Stage {
         String query = "SELECT u.first, u.last, u.email,u.username,u.role from Users u;";
         ObservableList<HMIUserRow> users = FXCollections.observableArrayList();
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
-            Statement statement = con.createStatement();
+            users=readUsers(con,users,query);
+        } catch (SQLException | IOException e) {
+            showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",e.getMessage());
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    public ObservableList<HMIUserRow> readUsers(Connection con,ObservableList<HMIUserRow> users,String query){
+        try(Statement statement = con.createStatement()){
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 users.add(new HMIUserRow(
@@ -129,7 +138,7 @@ public class ManageUsersWindow extends Stage {
                         )
                 ));
             }
-        } catch (SQLException | IOException e) {
+        }catch(Exception e){
             showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",e.getMessage());
             e.printStackTrace();
         }

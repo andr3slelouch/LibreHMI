@@ -122,111 +122,147 @@ public class HMIUser {
         this.saltedHashPassword = HMIPassword.computeSaltedHashString(password, this.salt);
     }
 
-    public boolean createInDatabase() throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToHMIUsers();
-        String query = "INSERT INTO Users(first,last,email,username,role,salt,saltedHashPassword) values (?,?,?,?,?,?,?)";
-        PreparedStatement prepareStatement = con.prepareStatement(query);
-        prepareStatement.setString(1, this.firstName);
-        prepareStatement.setString(2, this.lastName);
-        prepareStatement.setString(3, this.email);
-        prepareStatement.setString(4, this.username);
-        prepareStatement.setString(5, this.role);
-        prepareStatement.setString(6, this.salt);
-        prepareStatement.setString(7, this.saltedHashPassword);
-        int insertRowResult = prepareStatement.executeUpdate();
-        con.close();
-        return insertRowResult > 0;
+    public void createInDatabase() throws SQLException, IOException {
+        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+            String query = "INSERT INTO Users(first,last,email,username,role,salt,saltedHashPassword) values (?,?,?,?,?,?,?)";
+            try(PreparedStatement prepareStatement = con.prepareStatement(query)){
+                prepareStatement.setString(1, this.firstName);
+                prepareStatement.setString(2, this.lastName);
+                prepareStatement.setString(3, this.email);
+                prepareStatement.setString(4, this.username);
+                prepareStatement.setString(5, this.role);
+                prepareStatement.setString(6, this.salt);
+                prepareStatement.setString(7, this.saltedHashPassword);
+                prepareStatement.executeUpdate();
+            }
+        }catch(SQLException e){
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
+        }
+
     }
 
     public static boolean existsEmail(String email, String username) throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToHMIUsers();
-        String query = "SELECT email from Users WHERE email='" + email + "'";
-        if(!username.isEmpty()){
-            query = query.concat(" AND username!='"+username+"'");
+        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+            String query = "SELECT email from Users WHERE email='" + email + "'";
+            if(!username.isEmpty()){
+                query = query.concat(" AND username!='"+username+"'");
+            }
+            try(Statement statement = con.createStatement()){
+                ResultSet resultSet = statement.executeQuery(query);
+                boolean res = false;
+                while (resultSet.next()) {
+                    res = (email.equals(resultSet.getString(1)));
+                }
+                return res;
+            }
+        }catch(SQLException e){
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
         }
-        Statement statement = con.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        boolean res = false;
-        while (resultSet.next()) {
-            res = (email.equals(resultSet.getString(1)));
-        }
-        con.close();
-        return res;
+
     }
 
     public static boolean existsUsername(String username) throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToHMIUsers();
-        String query = "SELECT username from Users WHERE username='" + username + "'";
-        Statement statement = con.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        boolean res = false;
-        while (resultSet.next()) {
-            res = (username.equals(resultSet.getString(1)));
+        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+            String query = "SELECT username from Users WHERE username='" + username + "'";
+            try(Statement statement = con.createStatement()){
+                ResultSet resultSet = statement.executeQuery(query);
+                boolean res = false;
+                while (resultSet.next()) {
+                    res = (username.equals(resultSet.getString(1)));
+                }
+                return res;
+            }
+        }catch(SQLException e){
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
         }
-        con.close();
-        return res;
     }
 
     public boolean verifyUserAndPassword(String usernameOrEmail, String password) throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToHMIUsers();
-        String query = "SELECT username, salt, saltedHashPassword FROM Users WHERE username='" + usernameOrEmail + "' or email='" + usernameOrEmail + "'";
-        Statement statement = con.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-
-        String salt = "";
-        String expectedHash = "";
-        while (resultSet.next()) {
-            this.username = resultSet.getString(1);
-            salt = resultSet.getString(2);
-            expectedHash = resultSet.getString(3);
+        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+            String query = "SELECT username, salt, saltedHashPassword FROM Users WHERE username='" + usernameOrEmail + "' or email='" + usernameOrEmail + "'";
+            try(Statement statement = con.createStatement()){
+                ResultSet resultSet = statement.executeQuery(query);
+                String localSalt = "";
+                String localExpectedHash = "";
+                while (resultSet.next()) {
+                    this.username = resultSet.getString(1);
+                    localSalt = resultSet.getString(2);
+                    localExpectedHash = resultSet.getString(3);
+                }
+                return HMIPassword.verifyPassword(password, localSalt, localExpectedHash);
+            }
+        }catch(SQLException e){
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
         }
-        return HMIPassword.verifyPassword(password, salt, expectedHash);
+
 
     }
 
     public void readFromDatabase(String username) throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToHMIUsers();
-        String query = "SELECT * FROM Users WHERE username='" + username + "'";
-        Statement statement = con.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-
-        while (resultSet.next()) {
-            this.firstName = resultSet.getString(2);
-            this.lastName = resultSet.getString(3);
-            this.email = resultSet.getString(4);
-            this.username = resultSet.getString(5);
-            this.role = resultSet.getString(6);
-            this.salt = resultSet.getString(7);
-            this.saltedHashPassword = resultSet.getString(8);
+        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+            String query = "SELECT * FROM Users WHERE username='" + username + "'";
+            try(Statement statement = con.createStatement()){
+                ResultSet resultSet = statement.executeQuery(query);
+                while (resultSet.next()) {
+                    this.firstName = resultSet.getString(2);
+                    this.lastName = resultSet.getString(3);
+                    this.email = resultSet.getString(4);
+                    this.username = resultSet.getString(5);
+                    this.role = resultSet.getString(6);
+                    this.salt = resultSet.getString(7);
+                    this.saltedHashPassword = resultSet.getString(8);
+                }
+            }
+        }catch(SQLException e){
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
         }
-        con.close();
+
     }
 
-    public boolean updateInDatabase() throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToHMIUsers();
-        String query = "UPDATE Users SET first=?, last=?,email=?,username=?,role=?,salt=?,saltedHashPassword=? WHERE username='"+oldUsername+"'";
-        PreparedStatement prepareStatement = con.prepareStatement(query);
-        prepareStatement.setString(1, this.firstName);
-        prepareStatement.setString(2, this.lastName);
-        prepareStatement.setString(3, this.email);
-        prepareStatement.setString(4, this.username);
-        prepareStatement.setString(5, this.role);
-        prepareStatement.setString(6, this.salt);
-        prepareStatement.setString(7, this.saltedHashPassword);
-        int insertRowResult = prepareStatement.executeUpdate();
-        con.close();
-        return insertRowResult > 0;
+    public void updateInDatabase() throws SQLException, IOException {
+        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+            String query = "UPDATE Users SET first=?, last=?,email=?,username=?,role=?,salt=?,saltedHashPassword=? WHERE username='"+oldUsername+"'";
+            try(PreparedStatement prepareStatement = con.prepareStatement(query)){
+                prepareStatement.setString(1, this.firstName);
+                prepareStatement.setString(2, this.lastName);
+                prepareStatement.setString(3, this.email);
+                prepareStatement.setString(4, this.username);
+                prepareStatement.setString(5, this.role);
+                prepareStatement.setString(6, this.salt);
+                prepareStatement.setString(7, this.saltedHashPassword);
+                prepareStatement.executeUpdate();
+            }
+        }catch(SQLException e){
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
+        }
     }
 
     public boolean deleteFromDatabase() throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToHMIUsers();
-        String sql = "DELETE FROM Users WHERE username=?";
+        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+            String sql = "DELETE FROM Users WHERE username=?";
 
-        PreparedStatement statement = con.prepareStatement(sql);
-        statement.setString(1, this.username);
-
-        int rowsDeleted = statement.executeUpdate();
-        return rowsDeleted > 0;
+            try(PreparedStatement statement = con.prepareStatement(sql)){
+                statement.setString(1, this.username);
+                int rowsDeleted = statement.executeUpdate();
+                return rowsDeleted > 0;
+            }
+        }catch(SQLException e){
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
+        }
     }
 
     @Override

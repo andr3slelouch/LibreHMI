@@ -68,6 +68,9 @@ public class WriteExpressionWindow extends Stage {
 
     public void setAddedTags(ArrayList<Tag> addedTags) {
         this.addedTags = addedTags;
+        if(!this.addedTags.isEmpty()){
+            addTagButton.setDisable(true);
+        }
     }
 
     protected Button finishSelectionButton;
@@ -183,12 +186,14 @@ public class WriteExpressionWindow extends Stage {
         if(tag!=null){
             addedTags.add(tag);
             textField.setText(textField.getText()+tag.getName());
+            addTagButton.setDisable(true);
         }
     }
 
     protected void clearAll(){
         this.getTextField().setText("");
         this.getAddedTags().clear();
+        this.addTagButton.setDisable(false);
     }
 
     protected void confirmExit(Alert.AlertType type,String title,String message){

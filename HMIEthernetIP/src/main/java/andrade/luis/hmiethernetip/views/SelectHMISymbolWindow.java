@@ -225,20 +225,28 @@ public class SelectHMISymbolWindow extends Stage {
                 directory.mkdir();
             }
             String outputPath = categoryDirectory + File.separator + file.getName();
-            FileInputStream is = new FileInputStream(file.getAbsolutePath());
-            FileOutputStream out = new FileOutputStream(outputPath);
-            int c;
-
-            while ((c = is.read()) != -1) {
-                out.write(c);
+            try(FileInputStream is = new FileInputStream(file.getAbsolutePath())){
+                copyFile(is,outputPath);
+            }catch (IOException e) {
+                throw new IOException(e);
             }
-            is.close();
-            out.close();
             updateCategoryDirectoryInProperties(category);
             setResultValues(new Image(new FileInputStream(outputPath)), outputPath);
             this.close();
         }
 
+    }
+
+    private void copyFile(FileInputStream is,String outputPath) throws IOException{
+        try(FileOutputStream out = new FileOutputStream(outputPath)){
+            int c;
+
+            while ((c = is.read()) != -1) {
+                out.write(c);
+            }
+        }catch (IOException e){
+            throw new IOException(e);
+        }
     }
 
     private void updateCategoryDirectoryInProperties(String category) throws IOException {

@@ -39,6 +39,7 @@ andrade/luis/hmiethernetip/models/canvas/CanvasPoint.class
 andrade/luis/hmiethernetip/models/users/HMIPassword.class
 andrade/luis/hmiethernetip/models/users/HMIUserRow.class
 andrade/luis/hmiethernetip/models/canvas/CanvasObjectData.class
+andrade/luis/hmiethernetip/views/ManageAlarmsWindow$1.class
 andrade/luis/hmiethernetip/models/PercentFillOrientation.class
 andrade/luis/hmiethernetip/views/SetVisibilityAnimationWindow.class
 andrade/luis/hmiethernetip/views/WriteExpressionWindow.class

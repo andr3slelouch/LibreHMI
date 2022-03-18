@@ -29,7 +29,7 @@ public class DBConnection {
 
     public static String getWorkingDirectory() {
         String homeDirectory = System.getProperty("user.home");
-        String directoryName = homeDirectory.concat(File.separator+"HMIEthernetIP");
+        String directoryName = homeDirectory.concat(File.separator + "HMIEthernetIP");
         File directory = new File(directoryName);
         if (!directory.exists()) {
             directory.mkdir();
@@ -41,7 +41,7 @@ public class DBConnection {
         return getWorkingDirectory() + File.separator + "HMIEthernetIP.properties";
     }
 
-    public static void writePropertiesFile(String username, String password, String hostname, String port, boolean boilerFurnace, boolean conveyorBelts, boolean motorPumps, boolean others,boolean pipesValues,boolean tanks) throws IOException {
+    public static void writePropertiesFile(String username, String password, String hostname, String port, boolean boilerFurnace, boolean conveyorBelts, boolean motorPumps, boolean others, boolean pipesValues, boolean tanks) throws IOException {
         Properties properties = new Properties();
 
         properties.setProperty("username", username);
@@ -55,17 +55,20 @@ public class DBConnection {
         properties.setProperty("PipesValves", String.valueOf(pipesValues));
         properties.setProperty("Tanks", String.valueOf(tanks));
 
-        FileOutputStream out = new FileOutputStream(getPropertiesFileName());
-        properties.store(out, "HMIEthernetIP properties file");
-        out.close();
+        try (FileOutputStream out = new FileOutputStream(getPropertiesFileName())) {
+            properties.store(out, "HMIEthernetIP properties file");
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
+
     }
 
     public static Properties readPropertiesFile() throws IOException {
         Properties properties = new Properties();
-        FileInputStream in = new FileInputStream(getPropertiesFileName());
-        properties.load(in);
-        in.close();
-        return properties;
+        try (FileInputStream in = new FileInputStream(getPropertiesFileName())) {
+            properties.load(in);
+            return properties;
+        }
     }
 
     public static Connection createConnectionToBDDriverEIP() throws SQLException, IOException {
@@ -77,16 +80,22 @@ public class DBConnection {
     }
 
     public static boolean schemaExistsInDB(String schemaName) throws SQLException, IOException {
-        Connection con = createConnection("");
-        String query = "SELECT schema_name from information_schema.schemata where schema_name = '" + schemaName + "';";
-        Statement statement = con.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        boolean res = false;
-        if (resultSet.next()) {
-            res = (schemaName.equals(resultSet.getString(1)));
+        try (Connection con = createConnection("")) {
+            String query = "SELECT schema_name from information_schema.schemata where schema_name = '" + schemaName + "';";
+            try (Statement statement = con.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(query);
+                boolean res = false;
+                if (resultSet.next()) {
+                    res = (schemaName.equals(resultSet.getString(1)));
+                }
+                return res;
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        } catch (IOException e) {
+            throw new IOException(e);
         }
-        con.close();
-        return res;
+
     }
 
     public static boolean checkIfTablesFromSchemaBDDriverAreReady() throws SQLException, IOException {
@@ -97,20 +106,23 @@ public class DBConnection {
         if (schemaExistsInDB(schemaName)) {
             Connection con = createConnection(schemaName);
             String query = "select table_name from information_schema.tables where table_name='" + tableName + "' and table_schema='" + schemaName + "';";
-            Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            boolean res = false;
-            if (resultSet.next()) {
-                res = (tableName.equals(resultSet.getString(1)));
+            try (Statement statement = con.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(query);
+                boolean res = false;
+                if (resultSet.next()) {
+                    res = (tableName.equals(resultSet.getString(1)));
+                }
+                con.close();
+                return res;
+            } catch (SQLException e) {
+                throw new SQLException(e);
             }
-            con.close();
-            return res;
         } else {
             return false;
         }
     }
 
-    public static boolean createUsersTable() {
+    public static boolean createUsersTable() throws SQLException, IOException {
         // prepare query to create database
         String query = "CREATE TABLE Users " +
                 "(id INTEGER not NULL AUTO_INCREMENT, " +
@@ -122,74 +134,87 @@ public class DBConnection {
                 " salt VARCHAR(255) NOT NULL, " +
                 " saltedHashPassword VARCHAR(255) NOT NULL, " +
                 " PRIMARY KEY ( id ))";
-        Statement st = null;
+
         int result = 0;
 
         // establish the connection
-        Connection con = null;
-        try {
-            con = createConnectionToHMIUsers();
+        try (Connection con = createConnectionToHMIUsers()) {
+
             // place the password for the root user
             // create statement object
-            if (con != null)
-                st = con.createStatement();
 
-            // execute SQL query
-            if (st != null)
-                result = st.executeUpdate(query);
+            try(Statement st = con.createStatement()){
+                // execute SQL query
+                if (st != null)
+                    result = st.executeUpdate(query);
 
-            // process the result
-            if (result == 0) {
-                return true;
-            } else {
-                return false;
+                // process the result
+                return result == 0;
             }
 
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        } catch(IOException e){
+            throw new IOException(e);
         }
-        return false;
     }
 
     public static String readTagValueFromDatabase(Tag tag) throws SQLException, IOException {
 
-            Connection con = DBConnection.createConnectionToBDDriverEIP();
-            Statement statement = con.createStatement();
-            if (tag.getType() != null && tag.getName() != null) {
-                String query = queries.get(tag.getType()) + "'" + tag.getName() + "'";
-                ResultSet resultSet = statement.executeQuery(query);
-                while (resultSet.next()) {
-                    if (!resultSet.getString("valor").isEmpty()) {
-                        String result = resultSet.getString("valor");
-                        con.close();
-                        return result;
+        try(Connection con = DBConnection.createConnectionToBDDriverEIP()){
+            try(Statement statement = con.createStatement()){
+                if (tag.getType() != null && tag.getName() != null) {
+                    String query = queries.get(tag.getType()) + "'" + tag.getName() + "'";
+                    ResultSet resultSet = statement.executeQuery(query);
+                    while (resultSet.next()) {
+                        if (!resultSet.getString("valor").isEmpty()) {
+                            return resultSet.getString("valor");
+                        }
                     }
                 }
             }
-            con.close();
+        }catch (SQLException e) {
+            throw new SQLException(e);
+        } catch(IOException e){
+            throw new IOException(e);
+        }
 
         return "";
     }
 
     public static void createSchemaIfNotExists(String schemaName) throws SQLException, IOException {
         if (!schemaExistsInDB(schemaName)) {
-            Connection con = createConnection("");
-            String query = "CREATE database " + schemaName;
-            Statement statement = con.createStatement();
-            statement.execute(query);
-            con.close();
+            try(Connection con = createConnection("")){
+                String query = "CREATE database " + schemaName;
+                try(Statement statement = con.createStatement()){
+                    statement.execute(query);
+                }
+            }catch (SQLException e) {
+                throw new SQLException(e);
+            } catch(IOException e){
+                throw new IOException(e);
+            }
         }
     }
 
     public void generateSchemaBDDriverEIP() throws SQLException, IOException {
         createSchemaIfNotExists(BD_DRIVER_EIP_NAME);
-        Connection con = createConnectionToBDDriverEIP();
+        try(Connection con = createConnectionToBDDriverEIP()){
+            runScript(con);
+        }catch (SQLException e) {
+            throw new SQLException(e);
+        }catch (IOException e){
+            throw new IOException(e);
+        }
+
+    }
+
+    public void runScript(Connection con) throws IOException {
         ScriptRunner scriptRunner = new ScriptRunner(con);
-        try {
-            Reader reader = new BufferedReader(new FileReader(bdDriverEIPScriptLocation));
+        try (Reader reader = new BufferedReader(new FileReader(bdDriverEIPScriptLocation))){
             scriptRunner.runScript(reader);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new IOException(e);
         }
     }
 

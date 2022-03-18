@@ -25,7 +25,7 @@ public class SetAlarmWindow extends WriteExpressionWindow{
     private ToggleGroup toggleGroup;
 
     public SetAlarmWindow() {
-        super(750, 250);
+        super(750, 300);
 
         textField.textProperty().addListener((observableValue,oldValue,newValue) ->{
             deleteUnneededTags();

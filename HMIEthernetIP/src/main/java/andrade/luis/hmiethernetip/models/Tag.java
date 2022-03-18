@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 public class Tag implements Serializable {
     private static final Map<String, String> selectQueries = Map.of("Entero", "select valor from entero where nombreTag=", "Flotante", "select valor from flotante where nombreTag=", "Bool", "select valor from boolean where nombreTag=");
     private static final Map<String, String> updateQueries = Map.of("Entero", "update entero SET valor=? where nombreTag=", "Flotante", "update flotante SET valor=? where nombreTag=", "Bool", "update boolean SET valor=? where nombreTag=");
+
     public Tag() {
 
     }
@@ -93,58 +94,64 @@ public class Tag implements Serializable {
     }
 
     public String readFromDatabase() throws SQLException, IOException {
-
-        Connection con = DBConnection.createConnectionToBDDriverEIP();
-        Statement statement = con.createStatement();
-        if (this.getType() != null && this.getName() != null) {
-            String query = selectQueries.get(this.getType()) + "'" + this.getName() + "'";
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()) {
-                if (!resultSet.getString("valor").isEmpty()) {
-                    String result = resultSet.getString("valor");
-                    con.close();
-                    this.value = result;
-                    return result;
+        try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
+            try(Statement statement = con.createStatement()){
+                if (this.getType() != null && this.getName() != null) {
+                    String query = selectQueries.get(this.getType()) + "'" + this.getName() + "'";
+                    ResultSet resultSet = statement.executeQuery(query);
+                    while (resultSet.next()) {
+                        if (!resultSet.getString("valor").isEmpty()) {
+                            String result = resultSet.getString("valor");
+                            this.value = result;
+                            return result;
+                        }
+                    }
                 }
             }
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        } catch (IOException e) {
+            throw new IOException(e);
         }
-        con.close();
-
         return null;
     }
 
     public boolean updateInDatabase() throws SQLException, IOException {
-        Connection con = DBConnection.createConnectionToBDDriverEIP();
-        if (this.getType() != null && this.getName() != null) {
-            String query = updateQueries.get(this.getType()) + "'" + this.getName() + "'";
-            PreparedStatement preparedStatement = con.prepareStatement(query);
-            String updateValue;
-            switch(this.getType()) {
-                case "Entero":
-                case "Bool":
-                    updateValue = String.valueOf((int) Double.parseDouble(this.value.isEmpty() ? "0" : this.value ));
-                    break;
-                case "Flotante":
-                    updateValue = String.valueOf(Double.parseDouble(this.value));
-                    break;
-                default:
-                    updateValue = this.value;
+        try(Connection con = DBConnection.createConnectionToBDDriverEIP()){
+            if (this.getType() != null && this.getName() != null) {
+                String query = updateQueries.get(this.getType()) + "'" + this.getName() + "'";
+                try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                    String updateValue;
+                    switch (this.getType()) {
+                        case "Entero":
+                        case "Bool":
+                            updateValue = String.valueOf((int) Double.parseDouble(this.value.isEmpty() ? "0" : this.value));
+                            break;
+                        case "Flotante":
+                            updateValue = String.valueOf(Double.parseDouble(this.value));
+                            break;
+                        default:
+                            updateValue = this.value;
+                    }
+                    preparedStatement.setString(1, updateValue);
+                    int insertRowResult = preparedStatement.executeUpdate();
+                    return insertRowResult > 0;
+                }
+
+            } else {
+                return false;
             }
-            preparedStatement.setString(1, updateValue);
-            int insertRowResult = preparedStatement.executeUpdate();
-            Logger logger = Logger.getLogger(this.getClass().getName());
-            logger.log(Level.INFO, String.valueOf(insertRowResult));
-            con.close();
-            return insertRowResult > 0;
-        }else{
-            con.close();
-            return false;
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        } catch (IOException e) {
+            throw new IOException(e);
         }
+
     }
 
-    public DecimalFormat generateDecimalFormat(){
+    public DecimalFormat generateDecimalFormat() {
         String precisionStr = "#.";
-        for(int i=0;i<floatPrecision;i++){
+        for (int i = 0; i < floatPrecision; i++) {
             precisionStr = precisionStr.concat("#");
         }
         return new DecimalFormat(precisionStr);
@@ -176,9 +183,9 @@ public class Tag implements Serializable {
     private String value;
     @SerializedName("floatPrecision")
     @Expose
-    private int floatPrecision=-1;
+    private int floatPrecision = -1;
 
-    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String name, String type, String address, String action, String value,int floatPrecision) {
+    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String name, String type, String address, String action, String value, int floatPrecision) {
         this.plcName = plcName;
         this.plcAddress = plcAddress;
         this.plcDeviceGroup = plcDeviceGroup;
