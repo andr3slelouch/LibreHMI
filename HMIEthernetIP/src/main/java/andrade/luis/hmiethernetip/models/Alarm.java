@@ -7,11 +7,9 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.time.format.DateTimeFormatter;
 
 public class Alarm implements Serializable {
-    Logger logger = Logger.getLogger(getClass().getName());
     private static final String ACTIVATED_STR = "Activada";
     private static final String DEACTIVATED_STR = "Desactivada";
     private static final String UNACKNOWLEDGED_STATUS_STR = "No Reconocida";
@@ -32,7 +30,7 @@ public class Alarm implements Serializable {
     private String type="";
     private String name="";
     private String value="";
-    private LocalDateTime alarmExecutionDateTime;
+    private String alarmExecutionDateTime;
 
     public Alarm(
             Expression expression,
@@ -205,16 +203,16 @@ public class Alarm implements Serializable {
         this.acknowledgement = acknowledgement;
     }
 
-    public LocalDateTime getAlarmExecutionDateTime() {
+    public String getAlarmExecutionDateTime() {
         return alarmExecutionDateTime;
     }
 
-    public void setAlarmExecutionDateTime(LocalDateTime alarmExecutionDateTime) {
+    public void setAlarmExecutionDateTime(String alarmExecutionDateTime) {
         this.alarmExecutionDateTime = alarmExecutionDateTime;
     }
 
     public void setAlarmExecutionDateTime() {
-        this.alarmExecutionDateTime = LocalDateTime.now();
+        this.alarmExecutionDateTime = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now());
     }
 
     public String getComment() {

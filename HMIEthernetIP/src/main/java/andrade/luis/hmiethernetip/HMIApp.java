@@ -89,6 +89,11 @@ public class HMIApp extends Application {
             addScene(hmiScene);
             hmiScene.setHmiSceneData(hmiSceneData);
         }
+        manageableAlarms.clear();
+        projectAlarms.clear();
+        for(int i=0;i<this.hmiAppData.getHmiAlarms().size();i++){
+            addAlarm(this.hmiAppData.getHmiAlarms().get(i));
+        }
     }
 
     public void clearProject() {
@@ -492,6 +497,7 @@ public class HMIApp extends Application {
             hmiSceneDataArrayList.add(hmiScene.getHmiSceneData());
         }
         this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
+        this.hmiAppData.setHmiAlarms(manageableAlarms);
         Gson gson = new Gson();
         if(filenamePath != null){
             String[] filenameArr = filenamePath.split(File.separator);

@@ -20,9 +20,21 @@ public class HMIAppData implements Serializable, Transferable {
         this.hmiAppPages = hmiAppPages;
     }
 
+    public ArrayList<Alarm> getHmiAlarms() {
+        return hmiAlarms;
+    }
+
+    public void setHmiAlarms(ArrayList<Alarm> hmiAlarms) {
+        this.hmiAlarms = hmiAlarms;
+    }
+
     @SerializedName("hmiAppPages")
     @Expose
     private ArrayList<HMISceneData> hmiAppPages;
+
+    @SerializedName("hmiAlarms")
+    @Expose
+    private ArrayList<Alarm> hmiAlarms;
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {

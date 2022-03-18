@@ -32,6 +32,11 @@ public class CanvasAlarmDisplay extends CanvasObject {
     private Timeline updateTableTimeline;
     private ArrayList<Alarm> activatedAlarms = new ArrayList<>();
 
+    public CanvasAlarmDisplay(CanvasObjectData canvasObjectData) {
+        super(canvasObjectData);
+        setData(canvasObjectData.getPosition().getX(), canvasObjectData.getPosition().getY(),canvasObjectData.getWidth(),canvasObjectData.getHeight(),true);
+    }
+
     public HMIUser getUser() {
         return user;
     }
@@ -48,6 +53,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
     }
 
     private void setData(double x, double y, double width, double height, boolean isOnCanvas) {
+        this.getCanvasObjectData().setType("AlarmDisplay");
         this.alarmsTable = new TableView<>();
 
         TableColumn<AlarmRow, String> rowNumberColumn = new TableColumn<>("#");
@@ -297,7 +303,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
                 String.valueOf(index+1),
                 tableItem.getName(),
                 tableItem.getExpression().getExpressionToEvaluate(),
-                tableItem.getAlarmExecutionDateTime() != null ? DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(tableItem.getAlarmExecutionDateTime()) : "-",
+                tableItem.getAlarmExecutionDateTime() != null ? tableItem.getAlarmExecutionDateTime() : "-",
                 tableItem.getType(),
                 tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
                 tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",
@@ -323,7 +329,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
                         String.valueOf(this.alarmsTable.getItems().size() + 1),
                         tableItem.getName(),
                         tableItem.getExpression().getExpressionToEvaluate(),
-                        tableItem.getAlarmExecutionDateTime() != null ? DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(tableItem.getAlarmExecutionDateTime()) : "-",
+                        tableItem.getAlarmExecutionDateTime() != null ? tableItem.getAlarmExecutionDateTime() : "-",
                         tableItem.getType(),
                         tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
                         tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",

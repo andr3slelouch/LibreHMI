@@ -79,7 +79,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                 case SYMBOL_STR:
                     addPastedSymbolViewOnCanvasClicked(canvasObjectData);
                     continue;
+                case ALARM_DISPLAY_STR:
+                    addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
+                    continue;
                 default:
+                    continue;
             }
         }
         pasteOffset = 10;
@@ -191,7 +195,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
         this.addNewShape(canvasAlarmDisplay);
         this.getChildren().add(canvasAlarmDisplay);
-        //canvasAlarmDisplay.setTimeline();
         canvasAlarmDisplay.getHmiApp().setWasModified(true);
         canvasAlarmDisplay.setUpdateTableTimeline();
     }
@@ -510,6 +513,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                     case IMAGE_STR:
                         addPastedImageViewOnCanvasClicked(canvasObjectData);
                         break;
+                    case ALARM_DISPLAY_STR:
+                        addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
+                        break;
                     default:
                         break;
                 }
@@ -517,6 +523,18 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         } catch (ClassNotFoundException | IOException | UnsupportedFlavorException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addPastedAlarmDisplayOnCanvasClicked(CanvasObjectData canvasObjectData) {
+        CanvasAlarmDisplay canvasAlarmDisplay = new CanvasAlarmDisplay(canvasObjectData);
+        canvasAlarmDisplay.setCanvas(this);
+        canvasAlarmDisplay.setHmiApp(hmiApp);
+        canvasAlarmDisplay.setUser(hmiApp.getUser());
+        canvasAlarmDisplay.setId((generateIdForPasteOperation(canvasObjectData)));
+        this.addNewShape(canvasAlarmDisplay);
+        this.getChildren().add(canvasAlarmDisplay);
+        canvasAlarmDisplay.getHmiApp().setWasModified(true);
+        canvasAlarmDisplay.setUpdateTableTimeline();
     }
 
     private void addPastedImageViewOnCanvasClicked(CanvasObjectData canvasObjectData) {
