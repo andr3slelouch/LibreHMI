@@ -319,28 +319,40 @@ public class HMIApp extends Application {
                        setAlarmWindow.getAlarmNameTF().getText(),
                        setAlarmWindow.getAlarmCommentTF().getText()
                );
-               manageableAlarms.add(alarm);
-               generateDoubleProjectAlarms(alarm);
+               addAlarm(alarm);
            }else if(setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")){
                Alarm alarm = new Alarm(
                        setAlarmWindow.getLocalExpression(),
-                       setAlarmWindow.getHighLimitCheckBox().isSelected(),
                        setAlarmWindow.getTrueRadioButton().isSelected(),
+                       true,
                        setAlarmWindow.getAlarmNameTF().getText(),
                        setAlarmWindow.getAlarmCommentTF().getText()
                );
-               manageableAlarms.add(alarm);
-               projectAlarms.add(alarm);
-               logger.log(Level.INFO, String.valueOf(projectAlarms.size()));
+               addAlarm(alarm);
            }
         });
         manageAlarmBtn.setOnAction(mouseEvent ->{
-           ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow(projectAlarms);
+           ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone());
            manageAlarmsWindow.showAndWait();
+           manageableAlarms.clear();
+           projectAlarms.clear();
+           for(int i=0;i<manageAlarmsWindow.getAlarmsList().size();i++){
+               addAlarm(manageAlarmsWindow.getAlarmsList().get(i));
+           }
         });
         scene.setHmiApp(this);
 
         return scene;
+    }
+
+    private void addAlarm(Alarm alarm){
+        if(alarm.getExpression().determineResultType().equals("Flotante") || alarm.getExpression().determineResultType().equals("Entero")){
+            manageableAlarms.add(alarm);
+            generateDoubleProjectAlarms(alarm);
+        } else if(alarm.getExpression().determineResultType().equals("Bool")){
+            manageableAlarms.add(alarm);
+            projectAlarms.add(alarm);
+        }
     }
 
     private void generateDoubleProjectAlarms(Alarm manageableAlarm) {

@@ -56,6 +56,17 @@ public class SetAlarmWindow extends WriteExpressionWindow{
             return change;
         };
         hiHiLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
+        hiHiLimitTF.textProperty().addListener((observableValue,oldValue,newValue) ->{
+            if(Double.parseDouble(newValue)<Double.parseDouble(highLimitTF.getText()) && highLimitCheckBox.isSelected()){
+                hiHiLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)<Double.parseDouble(lowLimitTF.getText()) && lowLimitCheckBox.isSelected()){
+                hiHiLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)<Double.parseDouble(loloLimitTF.getText()) && loloLimitCheckBox.isSelected()){
+                hiHiLimitTF.setText(oldValue);
+            }
+        });
         hiHiLimitTF.setDisable(true);
         hiHiLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> hiHiLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
         HBox hiHiLimitHBox = new HBox();
@@ -66,6 +77,17 @@ public class SetAlarmWindow extends WriteExpressionWindow{
         highLimitTF = new TextField("0");
         highLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         highLimitTF.setDisable(true);
+        highLimitTF.textProperty().addListener((observableValue,oldValue,newValue) ->{
+            if(Double.parseDouble(newValue)>Double.parseDouble(hiHiLimitTF.getText()) && hiHiLimitCheckBox.isSelected()){
+                highLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)<Double.parseDouble(lowLimitTF.getText()) && lowLimitCheckBox.isSelected()){
+                highLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)<Double.parseDouble(loloLimitTF.getText()) && loloLimitCheckBox.isSelected()){
+                highLimitTF.setText(oldValue);
+            }
+        });
         highLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> highLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
         HBox highLimitHBox = new HBox();
         highLimitHBox.getChildren().addAll(highLimitCheckBox,highLimitTF);
@@ -75,6 +97,17 @@ public class SetAlarmWindow extends WriteExpressionWindow{
         loloLimitTF = new TextField("0");
         loloLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         loloLimitTF.setDisable(true);
+        loloLimitTF.textProperty().addListener((observableValue,oldValue,newValue) ->{
+            if(Double.parseDouble(newValue)>Double.parseDouble(hiHiLimitTF.getText()) && hiHiLimitCheckBox.isSelected()){
+                loloLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)>Double.parseDouble(highLimitTF.getText()) && highLimitCheckBox.isSelected()){
+                loloLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)>Double.parseDouble(lowLimitTF.getText()) && lowLimitCheckBox.isSelected()){
+                loloLimitTF.setText(oldValue);
+            }
+        });
         loloLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> loloLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
         HBox loloLimitHBox = new HBox();
         loloLimitHBox.getChildren().addAll(loloLimitCheckBox,loloLimitTF);
@@ -84,6 +117,17 @@ public class SetAlarmWindow extends WriteExpressionWindow{
         lowLimitTF = new TextField("0");
         lowLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         lowLimitTF.setDisable(true);
+        lowLimitTF.textProperty().addListener((observableValue,oldValue,newValue) ->{
+            if(Double.parseDouble(newValue)>Double.parseDouble(hiHiLimitTF.getText()) && hiHiLimitCheckBox.isSelected()){
+                lowLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)>Double.parseDouble(highLimitTF.getText()) && highLimitCheckBox.isSelected()){
+                lowLimitTF.setText(oldValue);
+            }
+            if(Double.parseDouble(newValue)<Double.parseDouble(loloLimitTF.getText()) && loloLimitCheckBox.isSelected()){
+                lowLimitTF.setText(oldValue);
+            }
+        });
         lowLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> lowLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
         HBox lowLimitHBox = new HBox();
         lowLimitHBox.getChildren().addAll(lowLimitCheckBox,lowLimitTF);

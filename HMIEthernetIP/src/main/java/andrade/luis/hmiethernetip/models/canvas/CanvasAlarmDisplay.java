@@ -291,23 +291,63 @@ public class CanvasAlarmDisplay extends CanvasObject {
         this.activatedAlarms = activatedAlarms;
     }
 
-    public void setTableItems(ArrayList<Alarm> tableItems) {
-        for (int i = 0; i < tableItems.size(); i++) {
-            this.alarmsTable.getItems().add(
-                    new AlarmRow(
-                            String.valueOf(this.alarmsTable.getItems().size()+1),
-                            tableItems.get(i).getName(),
-                            tableItems.get(i).getExpression().getExpressionToEvaluate(),
-                            tableItems.get(i).getAlarmExecutionDateTime()!= null?DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(tableItems.get(i).getAlarmExecutionDateTime()):"-",
-                            tableItems.get(i).getType(),
-                            tableItems.get(i).getHighLimit()  != null? String.valueOf(tableItems.get(i).getHighLimit()) :"-",
-                            tableItems.get(i).getHiHiLimit()  != null? String.valueOf(tableItems.get(i).getHiHiLimit()) :"-",
-                            tableItems.get(i).getLowLimit()  != null? String.valueOf(tableItems.get(i).getLowLimit()) :"-",
-                            tableItems.get(i).getLoloLimit()  != null? String.valueOf(tableItems.get(i).getLoloLimit()) :"-",
-                            tableItems.get(i).getValue(),
-                            tableItems.get(i).getStatus(),
-                            tableItems.get(i).getAcknowledgement()
-                            ));
+    public void updateTableItem(String oldName,Alarm tableItem){
+        int index = getAlarmIndex(oldName);
+        AlarmRow updatedAlarm = new AlarmRow(
+                String.valueOf(index+1),
+                tableItem.getName(),
+                tableItem.getExpression().getExpressionToEvaluate(),
+                tableItem.getAlarmExecutionDateTime() != null ? DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(tableItem.getAlarmExecutionDateTime()) : "-",
+                tableItem.getType(),
+                tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
+                tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",
+                tableItem.getLowLimit() != null ? String.valueOf(tableItem.getLowLimit()) : "-",
+                tableItem.getLoloLimit() != null ? String.valueOf(tableItem.getLoloLimit()) : "-",
+                tableItem.getValue(),
+                tableItem.getStatus(),
+                tableItem.getAcknowledgement()
+        );
+        this.alarmsTable.getItems().set(index, updatedAlarm);
+    }
+
+    public void removeTableItem(String name){
+        int index = getAlarmIndex(name);
+        if(index >= 0){
+            this.alarmsTable.getItems().remove(index);
         }
+    }
+
+    public void addTableItem(Alarm tableItem) {
+        this.alarmsTable.getItems().add(
+                new AlarmRow(
+                        String.valueOf(this.alarmsTable.getItems().size() + 1),
+                        tableItem.getName(),
+                        tableItem.getExpression().getExpressionToEvaluate(),
+                        tableItem.getAlarmExecutionDateTime() != null ? DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(tableItem.getAlarmExecutionDateTime()) : "-",
+                        tableItem.getType(),
+                        tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
+                        tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",
+                        tableItem.getLowLimit() != null ? String.valueOf(tableItem.getLowLimit()) : "-",
+                        tableItem.getLoloLimit() != null ? String.valueOf(tableItem.getLoloLimit()) : "-",
+                        tableItem.getValue(),
+                        tableItem.getStatus(),
+                        tableItem.getAcknowledgement()
+                ));
+    }
+
+    public void setTableItems(ArrayList<Alarm> tableItems) {
+        for (Alarm tableItem : tableItems) {
+            addTableItem(tableItem);
+        }
+    }
+
+    private int getAlarmIndex(String name){
+        int res = -1;
+        for(int i=0;i< alarmsTable.getItems().size(); i++){
+            if(name.equals(alarmsTable.getItems().get(i).getName())){
+                res = i;
+            }
+        }
+        return res;
     }
 }
