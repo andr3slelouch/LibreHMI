@@ -70,20 +70,22 @@ public class CanvasText extends CanvasLabel {
             writeExpressionWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getExpression().getFloatPrecision()));
         }
         writeExpressionWindow.showAndWait();
-        Expression expression = writeExpressionWindow.getLocalExpression();
-        try {
-            if (expression != null) {
-                expression.evaluate();
-                this.setExpression(expression);
-                this.getHmiApp().setWasModified(true);
+        if(writeExpressionWindow.isDone()){
+            Expression expression = writeExpressionWindow.getLocalExpression();
+            try {
+                if (expression != null) {
+                    expression.evaluate();
+                    this.setExpression(expression);
+                    this.getHmiApp().setWasModified(true);
+                }
+            } catch (Exception e) {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setHeaderText("Error");
+                errorAlert.setContentText("Error al agregar la expresión, reintente");
+                errorAlert.showAndWait();
+                setExpression();
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-            errorAlert.setHeaderText("Error");
-            errorAlert.setContentText("Error al agregar la expresión, reintente");
-            errorAlert.showAndWait();
-            setExpression();
-            e.printStackTrace();
         }
     }
 

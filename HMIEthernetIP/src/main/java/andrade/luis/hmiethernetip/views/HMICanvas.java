@@ -405,26 +405,23 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     public void addTextOnCanvasClicked(CanvasPoint current) {
-        CanvasText canvasText = new CanvasText("0.0", current);
-        canvasText.setCanvas(this);
-        canvasText.setHmiApp(hmiApp);
-        if (this.getShapeArrayList().isEmpty()) {
-            canvasText.setObjectId(FIGURE_ID + "0");
-        } else {
-            canvasText.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
-        }
-        Expression expression;
-        expression = writeExpression();
-        canvasText.setExpression(expression);
-        this.addNewShape(canvasText);
-        this.getChildren().add(canvasText);
-        canvasText.getHmiApp().setWasModified(true);
-    }
-
-    public Expression writeExpression() {
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
         writeExpressionWindow.showAndWait();
-        return writeExpressionWindow.getLocalExpression();
+        if(writeExpressionWindow.isDone()){
+            Expression expression = writeExpressionWindow.getLocalExpression();;
+            CanvasText canvasText = new CanvasText("0.0", current);
+            canvasText.setCanvas(this);
+            canvasText.setHmiApp(hmiApp);
+            if (this.getShapeArrayList().isEmpty()) {
+                canvasText.setObjectId(FIGURE_ID + "0");
+            } else {
+                canvasText.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
+            }
+            canvasText.setExpression(expression);
+            this.addNewShape(canvasText);
+            this.getChildren().add(canvasText);
+            canvasText.getHmiApp().setWasModified(true);
+        }
     }
 
     public ArrayList<CanvasObject> getCurrentCanvasObjects() {

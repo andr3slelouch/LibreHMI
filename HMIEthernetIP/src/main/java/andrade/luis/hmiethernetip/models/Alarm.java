@@ -277,4 +277,28 @@ public class Alarm implements Serializable {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "Alarm{" +
+                "expression=" + expression +
+                ", highLimit=" + highLimit +
+                ", hiHiLimit=" + hiHiLimit +
+                ", lowLimit=" + lowLimit +
+                ", loloLimit=" + loloLimit +
+                ", highAlarmEnabled=" + highAlarmEnabled +
+                ", hiHiAlarmEnabled=" + hiHiAlarmEnabled +
+                ", lowAlarmEnabled=" + lowAlarmEnabled +
+                ", loloAlarmEnabled=" + loloAlarmEnabled +
+                ", conditionEnabled=" + conditionEnabled +
+                ", condition=" + condition +
+                ", status='" + status + '\'' +
+                ", acknowledgement='" + acknowledgement + '\'' +
+                ", comment='" + comment + '\'' +
+                ", type='" + type + '\'' +
+                ", name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                ", alarmExecutionDateTime='" + alarmExecutionDateTime + '\'' +
+                '}';
+    }
 }

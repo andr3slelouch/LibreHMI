@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 public class SignUpWindow extends Stage {
 
-    private StackPane root;
     private HMIUser hmiUser;
 
     public boolean isCancelled() {
@@ -30,7 +29,6 @@ public class SignUpWindow extends Stage {
     }
 
     private boolean cancelled = true;
-    private final String[] userRoles = { "Administrador", "Diseñador", "Operador"};
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
@@ -40,7 +38,7 @@ public class SignUpWindow extends Stage {
     }
 
     public SignUpWindow(HMIUser hmiUser){
-        root = new StackPane();
+        StackPane root = new StackPane();
         final Label label = new Label("Registro de usuario");
 
         Label firstNameLabel = new Label("Nombre:");
@@ -65,6 +63,7 @@ public class SignUpWindow extends Stage {
 
         // Create a combo box
         Label rolesLabel = new Label("Rol:");
+        String[] userRoles = {"Administrador", "Diseñador", "Operador"};
         ComboBox<String> rolesComboBox =
                 new ComboBox<>(FXCollections
                         .observableArrayList(userRoles));

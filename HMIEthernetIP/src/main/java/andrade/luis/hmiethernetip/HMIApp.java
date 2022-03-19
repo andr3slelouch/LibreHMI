@@ -308,36 +308,38 @@ public class HMIApp extends Application {
         });
         newBtn.setOnAction(mouseEvent -> this.createNewProject());
         alarmBtn.setOnAction(mouseEvent -> {
-           SetAlarmWindow setAlarmWindow = new SetAlarmWindow();
+           SetAlarmWindow setAlarmWindow = new SetAlarmWindow(this);
            setAlarmWindow.showAndWait();
-           if(setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")){
-               Alarm alarm = new Alarm(
-                       setAlarmWindow.getLocalExpression(),
-                       Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
-                       Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
-                       Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
-                       Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
-                       setAlarmWindow.getHighLimitCheckBox().isSelected(),
-                       setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
-                       setAlarmWindow.getLowLimitCheckBox().isSelected(),
-                       setAlarmWindow.getLoloLimitCheckBox().isSelected(),
-                       setAlarmWindow.getAlarmNameTF().getText(),
-                       setAlarmWindow.getAlarmCommentTF().getText()
-               );
-               addAlarm(alarm);
-           }else if(setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")){
-               Alarm alarm = new Alarm(
-                       setAlarmWindow.getLocalExpression(),
-                       setAlarmWindow.getTrueRadioButton().isSelected(),
-                       true,
-                       setAlarmWindow.getAlarmNameTF().getText(),
-                       setAlarmWindow.getAlarmCommentTF().getText()
-               );
-               addAlarm(alarm);
+           if(setAlarmWindow.isDone()){
+               if(setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")){
+                   Alarm alarm = new Alarm(
+                           setAlarmWindow.getLocalExpression(),
+                           Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
+                           Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
+                           Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
+                           Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
+                           setAlarmWindow.getHighLimitCheckBox().isSelected(),
+                           setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
+                           setAlarmWindow.getLowLimitCheckBox().isSelected(),
+                           setAlarmWindow.getLoloLimitCheckBox().isSelected(),
+                           setAlarmWindow.getAlarmNameTF().getText(),
+                           setAlarmWindow.getAlarmCommentTF().getText()
+                   );
+                   addAlarm(alarm);
+               }else if(setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")){
+                   Alarm alarm = new Alarm(
+                           setAlarmWindow.getLocalExpression(),
+                           setAlarmWindow.getTrueRadioButton().isSelected(),
+                           true,
+                           setAlarmWindow.getAlarmNameTF().getText(),
+                           setAlarmWindow.getAlarmCommentTF().getText()
+                   );
+                   addAlarm(alarm);
+               }
            }
         });
         manageAlarmBtn.setOnAction(mouseEvent ->{
-           ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone());
+           ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone(),this);
            manageAlarmsWindow.showAndWait();
            manageableAlarms.clear();
            projectAlarms.clear();
@@ -354,9 +356,11 @@ public class HMIApp extends Application {
         if(alarm.getExpression().determineResultType().equals("Flotante") || alarm.getExpression().determineResultType().equals("Entero")){
             manageableAlarms.add(alarm);
             generateDoubleProjectAlarms(alarm);
+            this.setWasModified(true);
         } else if(alarm.getExpression().determineResultType().equals("Bool")){
             manageableAlarms.add(alarm);
             projectAlarms.add(alarm);
+            this.setWasModified(true);
         }
     }
 
@@ -698,6 +702,16 @@ public class HMIApp extends Application {
 
         mainStage.setScene(newScene);
         mainStage.setTitle(newScene.getTitle()+" - "+HMI_TITLE);
+    }
+
+    public int getIndexForAlarm(String name){
+        int res = -1;
+        for(int i=0;i<manageableAlarms.size();i++){
+            if(name.equals(manageableAlarms.get(i).getName())){
+                res = i;
+            }
+        }
+        return res;
     }
 
     /**

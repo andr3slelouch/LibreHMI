@@ -55,6 +55,28 @@ public class AlarmRow implements Serializable {
     @SerializedName("expression")
     @Expose
     private final SimpleStringProperty expression;
+    @SerializedName("acknowledgement")
+    @Expose
+    private final SimpleStringProperty acknowledgement;
+
+    @Override
+    public String toString() {
+        return "AlarmRow{" +
+                "rowNumber=" + rowNumber +
+                ", datetime=" + datetime +
+                ", type=" + type +
+                ", maxValue=" + maxValue +
+                ", hiHiValue=" + hiHiValue +
+                ", minValue=" + minValue +
+                ", loLoValue=" + loLoValue +
+                ", value=" + value +
+                ", status=" + status +
+                ", name=" + name +
+                ", expression=" + expression +
+                ", acknowledgement=" + acknowledgement +
+                '}';
+    }
+
     public String getName() {
         return name.get();
     }
@@ -186,10 +208,6 @@ public class AlarmRow implements Serializable {
     public void setAcknowledgement(String acknowledgement) {
         this.acknowledgement.set(acknowledgement);
     }
-
-    @SerializedName("acknowledgement")
-    @Expose
-    private final SimpleStringProperty acknowledgement;
 
     public String getExpression() {
         return expression.get();

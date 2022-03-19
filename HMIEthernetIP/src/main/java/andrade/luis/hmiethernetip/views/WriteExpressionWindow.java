@@ -21,112 +21,27 @@ import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 public class WriteExpressionWindow extends Stage {
-    public HBox getFloatPrecisionHBox() {
-        return floatPrecisionHBox;
-    }
-
-    public void setFloatPrecisionHBox(HBox floatPrecisionHBox) {
-        this.floatPrecisionHBox = floatPrecisionHBox;
-    }
 
     private HBox floatPrecisionHBox;
-
-    public TextField getFloatPrecisionTextField() {
-        return floatPrecisionTextField;
-    }
-
-    public void setFloatPrecisionTextField(TextField floatPrecisionTextField) {
-        this.floatPrecisionTextField = floatPrecisionTextField;
-    }
-
-    private TextField floatPrecisionTextField;
-
-    public Button getAddTagButton() {
-        return addTagButton;
-    }
-
     private final Button addTagButton;
-
-    public HBox getButtonsHBox() {
-        return buttonsHBox;
-    }
-
     private final HBox buttonsHBox;
     protected TextField textField;
-
-    public TextField getTextField() {
-        return textField;
-    }
-
-    public void setTextField(TextField textField) {
-        this.textField = textField;
-    }
-
-    public ArrayList<Tag> getAddedTags() {
-        return addedTags;
-    }
-
-    public void setAddedTags(ArrayList<Tag> addedTags) {
-        this.addedTags = addedTags;
-        if(!this.addedTags.isEmpty()){
-            addTagButton.setDisable(true);
-        }
-    }
-
     protected Button finishSelectionButton;
     private ArrayList<Tag> addedTags;
-
-    public Scene getMainScene() {
-        return mainScene;
-    }
-
-    public void setMainScene(Scene mainScene) {
-        this.mainScene = mainScene;
-    }
-
     private Scene mainScene;
-
-    public StackPane getRoot() {
-        return root;
-    }
-
-    public void setRoot(StackPane root) {
-        this.root = root;
-    }
-
     private StackPane root;
-
-    public VBox getVbox() {
-        return vbox;
-    }
-
     private final VBox vbox;
-    public Expression getLocalExpression() {
-        return localExpression;
-    }
-
-    public void setLocalExpression(Expression localExpression) {
-        this.localExpression = localExpression;
-    }
-
     private Expression localExpression;
-
-    public boolean isInputMode() {
-        return inputMode;
-    }
-
-    public void setInputMode(boolean inputMode) {
-        this.inputMode = inputMode;
-    }
-
     private boolean inputMode;
+    private TextField floatPrecisionTextField;
+    private boolean done = false;
+
     public WriteExpressionWindow(){
         this(750,250);
     }
     public WriteExpressionWindow(double width, double height) {
         root = new StackPane();
         addedTags = new ArrayList<>();
-
 
         final Label label = new Label("Escriba la expresión");
 
@@ -197,9 +112,9 @@ public class WriteExpressionWindow extends Stage {
     }
 
     protected void confirmExit(Alert.AlertType type,String title,String message){
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Advertencia");
-        alert.setHeaderText("Debe escribir una expresión con un Tag añadido a través del botón 'Añadir Tag' ");
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
 
         ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
 
@@ -219,6 +134,7 @@ public class WriteExpressionWindow extends Stage {
         }else{
             confirmExit(Alert.AlertType.WARNING,"No existe expresión definida","Debe agregar una expresión o un Tag");
         }
+        this.done = true;
     }
 
     protected void deleteUnneededTags(){
@@ -252,4 +168,91 @@ public class WriteExpressionWindow extends Stage {
 
         return false;
     }
+    public HBox getFloatPrecisionHBox() {
+        return floatPrecisionHBox;
+    }
+
+    public void setFloatPrecisionHBox(HBox floatPrecisionHBox) {
+        this.floatPrecisionHBox = floatPrecisionHBox;
+    }
+
+    public TextField getFloatPrecisionTextField() {
+        return floatPrecisionTextField;
+    }
+
+    public void setFloatPrecisionTextField(TextField floatPrecisionTextField) {
+        this.floatPrecisionTextField = floatPrecisionTextField;
+    }
+
+    public Button getAddTagButton() {
+        return addTagButton;
+    }
+
+    public HBox getButtonsHBox() {
+        return buttonsHBox;
+    }
+
+    public TextField getTextField() {
+        return textField;
+    }
+
+    public void setTextField(TextField textField) {
+        this.textField = textField;
+    }
+
+    public ArrayList<Tag> getAddedTags() {
+        return addedTags;
+    }
+
+    public void setAddedTags(ArrayList<Tag> addedTags) {
+        this.addedTags = addedTags;
+        if(!this.addedTags.isEmpty()){
+            addTagButton.setDisable(true);
+        }
+    }
+
+    public Scene getMainScene() {
+        return mainScene;
+    }
+
+    public void setMainScene(Scene mainScene) {
+        this.mainScene = mainScene;
+    }
+
+    public StackPane getRoot() {
+        return root;
+    }
+
+    public void setRoot(StackPane root) {
+        this.root = root;
+    }
+
+    public VBox getVbox() {
+        return vbox;
+    }
+
+    public Expression getLocalExpression() {
+        return localExpression;
+    }
+
+    public void setLocalExpression(Expression localExpression) {
+        this.localExpression = localExpression;
+    }
+
+    public boolean isInputMode() {
+        return inputMode;
+    }
+
+    public void setInputMode(boolean inputMode) {
+        this.inputMode = inputMode;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+
 }

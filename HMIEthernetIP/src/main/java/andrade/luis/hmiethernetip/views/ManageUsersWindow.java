@@ -49,38 +49,39 @@ public class ManageUsersWindow extends Stage {
 
         table.setItems(getUsers());
 
-        table.setRowFactory(param -> new TableRow<HMIUserRow>(){
-            public void updateItem(HMIUserRow row, boolean empty){
+        table.setRowFactory(param -> new TableRow<>() {
+            @Override
+            public void updateItem(HMIUserRow row, boolean empty) {
                 super.updateItem(row, empty);
-                if(!empty){
+                if (!empty) {
                     ContextMenu contextMenu = new ContextMenu();
                     MenuItem newItem = new MenuItem();
                     newItem.setText("Nuevo");
                     newItem.setOnAction(event -> {
                         SignUpWindow signUpWindow = new SignUpWindow(null);
                         signUpWindow.showAndWait();
-                        if(!signUpWindow.isCancelled()) table.setItems(getUsers());
+                        if (!signUpWindow.isCancelled()) table.setItems(getUsers());
                     });
                     MenuItem saveItem = new MenuItem();
                     saveItem.setText("Editar");
                     saveItem.setOnAction(event -> {
                         SignUpWindow signUpWindow = new SignUpWindow(row.getHmiUser());
                         signUpWindow.showAndWait();
-                        if(!signUpWindow.isCancelled()) table.setItems(getUsers());
+                        if (!signUpWindow.isCancelled()) table.setItems(getUsers());
                     });
                     MenuItem deleteItem = new MenuItem();
                     deleteItem.setText("Eliminar");
                     deleteItem.setOnAction(event -> {
                         try {
-                            if(showAlert(CONFIRMATION,"Confirmar eliminación de Usuario","Esta seguro de eliminar el usuario '"+row.getUsername()+"'?")){
-                                if(row.getHmiUser().deleteFromDatabase()) table.setItems(getUsers());
+                            if (showAlert(CONFIRMATION, "Confirmar eliminación de Usuario", "Esta seguro de eliminar el usuario '" + row.getUsername() + "'?")) {
+                                if (row.getHmiUser().deleteFromDatabase()) table.setItems(getUsers());
                             }
                         } catch (SQLException | IOException e) {
                             e.printStackTrace();
                         }
                     });
 
-                    contextMenu.getItems().addAll(newItem,saveItem,deleteItem);
+                    contextMenu.getItems().addAll(newItem, saveItem, deleteItem);
                     setContextMenu(contextMenu);
                 }
             }
@@ -143,7 +144,6 @@ public class ManageUsersWindow extends Stage {
 
     public void setSelectedUser(){
         ObservableList<HMIUserRow> selected = selectionModel.getSelectedItems();
-        Logger logger = Logger.getLogger(this.getClass().getName());
 
         if(!selected.isEmpty()){
             this.selectedHMIUserRow = new HMIUser(selected.get(0).getFirst(),selected.get(0).getLast(),selected.get(0).getEmail(),selected.get(0).getUsername(),selected.get(0).getRole(),"");
