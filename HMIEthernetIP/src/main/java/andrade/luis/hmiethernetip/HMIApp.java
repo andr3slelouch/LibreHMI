@@ -1,9 +1,7 @@
 package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
-import andrade.luis.hmiethernetip.models.Alarm;
-import andrade.luis.hmiethernetip.models.HMIAppData;
-import andrade.luis.hmiethernetip.models.HMISceneData;
+import andrade.luis.hmiethernetip.models.*;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
@@ -51,6 +49,8 @@ public class HMIApp extends Application {
     private ArrayList<Alarm> projectAlarms = new ArrayList<>();
     private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
     private static final String HMI_TITLE = "HMI";
+    private static final int CAPACITY = 10;
+    private static final String ERROR_STR = "Error:";
     private static final String ALERT_SAVE_TITLE = "¿Desea guardar los cambios del proyecto actual?";
     private static final String ALERT_SAVE_DESCRIPTION = "Los cambios se perderán si elige No Guardar";
     private HMIUser user;
@@ -91,27 +91,29 @@ public class HMIApp extends Application {
         }
         manageableAlarms.clear();
         projectAlarms.clear();
-        for(int i=0;i<this.hmiAppData.getHmiAlarms().size();i++){
-            addAlarm(this.hmiAppData.getHmiAlarms().get(i));
+        if(this.hmiAppData.getHmiAlarms()!=null){
+            for (int i = 0; i < this.hmiAppData.getHmiAlarms().size(); i++) {
+                addAlarm(this.hmiAppData.getHmiAlarms().get(i));
+            }
         }
     }
 
     public void clearProject() {
         this.pages.clear();
         this.pagesTitles.clear();
-        this.wasModified=false;
-        this.currentProjectFilePath=null;
+        this.wasModified = false;
+        this.currentProjectFilePath = null;
     }
 
     public void createNewProject() {
-        logger.log(Level.INFO,"Closing Project...");
-        if(wasModified){
-            if(showAlert(Alert.AlertType.CONFIRMATION,ALERT_SAVE_TITLE,ALERT_SAVE_DESCRIPTION,false, true)){
+        logger.log(Level.INFO, "Closing Project...");
+        if (wasModified) {
+            if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
                 this.clearProject();
                 HMIScene scene = generatePage(DEFAULT_PAGE_NAME, "", Color.WHITESMOKE);
                 addScene(scene);
             }
-        }else{
+        } else {
             this.clearProject();
             HMIScene scene = generatePage(DEFAULT_PAGE_NAME, "", Color.WHITESMOKE);
             addScene(scene);
@@ -132,31 +134,45 @@ public class HMIApp extends Application {
 
         mainStage = stage;
         mainStage.setOnCloseRequest(windowEvent -> {
-            logger.log(Level.INFO,"Closing...");
-            if(wasModified){
-                if(showAlert(Alert.AlertType.CONFIRMATION,ALERT_SAVE_TITLE,ALERT_SAVE_DESCRIPTION,false, true)){
-                    logger.log(Level.INFO,"CANCELED");
-                }else{
+            logger.log(Level.INFO, "Closing...");
+            if (wasModified) {
+                if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
+                    logger.log(Level.INFO, "CANCELED");
+                } else {
                     windowEvent.consume();
                 }
-            }else{
-                logger.log(Level.INFO,"CLOSED...");
+            } else {
+                logger.log(Level.INFO, "CLOSED...");
             }
         });
         generateDatabase();
-        HMIScene scene = generatePage(DEFAULT_PAGE_NAME, "", Color.WHITESMOKE);
-        addScene(scene);
-        mainStage.setTitle(scene.getTitle() +" - "+ HMI_TITLE);
-        mainStage.setScene(scene);
-        mainStage.show();
+        try {
+            this.mainStage = new WelcomeWindow(this);
+            mainStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         updateTitleFlag.addListener((observableValue, oldBoolean, newBoolean) -> {
-            if(Boolean.TRUE.equals(newBoolean)){
-                mainStage.setTitle(mainStage.getTitle()+"*");
-            }else if(Boolean.FALSE.equals(newBoolean) && mainStage.getTitle().endsWith("*")){
-                mainStage.setTitle(mainStage.getTitle().substring(0,mainStage.getTitle().length()-1));
+            if (Boolean.TRUE.equals(newBoolean)) {
+                mainStage.setTitle(mainStage.getTitle() + "*");
+            } else if (Boolean.FALSE.equals(newBoolean) && mainStage.getTitle().endsWith("*")) {
+                mainStage.setTitle(mainStage.getTitle().substring(0, mainStage.getTitle().length() - 1));
             }
         });
+    }
+
+    public void setHMIStage(String filenamePath) throws IOException {
+        this.mainStage = new Stage();
+        if(filenamePath==null){
+            createNewProject();
+        }else if(filenamePath.equals("")){
+            loadHMIData();
+        }
+        else{
+            loadHMIData(filenamePath);
+        }
+
     }
 
     /**
@@ -228,11 +244,11 @@ public class HMIApp extends Application {
         Button newBtn = new Button("Nuevo");
         Button alarmBtn = new Button("Alarma");
         Button manageAlarmBtn = new Button("Administrar Alarmas");
-        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn,alarmDisplayBtn);
+        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn, alarmDisplayBtn);
         HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(saveBtn,saveAsBtn ,loadBtn, newBtn);
+        HBox thirdHBox = new HBox(saveBtn, saveAsBtn, loadBtn, newBtn);
         HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn, symbolBtn, pushbuttonBtn);
-        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn,alarmBtn,manageAlarmBtn);
+        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn, alarmBtn, manageAlarmBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
@@ -279,7 +295,7 @@ public class HMIApp extends Application {
             try {
                 this.saveHMIDataProcess();
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR,"Error al Guardar","Error:"+e.getMessage(),false,false);
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
                 e.printStackTrace();
             }
         });
@@ -287,77 +303,84 @@ public class HMIApp extends Application {
             try {
                 this.saveAsHMIData();
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR,"Error al Guardar Como","Error:"+e.getMessage(),false,false);
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
                 e.printStackTrace();
             }
         });
         loadBtn.setOnAction(mouseEvent -> {
             try {
-                logger.log(Level.INFO,"Closing Project...");
-                if(wasModified){
-                    if(showAlert(Alert.AlertType.CONFIRMATION,ALERT_SAVE_TITLE,ALERT_SAVE_DESCRIPTION,false, true)){
+                logger.log(Level.INFO, "Closing Project...");
+                if (wasModified) {
+                    if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
                         loadHMIData();
                     }
-                }else{
+                } else {
                     loadHMIData();
                 }
-            } catch (FileNotFoundException e) {
-                showAlert(Alert.AlertType.ERROR,"Error al Cargar Proyecto","Error:"+e.getMessage(),false,false);
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error al Cargar Proyecto", ERROR_STR + e.getMessage(), false, false);
                 e.printStackTrace();
             }
         });
         newBtn.setOnAction(mouseEvent -> this.createNewProject());
         alarmBtn.setOnAction(mouseEvent -> {
-           SetAlarmWindow setAlarmWindow = new SetAlarmWindow(this);
-           setAlarmWindow.showAndWait();
-           if(setAlarmWindow.isDone()){
-               if(setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")){
-                   Alarm alarm = new Alarm(
-                           setAlarmWindow.getLocalExpression(),
-                           Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
-                           Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
-                           Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
-                           Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
-                           setAlarmWindow.getHighLimitCheckBox().isSelected(),
-                           setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
-                           setAlarmWindow.getLowLimitCheckBox().isSelected(),
-                           setAlarmWindow.getLoloLimitCheckBox().isSelected(),
-                           setAlarmWindow.getAlarmNameTF().getText(),
-                           setAlarmWindow.getAlarmCommentTF().getText()
-                   );
-                   addAlarm(alarm);
-               }else if(setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")){
-                   Alarm alarm = new Alarm(
-                           setAlarmWindow.getLocalExpression(),
-                           setAlarmWindow.getTrueRadioButton().isSelected(),
-                           true,
-                           setAlarmWindow.getAlarmNameTF().getText(),
-                           setAlarmWindow.getAlarmCommentTF().getText()
-                   );
-                   addAlarm(alarm);
-               }
-           }
+            SetAlarmWindow setAlarmWindow = new SetAlarmWindow(this);
+            setAlarmWindow.showAndWait();
+            if (setAlarmWindow.isDone()) {
+                if (setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")) {
+                    Alarm alarm = new Alarm(
+                            setAlarmWindow.getLocalExpression(),
+                            Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
+                            Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
+                            Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
+                            Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
+                            setAlarmWindow.getHighLimitCheckBox().isSelected(),
+                            setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
+                            setAlarmWindow.getLowLimitCheckBox().isSelected(),
+                            setAlarmWindow.getLoloLimitCheckBox().isSelected(),
+                            setAlarmWindow.getAlarmNameTF().getText(),
+                            setAlarmWindow.getAlarmCommentTF().getText()
+                    );
+                    addAlarm(alarm);
+                } else if (setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")) {
+                    Alarm alarm = new Alarm(
+                            setAlarmWindow.getLocalExpression(),
+                            setAlarmWindow.getTrueRadioButton().isSelected(),
+                            true,
+                            setAlarmWindow.getAlarmNameTF().getText(),
+                            setAlarmWindow.getAlarmCommentTF().getText()
+                    );
+                    addAlarm(alarm);
+                }
+            }
         });
-        manageAlarmBtn.setOnAction(mouseEvent ->{
-           ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone(),this);
-           manageAlarmsWindow.showAndWait();
-           manageableAlarms.clear();
-           projectAlarms.clear();
-           for(int i=0;i<manageAlarmsWindow.getAlarmsList().size();i++){
-               addAlarm(manageAlarmsWindow.getAlarmsList().get(i));
-           }
+        manageAlarmBtn.setOnAction(mouseEvent -> {
+            WelcomeWindow welcomeStage = null;
+            try {
+                welcomeStage = new WelcomeWindow();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            welcomeStage.show();
+            ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone(), this);
+            manageAlarmsWindow.showAndWait();
+            manageableAlarms.clear();
+            projectAlarms.clear();
+            for (int i = 0; i < manageAlarmsWindow.getAlarmsList().size(); i++) {
+                addAlarm(manageAlarmsWindow.getAlarmsList().get(i));
+            }
         });
         scene.setHmiApp(this);
 
         return scene;
     }
 
-    private void addAlarm(Alarm alarm){
-        if(alarm.getExpression().determineResultType().equals("Flotante") || alarm.getExpression().determineResultType().equals("Entero")){
+    private void addAlarm(Alarm alarm) {
+        if (alarm.getExpression().determineResultType().equals("Flotante") || alarm.getExpression().determineResultType().equals("Entero")) {
             manageableAlarms.add(alarm);
             generateDoubleProjectAlarms(alarm);
             this.setWasModified(true);
-        } else if(alarm.getExpression().determineResultType().equals("Bool")){
+        } else if (alarm.getExpression().determineResultType().equals("Bool")) {
             manageableAlarms.add(alarm);
             projectAlarms.add(alarm);
             this.setWasModified(true);
@@ -365,7 +388,7 @@ public class HMIApp extends Application {
     }
 
     private void generateDoubleProjectAlarms(Alarm manageableAlarm) {
-        if(manageableAlarm.isHighAlarmEnabled()){
+        if (manageableAlarm.isHighAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
                     manageableAlarm.getHighLimit(),
@@ -381,7 +404,7 @@ public class HMIApp extends Application {
             );
             projectAlarms.add(alarm);
         }
-        if(manageableAlarm.isHiHiAlarmEnabled()){
+        if (manageableAlarm.isHiHiAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
                     manageableAlarm.getHighLimit(),
@@ -398,7 +421,7 @@ public class HMIApp extends Application {
             );
             projectAlarms.add(alarm);
         }
-        if(manageableAlarm.isLoloAlarmEnabled()){
+        if (manageableAlarm.isLoloAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
                     manageableAlarm.getHighLimit(),
@@ -414,7 +437,7 @@ public class HMIApp extends Application {
             );
             projectAlarms.add(alarm);
         }
-        if(manageableAlarm.isLowAlarmEnabled()){
+        if (manageableAlarm.isLowAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
                     manageableAlarm.getHighLimit(),
@@ -433,16 +456,15 @@ public class HMIApp extends Application {
     }
 
     private void saveHMIDataProcess() throws IOException {
-        if(currentProjectFilePath!=null){
+        if (currentProjectFilePath != null) {
             this.saveHMIData(currentProjectFilePath);
-        }else{
+        } else {
             this.saveAsHMIData();
         }
     }
 
-    private void loadHMIData() throws FileNotFoundException {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
+    private void loadHMIData() throws IOException {
+
 
         FileChooser fileChooser = new FileChooser();
 
@@ -456,16 +478,57 @@ public class HMIApp extends Application {
         );
         File file = fileChooser.showOpenDialog(null);
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
+        loadHMIData(file.getAbsolutePath());
+
+    }
+
+    public void loadHMIData(String filenamePath) throws FileNotFoundException {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath));
 
         HMIAppData localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
-        if(localHmiAppData != null){
+        if (localHmiAppData != null) {
             this.setHmiAppData(localHmiAppData);
-            this.currentProjectFilePath = file.getAbsolutePath();
+            this.currentProjectFilePath = filenamePath;
+            String[] filenameArr = filenamePath.split(File.separator);
+            String filename = filenameArr[filenameArr.length - 1];
             this.setWasModified(false);
-            if(!mainStage.getTitle().contains(file.getName())){
-                mainStage.setTitle(file.getName()+" - "+mainStage.getTitle());
+            if (!mainStage.getTitle().contains(filename)) {
+                mainStage.setTitle(filename + " - " + mainStage.getTitle());
             }
+            addRecentUsedFilePath(filenamePath);
+        }
+    }
+
+    private void addRecentUsedFilePath(String filenamePath) {
+        String recentFilesFilePath = DBConnection.getWorkingDirectory()+File.separator+"recentFiles.json";
+        RecentUsedFilesData recentUsedFilesData = null;
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(recentFilesFilePath))) {
+            recentUsedFilesData = gson.fromJson(bufferedReader, RecentUsedFilesData.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        RecentUsedFilesCache recentUsedFilesCache = null;
+        if(recentUsedFilesData==null){
+            recentUsedFilesData = new RecentUsedFilesData();
+            recentUsedFilesData.setCapacity(CAPACITY);
+            recentUsedFilesCache = new RecentUsedFilesCache(CAPACITY);
+        }else{
+            recentUsedFilesCache = new RecentUsedFilesCache(recentUsedFilesData.getCapacity());
+            recentUsedFilesCache.importArrayList(recentUsedFilesData.getRecentlyUsedFilePaths());
+        }
+
+        recentUsedFilesCache.refer(filenamePath);
+        recentUsedFilesData.setCapacity(recentUsedFilesCache.getCapacity());
+        recentUsedFilesData.setRecentlyUsedFilePaths(recentUsedFilesCache.exportArrayList());
+        try (Writer writer = Files.newBufferedWriter(Path.of(recentFilesFilePath))){
+            gson.toJson(recentUsedFilesData, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -480,7 +543,7 @@ public class HMIApp extends Application {
         );
 
         File file = fileChooser.showSaveDialog(null);
-        if(file!=null){
+        if (file != null) {
             saveHMIData(file.getAbsolutePath());
         }
     }
@@ -488,7 +551,7 @@ public class HMIApp extends Application {
     /**
      * Este método inicia el proceso para guardar el proyecto dentro de un archivo json.
      *
-     * @throws IOException Si hay algun problema en la lectura o escritura.
+     * @throws IOException Si hay algún problema en la lectura o escritura.
      */
     private void saveHMIData(String filenamePath) throws IOException {
         ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
@@ -503,7 +566,7 @@ public class HMIApp extends Application {
         this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
         this.hmiAppData.setHmiAlarms(manageableAlarms);
         Gson gson = new Gson();
-        if(filenamePath != null){
+        if (filenamePath != null) {
             String[] filenameArr = filenamePath.split(File.separator);
             String filename = filenameArr[filenameArr.length - 1];
             Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
@@ -511,8 +574,9 @@ public class HMIApp extends Application {
             writer.close();
             this.currentProjectFilePath = filenamePath;
             this.setWasModified(false);
-            if(!mainStage.getTitle().contains(filename)){
-                mainStage.setTitle(filename+" - "+mainStage.getTitle());
+            addRecentUsedFilePath(filenamePath);
+            if (!mainStage.getTitle().contains(filename)) {
+                mainStage.setTitle(filename + " - " + mainStage.getTitle());
             }
         }
     }
@@ -569,7 +633,7 @@ public class HMIApp extends Application {
     private void generateStage(HMIScene scene) {
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.setTitle(scene.getTitle()+" - "+HMI_TITLE);
+        stage.setTitle(scene.getTitle() + " - " + HMI_TITLE);
         stage.show();
         createdWindows.add(stage);
     }
@@ -600,7 +664,7 @@ public class HMIApp extends Application {
         int index = getIndexForScene(sceneTitle);
         mainStage.setScene(pages.get(index));
         String compliment = wasModified ? "*" : "";
-        mainStage.setTitle(pages.get(index).getTitle()+ " - " +HMI_TITLE +compliment);
+        mainStage.setTitle(pages.get(index).getTitle() + " - " + HMI_TITLE + compliment);
         pages.get(index).getListViewReference().getSelectionModel().select(index);
     }
 
@@ -701,13 +765,13 @@ public class HMIApp extends Application {
         updateScenesInListView(pagesTitles);
 
         mainStage.setScene(newScene);
-        mainStage.setTitle(newScene.getTitle()+" - "+HMI_TITLE);
+        mainStage.setTitle(newScene.getTitle() + " - " + HMI_TITLE);
     }
 
-    public int getIndexForAlarm(String name){
+    public int getIndexForAlarm(String name) {
         int res = -1;
-        for(int i=0;i<manageableAlarms.size();i++){
-            if(name.equals(manageableAlarms.get(i).getName())){
+        for (int i = 0; i < manageableAlarms.size(); i++) {
+            if (name.equals(manageableAlarms.get(i).getName())) {
                 res = i;
             }
         }
@@ -767,10 +831,10 @@ public class HMIApp extends Application {
                 DBConnection.generateSchemaHMIUsers();
             }
         } catch (SQLException sqlException) {
-            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", sqlException.getMessage(), false,false);
+            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", sqlException.getMessage(), false, false);
             sqlException.printStackTrace();
         } catch (IOException e) {
-            if (!showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", e.getMessage() + "; pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos", true,false)) {
+            if (!showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", e.getMessage() + "; pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos", true, false)) {
                 generateDatabase();
             }
             e.printStackTrace();
@@ -783,14 +847,14 @@ public class HMIApp extends Application {
         alert.setTitle(title);
         alert.setHeaderText(message);
 
-        ButtonType saveButton = new ButtonType("Guardar",ButtonBar.ButtonData.YES);
-        ButtonType dontSaveButton = new ButtonType("No Guardar",ButtonBar.ButtonData.NO);
+        ButtonType saveButton = new ButtonType("Guardar", ButtonBar.ButtonData.YES);
+        ButtonType dontSaveButton = new ButtonType("No Guardar", ButtonBar.ButtonData.NO);
         ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButton = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        if(isSaveDialog){
-            alert.getButtonTypes().setAll(dontSaveButton,cancelButton, saveButton);
-        }else {
+        if (isSaveDialog) {
+            alert.getButtonTypes().setAll(dontSaveButton, cancelButton, saveButton);
+        } else {
             alert.getButtonTypes().setAll(cancelButton, okButton);
         }
 
@@ -803,19 +867,19 @@ public class HMIApp extends Application {
                 return saveDatabaseCredentialsWindow.isCancelled();
             }
             return true;
-        }else if(result.isPresent() && result.get() == cancelButton){
+        } else if (result.isPresent() && result.get() == cancelButton) {
             alert.close();
             return false;
-        } else if(result.isPresent() && result.get() == saveButton){
+        } else if (result.isPresent() && result.get() == saveButton) {
             alert.close();
             try {
                 saveHMIDataProcess();
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR,"Error al Guardar","Error:"+e.getMessage(),false,false);
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
                 e.printStackTrace();
             }
             return true;
-        } else if(result.isPresent() && result.get() == dontSaveButton){
+        } else if (result.isPresent() && result.get() == dontSaveButton) {
             alert.close();
             return true;
         }
