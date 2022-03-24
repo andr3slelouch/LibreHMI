@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<HBox fx:id="hBox" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+       <Button fx:id="editButton" mnemonicParsing="false" text="Button"/>
+        <Button fx:id="playButton" mnemonicParsing="false" text="Button">
+            <HBox.margin>
+                <Insets left="10.0"/>
+            </HBox.margin>
+        </Button>
+        <Label fx:id="filenameLabel" text="Label">
+            <font>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+            <padding>
+                <Insets left="10.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="filepathLabel" text="Label" textFill="#8d8d8d">
+            <padding>
+                <Insets left="10.0"/>
+            </padding>
+        </Label>
+    </children>
+</HBox>

@@ -22,7 +22,7 @@ module andrade.luis.hmiethernetip {
     exports andrade.luis.hmiethernetip.views;
     exports andrade.luis.hmiethernetip.models;
     exports andrade.luis.hmiethernetip.controllers;
-    opens andrade.luis.hmiethernetip.models to javafx.base, com.google.gson;
+    opens andrade.luis.hmiethernetip.models to javafx.base, com.google.gson, javafx.fxml;
     opens andrade.luis.hmiethernetip.views to javafx.base, javafx.fxml;
     exports andrade.luis.hmiethernetip.models.canvas;
     exports andrade.luis.hmiethernetip.models.users;

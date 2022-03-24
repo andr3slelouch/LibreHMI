@@ -36,6 +36,10 @@ public class HMIAppData implements Serializable, Transferable {
     @Expose
     private ArrayList<Alarm> hmiAlarms;
 
+    @SerializedName("type")
+    @Expose
+    private String type;
+
     @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[0];
@@ -49,5 +53,13 @@ public class HMIAppData implements Serializable, Transferable {
     @Override
     public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
         return null;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

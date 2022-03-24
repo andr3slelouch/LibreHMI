@@ -13,6 +13,7 @@ import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -39,6 +40,7 @@ public class HMIApp extends Application {
             HMIApp.class.getName());
 
     private static final String DEFAULT_PAGE_NAME = "Página 1";
+    private static final String FILE_ERROR_TITLE = "El archivo de proyecto no es válido";
     private final ArrayList<HMIScene> pages = new ArrayList<>();
     private final ArrayList<Stage> createdWindows = new ArrayList<>();
     private String currentProjectFilePath = null;
@@ -91,7 +93,7 @@ public class HMIApp extends Application {
         }
         manageableAlarms.clear();
         projectAlarms.clear();
-        if(this.hmiAppData.getHmiAlarms()!=null){
+        if (this.hmiAppData.getHmiAlarms() != null) {
             for (int i = 0; i < this.hmiAppData.getHmiAlarms().size(); i++) {
                 addAlarm(this.hmiAppData.getHmiAlarms().get(i));
             }
@@ -147,7 +149,10 @@ public class HMIApp extends Application {
         });
         generateDatabase();
         try {
-            this.mainStage = new WelcomeWindow(this);
+            WelcomeWindow welcomeWindow = new WelcomeWindow(this);
+            Scene tempScene = welcomeWindow.getScene();
+            mainStage.setScene(tempScene);
+            mainStage.setMaximized(true);
             mainStage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,17 +167,22 @@ public class HMIApp extends Application {
         });
     }
 
-    public void setHMIStage(String filenamePath) throws IOException {
-        this.mainStage = new Stage();
-        if(filenamePath==null){
-            createNewProject();
-        }else if(filenamePath.equals("")){
-            loadHMIData();
+    public void setHMIStage(String filenamePath, String mode) throws IOException {
+        if (!mode.equals("Play")) {
+            loginUser();
+        } else {
+            user = new HMIUser("", "", "", "", "Operador", "");
         }
-        else{
-            loadHMIData(filenamePath);
+        if (user != null) {
+            if (filenamePath == null) {
+                createNewProject();
+            } else if (filenamePath.equals("")) {
+                loadHMIData();
+            } else {
+                loadHMIData(filenamePath);
+            }
+            enableInputRepresentations(mode);
         }
-
     }
 
     /**
@@ -268,9 +278,7 @@ public class HMIApp extends Application {
             signUpWindow.show();
         });
         logIntUserBtn.setOnAction(mouseEvent -> {
-            LogInWindow logInWindow = new LogInWindow();
-            logInWindow.showAndWait();
-            user = logInWindow.getLoggedUser();
+            loginUser();
         });
         propertiesBtn.setOnAction(mouseEvent -> {
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
@@ -355,13 +363,13 @@ public class HMIApp extends Application {
             }
         });
         manageAlarmBtn.setOnAction(mouseEvent -> {
-            WelcomeWindow welcomeStage = null;
+            /*WelcomeWindow welcomeStage = null;
             try {
                 welcomeStage = new WelcomeWindow();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            welcomeStage.show();
+            welcomeStage.show();*/
             ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone(), this);
             manageAlarmsWindow.showAndWait();
             manageableAlarms.clear();
@@ -373,6 +381,12 @@ public class HMIApp extends Application {
         scene.setHmiApp(this);
 
         return scene;
+    }
+
+    private void loginUser() {
+        LogInWindow logInWindow = new LogInWindow();
+        logInWindow.showAndWait();
+        user = logInWindow.getLoggedUser();
     }
 
     private void addAlarm(Alarm alarm) {
@@ -489,35 +503,51 @@ public class HMIApp extends Application {
 
         HMIAppData localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
         if (localHmiAppData != null) {
-            this.setHmiAppData(localHmiAppData);
-            this.currentProjectFilePath = filenamePath;
-            String[] filenameArr = filenamePath.split(File.separator);
-            String filename = filenameArr[filenameArr.length - 1];
-            this.setWasModified(false);
-            if (!mainStage.getTitle().contains(filename)) {
-                mainStage.setTitle(filename + " - " + mainStage.getTitle());
+            if(localHmiAppData.getType()==null){
+                if(showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE,"¿Intentar cargarlo de todas formas?",false,false)){
+                    loadHMIData(localHmiAppData,filenamePath);
+                }
+            }else if(localHmiAppData.getType().equals("LibreHMIProject")){
+                loadHMIData(localHmiAppData,filenamePath);
+            }else{
+                if(showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE,"¿Intentar cargarlo de todas formas?",false,false)){
+                    loadHMIData(localHmiAppData,filenamePath);
+                }
             }
-            addRecentUsedFilePath(filenamePath);
+        }else{
+            showAlert(Alert.AlertType.ERROR,FILE_ERROR_TITLE,"No se pudo obtener ningún dato de proyecto desde el archivo",false,false);
         }
     }
 
+    private void loadHMIData(HMIAppData localHmiAppData,String filenamePath){
+        this.setHmiAppData(localHmiAppData);
+        this.currentProjectFilePath = filenamePath;
+        String[] filenameArr = filenamePath.split(File.separator);
+        String filename = filenameArr[filenameArr.length - 1];
+        this.setWasModified(false);
+        if (!mainStage.getTitle().contains(filename)) {
+            mainStage.setTitle(filename + " - " + mainStage.getTitle());
+        }
+        addRecentUsedFilePath(filenamePath);
+    }
+
     private void addRecentUsedFilePath(String filenamePath) {
-        String recentFilesFilePath = DBConnection.getWorkingDirectory()+File.separator+"recentFiles.json";
+        String recentFilesFilePath = DBConnection.getWorkingDirectory() + File.separator + "recentFiles.json";
         RecentUsedFilesData recentUsedFilesData = null;
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(recentFilesFilePath))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(recentFilesFilePath))) {
             recentUsedFilesData = gson.fromJson(bufferedReader, RecentUsedFilesData.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         RecentUsedFilesCache recentUsedFilesCache = null;
-        if(recentUsedFilesData==null){
+        if (recentUsedFilesData == null) {
             recentUsedFilesData = new RecentUsedFilesData();
             recentUsedFilesData.setCapacity(CAPACITY);
             recentUsedFilesCache = new RecentUsedFilesCache(CAPACITY);
-        }else{
+        } else {
             recentUsedFilesCache = new RecentUsedFilesCache(recentUsedFilesData.getCapacity());
             recentUsedFilesCache.importArrayList(recentUsedFilesData.getRecentlyUsedFilePaths());
         }
@@ -525,7 +555,7 @@ public class HMIApp extends Application {
         recentUsedFilesCache.refer(filenamePath);
         recentUsedFilesData.setCapacity(recentUsedFilesCache.getCapacity());
         recentUsedFilesData.setRecentlyUsedFilePaths(recentUsedFilesCache.exportArrayList());
-        try (Writer writer = Files.newBufferedWriter(Path.of(recentFilesFilePath))){
+        try (Writer writer = Files.newBufferedWriter(Path.of(recentFilesFilePath))) {
             gson.toJson(recentUsedFilesData, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -570,6 +600,7 @@ public class HMIApp extends Application {
             String[] filenameArr = filenamePath.split(File.separator);
             String filename = filenameArr[filenameArr.length - 1];
             Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
+            this.hmiAppData.setType("LibreHMIProject");
             gson.toJson(this.hmiAppData, writer);
             writer.close();
             this.currentProjectFilePath = filenamePath;
