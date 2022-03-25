@@ -9,19 +9,29 @@ import andrade.luis.hmiethernetip.util.DBConnection;
 import andrade.luis.hmiethernetip.views.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -56,6 +66,58 @@ public class HMIApp extends Application {
     private static final String ALERT_SAVE_TITLE = "¿Desea guardar los cambios del proyecto actual?";
     private static final String ALERT_SAVE_DESCRIPTION = "Los cambios se perderán si elige No Guardar";
     private HMIUser user;
+    /**
+     * Calendar Icon source : <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Freepik - Flaticon</a>
+     */
+    private Image calendarIcon = new Image(getClass().getResource("images"+File.separator+"calendar.png").toExternalForm());
+    /**
+     * Text icon source: <a href="https://www.flaticon.com/free-icons/text" title="text icons">Text icons created by Freepik - Flaticon</a>
+     */
+    private Image textIcon = new Image(getClass().getResource("images"+File.separator+"text.png").toExternalForm());
+    /**
+     * Input icon source: <a href="https://www.flaticon.com/free-icons/type" title="type icons">Type icons created by Freepik - Flaticon</a>
+     */
+    private Image inputIcon = new Image(getClass().getResource("images"+File.separator+"type.png").toExternalForm());
+    /**
+     * Line icon source: <a href="https://www.flaticon.com/free-icons/line" title="line icons">Line icons created by Freepik - Flaticon</a>
+     */
+    private Image lineIcon = new Image(getClass().getResource("images"+File.separator+"diagonal-line.png").toExternalForm());
+    /**
+     * Rectangle icon source: <a href="https://www.flaticon.com/free-icons/geometry" title="geometry icons">Geometry icons created by Freepik - Flaticon</a>
+     */
+    private Image rectangleIcon = new Image(getClass().getResource("images"+File.separator+"rectangle-shape.png").toExternalForm());
+    /**
+     * Slider icon source: <a href="https://www.flaticon.com/free-icons/slider" title="slider icons">Slider icons created by Andrejs Kirma - Flaticon</a>
+     */
+    private Image sliderIcon = new Image(getClass().getResource("images"+File.separator+"slider.png").toExternalForm());
+    /**
+     * Button icon source: <a href="https://www.flaticon.com/free-icons/accept" title="accept icons">Accept icons created by Freepik - Flaticon</a>
+     */
+    private Image buttonIcon = new Image(getClass().getResource("images"+File.separator+"ok-button.png").toExternalForm());
+    /**
+     * Alarm icon source: <a href="https://www.flaticon.com/free-icons/alarm" title="alarm icons">Alarm icons created by Freepik - Flaticon</a>
+     */
+    private Image alarmDisplayIcon = new Image(getClass().getResource("images"+File.separator+"alarm-display.png").toExternalForm());
+    /**
+     * Symbol icon source: <a href="https://www.flaticon.com/free-icons/graphic-design" title="graphic design icons">Graphic design icons created by monkik - Flaticon</a>
+     */
+    private Image symbolIcon = new Image(getClass().getResource("images"+File.separator+"symbol-icon.png").toExternalForm());
+    /**
+     * Pushbutton icon source: <a href="https://www.flaticon.com/free-icons/push-button" title="push button icons">Push button icons created by Pixel perfect - Flaticon</a>
+     */
+    private Image pushbuttonIcon = new Image(getClass().getResource("images"+File.separator+"pushbutton.png").toExternalForm());
+    /**
+     * Image icon source: <a href="https://www.flaticon.com/free-icons/photo" title="photo icons">Photo icons created by feen - Flaticon</a>
+     */
+    private Image imageIcon = new Image(getClass().getResource("images"+File.separator+"image.png").toExternalForm());
+    /**
+     * Alarm icon source: <a href="https://www.flaticon.com/free-icons/notification" title="notification icons">Notification icons created by Freepik - Flaticon</a>
+     */
+    private Image alarmIcon = new Image(getClass().getResource("images"+File.separator+"notification.png").toExternalForm());
+    /**
+     * Circle icon source: <a href="https://www.flaticon.com/free-icons/circle" title="circle icons">Circle icons created by Voysla - Flaticon</a>
+     */
+    private Image circleIcon = new Image(getClass().getResource("images"+File.separator+"circle.png").toExternalForm());
 
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
@@ -200,40 +262,56 @@ public class HMIApp extends Application {
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        ScrollPane stackPane = new ScrollPane();
-        stackPane.setContent(root);
-        HMIScene scene = new HMIScene(stackPane, root, sceneTitle, sceneCommentary, bounds.getWidth(), bounds.getHeight(), backgroundColor);
-        Button rectangleBtn = new Button("Rectangle");
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(root);
+        HMIScene scene = new HMIScene(scrollPane, root, sceneTitle, sceneCommentary, bounds.getWidth(), bounds.getHeight(), backgroundColor);
+        Label designElementsLabel = new Label("Elementos de Diseño");
+        designElementsLabel.setFont(new Font("Arial",15));
+        Button rectangleBtn = new Button("");
+        rectangleBtn.setTooltip(new Tooltip("Rectángulo"));
+        rectangleBtn.setGraphic(new ImageView(rectangleIcon));
         rectangleBtn.setOnMouseClicked(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Rectangle");
         });
-        Button systemDateTimeLabelBtn = new Button("DateTime Label");
+        Button systemDateTimeLabelBtn = new Button("");
+        systemDateTimeLabelBtn.setTooltip(new Tooltip("Etiqueta de Fecha y Hora"));
+        systemDateTimeLabelBtn.setGraphic(new ImageView(calendarIcon));
         systemDateTimeLabelBtn.setOnMouseClicked(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("SystemDateTime");
         });
-        Button textBtn = new Button("Text");
+        Button textBtn = new Button("");
+        textBtn.setTooltip(new Tooltip("Texto"));
+        textBtn.setGraphic(new ImageView(textIcon));
         textBtn.setOnMouseClicked(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Text");
         });
-        Button buttonBtn = new Button("Button");
+        Button buttonBtn = new Button("");
+        buttonBtn.setTooltip(new Tooltip("Botón"));
+        buttonBtn.setGraphic(new ImageView(buttonIcon));
         buttonBtn.setOnAction(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Button");
         });
-        Button sliderBtn = new Button("Slider");
+        Button sliderBtn = new Button("");
+        sliderBtn.setTooltip(new Tooltip("Slider"));
+        sliderBtn.setGraphic(new ImageView(sliderIcon));
         sliderBtn.setOnAction(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Slider");
         });
-        Button textFieldBtn = new Button("TextField");
+        Button textFieldBtn = new Button("");
+        textFieldBtn.setTooltip(new Tooltip("Entrada de Texto"));
+        textFieldBtn.setGraphic(new ImageView(inputIcon));
         textFieldBtn.setOnAction(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("TextField");
         });
-        Button alarmDisplayBtn = new Button("Alarm Display");
+        Button alarmDisplayBtn = new Button("");
+        alarmDisplayBtn.setTooltip(new Tooltip("Resumen de Alarmas"));
+        alarmDisplayBtn.setGraphic(new ImageView(alarmDisplayIcon));
         alarmDisplayBtn.setOnAction(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("AlarmDisplay");
@@ -242,9 +320,21 @@ public class HMIApp extends Application {
         Button registerUserBtn = new Button("Register");
         Button logIntUserBtn = new Button("Log In");
         Button propertiesBtn = new Button("Guardar Propiedades");
-        Button symbolBtn = new Button("Symbol");
-        Button imageBtn = new Button("Image");
-        Button pushbuttonBtn = new Button("Pushbutton");
+        Button symbolBtn = new Button("");
+        symbolBtn.setTooltip(new Tooltip("Símbolo HMI"));
+        symbolBtn.setGraphic(new ImageView(symbolIcon));
+        Button imageBtn = new Button("");
+        imageBtn.setTooltip(new Tooltip("Imagen"));
+        imageBtn.setGraphic(new ImageView(imageIcon));
+        Button pushbuttonBtn = new Button("");
+        pushbuttonBtn.setTooltip(new Tooltip("Botón Pulsador"));
+        pushbuttonBtn.setGraphic(new ImageView(pushbuttonIcon));
+        Button lineBtn = new Button("");
+        lineBtn.setTooltip(new Tooltip("Línea"));
+        lineBtn.setGraphic(new ImageView(lineIcon));
+        Button circleBtn = new Button("");
+        circleBtn.setTooltip(new Tooltip("Círculo"));
+        circleBtn.setGraphic(new ImageView(circleIcon));
         Button playBtn = new Button("Play");
         Button stopBtn = new Button("Stop");
         Button defaultBtn = new Button("Default");
@@ -254,20 +344,59 @@ public class HMIApp extends Application {
         Button newBtn = new Button("Nuevo");
         Button alarmBtn = new Button("Alarma");
         Button manageAlarmBtn = new Button("Administrar Alarmas");
-        HBox hbox = new HBox(rectangleBtn, systemDateTimeLabelBtn, textBtn, buttonBtn, alarmDisplayBtn);
-        HBox secondHBox = new HBox(sliderBtn, textFieldBtn, manageUsersBtn, registerUserBtn);
-        HBox thirdHBox = new HBox(saveBtn, saveAsBtn, loadBtn, newBtn);
-        HBox fourthHBox = new HBox(logIntUserBtn, propertiesBtn, imageBtn, symbolBtn, pushbuttonBtn);
-        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn, alarmBtn, manageAlarmBtn);
+        HBox hbox = new HBox(lineBtn,circleBtn,rectangleBtn);
+        HBox secondHBox = new HBox(systemDateTimeLabelBtn, textBtn, textFieldBtn);
+        HBox thirdHBox = new HBox(imageBtn, symbolBtn, pushbuttonBtn);
+        HBox fourthHBox = new HBox(buttonBtn,alarmDisplayBtn,sliderBtn);
+        HBox fifthHBox = new HBox(alarmBtn,logIntUserBtn, propertiesBtn,  manageAlarmBtn);
+        HBox sixthHBox = new HBox(playBtn, stopBtn, defaultBtn);
+        HBox seventhHBox = new HBox(newBtn,saveBtn, saveAsBtn, loadBtn);
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
         scene.setListViewReference(listViewReference);
         scene.setItems(itemsForComboBox);
 
-        VBox vbox = new VBox(hbox, secondHBox, thirdHBox, fourthHBox, fifthHBox, scene.getListViewReference());
+        Label pagesLabel = new Label("Páginas");
+        pagesLabel.setFont(new Font("Arial", 15));
+
+        VBox vbox = new VBox(designElementsLabel,hbox, secondHBox, thirdHBox, fourthHBox, fifthHBox, sixthHBox,seventhHBox,pagesLabel,scene.getListViewReference());
         vbox.setSpacing(10);
-        root.getChildren().add(vbox);
+        vbox.setPrefWidth(200);
+        Button expandButton = new Button(">");
+        HBox expandHBox = new HBox(vbox, expandButton);
+        expandHBox.setAlignment(Pos.CENTER);
+        expandHBox.setPrefWidth(VBox.USE_COMPUTED_SIZE);
+        expandHBox.setMaxWidth(VBox.USE_PREF_SIZE);
+
+        expandHBox.setTranslateX(-vbox.getPrefWidth());
+        StackPane.setAlignment(expandHBox, Pos.CENTER_LEFT);
+        // animation for moving the slider
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(expandHBox.translateXProperty(), -vbox.getPrefWidth())),
+                new KeyFrame(Duration.millis(500), new KeyValue(expandHBox.translateXProperty(), 0d))
+        );
+
+        expandButton.setOnAction(evt -> {
+            // adjust the direction of play and start playing, if not already done
+            String text = expandButton.getText();
+            boolean playing = timeline.getStatus() == Animation.Status.RUNNING;
+            if (">".equals(text)) {
+                timeline.setRate(1);
+                if (!playing) {
+                    timeline.playFromStart();
+                }
+                expandButton.setText("<");
+            } else {
+                timeline.setRate(-1);
+                if (!playing) {
+                    timeline.playFrom("end");
+                }
+                expandButton.setText(">");
+            }
+        });
+
+        root.getChildren().add(expandHBox);
 
         manageUsersBtn.setOnMouseClicked(mouseEvent -> {
             ManageUsersWindow manageUsersWindow = new ManageUsersWindow(this.user);
@@ -277,9 +406,7 @@ public class HMIApp extends Application {
             SignUpWindow signUpWindow = new SignUpWindow(null);
             signUpWindow.show();
         });
-        logIntUserBtn.setOnAction(mouseEvent -> {
-            loginUser();
-        });
+        logIntUserBtn.setOnAction(mouseEvent -> loginUser());
         propertiesBtn.setOnAction(mouseEvent -> {
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.show();
@@ -363,13 +490,6 @@ public class HMIApp extends Application {
             }
         });
         manageAlarmBtn.setOnAction(mouseEvent -> {
-            /*WelcomeWindow welcomeStage = null;
-            try {
-                welcomeStage = new WelcomeWindow();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            welcomeStage.show();*/
             ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone(), this);
             manageAlarmsWindow.showAndWait();
             manageableAlarms.clear();
