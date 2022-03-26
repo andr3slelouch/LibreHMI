@@ -14,14 +14,6 @@ import java.io.IOException;
 
 
 public class RecentUsedFilesItem {
-    private Image editImage;
-    /**
-     * Edit button source <a href="https://www.flaticon.com/free-icons/edit" title="edit icons">Edit icons created by Pixel perfect - Flaticon</a>
-     */
-    private Image playImage;
-    /**
-     * Play button source <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">Play button icons created by Maxim Basinski Premium - Flaticon</a>
-     */
     @FXML
     private HBox hBox;
     @FXML
@@ -32,7 +24,7 @@ public class RecentUsedFilesItem {
     private Button playButton;
     @FXML
     private Button editButton;
-    private HMIApp hmiApp;
+    private final HMIApp hmiApp;
 
     public RecentUsedFilesItem(HMIApp hmiApp){
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("welcomeStageLVItem.fxml"));
@@ -52,8 +44,14 @@ public class RecentUsedFilesItem {
         filenameLabel.setText(filename);
         String editPath = getClass().getResource("edit.png").toExternalForm();
         String playPath = getClass().getResource("play-button.png").toExternalForm();
-        editImage = new Image(editPath);
-        playImage = new Image(playPath);
+        /**
+         * Edit button source <a href="https://www.flaticon.com/free-icons/edit" title="edit icons">Edit icons created by Pixel perfect - Flaticon</a>
+         */
+        Image editImage = new Image(editPath);
+        /**
+         * Play button source <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">Play button icons created by Maxim Basinski Premium - Flaticon</a>
+         */
+        Image playImage = new Image(playPath);
         ImageView editImageView = new ImageView(editImage);
         ImageView playImageView = new ImageView(playImage);
 

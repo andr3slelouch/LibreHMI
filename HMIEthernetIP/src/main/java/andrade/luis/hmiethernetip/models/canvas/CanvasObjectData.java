@@ -23,6 +23,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("mouseOver")
     @Expose
     private boolean mouseOver;
+    @SerializedName("strokeWidth")
+    @Expose
+    private double strokeWidth;
     @SerializedName("width")
     @Expose
     private double width;
@@ -32,6 +35,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("position")
     @Expose
     private CanvasPoint position;
+    @SerializedName("polygonPoints")
+    @Expose
+    private ArrayList<Double> polygonPoints;
     @SerializedName("id")
     @Expose
     private String id;
@@ -101,6 +107,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("rotation")
     @Expose
     private double rotation = 0;
+    @SerializedName("rotated")
+    @Expose
+    private boolean rotated = false;
     @SerializedName("isImageSymbol")
     @Expose
     private boolean imageSymbol;
@@ -109,7 +118,7 @@ public class CanvasObjectData implements Serializable, Transferable {
     private String symbolCategory = "";
     @SerializedName("isModifyingImage")
     @Expose
-    private boolean isModifyingImage = false;
+    private boolean isModifyingColors = false;
     @SerializedName("contrast")
     @Expose
     private double contrast;
@@ -250,12 +259,12 @@ public class CanvasObjectData implements Serializable, Transferable {
         this.maxValue = maxValue;
     }
 
-    public boolean isModifyingImage() {
-        return isModifyingImage;
+    public boolean isModifyingColors() {
+        return isModifyingColors;
     }
 
-    public void setModifyingImage(boolean modifyingImage) {
-        isModifyingImage = modifyingImage;
+    public void setModifyingColors(boolean modifyingColors) {
+        isModifyingColors = modifyingColors;
     }
 
     public double getContrast() {
@@ -385,12 +394,31 @@ public class CanvasObjectData implements Serializable, Transferable {
     public void setSymbolCategory(String symbolCategory) {
         this.symbolCategory = symbolCategory;
     }
+    public double getStrokeWidth() {
+        return strokeWidth;
+    }
+
+    public void setStrokeWidth(double strokeWidth) {
+        this.strokeWidth = strokeWidth;
+    }
 
     public CanvasPoint determineCenterFromPosition(CanvasPoint position) {
         double tempX = position.getX() + getWidth()/2;
         double tempY = position.getY() + getHeight()/2;
         return new CanvasPoint(tempX, tempY);
     }
+
+
+
+    public ArrayList<Double> getPolygonPoints() {
+        return polygonPoints;
+    }
+
+    public void setPolygonPoints(ArrayList<Double> polygonPoints) {
+        this.polygonPoints = polygonPoints;
+    }
+
+
 
     @Override
     public String toString() {
@@ -478,7 +506,7 @@ public class CanvasObjectData implements Serializable, Transferable {
         sb.append(',');
         sb.append("isModifyingImage");
         sb.append('=');
-        sb.append(isModifyingImage);
+        sb.append(isModifyingColors);
         sb.append(',');
         sb.append("contrast");
         sb.append('=');
@@ -507,6 +535,10 @@ public class CanvasObjectData implements Serializable, Transferable {
         sb.append("isVisible");
         sb.append('=');
         sb.append(visible);
+        sb.append(',');
+        sb.append("polygonPoints");
+        sb.append('=');
+        sb.append(polygonPoints);
         sb.append(',');
         if (sb.charAt((sb.length() - 1)) == ',') {
             sb.setCharAt((sb.length() - 1), ']');
@@ -619,7 +651,11 @@ public class CanvasObjectData implements Serializable, Transferable {
         this.visible = visible;
     }
 
+    public boolean isRotated() {
+        return rotated;
+    }
 
-
-
+    public void setRotated(boolean rotated) {
+        this.rotated = rotated;
+    }
 }

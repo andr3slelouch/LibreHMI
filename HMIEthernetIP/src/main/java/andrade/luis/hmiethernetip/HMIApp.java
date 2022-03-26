@@ -16,6 +16,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -23,7 +24,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -31,6 +34,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.*;
@@ -42,6 +46,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static javafx.geometry.Pos.CENTER;
 
 public class HMIApp extends Application {
     private Stage mainStage;
@@ -60,64 +66,65 @@ public class HMIApp extends Application {
     private ArrayList<String> pagesTitles = new ArrayList<>();
     private ArrayList<Alarm> projectAlarms = new ArrayList<>();
     private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
-    private static final String HMI_TITLE = "HMI";
+    private static final String HMI_TITLE = "LibreHMI";
     private static final int CAPACITY = 10;
     private static final String ERROR_STR = "Error:";
+    private static final String IMAGES_DIR_STR = "images";
     private static final String ALERT_SAVE_TITLE = "¿Desea guardar los cambios del proyecto actual?";
     private static final String ALERT_SAVE_DESCRIPTION = "Los cambios se perderán si elige No Guardar";
     private HMIUser user;
     /**
      * Calendar Icon source : <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Freepik - Flaticon</a>
      */
-    private Image calendarIcon = new Image(getClass().getResource("images"+File.separator+"calendar.png").toExternalForm());
+    private final Image calendarIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "calendar.png").toExternalForm());
     /**
      * Text icon source: <a href="https://www.flaticon.com/free-icons/text" title="text icons">Text icons created by Freepik - Flaticon</a>
      */
-    private Image textIcon = new Image(getClass().getResource("images"+File.separator+"text.png").toExternalForm());
+    private final Image textIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "text.png").toExternalForm());
     /**
      * Input icon source: <a href="https://www.flaticon.com/free-icons/type" title="type icons">Type icons created by Freepik - Flaticon</a>
      */
-    private Image inputIcon = new Image(getClass().getResource("images"+File.separator+"type.png").toExternalForm());
+    private final Image inputIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "type.png").toExternalForm());
     /**
      * Line icon source: <a href="https://www.flaticon.com/free-icons/line" title="line icons">Line icons created by Freepik - Flaticon</a>
      */
-    private Image lineIcon = new Image(getClass().getResource("images"+File.separator+"diagonal-line.png").toExternalForm());
+    private final Image lineIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "diagonal-line.png").toExternalForm());
     /**
      * Rectangle icon source: <a href="https://www.flaticon.com/free-icons/geometry" title="geometry icons">Geometry icons created by Freepik - Flaticon</a>
      */
-    private Image rectangleIcon = new Image(getClass().getResource("images"+File.separator+"rectangle-shape.png").toExternalForm());
+    private final Image rectangleIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "rectangle-shape.png").toExternalForm());
     /**
      * Slider icon source: <a href="https://www.flaticon.com/free-icons/slider" title="slider icons">Slider icons created by Andrejs Kirma - Flaticon</a>
      */
-    private Image sliderIcon = new Image(getClass().getResource("images"+File.separator+"slider.png").toExternalForm());
+    private final Image sliderIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "slider.png").toExternalForm());
     /**
      * Button icon source: <a href="https://www.flaticon.com/free-icons/accept" title="accept icons">Accept icons created by Freepik - Flaticon</a>
      */
-    private Image buttonIcon = new Image(getClass().getResource("images"+File.separator+"ok-button.png").toExternalForm());
+    private final Image buttonIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "ok-button.png").toExternalForm());
     /**
      * Alarm icon source: <a href="https://www.flaticon.com/free-icons/alarm" title="alarm icons">Alarm icons created by Freepik - Flaticon</a>
      */
-    private Image alarmDisplayIcon = new Image(getClass().getResource("images"+File.separator+"alarm-display.png").toExternalForm());
+    private final Image alarmDisplayIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "alarm-display.png").toExternalForm());
     /**
      * Symbol icon source: <a href="https://www.flaticon.com/free-icons/graphic-design" title="graphic design icons">Graphic design icons created by monkik - Flaticon</a>
      */
-    private Image symbolIcon = new Image(getClass().getResource("images"+File.separator+"symbol-icon.png").toExternalForm());
+    private final Image symbolIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "symbol-icon.png").toExternalForm());
     /**
      * Pushbutton icon source: <a href="https://www.flaticon.com/free-icons/push-button" title="push button icons">Push button icons created by Pixel perfect - Flaticon</a>
      */
-    private Image pushbuttonIcon = new Image(getClass().getResource("images"+File.separator+"pushbutton.png").toExternalForm());
+    private final Image pushbuttonIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "pushbutton.png").toExternalForm());
     /**
      * Image icon source: <a href="https://www.flaticon.com/free-icons/photo" title="photo icons">Photo icons created by feen - Flaticon</a>
      */
-    private Image imageIcon = new Image(getClass().getResource("images"+File.separator+"image.png").toExternalForm());
+    private final Image imageIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "image.png").toExternalForm());
     /**
      * Alarm icon source: <a href="https://www.flaticon.com/free-icons/notification" title="notification icons">Notification icons created by Freepik - Flaticon</a>
      */
-    private Image alarmIcon = new Image(getClass().getResource("images"+File.separator+"notification.png").toExternalForm());
+    private final Image alarmIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "notification.png").toExternalForm());
     /**
      * Circle icon source: <a href="https://www.flaticon.com/free-icons/circle" title="circle icons">Circle icons created by Voysla - Flaticon</a>
      */
-    private Image circleIcon = new Image(getClass().getResource("images"+File.separator+"circle.png").toExternalForm());
+    private final Image circleIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "circle.png").toExternalForm());
 
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
@@ -197,24 +204,14 @@ public class HMIApp extends Application {
     public void start(Stage stage) {
 
         mainStage = stage;
-        mainStage.setOnCloseRequest(windowEvent -> {
-            logger.log(Level.INFO, "Closing...");
-            if (wasModified) {
-                if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
-                    logger.log(Level.INFO, "CANCELED");
-                } else {
-                    windowEvent.consume();
-                }
-            } else {
-                logger.log(Level.INFO, "CLOSED...");
-            }
-        });
+        mainStage.setOnCloseRequest(this::closeProcess);
         generateDatabase();
         try {
             WelcomeWindow welcomeWindow = new WelcomeWindow(this);
             Scene tempScene = welcomeWindow.getScene();
             mainStage.setScene(tempScene);
             mainStage.setMaximized(true);
+            mainStage.setTitle(HMI_TITLE);
             mainStage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -227,6 +224,19 @@ public class HMIApp extends Application {
                 mainStage.setTitle(mainStage.getTitle().substring(0, mainStage.getTitle().length() - 1));
             }
         });
+    }
+
+    private void closeProcess(WindowEvent windowEvent) {
+        logger.log(Level.INFO, "Closing...");
+        if (wasModified) {
+            if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
+                logger.log(Level.INFO, "CANCELED");
+            } else {
+                windowEvent.consume();
+            }
+        } else {
+            logger.log(Level.INFO, "CLOSED...");
+        }
     }
 
     public void setHMIStage(String filenamePath, String mode) throws IOException {
@@ -266,7 +276,262 @@ public class HMIApp extends Application {
         scrollPane.setContent(root);
         HMIScene scene = new HMIScene(scrollPane, root, sceneTitle, sceneCommentary, bounds.getWidth(), bounds.getHeight(), backgroundColor);
         Label designElementsLabel = new Label("Elementos de Diseño");
-        designElementsLabel.setFont(new Font("Arial",15));
+        designElementsLabel.setFont(new Font("Arial", 15));
+        VBox designToolsVBox = generateDesignVBox(scene, root);
+
+        Button playBtn = new Button("Play");
+        Button stopBtn = new Button("Stop");
+        Button defaultBtn = new Button("Default");
+
+        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn);
+        fifthHBox.setAlignment(CENTER);
+
+
+        ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
+        ListView<String> listViewReference = new ListView<>();
+        scene.setListViewReference(listViewReference);
+        scene.setItems(itemsForComboBox);
+
+        Label pagesLabel = new Label("Páginas");
+        pagesLabel.setFont(new Font("Arial", 15));
+
+        VBox vbox = new VBox(designElementsLabel, designToolsVBox, fifthHBox, pagesLabel, scene.getListViewReference());
+        vbox.setPadding(new Insets(50, 0, 0, 0));
+        vbox.setSpacing(10);
+        vbox.setPrefWidth(150);
+        Button expandButton = new Button(">");
+        HBox expandHBox = new HBox(vbox, expandButton);
+        expandHBox.setAlignment(CENTER);
+        expandHBox.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        expandHBox.setMaxWidth(Region.USE_PREF_SIZE);
+
+        expandHBox.setTranslateX(-vbox.getPrefWidth());
+        StackPane.setAlignment(expandHBox, Pos.CENTER_LEFT);
+        // animation for moving the slider
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(expandHBox.translateXProperty(), -vbox.getPrefWidth())),
+                new KeyFrame(Duration.millis(500), new KeyValue(expandHBox.translateXProperty(), 0d))
+        );
+
+        expandButton.setOnAction(evt -> {
+            // adjust the direction of play and start playing, if not already done
+            String text = expandButton.getText();
+            boolean playing = timeline.getStatus() == Animation.Status.RUNNING;
+            if (">".equals(text)) {
+                timeline.setRate(1);
+                if (!playing) {
+                    timeline.playFromStart();
+                }
+                expandButton.setText("<");
+            } else {
+                timeline.setRate(-1);
+                if (!playing) {
+                    timeline.playFrom("end");
+                }
+                expandButton.setText(">");
+            }
+        });
+
+        MenuBar menuBar = generateMenuBar(scene, root);
+
+        root.getChildren().add(menuBar);
+        root.getChildren().add(expandHBox);
+
+        playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
+        stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
+        defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
+        scene.setHmiApp(this);
+
+        return scene;
+    }
+
+    private MenuBar generateMenuBar(HMIScene scene, HMICanvas root) {
+        MenuBar menuBar = new MenuBar();
+        menuBar.setPrefWidth(mainStage.getWidth());
+
+        //Menu file
+        Menu menuFile = generateMenuFile();
+
+        // --- Menu Edit
+        Menu menuEdit = new Menu("Editar");
+        MenuItem copyMI = new MenuItem("Copiar");
+        copyMI.setAccelerator(KeyCombination.keyCombination("Ctrl+C"));
+        copyMI.setOnAction(mouseEvent -> scene.copy());
+
+        MenuItem cutMI = new MenuItem("Cortar");
+        cutMI.setAccelerator(KeyCombination.keyCombination("Ctrl+X"));
+        cutMI.setOnAction(mouseEvent -> scene.cut());
+
+        MenuItem pasteMI = new MenuItem("Pegar");
+        pasteMI.setAccelerator(KeyCombination.keyCombination("Ctrl+V"));
+        pasteMI.setOnAction(mouseEvent -> root.paste());
+
+        menuEdit.getItems().addAll(copyMI, cutMI, pasteMI);
+
+        Menu menuAlarm = generateMenuAlarm();
+
+        // --- Menu Configuration
+        Menu menuConfiguration = new Menu("Configurar");
+        Menu userMI = new Menu("Usuarios");
+        MenuItem changeUserMI = new MenuItem("Cambiar de Usuario");
+        changeUserMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+U"));
+        changeUserMI.setOnAction(mouseEvent -> loginUser());
+        MenuItem manageUsersMI = new MenuItem("Administrar Usuarios");
+        manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
+        manageUsersMI.setOnAction(mouseEvent -> {
+            ManageUsersWindow manageUsersWindow = new ManageUsersWindow(this.user);
+            manageUsersWindow.showAndWait();
+        });
+        userMI.getItems().addAll(changeUserMI, manageUsersMI);
+        MenuItem propertiesMI = new MenuItem("Editar Propiedades de Conexión de Base de Datos");
+        propertiesMI.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
+        propertiesMI.setOnAction(mouseEvent -> {
+            SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
+            saveDatabaseCredentialsWindow.show();
+        });
+        menuConfiguration.getItems().addAll(userMI, propertiesMI);
+
+        Menu menuHelp = new Menu("Ayuda");
+
+        menuBar.getMenus().addAll(menuFile, menuEdit, menuAlarm, menuConfiguration, menuHelp);
+
+        return menuBar;
+    }
+
+    private void openProcess() {
+        try {
+            logger.log(Level.INFO, "Closing Project...");
+            if (wasModified) {
+                if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
+                    loadHMIData();
+                }
+            } else {
+                loadHMIData();
+            }
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error al Cargar Proyecto", ERROR_STR + e.getMessage(), false, false);
+            e.printStackTrace();
+        }
+    }
+
+    private Menu generateMenuFile() {
+        // --- Menu File
+        Menu menuFile = new Menu("Archivo");
+        MenuItem newProjectMI = new MenuItem("Nuevo");
+        newProjectMI.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
+        newProjectMI.setOnAction(mouseEvent -> this.createNewProject());
+        MenuItem openProjectMI = new MenuItem("Abrir");
+        openProjectMI.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
+        openProjectMI.setOnAction(mouseEvent -> openProcess());
+        Menu openRecentProjectsMI = new Menu("Recientes");
+
+        ArrayList<String> menuItems = getRecentItems();
+        if (!menuItems.isEmpty()) {
+            for (int i = 0; i < menuItems.size(); i++) {
+                MenuItem recentMenuItem = new MenuItem(menuItems.get(i));
+                int finalI = i;
+                recentMenuItem.setOnAction(mouseEvent -> {
+                    try {
+                        this.loadHMIData(menuItems.get(finalI));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                });
+                openRecentProjectsMI.getItems().add(recentMenuItem);
+            }
+        }
+
+        SeparatorMenuItem separatorMenuItem = new SeparatorMenuItem();
+
+        MenuItem saveMI = new MenuItem("Guardar");
+        saveMI.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
+        saveMI.setOnAction(mouseEvent -> {
+            try {
+                this.saveHMIDataProcess();
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
+                e.printStackTrace();
+            }
+        });
+        MenuItem saveAsMI = new MenuItem("Guardar como");
+        saveAsMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+G"));
+        saveAsMI.setOnAction(mouseEvent -> {
+            try {
+                this.saveAsHMIData();
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
+                e.printStackTrace();
+            }
+        });
+
+        MenuItem exitMI = new MenuItem("Salir");
+        exitMI.setAccelerator(KeyCombination.keyCombination("Alt+F4"));
+        exitMI.setOnAction(mouseEvent -> closeProcess(new WindowEvent(
+                mainStage,
+                WindowEvent.WINDOW_CLOSE_REQUEST
+        )));
+
+        SeparatorMenuItem exitSeparatorMenuItem = new SeparatorMenuItem();
+
+        menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, exitSeparatorMenuItem, exitMI);
+
+        return menuFile;
+    }
+
+    private Menu generateMenuAlarm() {
+        // --- Menu View
+        Menu menuAlarm = new Menu("Alarmas");
+        MenuItem alarmMI = new MenuItem("Crear Alarma");
+        alarmMI.setAccelerator(KeyCombination.keyCombination("Ctrl+A"));
+        alarmMI.setOnAction(mouseEvent -> {
+            SetAlarmWindow setAlarmWindow = new SetAlarmWindow(this);
+            setAlarmWindow.showAndWait();
+            if (setAlarmWindow.isDone()) {
+                if (setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")) {
+                    Alarm alarm = new Alarm(
+                            setAlarmWindow.getLocalExpression(),
+                            Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
+                            Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
+                            Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
+                            Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
+                            setAlarmWindow.getHighLimitCheckBox().isSelected(),
+                            setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
+                            setAlarmWindow.getLowLimitCheckBox().isSelected(),
+                            setAlarmWindow.getLoloLimitCheckBox().isSelected(),
+                            setAlarmWindow.getAlarmNameTF().getText(),
+                            setAlarmWindow.getAlarmCommentTF().getText()
+                    );
+                    addAlarm(alarm);
+                } else if (setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")) {
+                    Alarm alarm = new Alarm(
+                            setAlarmWindow.getLocalExpression(),
+                            setAlarmWindow.getTrueRadioButton().isSelected(),
+                            true,
+                            setAlarmWindow.getAlarmNameTF().getText(),
+                            setAlarmWindow.getAlarmCommentTF().getText()
+                    );
+                    addAlarm(alarm);
+                }
+            }
+        });
+
+        MenuItem manageAlarmsMI = new MenuItem("Administrar Alarmas");
+        manageAlarmsMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+A"));
+        manageAlarmsMI.setOnAction(mouseEvent -> {
+            ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone(), this);
+            manageAlarmsWindow.showAndWait();
+            manageableAlarms.clear();
+            projectAlarms.clear();
+            for (int i = 0; i < manageAlarmsWindow.getAlarmsList().size(); i++) {
+                addAlarm(manageAlarmsWindow.getAlarmsList().get(i));
+            }
+        });
+
+        menuAlarm.getItems().addAll(alarmMI, manageAlarmsMI);
+        return menuAlarm;
+    }
+
+    private VBox generateDesignVBox(HMIScene scene, HMICanvas root) {
         Button rectangleBtn = new Button("");
         rectangleBtn.setTooltip(new Tooltip("Rectángulo"));
         rectangleBtn.setGraphic(new ImageView(rectangleIcon));
@@ -316,10 +581,6 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("AlarmDisplay");
         });
-        Button manageUsersBtn = new Button("Manage Users");
-        Button registerUserBtn = new Button("Register");
-        Button logIntUserBtn = new Button("Log In");
-        Button propertiesBtn = new Button("Guardar Propiedades");
         Button symbolBtn = new Button("");
         symbolBtn.setTooltip(new Tooltip("Símbolo HMI"));
         symbolBtn.setGraphic(new ImageView(symbolIcon));
@@ -330,87 +591,23 @@ public class HMIApp extends Application {
         pushbuttonBtn.setTooltip(new Tooltip("Botón Pulsador"));
         pushbuttonBtn.setGraphic(new ImageView(pushbuttonIcon));
         Button lineBtn = new Button("");
+        lineBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Line");
+        });
         lineBtn.setTooltip(new Tooltip("Línea"));
         lineBtn.setGraphic(new ImageView(lineIcon));
         Button circleBtn = new Button("");
         circleBtn.setTooltip(new Tooltip("Círculo"));
         circleBtn.setGraphic(new ImageView(circleIcon));
-        Button playBtn = new Button("Play");
-        Button stopBtn = new Button("Stop");
-        Button defaultBtn = new Button("Default");
-        Button saveBtn = new Button("Guardar");
-        Button saveAsBtn = new Button("Guardar Como");
-        Button loadBtn = new Button("Cargar");
-        Button newBtn = new Button("Nuevo");
-        Button alarmBtn = new Button("Alarma");
-        Button manageAlarmBtn = new Button("Administrar Alarmas");
-        HBox hbox = new HBox(lineBtn,circleBtn,rectangleBtn);
+        HBox firstHBox = new HBox(lineBtn, circleBtn, rectangleBtn);
+        firstHBox.setAlignment(CENTER);
         HBox secondHBox = new HBox(systemDateTimeLabelBtn, textBtn, textFieldBtn);
+        secondHBox.setAlignment(CENTER);
         HBox thirdHBox = new HBox(imageBtn, symbolBtn, pushbuttonBtn);
-        HBox fourthHBox = new HBox(buttonBtn,alarmDisplayBtn,sliderBtn);
-        HBox fifthHBox = new HBox(alarmBtn,logIntUserBtn, propertiesBtn,  manageAlarmBtn);
-        HBox sixthHBox = new HBox(playBtn, stopBtn, defaultBtn);
-        HBox seventhHBox = new HBox(newBtn,saveBtn, saveAsBtn, loadBtn);
-
-        ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
-        ListView<String> listViewReference = new ListView<>();
-        scene.setListViewReference(listViewReference);
-        scene.setItems(itemsForComboBox);
-
-        Label pagesLabel = new Label("Páginas");
-        pagesLabel.setFont(new Font("Arial", 15));
-
-        VBox vbox = new VBox(designElementsLabel,hbox, secondHBox, thirdHBox, fourthHBox, fifthHBox, sixthHBox,seventhHBox,pagesLabel,scene.getListViewReference());
-        vbox.setSpacing(10);
-        vbox.setPrefWidth(200);
-        Button expandButton = new Button(">");
-        HBox expandHBox = new HBox(vbox, expandButton);
-        expandHBox.setAlignment(Pos.CENTER);
-        expandHBox.setPrefWidth(VBox.USE_COMPUTED_SIZE);
-        expandHBox.setMaxWidth(VBox.USE_PREF_SIZE);
-
-        expandHBox.setTranslateX(-vbox.getPrefWidth());
-        StackPane.setAlignment(expandHBox, Pos.CENTER_LEFT);
-        // animation for moving the slider
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(expandHBox.translateXProperty(), -vbox.getPrefWidth())),
-                new KeyFrame(Duration.millis(500), new KeyValue(expandHBox.translateXProperty(), 0d))
-        );
-
-        expandButton.setOnAction(evt -> {
-            // adjust the direction of play and start playing, if not already done
-            String text = expandButton.getText();
-            boolean playing = timeline.getStatus() == Animation.Status.RUNNING;
-            if (">".equals(text)) {
-                timeline.setRate(1);
-                if (!playing) {
-                    timeline.playFromStart();
-                }
-                expandButton.setText("<");
-            } else {
-                timeline.setRate(-1);
-                if (!playing) {
-                    timeline.playFrom("end");
-                }
-                expandButton.setText(">");
-            }
-        });
-
-        root.getChildren().add(expandHBox);
-
-        manageUsersBtn.setOnMouseClicked(mouseEvent -> {
-            ManageUsersWindow manageUsersWindow = new ManageUsersWindow(this.user);
-            manageUsersWindow.show();
-        });
-        registerUserBtn.setOnMouseClicked(mouseEvent -> {
-            SignUpWindow signUpWindow = new SignUpWindow(null);
-            signUpWindow.show();
-        });
-        logIntUserBtn.setOnAction(mouseEvent -> loginUser());
-        propertiesBtn.setOnAction(mouseEvent -> {
-            SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
-            saveDatabaseCredentialsWindow.show();
-        });
+        thirdHBox.setAlignment(CENTER);
+        HBox fourthHBox = new HBox(buttonBtn, alarmDisplayBtn, sliderBtn);
+        fourthHBox.setAlignment(CENTER);
         symbolBtn.setOnAction(mouseEvent -> {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Symbol");
@@ -423,84 +620,9 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Pushbutton");
         });
-        playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
-        stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
-        defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
-        saveBtn.setOnAction(mouseEvent -> {
-            try {
-                this.saveHMIDataProcess();
-            } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
-                e.printStackTrace();
-            }
-        });
-        saveAsBtn.setOnAction(mouseEvent -> {
-            try {
-                this.saveAsHMIData();
-            } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
-                e.printStackTrace();
-            }
-        });
-        loadBtn.setOnAction(mouseEvent -> {
-            try {
-                logger.log(Level.INFO, "Closing Project...");
-                if (wasModified) {
-                    if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
-                        loadHMIData();
-                    }
-                } else {
-                    loadHMIData();
-                }
-            } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error al Cargar Proyecto", ERROR_STR + e.getMessage(), false, false);
-                e.printStackTrace();
-            }
-        });
-        newBtn.setOnAction(mouseEvent -> this.createNewProject());
-        alarmBtn.setOnAction(mouseEvent -> {
-            SetAlarmWindow setAlarmWindow = new SetAlarmWindow(this);
-            setAlarmWindow.showAndWait();
-            if (setAlarmWindow.isDone()) {
-                if (setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")) {
-                    Alarm alarm = new Alarm(
-                            setAlarmWindow.getLocalExpression(),
-                            Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
-                            Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
-                            Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
-                            Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
-                            setAlarmWindow.getHighLimitCheckBox().isSelected(),
-                            setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
-                            setAlarmWindow.getLowLimitCheckBox().isSelected(),
-                            setAlarmWindow.getLoloLimitCheckBox().isSelected(),
-                            setAlarmWindow.getAlarmNameTF().getText(),
-                            setAlarmWindow.getAlarmCommentTF().getText()
-                    );
-                    addAlarm(alarm);
-                } else if (setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")) {
-                    Alarm alarm = new Alarm(
-                            setAlarmWindow.getLocalExpression(),
-                            setAlarmWindow.getTrueRadioButton().isSelected(),
-                            true,
-                            setAlarmWindow.getAlarmNameTF().getText(),
-                            setAlarmWindow.getAlarmCommentTF().getText()
-                    );
-                    addAlarm(alarm);
-                }
-            }
-        });
-        manageAlarmBtn.setOnAction(mouseEvent -> {
-            ManageAlarmsWindow manageAlarmsWindow = new ManageAlarmsWindow((ArrayList<Alarm>) manageableAlarms.clone(), this);
-            manageAlarmsWindow.showAndWait();
-            manageableAlarms.clear();
-            projectAlarms.clear();
-            for (int i = 0; i < manageAlarmsWindow.getAlarmsList().size(); i++) {
-                addAlarm(manageAlarmsWindow.getAlarmsList().get(i));
-            }
-        });
-        scene.setHmiApp(this);
-
-        return scene;
+        VBox designToolsVBox = new VBox(firstHBox, secondHBox, thirdHBox, fourthHBox);
+        designToolsVBox.setAlignment(CENTER);
+        return designToolsVBox;
     }
 
     private void loginUser() {
@@ -519,6 +641,20 @@ public class HMIApp extends Application {
             projectAlarms.add(alarm);
             this.setWasModified(true);
         }
+    }
+
+    private ArrayList<String> getRecentItems() {
+        String recentFilesFilePath = DBConnection.getWorkingDirectory() + File.separator + "recentFiles.json";
+        RecentUsedFilesData recentUsedFilesData = null;
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(recentFilesFilePath))) {
+            recentUsedFilesData = gson.fromJson(bufferedReader, RecentUsedFilesData.class);
+            return new ArrayList<>(recentUsedFilesData.getRecentlyUsedFilePaths());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     private void generateDoubleProjectAlarms(Alarm manageableAlarm) {
@@ -623,23 +759,23 @@ public class HMIApp extends Application {
 
         HMIAppData localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
         if (localHmiAppData != null) {
-            if(localHmiAppData.getType()==null){
-                if(showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE,"¿Intentar cargarlo de todas formas?",false,false)){
-                    loadHMIData(localHmiAppData,filenamePath);
+            if (localHmiAppData.getType() == null) {
+                if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?", false, false)) {
+                    loadHMIData(localHmiAppData, filenamePath);
                 }
-            }else if(localHmiAppData.getType().equals("LibreHMIProject")){
-                loadHMIData(localHmiAppData,filenamePath);
-            }else{
-                if(showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE,"¿Intentar cargarlo de todas formas?",false,false)){
-                    loadHMIData(localHmiAppData,filenamePath);
+            } else if (localHmiAppData.getType().equals("LibreHMIProject")) {
+                loadHMIData(localHmiAppData, filenamePath);
+            } else {
+                if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?", false, false)) {
+                    loadHMIData(localHmiAppData, filenamePath);
                 }
             }
-        }else{
-            showAlert(Alert.AlertType.ERROR,FILE_ERROR_TITLE,"No se pudo obtener ningún dato de proyecto desde el archivo",false,false);
+        } else {
+            showAlert(Alert.AlertType.ERROR, FILE_ERROR_TITLE, "No se pudo obtener ningún dato de proyecto desde el archivo", false, false);
         }
     }
 
-    private void loadHMIData(HMIAppData localHmiAppData,String filenamePath){
+    private void loadHMIData(HMIAppData localHmiAppData, String filenamePath) {
         this.setHmiAppData(localHmiAppData);
         this.currentProjectFilePath = filenamePath;
         String[] filenameArr = filenamePath.split(File.separator);
@@ -755,25 +891,25 @@ public class HMIApp extends Application {
      */
     public void generateStagesForPages(ArrayList<String> selectedPages) {
         boolean mainStageWasUpdated = false;
-        if (!selectedPages.isEmpty()) {
-            for (String selectedPage : selectedPages) {
-                int index = getIndexForStageWithScene(selectedPage);
-                if (index == -1) {
-                    if (!mainStageWasUpdated) {
-                        changeSelectedScene(selectedPage);
-                        mainStageWasUpdated = true;
-                    } else {
-                        generateStage(pages.get(index));
-                    }
+
+        for (String selectedPage : selectedPages) {
+            int index = getIndexForStageWithScene(selectedPage);
+            if (index == -1) {
+                if (!mainStageWasUpdated) {
+                    changeSelectedScene(selectedPage);
+                    mainStageWasUpdated = true;
                 } else {
-                    if (createdWindows.get(index).isShowing()) {
-                        createdWindows.get(index).requestFocus();
-                    } else {
-                        createdWindows.get(index).show();
-                    }
+                    generateStage(pages.get(index));
+                }
+            } else {
+                if (createdWindows.get(index).isShowing()) {
+                    createdWindows.get(index).requestFocus();
+                } else {
+                    createdWindows.get(index).show();
                 }
             }
         }
+
     }
 
     /**

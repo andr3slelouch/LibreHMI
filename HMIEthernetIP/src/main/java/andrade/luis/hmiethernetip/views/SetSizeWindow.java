@@ -11,8 +11,15 @@ import javafx.stage.Stage;
 import java.util.Optional;
 
 public class SetSizeWindow extends Stage {
-    private final StackPane root;
-    private final Scene mainScene;
+    protected final StackPane root;
+
+    public Scene getMainScene() {
+        return mainScene;
+    }
+
+    protected final Scene mainScene;
+    protected final Label titleLabel;
+    protected final VBox vbox;
 
     public double getWidthFromField() {
         return widthField.getText().isEmpty() ? minWidth : Double.parseDouble(widthField.getText());
@@ -30,7 +37,7 @@ public class SetSizeWindow extends Stage {
     public SetSizeWindow(double width, double height) {
         root = new StackPane();
         
-        final Label label = new Label("Escriba los tamaños para el objeto");
+        titleLabel = new Label("Defina los tamaños");
         Label widthLabel = new Label("Defina el ancho:");
         widthField = new TextField(width+"");
         HBox widthValueHBox = new HBox(widthLabel, widthField);
@@ -41,10 +48,10 @@ public class SetSizeWindow extends Stage {
         HBox heightValueHBox = new HBox(heightLabel, heightField);
         heightValueHBox.setSpacing(25);
 
-        VBox vbox = new VBox();
+        vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(widthValueHBox,heightValueHBox);
+        vbox.getChildren().addAll(titleLabel,widthValueHBox,heightValueHBox);
 
         Button finishSelectionButton = new Button("OK");
         finishSelectionButton.setAlignment(Pos.CENTER);
@@ -64,7 +71,7 @@ public class SetSizeWindow extends Stage {
 
     }
 
-    private void finishingAction() {
+    protected void finishingAction() {
         if(!widthField.getText().isEmpty() && !heightField.getText().isEmpty()){
             this.close();
         } else if(widthField.getText().isEmpty() && heightField.getText().isEmpty()){

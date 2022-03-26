@@ -22,7 +22,6 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class WelcomeWindow extends Stage {
@@ -44,12 +43,8 @@ public class WelcomeWindow extends Stage {
     @FXML
     private VBox recentVBox;
     private Scene scene;
-    private ArrayList<String> stringList = new ArrayList<>();
+    private final ArrayList<String> stringList = new ArrayList<>();
     ObservableList<String> observableList = FXCollections.observableArrayList();
-    /**
-     * HMI background source <a href="https://www.flaticon.com/free-icons/machines" title="machines icons">Machines icons created by Flat Icons - Flaticon</a>
-     * */
-    private Image backgroundImage;
     Logger logger = Logger.getLogger(this.getClass().getName());
 
 
@@ -76,7 +71,6 @@ public class WelcomeWindow extends Stage {
         Gson gson = builder.create();
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader(recentFilesFilePath))) {
             recentUsedFilesData = gson.fromJson(bufferedReader, RecentUsedFilesData.class);
-            logger.log(Level.INFO,recentUsedFilesData.getRecentlyUsedFilePaths().get(0));
             stringList.addAll(recentUsedFilesData.getRecentlyUsedFilePaths());
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,9 +79,10 @@ public class WelcomeWindow extends Stage {
         observableList.setAll(stringList);
         recentUsedFilesListView.setCellFactory(stringListView -> new RecentUsedFilesCell(WelcomeWindow.this.hmiApp));
         recentUsedFilesListView.setItems(observableList);
+        recentUsedFilesListView.setPrefHeight(400);
     }
     @FXML
-    void initialize() throws FileNotFoundException {
+    void initialize() {
         assert recentUsedFilesListView != null : "fx:id=\"recentUsedFilesListView\" was not injected: check your FXML file 'CustomList.fxml'.";
         assert newProjectButton != null : "fx:id=\"newProjectButton\" was not injected: check your FXML file 'CustomList.fxml'.";
         assert loadProjectButton != null : "fx:id=\"loadProjectButton\" was not injected: check your FXML file 'CustomList.fxml'.";
@@ -119,7 +114,10 @@ public class WelcomeWindow extends Stage {
             }
         });
         String imagePath = getClass().getResource("machines.png").toExternalForm();
-        backgroundImage = new Image(imagePath);
+        /**
+         * HMI background source <a href="https://www.flaticon.com/free-icons/machines" title="machines icons">Machines icons created by Flat Icons - Flaticon</a>
+         * */
+        Image backgroundImage = new Image(imagePath);
         backgroundImageView = new ImageView(backgroundImage);
         backgroundImageView.setImage(backgroundImage);
         backgroundImageView.setFitWidth(150);

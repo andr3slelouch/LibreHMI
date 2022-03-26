@@ -347,7 +347,7 @@ public class CanvasObject extends BorderPane {
         rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, deleteMenuItem, resizeMI, visibilityAnimationMI);
     }
 
-    public CanvasObject(CanvasPoint center) {
+    public CanvasObject(CanvasPoint positionCanvasPoint) {
         super();
 
         this.setOnMousePressed(onMyMousePressed);
@@ -356,8 +356,8 @@ public class CanvasObject extends BorderPane {
         this.setOnMouseClicked(onMyMouseClicked);
         //this.setOnMouseMoved(onMyMouseMoved);
 
-        setPosition(center);
-        setPosition(center, true);
+        setPosition(positionCanvasPoint);
+        setPosition(positionCanvasPoint, true);
         setSelected(true);
 
         setContextMenu();

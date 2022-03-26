@@ -11,7 +11,6 @@ import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.logging.Logger;
 
 public class CanvasImage extends CanvasObject {
     private ImageView imageView;
@@ -38,7 +37,7 @@ public class CanvasImage extends CanvasObject {
 
         this.setData(this.image, this.getCanvasObjectData().getData(), true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().isImageSymbol());
         this.modifyImageViewSizeRotation(this.getCanvasObjectData().isMirroringHorizontal(),this.getCanvasObjectData().isMirroringVertical(),this.getCanvasObjectData().getRotation());
-        if(this.getCanvasObjectData().isModifyingImage()){
+        if(this.getCanvasObjectData().isModifyingColors()){
             this.modifyImageViewColors(this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getContrast(),this.getCanvasObjectData().getBrightness(),this.getCanvasObjectData().getSaturation(),this.getCanvasObjectData().getHue());
         }
     }
@@ -55,7 +54,7 @@ public class CanvasImage extends CanvasObject {
             lighting.setContentInput(bright);
             lighting.setSurfaceScale(0.0);
             this.imageView.setEffect(lighting);
-            this.getCanvasObjectData().setModifyingImage(true);
+            this.getCanvasObjectData().setModifyingColors(true);
             this.getCanvasObjectData().setPrimaryColor(color);
             this.getCanvasObjectData().setContrast(contrast);
             this.getCanvasObjectData().setBrightness(brightness);
@@ -65,7 +64,7 @@ public class CanvasImage extends CanvasObject {
 
     public void modifyImageViewSizeRotation(boolean isMirroringHorizontal, boolean isMirroringVertical, double rotation){
         if (this.imageView != null) {
-            this.imageView.setRotate(rotation);
+            this.setRotate(rotation);
             this.getCanvasObjectData().setRotation(rotation);
             if (isMirroringHorizontal) {
                 this.getCanvasObjectData().setMirroringHorizontal(true);
@@ -129,13 +128,13 @@ public class CanvasImage extends CanvasObject {
             selectHMISymbolWindow.setRotation(this.getCanvasObjectData().getRotation());
             selectHMISymbolWindow.setSymbolCategory(this.getCanvasObjectData().getSymbolCategory());
             selectHMISymbolWindow.setSelectedImagePath(this.getCanvasObjectData().getData());
-            if(this.getCanvasObjectData().isModifyingImage()){
+            if(this.getCanvasObjectData().isModifyingColors()){
                 selectHMISymbolWindow.setColor(this.getCanvasObjectData().getPrimaryColor());
                 selectHMISymbolWindow.setContrast(this.getCanvasObjectData().getContrast());
                 selectHMISymbolWindow.setBrightness(this.getCanvasObjectData().getBrightness());
                 selectHMISymbolWindow.setSaturation(this.getCanvasObjectData().getSaturation());
                 selectHMISymbolWindow.setHue(this.getCanvasObjectData().getHue());
-                selectHMISymbolWindow.setModifyingColor(this.getCanvasObjectData().isModifyingImage());
+                selectHMISymbolWindow.setModifyingColor(this.getCanvasObjectData().isModifyingColors());
             }
         }
         selectHMISymbolWindow.showAndWait();
@@ -162,7 +161,7 @@ public class CanvasImage extends CanvasObject {
 
     private void setImageViewProcess() throws FileNotFoundException {
         SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow();
-        if(this.getCanvasObjectData().isModifyingImage()){
+        if(this.getCanvasObjectData().isModifyingColors()){
             imageOptionsWindow.setModifyingColor(true);
             imageOptionsWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
             imageOptionsWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));

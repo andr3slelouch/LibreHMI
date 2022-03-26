@@ -154,7 +154,6 @@ public class HMIScene extends Scene implements Cloneable {
                 }
             }
         });
-
     }
 
     public ListView<String> getListViewReference() {
@@ -196,7 +195,6 @@ public class HMIScene extends Scene implements Cloneable {
         this.setOnMouseClicked(mouseEvent -> {
             if (this.hmiCanvas.isAddOnClickEnabled()) {
                 hmiCanvas.addFigureOnCanvasClicked(new CanvasPoint(mouseEvent.getX(), mouseEvent.getY()));
-                this.hmiCanvas.setAddOnClickEnabled(false);
             }else if(mouseEvent.getButton() == MouseButton.SECONDARY){
                 hmiCanvas.onCanvasClicked(new CanvasPoint(mouseEvent.getScreenX(), mouseEvent.getScreenY()));
             }
@@ -210,18 +208,24 @@ public class HMIScene extends Scene implements Cloneable {
                 }
             }
         });
-        this.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), () -> {
-            CanvasObject selected = getCanvas().getSelectedFigure();
-            selected.copy("Copy");
-        });
+        this.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), this::copy);
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY), () -> {
-            CanvasObject selected = getCanvas().getSelectedFigure();
-            selected.cut();
+            cut();
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), () -> {
             getCanvas().paste();
         });
 
+    }
+
+    public void copy(){
+        CanvasObject selected = getCanvas().getSelectedFigure();
+        selected.copy("Copy");
+    }
+
+    public void cut(){
+        CanvasObject selected = getCanvas().getSelectedFigure();
+        selected.cut();
     }
 
     public void updateSelected(){

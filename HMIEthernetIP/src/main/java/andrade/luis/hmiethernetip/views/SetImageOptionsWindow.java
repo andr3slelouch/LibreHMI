@@ -22,6 +22,7 @@ public class SetImageOptionsWindow extends Stage {
         }
         return change;
     };
+    protected final VBox vbox;
 
     public CheckBox getPreserveRatioCheckBox() {
         return preserveRatioCheckBox;
@@ -309,11 +310,11 @@ public class SetImageOptionsWindow extends Stage {
         okHBox.getChildren().addAll(okButton);
         okHBox.setAlignment(Pos.BOTTOM_RIGHT);
 
-        VBox vbox = new VBox();
+        vbox = new VBox();
         vbox.getChildren().addAll(label, imagePathHBox, preserveRatioCheckBox,mirrorHorizontalCheckBox, mirrorVerticalCheckBox, rotationHBox, colorModeHBox, colorHBox, contrastHBox, brightnessHBox, saturationHBox, hueHBox, okHBox);
 
         root.getChildren().add(vbox);
 
-        this.setScene(new Scene(root, 300, 300));
+        this.setScene(new Scene(root, 300, 320));
     }
 }
