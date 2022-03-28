@@ -29,8 +29,8 @@ public class SetSizeWindow extends Stage {
         return heightField.getText().isEmpty() ? minHeight : Double.parseDouble(heightField.getText());
     }
 
-    private final TextField widthField;
-    private final TextField heightField;
+    private TextField widthField;
+    private TextField heightField;
     private Double minWidth = 50.0;
     private Double minHeight = 50.0;
 
@@ -51,7 +51,7 @@ public class SetSizeWindow extends Stage {
         vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(titleLabel,widthValueHBox,heightValueHBox);
+        vbox.getChildren().addAll(widthValueHBox,heightValueHBox);
 
         Button finishSelectionButton = new Button("OK");
         finishSelectionButton.setAlignment(Pos.CENTER);
@@ -96,5 +96,21 @@ public class SetSizeWindow extends Stage {
         {
             alert.close();
         }
+    }
+
+    public TextField getWidthField() {
+        return widthField;
+    }
+
+    public void setWidthField(TextField widthField) {
+        this.widthField = widthField;
+    }
+
+    public TextField getHeightField() {
+        return heightField;
+    }
+
+    public void setHeightField(TextField heightField) {
+        this.heightField = heightField;
     }
 }

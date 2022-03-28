@@ -112,8 +112,8 @@ public class CanvasButton extends CanvasObject {
     }
 
     @Override
-    public void resize(){
-        super.resize();
+    public void properties(){
+        super.properties();
         this.button.setPrefWidth(this.getCanvasObjectData().getWidth());
         this.button.setPrefHeight(this.getCanvasObjectData().getHeight());
     }

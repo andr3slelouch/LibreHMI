@@ -1,6 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
-import andrade.luis.hmiethernetip.views.CanvasObjectPropertiesWindow;
+import andrade.luis.hmiethernetip.views.SetCanvasObjectPropertiesWindow;
 import javafx.scene.control.MenuItem;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Light;
@@ -29,14 +29,12 @@ public class CanvasLine extends CanvasObject{
     }
 
     public void setData(double x1, double y1,double x2,double y2){
-        logger.log(Level.INFO,"X1"+x1+"Y1"+y1+"X2"+x2+"Y2"+y2);
         this.line = new Line();
         this.line.setStartX(x1);
         this.line.setStartY(y1);
         this.line.setEndX(x2);
         this.line.setEndY(y2);
 
-        this.getCanvasObjectData().setPrimaryColor(new CanvasColor((Color) this.line.getStroke()));
         this.getCanvasObjectData().setType("Line");
         this.setCenter(this.line);
         if(this.getCanvasObjectData().isRotated()){
@@ -45,39 +43,51 @@ public class CanvasLine extends CanvasObject{
         this.setContextMenu();
         MenuItem percentFillMI = new MenuItem("Propiedades");
         percentFillMI.setId("#propertiesMI");
-        percentFillMI.setOnAction(actionEvent -> this.resize());
+        percentFillMI.setOnAction(actionEvent -> this.properties());
         this.getRightClickMenu().getItems().add(percentFillMI);
+        if(this.getCanvasObjectData().getPrimaryColor()!=null){
+            modifyImageViewColors(this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getContrast(),this.getCanvasObjectData().getBrightness(),this.getCanvasObjectData().getSaturation(),this.getCanvasObjectData().getHue());
+        }else{
+            this.getCanvasObjectData().setPrimaryColor(new CanvasColor((Color) this.line.getStroke()));
+        }
+        this.line.setStrokeWidth(this.getCanvasObjectData().getWidth());
+        this.setRotate(this.getCanvasObjectData().getRotation());
     }
 
     @Override
-    public void resize(){
-        CanvasObjectPropertiesWindow canvasObjectPropertiesWindow = new CanvasObjectPropertiesWindow(this.line.getStrokeWidth(),this.getCanvasObjectData().getHeight());
-        canvasObjectPropertiesWindow.setHeight(500);
+    public void properties(){
+        SetCanvasObjectPropertiesWindow setCanvasObjectPropertiesWindow = new SetCanvasObjectPropertiesWindow(this.line.getStrokeWidth(),this.getCanvasObjectData().getHeight());
+        setCanvasObjectPropertiesWindow.setTitle("Propiedades de Línea");
+        setCanvasObjectPropertiesWindow.getHeightField().setDisable(true);
+        setCanvasObjectPropertiesWindow.setHeight(375);
         if(this.getCanvasObjectData().isModifyingColors()){
-            canvasObjectPropertiesWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
-            canvasObjectPropertiesWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
-            canvasObjectPropertiesWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
-            canvasObjectPropertiesWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
+            setCanvasObjectPropertiesWindow.setModifyingColor(true);
+            setCanvasObjectPropertiesWindow.getModColorRB().setSelected(true);
+            setCanvasObjectPropertiesWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
+            setCanvasObjectPropertiesWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
+            setCanvasObjectPropertiesWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
+            setCanvasObjectPropertiesWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
         }
 
-        canvasObjectPropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
-        canvasObjectPropertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
+        setCanvasObjectPropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
+        setCanvasObjectPropertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
 
-        canvasObjectPropertiesWindow.showAndWait();
+        setCanvasObjectPropertiesWindow.showAndWait();
 
 
-        boolean isModifyingColor = canvasObjectPropertiesWindow.isModifyingColor();
+        boolean isModifyingColor = setCanvasObjectPropertiesWindow.isModifyingColor();
         this.getCanvasObjectData().setModifyingColors(isModifyingColor);
-        double rotation = Double.parseDouble(canvasObjectPropertiesWindow.getRotationTextField().getText());
+        double rotation = Double.parseDouble(setCanvasObjectPropertiesWindow.getRotationTextField().getText());
+        this.getCanvasObjectData().setRotation(rotation);
         this.setRotate(rotation);
-        double contrast = Double.parseDouble(canvasObjectPropertiesWindow.getContrastTextField().getText());
-        double brightness = Double.parseDouble(canvasObjectPropertiesWindow.getBrightnessTextField().getText());
-        double saturation = Double.parseDouble(canvasObjectPropertiesWindow.getSaturationTextField().getText());
-        double hue = Double.parseDouble(canvasObjectPropertiesWindow.getHueTextField().getText());
-        CanvasColor color = new CanvasColor(canvasObjectPropertiesWindow.getColorPicker().getValue());
+        double contrast = Double.parseDouble(setCanvasObjectPropertiesWindow.getContrastTextField().getText());
+        double brightness = Double.parseDouble(setCanvasObjectPropertiesWindow.getBrightnessTextField().getText());
+        double saturation = Double.parseDouble(setCanvasObjectPropertiesWindow.getSaturationTextField().getText());
+        double hue = Double.parseDouble(setCanvasObjectPropertiesWindow.getHueTextField().getText());
+        CanvasColor color = new CanvasColor(setCanvasObjectPropertiesWindow.getColorPicker().getValue());
         modifyImageViewColors(color,contrast,brightness,saturation,hue);
-        this.getCanvasObjectData().setWidth(canvasObjectPropertiesWindow.getWidthFromField());
-        this.getCanvasObjectData().setHeight(canvasObjectPropertiesWindow.getHeightFromField());
+        this.getCanvasObjectData().setWidth(setCanvasObjectPropertiesWindow.getWidthFromField());
+        this.getCanvasObjectData().setHeight(setCanvasObjectPropertiesWindow.getHeightFromField());
         this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         this.getHmiApp().setWasModified(true);
         this.line.setStrokeWidth(this.getCanvasObjectData().getWidth());
@@ -86,11 +96,11 @@ public class CanvasLine extends CanvasObject{
     public void modifyImageViewColors(CanvasColor color, double contrast, double brightness, double saturation, double hue) {
         this.line.setStroke(color.getColor());
         this.getCanvasObjectData().setPrimaryColor(color);
-        if (this.line != null && this.getCanvasObjectData().isModifyingColors()) {
+        if (this.getCanvasObjectData().isModifyingColors()) {
+            logger.log(Level.INFO,"Applying colors");
             Lighting lighting = new Lighting(new Light.Distant(45, 90, color.getColor()));
             ColorAdjust bright = new ColorAdjust();
             bright.setContrast(contrast);
-            bright.setHue(-0.05);
             bright.setSaturation(saturation);
             bright.setBrightness(brightness);
             bright.setHue(hue);

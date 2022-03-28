@@ -126,6 +126,11 @@ public class HMIApp extends Application {
      */
     private final Image circleIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "circle.png").toExternalForm());
 
+    /**
+     * Ellipse icon source: <a href="https://www.flaticon.com/free-icons/oval" title="oval icons">Oval icons created by Freepik - Flaticon</a>
+     */
+    private final Image ellipseIcon = new Image(getClass().getResource(IMAGES_DIR_STR+File.separator+"ellipse.png").toExternalForm());
+
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
     }
@@ -597,10 +602,14 @@ public class HMIApp extends Application {
         });
         lineBtn.setTooltip(new Tooltip("Línea"));
         lineBtn.setGraphic(new ImageView(lineIcon));
-        Button circleBtn = new Button("");
-        circleBtn.setTooltip(new Tooltip("Círculo"));
-        circleBtn.setGraphic(new ImageView(circleIcon));
-        HBox firstHBox = new HBox(lineBtn, circleBtn, rectangleBtn);
+        Button ellipseBtn = new Button("");
+        ellipseBtn.setTooltip(new Tooltip("Elipse"));
+        ellipseBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("Ellipse");
+        });
+        ellipseBtn.setGraphic(new ImageView(ellipseIcon));
+        HBox firstHBox = new HBox(lineBtn, ellipseBtn, rectangleBtn);
         firstHBox.setAlignment(CENTER);
         HBox secondHBox = new HBox(systemDateTimeLabelBtn, textBtn, textFieldBtn);
         secondHBox.setAlignment(CENTER);

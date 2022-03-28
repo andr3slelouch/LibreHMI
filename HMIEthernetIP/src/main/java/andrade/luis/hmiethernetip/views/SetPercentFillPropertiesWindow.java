@@ -32,12 +32,12 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
     private TextField maxValueField;
 
     public SetPercentFillPropertiesWindow() {
-        super(750, 250);
+        super(750, 300);
         this.init(Color.BLACK, Color.GREEN);
     }
 
     public SetPercentFillPropertiesWindow(Color primaryColor, Color backgroundColor) {
-        super(750, 250);
+        super(750, 300);
         this.primaryColor = new CanvasColor(primaryColor);
         this.backgroundColor = new CanvasColor(backgroundColor);
         this.init(this.primaryColor.getColor(), this.backgroundColor.getColor());

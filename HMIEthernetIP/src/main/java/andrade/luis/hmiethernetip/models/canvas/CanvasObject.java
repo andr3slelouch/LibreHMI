@@ -140,7 +140,7 @@ public class CanvasObject extends BorderPane {
             double newTranslateY = end.getY() + offsetY;
 
             ((BorderPane) (t.getSource())).setTranslateX(newTranslateX);
-            ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);;
+            ((BorderPane) (t.getSource())).setTranslateY(newTranslateY);
 
             setPosition(new CanvasPoint(((BorderPane) (t.getSource())).getBoundsInParent().getMinX(), ((BorderPane) (t.getSource())).getBoundsInParent().getMinY()), false);
             setPosition(new CanvasPoint(((BorderPane) (t.getSource())).getBoundsInParent().getMinX(), ((BorderPane) (t.getSource())).getBoundsInParent().getMinY()));
@@ -334,7 +334,7 @@ public class CanvasObject extends BorderPane {
         deleteMenuItem.setOnAction(actionEvent -> delete());
         MenuItem resizeMI = new MenuItem("Redimensionar");
         resizeMI.setId("#resizeMI");
-        resizeMI.setOnAction(actionEvent -> this.resize());
+        resizeMI.setOnAction(actionEvent -> this.properties());
         MenuItem visibilityAnimationMI = new MenuItem("Animación de Visibilidad");
         visibilityAnimationMI.setId("#visibilityMI");
         visibilityAnimationMI.setOnAction(actionEvent -> {
@@ -372,7 +372,7 @@ public class CanvasObject extends BorderPane {
      * Este método permite cambiar el tamaño del CanvasObject.
      * Muestra una ventana para la definición de los nuevos valores de Ancho y Alto del objeto
      */
-    public void resize() {
+    public void properties() {
         SetSizeWindow setSizeWindow = new SetSizeWindow(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         setSizeWindow.showAndWait();
         this.getCanvasObjectData().setWidth(setSizeWindow.getWidthFromField());
@@ -404,7 +404,6 @@ public class CanvasObject extends BorderPane {
         }
         setVisibilityAnimationWindow.showAndWait();
         this.canvasObjectData.setVisible(setVisibilityAnimationWindow.getTrueRadioButton().isSelected());
-        logger.log(Level.INFO,setVisibilityAnimationWindow.getLocalExpression().getExpressionToEvaluate());
         Expression expression = setVisibilityAnimationWindow.getLocalExpression();
         if (expression != null) {
             this.setVisibilityAnimation(expression);

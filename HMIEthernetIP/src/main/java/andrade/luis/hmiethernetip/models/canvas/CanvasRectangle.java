@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.logging.Level;
 
 import static javafx.geometry.Pos.CENTER;
 
@@ -69,15 +70,15 @@ public class CanvasRectangle extends CanvasObject {
         this.setCenter(rectangle);
         this.getCanvasObjectData().setType("Rectangle");
         this.setContextMenu();
-        MenuItem percentFillMI = new MenuItem("Percent Fill Animation");
+        MenuItem percentFillMI = new MenuItem("Animación de Relleno Porcentual");
         percentFillMI.setId("#percentFillMI");
         percentFillMI.setOnAction(actionEvent -> this.setPercentFill());
         this.getRightClickMenu().getItems().add(percentFillMI);
     }
 
     @Override
-    public void resize() {
-        super.resize();
+    public void properties() {
+        super.properties();
         if (refillRectangleTimeline != null) {
             if (refillRectangleTimeline.getStatus().toString().equals("RUNNING")) {
                 refillRectangleTimeline.stop();
@@ -233,6 +234,7 @@ public class CanvasRectangle extends CanvasObject {
                                         evaluatedValue = (boolean) this.getCanvasObjectData().getExpression().evaluate() ? 100 : 0;
                                         break;
                                     case "Flotante":
+                                    case "Entero":
                                         evaluatedValue = (double) this.getCanvasObjectData().getExpression().evaluate();
                                         break;
                                     default:

@@ -36,6 +36,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private boolean addOnClickEnabled;
     private static final String LINE_STR = "Line";
     private static final String RECTANGLE_STR = "Rectangle";
+    private static final String ELLIPSE_STR = "Ellipse";
     private static final String SYS_DATE_TIME_STR = "SystemDateTime";
     private static final String TEXT_STR = "Text";
     private static final String IMAGE_STR = "Image";
@@ -61,6 +62,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                     continue;
                 case RECTANGLE_STR:
                     addPastedRectangle(canvasObjectData);
+                    continue;
+                case ELLIPSE_STR:
+                    addPastedEllipse(canvasObjectData);
                     continue;
                 case SYS_DATE_TIME_STR:
                     addPastedSystemDateTimeLabel(canvasObjectData);
@@ -90,7 +94,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                     addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
                     continue;
                 default:
-                    continue;
             }
         }
         pasteOffset = 10;
@@ -160,6 +163,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             case RECTANGLE_STR:
                 addRectangleOnCanvasClicked(current);
                 break;
+            case ELLIPSE_STR:
+                addEllipseOnCanvasClicked(current);
+                break;
             case SYS_DATE_TIME_STR:
                 addSystemDateTimeLabelOnCanvasClicked(current);
                 break;
@@ -190,6 +196,21 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             default:
                 break;
         }
+    }
+
+    private void addEllipseOnCanvasClicked(CanvasPoint current) {
+        CanvasEllipse canvasEllipse = new CanvasEllipse(current);
+        canvasEllipse.setCanvas(this);
+        canvasEllipse.setHmiApp(hmiApp);
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasEllipse.setObjectId(FIGURE_ID + "0");
+        } else {
+            canvasEllipse.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        this.addNewShape(canvasEllipse);
+        this.getChildren().add(canvasEllipse);
+        canvasEllipse.getHmiApp().setWasModified(true);
+        this.setAddOnClickEnabled(false);
     }
 
     private void addLineOnCanvasClicked(CanvasPoint current) {
@@ -451,7 +472,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         this.getChildren().add(newCreatedRectangle);
         newCreatedRectangle.getHmiApp().setWasModified(true);
         this.setAddOnClickEnabled(false);
-
     }
 
     public void addSystemDateTimeLabelOnCanvasClicked(CanvasPoint current) {
@@ -551,12 +571,16 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             DataFlavor flavor = new DataFlavor("application/x-java-serialized-object;class=andrade.luis.hmiethernetip.models.canvas.CanvasObjectData");
             if (clipboard.isDataFlavorAvailable(flavor)) {
                 CanvasObjectData canvasObjectData = (CanvasObjectData) clipboard.getData(flavor);
+                canvasObjectData.setPosition(Objects.requireNonNullElseGet(lastClickPoint, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + 10, canvasObjectData.getPosition().getY() + 10)));
                 switch (canvasObjectData.getType()) {
                     case LINE_STR:
                         addPastedLine(canvasObjectData);
                         break;
                     case RECTANGLE_STR:
                         addPastedRectangle(canvasObjectData);
+                        break;
+                    case ELLIPSE_STR:
+                        addPastedEllipse(canvasObjectData);
                         break;
                     case SYS_DATE_TIME_STR:
                         addPastedSystemDateTimeLabel(canvasObjectData);
@@ -594,8 +618,17 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    private void addPastedEllipse(CanvasObjectData canvasObjectData) {
+        CanvasEllipse canvasEllipse = new CanvasEllipse(canvasObjectData);
+        canvasEllipse.setCanvas(this);
+        canvasEllipse.setHmiApp(hmiApp);
+        canvasEllipse.setId(generateIdForPasteOperation(canvasObjectData));
+        this.addNewShape(canvasEllipse);
+        this.getChildren().add(canvasEllipse);
+        canvasEllipse.getHmiApp().setWasModified(true);
+    }
+
     private void addPastedLine(CanvasObjectData canvasObjectData) {
-        canvasObjectData.setPosition(lastClickPoint);
         CanvasLine canvasLine = new CanvasLine(canvasObjectData);
         canvasLine.setCanvas(this);
         canvasLine.setHmiApp(hmiApp);
