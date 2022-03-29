@@ -1,7 +1,7 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.Expression;
-import andrade.luis.hmiethernetip.views.SetTextCanvasObjectPropertiesWindow;
+import andrade.luis.hmiethernetip.views.SetTextPropertiesWindow;
 import andrade.luis.hmiethernetip.views.WriteExpressionWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -79,8 +79,8 @@ public class CanvasText extends CanvasLabel {
     }
 
     @Override
-    public void properties() {
-        SetTextCanvasObjectPropertiesWindow propertiesWindow = new SetTextCanvasObjectPropertiesWindow();
+    public void setProperties() {
+        SetTextPropertiesWindow propertiesWindow = new SetTextPropertiesWindow();
         propertiesWindow.getFontStyleComboBox().getSelectionModel().select(this.getLabel().getFont().getStyle());
         propertiesWindow.getFontFamilyComboBox().getSelectionModel().select(this.getLabel().getFont().getFamily());
         propertiesWindow.getFontSizeField().setText(String.valueOf(this.getLabel().getFont().getSize()));

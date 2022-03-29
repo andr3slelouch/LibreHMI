@@ -1,6 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
-import andrade.luis.hmiethernetip.views.SetGeometricCanvasObjectPropertiesWindow;
+import andrade.luis.hmiethernetip.views.SetGeometricFigurePropertiesWindow;
 import javafx.scene.control.MenuItem;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Light;
@@ -43,7 +43,7 @@ public class CanvasLine extends CanvasObject{
         this.setContextMenu();
         MenuItem percentFillMI = new MenuItem("Propiedades");
         percentFillMI.setId("#propertiesMI");
-        percentFillMI.setOnAction(actionEvent -> this.properties());
+        percentFillMI.setOnAction(actionEvent -> this.setProperties());
         this.getRightClickMenu().getItems().add(percentFillMI);
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             modifyColors(this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getContrast(),this.getCanvasObjectData().getBrightness(),this.getCanvasObjectData().getSaturation(),this.getCanvasObjectData().getHue());
@@ -55,39 +55,39 @@ public class CanvasLine extends CanvasObject{
     }
 
     @Override
-    public void properties(){
-        SetGeometricCanvasObjectPropertiesWindow setGeometricCanvasObjectPropertiesWindow = new SetGeometricCanvasObjectPropertiesWindow(this.line.getStrokeWidth(),this.getCanvasObjectData().getHeight());
-        setGeometricCanvasObjectPropertiesWindow.setTitle("Propiedades de Línea");
-        setGeometricCanvasObjectPropertiesWindow.getHeightField().setDisable(true);
-        setGeometricCanvasObjectPropertiesWindow.setHeight(375);
+    public void setProperties(){
+        SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.line.getStrokeWidth(),this.getCanvasObjectData().getHeight());
+        setGeometricFigurePropertiesWindow.setTitle("Propiedades de Línea");
+        setGeometricFigurePropertiesWindow.getHeightField().setDisable(true);
+        setGeometricFigurePropertiesWindow.setHeight(375);
         if(this.getCanvasObjectData().isModifyingColors()){
-            setGeometricCanvasObjectPropertiesWindow.setModifyingColor(true);
-            setGeometricCanvasObjectPropertiesWindow.getModColorRB().setSelected(true);
-            setGeometricCanvasObjectPropertiesWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
-            setGeometricCanvasObjectPropertiesWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
-            setGeometricCanvasObjectPropertiesWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
-            setGeometricCanvasObjectPropertiesWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
+            setGeometricFigurePropertiesWindow.setModifyingColor(true);
+            setGeometricFigurePropertiesWindow.getModColorRB().setSelected(true);
+            setGeometricFigurePropertiesWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
+            setGeometricFigurePropertiesWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
+            setGeometricFigurePropertiesWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
+            setGeometricFigurePropertiesWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
         }
 
-        setGeometricCanvasObjectPropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
-        setGeometricCanvasObjectPropertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
+        setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
+        setGeometricFigurePropertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
 
-        setGeometricCanvasObjectPropertiesWindow.showAndWait();
+        setGeometricFigurePropertiesWindow.showAndWait();
 
 
-        boolean isModifyingColor = setGeometricCanvasObjectPropertiesWindow.isModifyingColor();
+        boolean isModifyingColor = setGeometricFigurePropertiesWindow.isModifyingColor();
         this.getCanvasObjectData().setModifyingColors(isModifyingColor);
-        double rotation = Double.parseDouble(setGeometricCanvasObjectPropertiesWindow.getRotationTextField().getText());
+        double rotation = Double.parseDouble(setGeometricFigurePropertiesWindow.getRotationTextField().getText());
         this.getCanvasObjectData().setRotation(rotation);
         this.setRotate(rotation);
-        double contrast = Double.parseDouble(setGeometricCanvasObjectPropertiesWindow.getContrastTextField().getText());
-        double brightness = Double.parseDouble(setGeometricCanvasObjectPropertiesWindow.getBrightnessTextField().getText());
-        double saturation = Double.parseDouble(setGeometricCanvasObjectPropertiesWindow.getSaturationTextField().getText());
-        double hue = Double.parseDouble(setGeometricCanvasObjectPropertiesWindow.getHueTextField().getText());
-        CanvasColor color = new CanvasColor(setGeometricCanvasObjectPropertiesWindow.getColorPicker().getValue());
+        double contrast = Double.parseDouble(setGeometricFigurePropertiesWindow.getContrastTextField().getText());
+        double brightness = Double.parseDouble(setGeometricFigurePropertiesWindow.getBrightnessTextField().getText());
+        double saturation = Double.parseDouble(setGeometricFigurePropertiesWindow.getSaturationTextField().getText());
+        double hue = Double.parseDouble(setGeometricFigurePropertiesWindow.getHueTextField().getText());
+        CanvasColor color = new CanvasColor(setGeometricFigurePropertiesWindow.getColorPicker().getValue());
         modifyColors(color,contrast,brightness,saturation,hue);
-        this.getCanvasObjectData().setWidth(setGeometricCanvasObjectPropertiesWindow.getWidthFromField());
-        this.getCanvasObjectData().setHeight(setGeometricCanvasObjectPropertiesWindow.getHeightFromField());
+        this.getCanvasObjectData().setWidth(setGeometricFigurePropertiesWindow.getWidthFromField());
+        this.getCanvasObjectData().setHeight(setGeometricFigurePropertiesWindow.getHeightFromField());
         this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         this.getHmiApp().setWasModified(true);
         this.line.setStrokeWidth(this.getCanvasObjectData().getWidth());

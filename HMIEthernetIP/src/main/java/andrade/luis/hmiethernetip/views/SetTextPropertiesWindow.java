@@ -15,9 +15,9 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.function.UnaryOperator;
 
-public class SetTextCanvasObjectPropertiesWindow extends Stage {
+public class SetTextPropertiesWindow extends Stage {
     private final StackPane root;
-    private final VBox vbox;
+    protected final VBox vbox;
     private final Scene mainScene;
 
     public TextField getRotationTextField() {
@@ -51,8 +51,11 @@ public class SetTextCanvasObjectPropertiesWindow extends Stage {
         return change;
     };
 
+    public SetTextPropertiesWindow(){
+        this(350,200);
+    }
 
-    public SetTextCanvasObjectPropertiesWindow() {
+    public SetTextPropertiesWindow(double width, double height) {
         root = new StackPane();
         // font weight names
         String[] weight = {
@@ -123,7 +126,7 @@ public class SetTextCanvasObjectPropertiesWindow extends Stage {
         vbox.getChildren().add(hbox);
 
         root.getChildren().add(vbox);
-        mainScene = new Scene(root,350,200);
+        mainScene = new Scene(root,width,height);
         this.setScene(mainScene);
     }
 

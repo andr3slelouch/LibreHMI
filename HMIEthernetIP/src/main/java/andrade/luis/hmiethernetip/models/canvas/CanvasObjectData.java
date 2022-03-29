@@ -145,14 +145,13 @@ public class CanvasObjectData implements Serializable, Transferable {
     private ArrayList<String> selectedPages;
     @SerializedName("fontFamily")
     @Expose
-    private String fontFamily="";
+    private String fontFamily;
     @SerializedName("fontStyle")
     @Expose
-    private String fontStyle="";
+    private String fontStyle;
     @SerializedName("fontSize")
     @Expose
     private double fontSize;
-
 
     private static final long serialVersionUID = 6976931227659398285L;
 

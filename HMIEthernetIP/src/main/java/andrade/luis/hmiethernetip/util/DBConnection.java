@@ -56,7 +56,7 @@ public class DBConnection {
         properties.setProperty("Tanks", String.valueOf(tanks));
 
         try (FileOutputStream out = new FileOutputStream(getPropertiesFileName())) {
-            properties.store(out, "HMIEthernetIP properties file");
+            properties.store(out, "HMIEthernetIP setProperties file");
         } catch (IOException e) {
             throw new IOException(e);
         }

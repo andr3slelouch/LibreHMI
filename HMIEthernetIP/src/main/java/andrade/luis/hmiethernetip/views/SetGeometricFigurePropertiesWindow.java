@@ -6,7 +6,7 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.function.UnaryOperator;
 
-public class SetGeometricCanvasObjectPropertiesWindow extends SetSizeWindow {
+public class SetGeometricFigurePropertiesWindow extends SetSizeWindow {
 
     private final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
         String newText = change.getControlNewText();
@@ -38,7 +38,7 @@ public class SetGeometricCanvasObjectPropertiesWindow extends SetSizeWindow {
     private TextField hueTextField;
     private String rotationValue;
 
-    public SetGeometricCanvasObjectPropertiesWindow(double width, double height) {
+    public SetGeometricFigurePropertiesWindow(double width, double height) {
         super(width, height);
         Label rotationLabel = new Label("Rotar:");
         rotationTextField = new TextField("0");

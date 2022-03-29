@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DEFAULT;
@@ -338,7 +337,7 @@ public class CanvasObject extends BorderPane {
         deleteMenuItem.setOnAction(actionEvent -> delete());
         MenuItem resizeMI = new MenuItem("Propiedades");
         resizeMI.setId("#propertiesMI");
-        resizeMI.setOnAction(actionEvent -> this.properties());
+        resizeMI.setOnAction(actionEvent -> this.setProperties());
         MenuItem visibilityAnimationMI = new MenuItem("Animación de Visibilidad");
         visibilityAnimationMI.setId("#visibilityMI");
         visibilityAnimationMI.setOnAction(actionEvent -> {
@@ -376,7 +375,7 @@ public class CanvasObject extends BorderPane {
      * Este método permite cambiar el tamaño(propiedades) del CanvasObject.
      * Muestra una ventana para la definición de los nuevos valores de Ancho y Alto del objeto
      */
-    public void properties() {
+    public void setProperties() {
         SetSizeWindow setSizeWindow = new SetSizeWindow(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         setSizeWindow.showAndWait();
         this.getCanvasObjectData().setWidth(setSizeWindow.getWidthFromField());

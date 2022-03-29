@@ -201,8 +201,8 @@ public class CanvasImage extends CanvasObject {
     }
 
     @Override
-    public void properties() {
-        super.properties();
+    public void setProperties() {
+        super.setProperties();
         this.imageView.setFitWidth(this.getCanvasObjectData().getWidth());
         this.imageView.setFitHeight(this.getCanvasObjectData().getHeight());
         this.imageView.setPreserveRatio(this.getCanvasObjectData().isPreservingRatio());

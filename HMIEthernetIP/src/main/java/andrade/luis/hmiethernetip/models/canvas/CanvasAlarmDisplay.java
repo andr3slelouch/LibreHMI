@@ -219,8 +219,8 @@ public class CanvasAlarmDisplay extends CanvasObject {
     }
 
     @Override
-    public void properties() {
-        super.properties();
+    public void setProperties() {
+        super.setProperties();
         this.alarmsTable.setPrefWidth(this.getCanvasObjectData().getWidth());
         this.alarmsTable.setPrefHeight(this.getCanvasObjectData().getHeight());
     }
