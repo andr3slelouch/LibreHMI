@@ -209,9 +209,7 @@ public class HMIScene extends Scene implements Cloneable {
             }
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), this::copy);
-        this.getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY), () -> {
-            cut();
-        });
+        this.getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY), this::cut);
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), () -> {
             getCanvas().paste();
         });
@@ -237,9 +235,10 @@ public class HMIScene extends Scene implements Cloneable {
                 max = canvasObjects.get(i).getLastTimeSelected();
                 index = i;
             } else {
-                andrade.luis.hmiethernetip.models.canvas.CanvasObject rectangle = canvasObjects.get(i);
-                if (rectangle.getLastTimeSelected() != null && max != null) {
-                    if (max.isBefore(rectangle.getLastTimeSelected())) {
+                CanvasObject canvasObject = canvasObjects.get(i);
+                if (canvasObject.getLastTimeSelected() != null && max != null) {
+                    logger.log(Level.INFO,"Checking object:"+canvasObjects.get(i).getId());
+                    if (max.isBefore(canvasObject.getLastTimeSelected())) {
                         max = canvasObjects.get(i).getLastTimeSelected();
                         index = i;
                     }
@@ -247,6 +246,7 @@ public class HMIScene extends Scene implements Cloneable {
             }
         }
         if (index > -1 && max != null) {
+            logger.log(Level.INFO,String.valueOf(index));
             for (int i = 0; i < canvasObjects.size(); i++) {
                 if (i != index) {
                     canvasObjects.get(i).setSelected(false);

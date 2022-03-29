@@ -623,7 +623,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         CanvasEllipse canvasEllipse = new CanvasEllipse(canvasObjectData);
         canvasEllipse.setCanvas(this);
         canvasEllipse.setHmiApp(hmiApp);
-        canvasEllipse.setId(generateIdForPasteOperation(canvasObjectData));
+        canvasEllipse.setObjectId(generateIdForPasteOperation(canvasObjectData));
+        canvasEllipse.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         this.addNewShape(canvasEllipse);
         this.getChildren().add(canvasEllipse);
         canvasEllipse.getHmiApp().setWasModified(true);
@@ -633,7 +634,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         CanvasLine canvasLine = new CanvasLine(canvasObjectData);
         canvasLine.setCanvas(this);
         canvasLine.setHmiApp(hmiApp);
-        canvasLine.setId((generateIdForPasteOperation(canvasObjectData)));
+        canvasLine.setObjectId(generateIdForPasteOperation(canvasObjectData));
+        canvasLine.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         this.addNewShape(canvasLine);
         this.getChildren().add(canvasLine);
         canvasLine.getHmiApp().setWasModified(true);
@@ -644,7 +646,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasAlarmDisplay.setCanvas(this);
         canvasAlarmDisplay.setHmiApp(hmiApp);
         canvasAlarmDisplay.setUser(hmiApp.getUser());
-        canvasAlarmDisplay.setId((generateIdForPasteOperation(canvasObjectData)));
+        canvasAlarmDisplay.setObjectId(generateIdForPasteOperation(canvasObjectData));
+        canvasAlarmDisplay.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
         this.addNewShape(canvasAlarmDisplay);
         this.getChildren().add(canvasAlarmDisplay);
         canvasAlarmDisplay.getHmiApp().setWasModified(true);

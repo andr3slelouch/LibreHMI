@@ -744,7 +744,6 @@ public class HMIApp extends Application {
 
     private void loadHMIData() throws IOException {
 
-
         FileChooser fileChooser = new FileChooser();
 
         fileChooser.setTitle("Seleccione un archivo de configuración");

@@ -143,6 +143,15 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("selectedPages")
     @Expose
     private ArrayList<String> selectedPages;
+    @SerializedName("fontFamily")
+    @Expose
+    private String fontFamily="";
+    @SerializedName("fontStyle")
+    @Expose
+    private String fontStyle="";
+    @SerializedName("fontSize")
+    @Expose
+    private double fontSize;
 
 
     private static final long serialVersionUID = 6976931227659398285L;
@@ -657,5 +666,29 @@ public class CanvasObjectData implements Serializable, Transferable {
 
     public void setRotated(boolean rotated) {
         this.rotated = rotated;
+    }
+
+    public String getFontFamily() {
+        return fontFamily;
+    }
+
+    public void setFontFamily(String fontFamily) {
+        this.fontFamily = fontFamily;
+    }
+
+    public String getFontStyle() {
+        return fontStyle;
+    }
+
+    public void setFontStyle(String fontStyle) {
+        this.fontStyle = fontStyle;
+    }
+
+    public double getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(double fontSize) {
+        this.fontSize = fontSize;
     }
 }

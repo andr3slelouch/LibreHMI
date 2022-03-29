@@ -336,8 +336,8 @@ public class CanvasObject extends BorderPane {
         deleteMenuItem = new MenuItem("Eliminar");
         deleteMenuItem.setId("#delete");
         deleteMenuItem.setOnAction(actionEvent -> delete());
-        MenuItem resizeMI = new MenuItem("Redimensionar");
-        resizeMI.setId("#resizeMI");
+        MenuItem resizeMI = new MenuItem("Propiedades");
+        resizeMI.setId("#propertiesMI");
         resizeMI.setOnAction(actionEvent -> this.properties());
         MenuItem visibilityAnimationMI = new MenuItem("Animación de Visibilidad");
         visibilityAnimationMI.setId("#visibilityMI");
@@ -373,7 +373,7 @@ public class CanvasObject extends BorderPane {
     }
 
     /**
-     * Este método permite cambiar el tamaño del CanvasObject.
+     * Este método permite cambiar el tamaño(propiedades) del CanvasObject.
      * Muestra una ventana para la definición de los nuevos valores de Ancho y Alto del objeto
      */
     public void properties() {
