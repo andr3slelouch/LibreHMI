@@ -42,6 +42,7 @@ public class CanvasRectangle extends CanvasObject {
 
     public CanvasRectangle(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
+        logger.log(Level.INFO, "ID:" + canvasObjectData.getId() + "Width:" + canvasObjectData.getWidth() + "Height:" + canvasObjectData.getHeight());
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), canvasObjectData.getWidth(), canvasObjectData.getHeight());
     }
 
@@ -57,16 +58,18 @@ public class CanvasRectangle extends CanvasObject {
     @Override
     public void setPosition(CanvasPoint center) {
         super.setPosition(center);
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150);
-        super.setCenter(this.rectangle);
     }
 
     public void setData(double x, double y, double width, double height) {
         this.rectangle = new Rectangle(x, y);
+
         this.rectangle.setWidth(width);
+        this.setPrefWidth(width);
         this.getCanvasObjectData().setWidth(width);
         this.rectangle.setHeight(height);
+        this.setPrefHeight(height);
         this.getCanvasObjectData().setHeight(height);
+
         this.setCenter(rectangle);
         this.getCanvasObjectData().setType("Rectangle");
         this.setContextMenu();
@@ -187,7 +190,7 @@ public class CanvasRectangle extends CanvasObject {
 
                     rightRect.yProperty().bind(this.rectangle.heightProperty());
                     rightRect.heightProperty().bind(life.multiply(-height * 0.01).add(height));
-                    solutionPane2 = new Pane(rightRect,this.rectangle);
+                    solutionPane2 = new Pane(rightRect, this.rectangle);
                     this.setCenter(solutionPane2);
 
                     perfectFillOrientation = PercentFillOrientation.VERTICAL;
@@ -241,8 +244,8 @@ public class CanvasRectangle extends CanvasObject {
                                         break;
                                 }
                                 double value = calculatePercentFillValue(evaluatedValue);
-                                String captionValue =String.valueOf(evaluatedValue);
-                                if(this.getCanvasObjectData().getExpression().getFloatPrecision()>-1){
+                                String captionValue = String.valueOf(evaluatedValue);
+                                if (this.getCanvasObjectData().getExpression().getFloatPrecision() > -1) {
                                     DecimalFormat decimalFormat = this.getCanvasObjectData().getExpression().generateDecimalFormat();
                                     captionValue = decimalFormat.format(value);
                                 }
@@ -270,7 +273,7 @@ public class CanvasRectangle extends CanvasObject {
             return (multiplication / difference);
 
         } else if (perfectFillOrientation == PercentFillOrientation.VERTICAL || perfectFillOrientation == PercentFillOrientation.HORIZONTAL_REVERSED) {
-            return 100-(multiplication / difference);
+            return 100 - (multiplication / difference);
         }
         return -1;
     }

@@ -267,7 +267,9 @@ public class CanvasObject extends BorderPane {
             showBorder();
             setLastTimeSelected();
         } else {
-            hideBorder();
+            if(this.borderActive!=null){
+                hideBorder();
+            }
         }
     }
 
@@ -286,6 +288,7 @@ public class CanvasObject extends BorderPane {
                 CanvasObject.this.pseudoClassStateChanged(CanvasObject.this.border, get());
             }
         };
+
     }
 
     public CanvasObject(CanvasObjectData canvasObjectData) {
@@ -300,8 +303,9 @@ public class CanvasObject extends BorderPane {
 
         this.canvasObjectData = canvasObjectData;
 
-        this.setPosition(this.canvasObjectData.getPosition());
+
         setPosition(this.canvasObjectData.getPosition(), true);
+
 
         if(this.getCanvasObjectData().getVisibilityExpression() != null){
             this.setVisibilityAnimation(this.canvasObjectData.getVisibilityExpression());
