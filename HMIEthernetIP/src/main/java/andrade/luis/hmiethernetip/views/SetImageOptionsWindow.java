@@ -1,5 +1,7 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.SizeVBox;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -23,6 +25,35 @@ public class SetImageOptionsWindow extends Stage {
         return change;
     };
     protected final VBox vbox;
+
+    public SizeVBox getSizeVBox() {
+        return sizeVBox;
+    }
+
+    public void setSizeVBox(SizeVBox sizeVBox) {
+        this.sizeVBox = sizeVBox;
+    }
+
+    private SizeVBox sizeVBox;
+
+    public RadioButton getOriginalColorRB() {
+        return originalColorRB;
+    }
+
+    public void setOriginalColorRB(RadioButton originalColorRB) {
+        this.originalColorRB = originalColorRB;
+    }
+
+    public RadioButton getModColorRB() {
+        return modColorRB;
+    }
+
+    public void setModColorRB(RadioButton modColorRB) {
+        this.modColorRB = modColorRB;
+    }
+
+    private RadioButton originalColorRB;
+    private RadioButton modColorRB;
 
     public CheckBox getPreserveRatioCheckBox() {
         return preserveRatioCheckBox;
@@ -186,9 +217,13 @@ public class SetImageOptionsWindow extends Stage {
     final FileChooser fileChooser = new FileChooser();
 
 
-    public SetImageOptionsWindow() {
+    public SetImageOptionsWindow(double imageViewWidth, double imageViewHeight) {
         StackPane root = new StackPane();
-        Label label = new Label("Opciones de Imagen");
+       this.setTitle("Propiedades de Imagen");
+
+        sizeVBox = new SizeVBox(imageViewWidth,imageViewHeight,252,252);
+        sizeVBox.getWidthValueHBox().setSpacing(32);
+        sizeVBox.getHeightValueHBox().setSpacing(45);
 
         Label imagePathLabel = new Label("Ubicación de Imagen:");
         imagePathTextField = new TextField();
@@ -233,66 +268,72 @@ public class SetImageOptionsWindow extends Stage {
         rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             rotationValue = newValue;
         });
+        rotationTextField.setPrefWidth(200);
         Button rotationButton = new Button("+90°");
         rotationButton.setOnAction(mouseEvent -> {
             double value = Double.parseDouble(rotationTextField.getText());
             rotationTextField.setText(String.valueOf(value + 90));
         });
 
+        HBox rotationInputHBox = new HBox();
+        rotationInputHBox.getChildren().addAll(rotationTextField,rotationButton);
+
         HBox rotationHBox = new HBox();
-        rotationHBox.getChildren().addAll(rotationLabel, preserveRatioCheckBox,rotationTextField, rotationButton);
+        rotationHBox.getChildren().addAll(rotationLabel, rotationInputHBox);
+        rotationHBox.setSpacing(100);
 
         Label colorMode = new Label("Modo de Color:");
         toggleGroup = new ToggleGroup();
-        RadioButton originalColorRB = new RadioButton("Original");
+        originalColorRB = new RadioButton("Original");
         originalColorRB.setToggleGroup(toggleGroup);
-        RadioButton modColorRB = new RadioButton("Modificar");
+        modColorRB = new RadioButton("Modificar");
         modColorRB.setToggleGroup(toggleGroup);
         HBox colorModeHBox = new HBox();
         colorModeHBox.getChildren().addAll(colorMode, originalColorRB, modColorRB);
+        colorModeHBox.setSpacing(40);
 
         Label selectColor = new Label("Seleccione el color:");
         colorPicker = new ColorPicker();
-        colorPicker.setPrefWidth(100);
+        colorPicker.setPrefWidth(242);
         colorPicker.setDisable(true);
         HBox colorHBox = new HBox();
-        colorHBox.setSpacing(25);
+        colorHBox.setSpacing(22);
         colorHBox.getChildren().addAll(selectColor, colorPicker);
 
         Label contrastLabel = new Label("Contraste:");
         contrastTextField = new TextField("0");
-        contrastTextField.setPrefWidth(100);
+        contrastTextField.setPrefWidth(242);
         contrastTextField.setDisable(true);
         contrastTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox contrastHBox = new HBox();
-        contrastHBox.setSpacing(81);
+        contrastHBox.setSpacing(76);
         contrastHBox.getChildren().addAll(contrastLabel, contrastTextField);
 
         Label brightnessLabel = new Label("Brillo:");
         brightnessTextField = new TextField("0");
-        brightnessTextField.setPrefWidth(100);
+        brightnessTextField.setPrefWidth(242);
         brightnessTextField.setDisable(true);
         brightnessTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox brightnessHBox = new HBox();
-        brightnessHBox.setSpacing(110);
+        brightnessHBox.setSpacing(105);
         brightnessHBox.getChildren().addAll(brightnessLabel, brightnessTextField);
 
         Label saturationLabel = new Label("Saturación:");
         saturationTextField = new TextField("0");
-        saturationTextField.setPrefWidth(100);
+        saturationTextField.setPrefWidth(242);
         saturationTextField.setDisable(true);
         saturationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox saturationHBox = new HBox();
-        saturationHBox.setSpacing(76);
+        saturationHBox.setSpacing(71);
         saturationHBox.getChildren().addAll(saturationLabel, saturationTextField);
 
         Label hueLabel = new Label("Hue:");
         hueTextField = new TextField("0");
-        hueTextField.setPrefWidth(100);
+        hueTextField.setPrefWidth(242);
         hueTextField.setDisable(true);
         hueTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox hueHBox = new HBox();
-        hueHBox.setSpacing(118);
+        hueHBox.setSpacing(113);
         hueHBox.getChildren().addAll(hueLabel, hueTextField);
 
         modColorRB.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
@@ -311,10 +352,11 @@ public class SetImageOptionsWindow extends Stage {
         okHBox.setAlignment(Pos.BOTTOM_RIGHT);
 
         vbox = new VBox();
-        vbox.getChildren().addAll(label, imagePathHBox, preserveRatioCheckBox,mirrorHorizontalCheckBox, mirrorVerticalCheckBox, rotationHBox, colorModeHBox, colorHBox, contrastHBox, brightnessHBox, saturationHBox, hueHBox, okHBox);
-
+        vbox.getChildren().addAll(sizeVBox, imagePathHBox, preserveRatioCheckBox,mirrorHorizontalCheckBox, mirrorVerticalCheckBox, rotationHBox, colorModeHBox, colorHBox, contrastHBox, brightnessHBox, saturationHBox, hueHBox, okHBox);
+        vbox.setPadding(new Insets(5,5,5,5));
+        vbox.setSpacing(5);
         root.getChildren().add(vbox);
 
-        this.setScene(new Scene(root, 300, 320));
+        this.setScene(new Scene(root, 400, 420));
     }
 }

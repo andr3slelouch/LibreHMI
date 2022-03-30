@@ -16,7 +16,8 @@ public class SetDateTimeProperties extends SetTextPropertiesWindow{
     private TextField dateTimeField;
 
     public SetDateTimeProperties() {
-        super(350,250);
+        super(340,250);
+        this.setTitle("Propiedades de Etiqueta de Fecha y Hora");
         Label dateTimeFormat = new Label("Formato de fecha y hora:");
         dateTimeField = new TextField();
         HBox dateTimeHBox = new HBox();

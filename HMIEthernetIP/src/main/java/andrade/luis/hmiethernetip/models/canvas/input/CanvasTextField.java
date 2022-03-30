@@ -1,11 +1,14 @@
 package andrade.luis.hmiethernetip.models.canvas.input;
 
+import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
-import andrade.luis.hmiethernetip.views.SetTextFieldPropertiesWindow;
+import andrade.luis.hmiethernetip.views.SetInputTextPropertiesWindow;
+import andrade.luis.hmiethernetip.views.SetTagInputPropertiesWindow;
+import andrade.luis.hmiethernetip.views.SetTextPropertiesWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -14,6 +17,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
@@ -32,6 +37,8 @@ public class CanvasTextField extends CanvasObject {
     private Tag linkedTag;
     private double maxValue = 100;
     private double minValue = 0;
+    private static final String ENTERO_STR = "Entero";
+    private static final String FLOTANTE_STR = "Flotante";
     Logger logger = Logger.getLogger(this.getClass().getName());
     private Timeline timeline;
 
@@ -100,7 +107,7 @@ public class CanvasTextField extends CanvasObject {
         this.getCanvasObjectData().setMaxValue(maxValue);
         this.getCanvasObjectData().setDataType(type);
         this.textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (!newValue.isEmpty() && (this.type.equals("Entero") || this.type.equals("Flotante"))) {
+            if (!newValue.isEmpty() && (this.type.equals(ENTERO_STR) || this.type.equals(FLOTANTE_STR))) {
                 double value = Double.parseDouble(newValue);
                 if (value < this.minValue || value > this.maxValue) {
                     this.textField.setText(oldValue);
@@ -134,10 +141,10 @@ public class CanvasTextField extends CanvasObject {
         this.textField.setPrefWidth(width);
         this.textField.setPrefHeight(height);
         switch (type) {
-            case "Entero":
+            case ENTERO_STR:
                 this.textField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), (int) (minValue + 1), integerFilter));
                 break;
-            case "Flotante":
+            case FLOTANTE_STR:
                 this.textField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
                 break;
             case "Bool":
@@ -157,24 +164,69 @@ public class CanvasTextField extends CanvasObject {
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
         this.setCenter(this.textField);
+
+        if(this.getCanvasObjectData().getFontFamily()!=null && this.getCanvasObjectData().getFontStyle()!=null){
+            this.textField.setFont(
+                    Font.font(
+                            this.getCanvasObjectData().getFontFamily(),
+                            FontWeight.valueOf(this.getCanvasObjectData().getFontStyle()),
+                            this.getCanvasObjectData().getFontSize()
+                    )
+            );
+        }
+        this.setRotate(this.getCanvasObjectData().getRotation());
     }
     public void setNewMenuItem() {
-        MenuItem attachShowHideWindowsActionMI = new MenuItem("Editar");
-        attachShowHideWindowsActionMI.setId("#editMI");
-        attachShowHideWindowsActionMI.setOnAction(actionEvent -> buttonAction());
-        this.getRightClickMenu().getItems().add(attachShowHideWindowsActionMI);
+        MenuItem editMI = new MenuItem("Editar");
+        editMI.setId("#editMI");
+        editMI.setOnAction(actionEvent -> buttonAction());
+        this.getRightClickMenu().getItems().add(2,editMI);
     }
 
     private void buttonAction() {
-        SetTextFieldPropertiesWindow setTextFieldPropertiesWindow = new SetTextFieldPropertiesWindow();
-        setTextFieldPropertiesWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
-        setTextFieldPropertiesWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
-        setTextFieldPropertiesWindow.setSelectedRadioButton(this.getCanvasObjectData().getType());
-        setTextFieldPropertiesWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
-        setTextFieldPropertiesWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
-        setTextFieldPropertiesWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getTag().getFloatPrecision()));
-        setTextFieldPropertiesWindow.showAndWait();
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(),setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
+        SetTagInputPropertiesWindow setTagInputPropertiesWindow = new SetTagInputPropertiesWindow();
+        setTagInputPropertiesWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
+        setTagInputPropertiesWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
+        setTagInputPropertiesWindow.setSelectedRadioButton(this.getCanvasObjectData().getType());
+        setTagInputPropertiesWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
+        setTagInputPropertiesWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
+        setTagInputPropertiesWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getTag().getFloatPrecision()));
+        setTagInputPropertiesWindow.showAndWait();
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), setTagInputPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTagInputPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTagInputPropertiesWindow.getMaxValueField().getText()), setTagInputPropertiesWindow.getType());
+        this.getHmiApp().setWasModified(true);
+    }
+
+    @Override
+    public void setProperties() {
+        SetInputTextPropertiesWindow propertiesWindow = new SetInputTextPropertiesWindow(this.textField.getWidth(),this.textField.getHeight());
+        propertiesWindow.setTitle("Propiedades de Campo de Texto");
+        propertiesWindow.getFontStyleComboBox().getSelectionModel().select(this.textField.getFont().getStyle());
+        propertiesWindow.getFontFamilyComboBox().getSelectionModel().select(this.textField.getFont().getFamily());
+        propertiesWindow.getFontSizeField().setText(String.valueOf(this.textField.getFont().getSize()));
+        propertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
+        propertiesWindow.getColorHBox().setVisible(false);
+        propertiesWindow.showAndWait();
+        this.textField.setFont(
+                Font.font(
+                        propertiesWindow.getFontFamilyComboBox().getValue(),
+                        propertiesWindow.getFontStyle(),
+                        Double.parseDouble(propertiesWindow.getFontSizeField().getText()
+                        )
+                )
+        );
+        double rotation = Double.parseDouble(propertiesWindow.getRotationTextField().getText());
+        this.setRotate(rotation);
+        this.getCanvasObjectData().setWidth(propertiesWindow.getSizeVBox().getWidthFromField());
+        this.getCanvasObjectData().setHeight(propertiesWindow.getSizeVBox().getHeightFromField());
+        this.textField.setPrefWidth(this.getCanvasObjectData().getWidth());
+        this.textField.setPrefHeight(this.getCanvasObjectData().getHeight());
+        this.setSize(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
+        this.getCanvasObjectData().setRotation(rotation);
+        this.getCanvasObjectData().setPrimaryColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
+        this.getCanvasObjectData().setFontStyle(propertiesWindow.getFontStyle().name());
+        this.getCanvasObjectData().setFontFamily(propertiesWindow.getFontFamilyComboBox().getValue());
+        this.getCanvasObjectData().setFontSize(Double.parseDouble(propertiesWindow.getFontSizeField().getText()));
+        this.getCanvasObjectData().setPrimaryColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
         this.getHmiApp().setWasModified(true);
     }
 
@@ -208,11 +260,11 @@ public class CanvasTextField extends CanvasObject {
                             String evaluatedValue = "";
                             try {
                                 switch (type) {
-                                    case "Entero":
+                                    case ENTERO_STR:
                                     case "Bool":
                                         evaluatedValue = String.valueOf(Integer.parseInt(this.linkedTag.readFromDatabase()));
                                         break;
-                                    case "Flotante":
+                                    case FLOTANTE_STR:
                                         evaluatedValue = String.valueOf(Double.parseDouble(this.linkedTag.readFromDatabase()));
                                         if(this.linkedTag.getFloatPrecision()>-1){
                                             DecimalFormat decimalFormat = this.linkedTag.generateDecimalFormat();

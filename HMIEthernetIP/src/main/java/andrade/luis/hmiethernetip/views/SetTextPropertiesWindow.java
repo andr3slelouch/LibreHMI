@@ -20,6 +20,26 @@ public class SetTextPropertiesWindow extends Stage {
     protected final VBox vbox;
     private final Scene mainScene;
 
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    private boolean cancelled;
+
+    public HBox getColorHBox() {
+        return colorHBox;
+    }
+
+    public void setColorHBox(HBox colorHBox) {
+        this.colorHBox = colorHBox;
+    }
+
+    private HBox colorHBox;
+
     public TextField getRotationTextField() {
         return rotationTextField;
     }
@@ -83,19 +103,21 @@ public class SetTextPropertiesWindow extends Stage {
 
         Label fontSizeLabel = new Label("Tamaño de Fuente:");
         fontSizeField = new TextField("12.0");
+        fontSizeField.setPrefWidth(195);
+        fontSizeField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox fontSizeHBox = new HBox(fontSizeLabel, fontSizeField);
-        fontSizeHBox.setSpacing(10);
+        fontSizeHBox.setSpacing(12);
 
         Label selectColor = new Label("Seleccione el color:");
         colorPicker = new ColorPicker();
-        colorPicker.setPrefWidth(100);
-        HBox colorHBox = new HBox();
-        colorHBox.setSpacing(55);
+        colorPicker.setPrefWidth(195);
+        colorHBox = new HBox();
+        colorHBox.setSpacing(13);
         colorHBox.getChildren().addAll(selectColor, colorPicker);
 
         Label rotationLabel = new Label("Rotar:");
         rotationTextField = new TextField("0");
-        rotationTextField.setPrefWidth(115);
+        rotationTextField.setPrefWidth(150);
         rotationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             rotationValue = newValue;
@@ -109,20 +131,26 @@ public class SetTextPropertiesWindow extends Stage {
         rotationInputHBox.getChildren().addAll(rotationTextField,rotationButton);
         HBox rotationHBox = new HBox();
         rotationHBox.getChildren().addAll(rotationLabel, rotationInputHBox);
+        rotationHBox.setSpacing(92);
 
         vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(fontStyleComboBox, fontFamilyComboBox, fontSizeHBox, colorHBox,rotationHBox);
+        vbox.getChildren().addAll(fontStyleComboBox, fontFamilyComboBox, fontSizeHBox, rotationHBox,colorHBox);
 
         Button finishSelectionButton = new Button("OK");
         finishSelectionButton.setAlignment(Pos.CENTER);
 
         finishSelectionButton.setOnAction(actionEvent -> finishingAction());
 
+        Button cancelButton = new Button("Cancelar");
+        cancelButton.setAlignment(Pos.CENTER);
+        cancelButton.setOnAction(actionEvent -> this.close());
+
         HBox hbox = new HBox();
-        hbox.getChildren().add(finishSelectionButton);
+        hbox.getChildren().addAll(cancelButton,finishSelectionButton);
         hbox.setAlignment(Pos.BASELINE_RIGHT);
+        hbox.setPadding(new Insets(5, 5, 5, 5));
         vbox.getChildren().add(hbox);
 
         root.getChildren().add(vbox);
@@ -132,6 +160,7 @@ public class SetTextPropertiesWindow extends Stage {
 
     private void finishingAction() {
         this.close();
+        cancelled = false;
     }
 
     public ComboBox<String> getFontStyleComboBox() {

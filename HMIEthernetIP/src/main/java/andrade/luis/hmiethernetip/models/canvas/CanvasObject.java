@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DEFAULT;
@@ -77,7 +78,21 @@ public class CanvasObject extends BorderPane {
     }
 
     public void delete() {
-        canvas.delete(this.canvasObjectData);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar eliminación");
+        alert.setHeaderText("¿Confirmar eliminación del objeto seleccionado?");
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(cancelButton,okButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == okButton) {
+            alert.close();
+            canvas.delete(this.canvasObjectData);
+        }else if(result.isPresent() && result.get().equals(cancelButton)) {
+            alert.close();
+        }
     }
 
     public void hideBorder() {
@@ -347,7 +362,7 @@ public class CanvasObject extends BorderPane {
                 e.printStackTrace();
             }
         });
-        rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, deleteMenuItem, resizeMI, visibilityAnimationMI);
+        rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, resizeMI, deleteMenuItem,visibilityAnimationMI);
     }
 
     public CanvasObject(CanvasPoint positionCanvasPoint) {
@@ -378,8 +393,9 @@ public class CanvasObject extends BorderPane {
     public void setProperties() {
         SetSizeWindow setSizeWindow = new SetSizeWindow(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         setSizeWindow.showAndWait();
-        this.getCanvasObjectData().setWidth(setSizeWindow.getWidthFromField());
-        this.getCanvasObjectData().setHeight(setSizeWindow.getHeightFromField());
+
+        this.getCanvasObjectData().setWidth(setSizeWindow.getVbox().getWidthFromField());
+        this.getCanvasObjectData().setHeight(setSizeWindow.getVbox().getHeightFromField());
         this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         this.getHmiApp().setWasModified(true);
     }

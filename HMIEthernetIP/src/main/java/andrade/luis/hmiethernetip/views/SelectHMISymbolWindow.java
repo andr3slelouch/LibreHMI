@@ -25,6 +25,24 @@ import java.util.logging.Logger;
 
 
 public class SelectHMISymbolWindow extends Stage {
+    public double getImageViewWidth() {
+        return imageViewWidth;
+    }
+
+    public void setImageViewWidth(double imageViewWidth) {
+        this.imageViewWidth = imageViewWidth;
+    }
+
+    public double getImageViewHeight() {
+        return imageViewHeight;
+    }
+
+    public void setImageViewHeight(double imageViewHeight) {
+        this.imageViewHeight = imageViewHeight;
+    }
+
+    private double imageViewWidth;
+    private double imageViewHeight;
     Logger logger = Logger.getLogger(this.getClass().getName());
     private final String resourcesDirectory = getClass().getResource("HMISymbols").toExternalForm().substring(5);
 
@@ -71,8 +89,9 @@ public class SelectHMISymbolWindow extends Stage {
     HashMap<String, Boolean> categoriesDirectoriesFlags = new HashMap<>();
     ArrayList<String> categories = new ArrayList<>(categoriesDirectory.keySet());
 
-    public SelectHMISymbolWindow() throws FileNotFoundException {
-
+    public SelectHMISymbolWindow(double imageViewWidth, double imageViewHeight) throws FileNotFoundException {
+        this.imageViewWidth = imageViewWidth;
+        this.imageViewHeight = imageViewHeight;
         categoriesDirectoriesFlags.put(PIPES_VALVES, false);
         categoriesDirectoriesFlags.put(MOTOR_PUMPS, false);
         categoriesDirectoriesFlags.put(BOILER_FURNACE, false);
@@ -111,20 +130,28 @@ public class SelectHMISymbolWindow extends Stage {
         });
         Button optionsButton = new Button("Opciones de Imagen");
         optionsButton.setOnAction(mouseEvent -> {
-            SetImageOptionsWindow setImageOptionsWindow = new SetImageOptionsWindow();
+            double width = SelectHMISymbolWindow.this.imageViewWidth;
+            double height = SelectHMISymbolWindow.this.imageViewHeight;
+            SetImageOptionsWindow setImageOptionsWindow = new SetImageOptionsWindow(width,height);
+            setImageOptionsWindow.getImagePathButton().setDisable(true);
             if (modifyingColor) {
                 setImageOptionsWindow.setModifyingColor(true);
+                setImageOptionsWindow.getModColorRB().setSelected(true);
                 setImageOptionsWindow.getBrightnessTextField().setText(String.valueOf(brightness));
                 setImageOptionsWindow.getContrastTextField().setText(String.valueOf(contrast));
                 setImageOptionsWindow.getHueTextField().setText(String.valueOf(hue));
                 setImageOptionsWindow.getSaturationTextField().setText(String.valueOf(saturation));
                 setImageOptionsWindow.getColorPicker().setValue(color.getColor());
+            }else{
+                setImageOptionsWindow.getOriginalColorRB().setSelected(true);
             }
             setImageOptionsWindow.showAndWait();
             preservingRatio = setImageOptionsWindow.isPreservingRatio();
             mirroringVertical = setImageOptionsWindow.isMirroringVertical();
             mirroringHorizontal = setImageOptionsWindow.isMirroringHorizontal();
             rotation = Double.parseDouble(setImageOptionsWindow.getRotationValue());
+            SelectHMISymbolWindow.this.imageViewWidth= setImageOptionsWindow.getSizeVBox().getWidthFromField();
+            SelectHMISymbolWindow.this.imageViewHeight = setImageOptionsWindow.getSizeVBox().getHeightFromField();
             if (setImageOptionsWindow.isModifyingColor()) {
                 modifyingColor = setImageOptionsWindow.isModifyingColor();
                 color = new CanvasColor(setImageOptionsWindow.getColorPicker().getValue());

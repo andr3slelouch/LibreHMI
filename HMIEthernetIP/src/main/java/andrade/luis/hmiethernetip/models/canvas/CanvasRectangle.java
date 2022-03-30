@@ -13,9 +13,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.effect.ColorAdjust;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -24,12 +21,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.codehaus.commons.compiler.CompileException;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.logging.Level;
+
 
 import static javafx.geometry.Pos.CENTER;
 
@@ -91,15 +87,9 @@ public class CanvasRectangle extends CanvasObject {
     public void setProperties() {
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
         setGeometricFigurePropertiesWindow.setTitle("Propiedades del Rectángulo");
-        setGeometricFigurePropertiesWindow.setHeight(375);
-        if(this.getCanvasObjectData().isModifyingColors()){
-            setGeometricFigurePropertiesWindow.setModifyingColor(true);
-            setGeometricFigurePropertiesWindow.getModColorRB().setSelected(true);
-            setGeometricFigurePropertiesWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
-            setGeometricFigurePropertiesWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
-            setGeometricFigurePropertiesWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
-            setGeometricFigurePropertiesWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
-        }
+        setGeometricFigurePropertiesWindow.setHeight(210);
+        setGeometricFigurePropertiesWindow.setWidth(295);
+
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
         }else{
@@ -113,14 +103,12 @@ public class CanvasRectangle extends CanvasObject {
         double rotation = Double.parseDouble(setGeometricFigurePropertiesWindow.getRotationTextField().getText());
         this.getCanvasObjectData().setRotation(rotation);
         this.setRotate(rotation);
-        double contrast = Double.parseDouble(setGeometricFigurePropertiesWindow.getContrastTextField().getText());
-        double brightness = Double.parseDouble(setGeometricFigurePropertiesWindow.getBrightnessTextField().getText());
-        double saturation = Double.parseDouble(setGeometricFigurePropertiesWindow.getSaturationTextField().getText());
-        double hue = Double.parseDouble(setGeometricFigurePropertiesWindow.getHueTextField().getText());
+
         CanvasColor color = new CanvasColor(setGeometricFigurePropertiesWindow.getColorPicker().getValue());
-        modifyColors(color,contrast,brightness,saturation,hue);
-        this.getCanvasObjectData().setWidth(setGeometricFigurePropertiesWindow.getWidthFromField());
-        this.getCanvasObjectData().setHeight(setGeometricFigurePropertiesWindow.getHeightFromField());
+        this.rectangle.setFill(color.getColor());
+        this.getCanvasObjectData().setPrimaryColor(color);
+        this.getCanvasObjectData().setWidth(setGeometricFigurePropertiesWindow.getVbox().getWidthFromField());
+        this.getCanvasObjectData().setHeight(setGeometricFigurePropertiesWindow.getVbox().getHeightFromField());
         this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         this.getHmiApp().setWasModified(true);
         if (refillRectangleTimeline != null) {
@@ -135,26 +123,7 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
 
-    private void modifyColors(CanvasColor color, double contrast, double brightness, double saturation, double hue) {
-        this.rectangle.setFill(color.getColor());
-        this.getCanvasObjectData().setPrimaryColor(color);
-        if (this.getCanvasObjectData().isModifyingColors()) {
-            logger.log(Level.INFO,"Applying colors");
-            Lighting lighting = new Lighting(new Light.Distant(45, 90, color.getColor()));
-            ColorAdjust bright = new ColorAdjust();
-            bright.setContrast(contrast);
-            bright.setSaturation(saturation);
-            bright.setBrightness(brightness);
-            bright.setHue(hue);
-            lighting.setContentInput(bright);
-            lighting.setSurfaceScale(0.0);
-            this.rectangle.setEffect(lighting);
-            this.getCanvasObjectData().setModifyingColors(true);
-            this.getCanvasObjectData().setContrast(contrast);
-            this.getCanvasObjectData().setBrightness(brightness);
-            this.getCanvasObjectData().setHue(hue);
-        }
-    }
+
 
     private void setPercentFill() {
         SetPercentFillPropertiesWindow writeExpressionWindow;

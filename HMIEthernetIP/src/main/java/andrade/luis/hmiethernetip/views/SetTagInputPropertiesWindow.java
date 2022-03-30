@@ -7,7 +7,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 
-public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
+public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
     public TextField getMinValueField() {
         return minValueField;
     }
@@ -42,7 +42,7 @@ public class SetTextFieldPropertiesWindow extends WriteExpressionWindow{
     private String type = "String";
     private ArrayList<RadioButton> radioButtons;
 
-    public SetTextFieldPropertiesWindow(){
+    public SetTagInputPropertiesWindow(){
         super(750, 275);
         this.init();
     }

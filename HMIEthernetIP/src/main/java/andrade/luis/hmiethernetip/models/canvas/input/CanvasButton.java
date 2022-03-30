@@ -119,14 +119,7 @@ public class CanvasButton extends CanvasObject {
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
         setGeometricFigurePropertiesWindow.setTitle("Propiedades del Botón");
         setGeometricFigurePropertiesWindow.setHeight(375);
-        if(this.getCanvasObjectData().isModifyingColors()){
-            setGeometricFigurePropertiesWindow.setModifyingColor(true);
-            setGeometricFigurePropertiesWindow.getModColorRB().setSelected(true);
-            setGeometricFigurePropertiesWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
-            setGeometricFigurePropertiesWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
-            setGeometricFigurePropertiesWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
-            setGeometricFigurePropertiesWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
-        }
+
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
         }else{
@@ -140,14 +133,10 @@ public class CanvasButton extends CanvasObject {
         double rotation = Double.parseDouble(setGeometricFigurePropertiesWindow.getRotationTextField().getText());
         this.getCanvasObjectData().setRotation(rotation);
         this.setRotate(rotation);
-        double contrast = Double.parseDouble(setGeometricFigurePropertiesWindow.getContrastTextField().getText());
-        double brightness = Double.parseDouble(setGeometricFigurePropertiesWindow.getBrightnessTextField().getText());
-        double saturation = Double.parseDouble(setGeometricFigurePropertiesWindow.getSaturationTextField().getText());
-        double hue = Double.parseDouble(setGeometricFigurePropertiesWindow.getHueTextField().getText());
         CanvasColor color = new CanvasColor(setGeometricFigurePropertiesWindow.getColorPicker().getValue());
-        modifyColors(color,contrast,brightness,saturation,hue);
-        this.getCanvasObjectData().setWidth(setGeometricFigurePropertiesWindow.getWidthFromField());
-        this.getCanvasObjectData().setHeight(setGeometricFigurePropertiesWindow.getHeightFromField());
+        //TODO Apply colors
+        this.getCanvasObjectData().setWidth(setGeometricFigurePropertiesWindow.getVbox().getWidthFromField());
+        this.getCanvasObjectData().setHeight(setGeometricFigurePropertiesWindow.getVbox().getHeightFromField());
         this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
         this.getHmiApp().setWasModified(true);
         this.button.setPrefWidth(this.getCanvasObjectData().getWidth());

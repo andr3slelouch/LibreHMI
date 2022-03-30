@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HMICanvas extends Pane implements CanvasObjectInterface {
@@ -284,7 +283,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         double rotation = 0;
         CanvasColor color = new CanvasColor(Color.WHITE);
         try {
-            SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow();
+            SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow(150,150);
             imageOptionsWindow.showAndWait();
             selectedImagePath = imageOptionsWindow.getImagePathTextField().getText();
             selectedImage = new Image(new FileInputStream(selectedImagePath));
@@ -354,7 +353,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
         CanvasColor color = new CanvasColor(Color.WHITE);
         try {
-            SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow();
+            SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow(150,150);
             selectHMISymbolWindow.showAndWait();
             selectedSymbol = selectHMISymbolWindow.getSelectedImage();
             selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
@@ -394,9 +393,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {
-        SetTextFieldPropertiesWindow setTextFieldPropertiesWindow = new SetTextFieldPropertiesWindow();
-        setTextFieldPropertiesWindow.showAndWait();
-        CanvasTextField canvasTextField = new CanvasTextField(current, setTextFieldPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTextFieldPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTextFieldPropertiesWindow.getMaxValueField().getText()), setTextFieldPropertiesWindow.getType());
+        SetTagInputPropertiesWindow setTagInputPropertiesWindow = new SetTagInputPropertiesWindow();
+        setTagInputPropertiesWindow.showAndWait();
+        CanvasTextField canvasTextField = new CanvasTextField(current, setTagInputPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTagInputPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTagInputPropertiesWindow.getMaxValueField().getText()), setTagInputPropertiesWindow.getType());
         canvasTextField.setCanvas(this);
         canvasTextField.setHmiApp(hmiApp);
         canvasTextField.setUser(hmiApp.getUser());

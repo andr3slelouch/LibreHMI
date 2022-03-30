@@ -62,7 +62,7 @@ public class CanvasText extends CanvasLabel {
         MenuItem editMI = new MenuItem("Editar");
         editMI.setId("#editMI");
         editMI.setOnAction(actionEvent -> this.setExpression());
-        this.getRightClickMenu().getItems().add(editMI);
+        this.getRightClickMenu().getItems().add(2,editMI);
         if(this.getCanvasObjectData().getFontFamily()!=null && this.getCanvasObjectData().getFontStyle()!=null){
             this.getLabel().setFont(
                     Font.font(
@@ -81,6 +81,9 @@ public class CanvasText extends CanvasLabel {
     @Override
     public void setProperties() {
         SetTextPropertiesWindow propertiesWindow = new SetTextPropertiesWindow();
+        propertiesWindow.setTitle("Propiedades de Texto");
+        propertiesWindow.setWidth(340);
+        propertiesWindow.setHeight(245);
         propertiesWindow.getFontStyleComboBox().getSelectionModel().select(this.getLabel().getFont().getStyle());
         propertiesWindow.getFontFamilyComboBox().getSelectionModel().select(this.getLabel().getFont().getFamily());
         propertiesWindow.getFontSizeField().setText(String.valueOf(this.getLabel().getFont().getSize()));

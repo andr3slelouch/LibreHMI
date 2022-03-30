@@ -99,16 +99,6 @@ public class CanvasImage extends CanvasObject {
         }
         this.setSelected(false);
         this.setContextMenu();
-        MenuItem editMI = new MenuItem("Editar");
-        editMI.setId("#editMI");
-        editMI.setOnAction(actionEvent -> {
-            try {
-                this.setCanvasImage();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        });
-        this.getRightClickMenu().getItems().set(4,editMI);
     }
 
     private void setCanvasImage() throws FileNotFoundException {
@@ -121,7 +111,7 @@ public class CanvasImage extends CanvasObject {
     }
 
     private void setSymbolImageProcess() throws FileNotFoundException {
-        SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow();
+        SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow(this.imageView.getFitWidth(),this.imageView.getFitHeight());
         if (this.getCanvasObjectData() != null) {
             selectHMISymbolWindow.setMirroringHorizontal(this.getCanvasObjectData().isMirroringHorizontal());
             selectHMISymbolWindow.setMirroringVertical(this.getCanvasObjectData().isMirroringHorizontal());
@@ -139,6 +129,8 @@ public class CanvasImage extends CanvasObject {
         }
         selectHMISymbolWindow.showAndWait();
 
+        this.getCanvasObjectData().setWidth(selectHMISymbolWindow.getImageViewWidth());
+        this.getCanvasObjectData().setHeight(selectHMISymbolWindow.getImageViewHeight());
         String selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
         Image selectedSymbol = new Image(new FileInputStream(selectedSymbolPath));
         boolean isMirroringVertical = selectHMISymbolWindow.isMirroringVertical();
@@ -160,14 +152,17 @@ public class CanvasImage extends CanvasObject {
     }
 
     private void setImageViewProcess() throws FileNotFoundException {
-        SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow();
+        SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow(this.imageView.getFitWidth(),this.imageView.getFitHeight());
         if(this.getCanvasObjectData().isModifyingColors()){
             imageOptionsWindow.setModifyingColor(true);
+            imageOptionsWindow.getModColorRB().setSelected(true);
             imageOptionsWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
             imageOptionsWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
             imageOptionsWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
             imageOptionsWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
             imageOptionsWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
+        }else{
+            imageOptionsWindow.getOriginalColorRB().setSelected(true);
         }
         imageOptionsWindow.getImagePathTextField().setText(this.getCanvasObjectData().getData());
         imageOptionsWindow.getMirrorHorizontalCheckBox().setSelected(this.getCanvasObjectData().isMirroringHorizontal());
@@ -176,6 +171,8 @@ public class CanvasImage extends CanvasObject {
         imageOptionsWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
         imageOptionsWindow.showAndWait();
 
+        this.getCanvasObjectData().setWidth(imageOptionsWindow.getSizeVBox().getWidthFromField());
+        this.getCanvasObjectData().setHeight(imageOptionsWindow.getSizeVBox().getHeightFromField());
         String selectedImagePath = imageOptionsWindow.getImagePathTextField().getText();
         Image selectedImage = new Image(new FileInputStream(selectedImagePath));
         boolean isMirroringVertical = imageOptionsWindow.isMirroringVertical();
@@ -202,9 +199,16 @@ public class CanvasImage extends CanvasObject {
 
     @Override
     public void setProperties() {
-        super.setProperties();
+        /*super.setProperties();
+        */
+        try {
+            this.setCanvasImage();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         this.imageView.setFitWidth(this.getCanvasObjectData().getWidth());
         this.imageView.setFitHeight(this.getCanvasObjectData().getHeight());
         this.imageView.setPreserveRatio(this.getCanvasObjectData().isPreservingRatio());
     }
 }
+
