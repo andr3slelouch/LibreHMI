@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public enum PercentFillOrientation implements Serializable {
+public enum CanvasOrientation implements Serializable {
     @SerializedName("HORIZONTAL")
     @Expose
     HORIZONTAL,
@@ -19,7 +19,7 @@ public enum PercentFillOrientation implements Serializable {
     @Expose
     VERTICAL_REVERSED;
 
-    PercentFillOrientation(){
+    CanvasOrientation(){
 
     }
 }

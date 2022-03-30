@@ -1,12 +1,10 @@
 package andrade.luis.hmiethernetip.views;
 
-import andrade.luis.hmiethernetip.models.PercentFillOrientation;
 import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
     private final ToggleGroup radioGroup;

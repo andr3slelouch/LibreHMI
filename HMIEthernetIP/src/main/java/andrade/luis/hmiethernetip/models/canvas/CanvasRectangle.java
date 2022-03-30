@@ -30,7 +30,7 @@ import java.text.DecimalFormat;
 import static javafx.geometry.Pos.CENTER;
 
 public class CanvasRectangle extends CanvasObject {
-    private PercentFillOrientation perfectFillOrientation;
+    private CanvasOrientation perfectFillOrientation;
     private Timeline refillRectangleTimeline;
     private Label captionLabel;
     private DoubleProperty life;
@@ -164,7 +164,7 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
 
-    public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor, PercentFillOrientation orientation) {
+    public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor, CanvasOrientation orientation) {
         if (exp != null) {
             this.getCanvasObjectData().setExpression(exp);
             double width = this.getCanvasObjectData().getWidth();
@@ -193,7 +193,7 @@ public class CanvasRectangle extends CanvasObject {
                     solutionPane2 = new Pane(this.rectangle, rightRect);
                     this.setCenter(solutionPane2);
 
-                    perfectFillOrientation = PercentFillOrientation.HORIZONTAL;
+                    perfectFillOrientation = CanvasOrientation.HORIZONTAL;
                     break;
                 case HORIZONTAL_REVERSED:
                     rightRect.setFill(backgroundColor.getColor());
@@ -208,7 +208,7 @@ public class CanvasRectangle extends CanvasObject {
                     solutionPane2 = new Pane(this.rectangle, rightRect);
                     this.setCenter(solutionPane2);
 
-                    perfectFillOrientation = PercentFillOrientation.HORIZONTAL_REVERSED;
+                    perfectFillOrientation = CanvasOrientation.HORIZONTAL_REVERSED;
                     break;
                 case VERTICAL:
                     rightRect.setFill(primaryColor.getColor());
@@ -224,7 +224,7 @@ public class CanvasRectangle extends CanvasObject {
                     solutionPane2 = new Pane(rightRect, this.rectangle);
                     this.setCenter(solutionPane2);
 
-                    perfectFillOrientation = PercentFillOrientation.VERTICAL;
+                    perfectFillOrientation = CanvasOrientation.VERTICAL;
                     break;
                 case VERTICAL_REVERSED:
                     rightRect.setFill(primaryColor.getColor());
@@ -239,7 +239,7 @@ public class CanvasRectangle extends CanvasObject {
                     solutionPane2 = new Pane(rightRect, this.rectangle);
                     this.setCenter(solutionPane2);
 
-                    perfectFillOrientation = PercentFillOrientation.VERTICAL_REVERSED;
+                    perfectFillOrientation = CanvasOrientation.VERTICAL_REVERSED;
                     break;
             }
             HBox bottomHBox = new HBox();
@@ -300,10 +300,10 @@ public class CanvasRectangle extends CanvasObject {
         }
         double multiplication = ((evaluatedValue - this.getCanvasObjectData().getMinValue()) * 100);
         double difference = (this.getCanvasObjectData().getMaxValue() - this.getCanvasObjectData().getMinValue());
-        if (perfectFillOrientation == PercentFillOrientation.HORIZONTAL || perfectFillOrientation == PercentFillOrientation.VERTICAL_REVERSED) {
+        if (perfectFillOrientation == CanvasOrientation.HORIZONTAL || perfectFillOrientation == CanvasOrientation.VERTICAL_REVERSED) {
             return (multiplication / difference);
 
-        } else if (perfectFillOrientation == PercentFillOrientation.VERTICAL || perfectFillOrientation == PercentFillOrientation.HORIZONTAL_REVERSED) {
+        } else if (perfectFillOrientation == CanvasOrientation.VERTICAL || perfectFillOrientation == CanvasOrientation.HORIZONTAL_REVERSED) {
             return 100 - (multiplication / difference);
         }
         return -1;

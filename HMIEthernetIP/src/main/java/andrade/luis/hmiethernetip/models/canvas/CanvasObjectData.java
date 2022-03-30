@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import andrade.luis.hmiethernetip.models.Expression;
-import andrade.luis.hmiethernetip.models.PercentFillOrientation;
+import andrade.luis.hmiethernetip.models.CanvasOrientation;
 import andrade.luis.hmiethernetip.models.Tag;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
@@ -76,7 +76,7 @@ public class CanvasObjectData implements Serializable, Transferable {
     private CanvasColor fontColor;
     @SerializedName("orientation")
     @Expose
-    private PercentFillOrientation orientation;
+    private CanvasOrientation orientation;
     @SerializedName("minValue")
     @Expose
     private double minValue;
@@ -246,11 +246,11 @@ public class CanvasObjectData implements Serializable, Transferable {
         this.expression = expression;
     }
 
-    public PercentFillOrientation getOrientation() {
+    public CanvasOrientation getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(PercentFillOrientation orientation) {
+    public void setOrientation(CanvasOrientation orientation) {
         this.orientation = orientation;
     }
 

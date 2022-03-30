@@ -412,18 +412,18 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addSliderOnCanvasClicked(CanvasPoint current) {
-        SetSliderOptionsWindow setSliderOptionsWindow = new SetSliderOptionsWindow();
-        setSliderOptionsWindow.showAndWait();
-        double minValue = Double.parseDouble(setSliderOptionsWindow.getMinValueField().getText());
-        double maxValue = Double.parseDouble(setSliderOptionsWindow.getMaxValueField().getText());
-        double minorTickValue = Double.parseDouble(setSliderOptionsWindow.getMinorTickField().getText());
-        double majorTickValue = Double.parseDouble(setSliderOptionsWindow.getMajorTickField().getText());
-        boolean snapHandleToTick = setSliderOptionsWindow.getSnapHandleToTick().isSelected();
-        boolean showTicks = setSliderOptionsWindow.getShowTicks().isSelected();
-        boolean showLabelsTicks = setSliderOptionsWindow.getShowLabelsTicks().isSelected();
+        SetSliderPropertiesWindow setSliderPropertiesWindow = new SetSliderPropertiesWindow(150,150);
+        setSliderPropertiesWindow.showAndWait();
+        double minValue = Double.parseDouble(setSliderPropertiesWindow.getMinValueField().getText());
+        double maxValue = Double.parseDouble(setSliderPropertiesWindow.getMaxValueField().getText());
+        double minorTickValue = Double.parseDouble(setSliderPropertiesWindow.getMinorTickField().getText());
+        double majorTickValue = Double.parseDouble(setSliderPropertiesWindow.getMajorTickField().getText());
+        boolean snapHandleToTick = setSliderPropertiesWindow.getSnapHandleToTick().isSelected();
+        boolean showTicks = setSliderPropertiesWindow.getShowTicks().isSelected();
+        boolean showLabelsTicks = setSliderPropertiesWindow.getShowLabelsTicks().isSelected();
         CanvasSlider canvasSlider = null;
         try {
-            canvasSlider = new CanvasSlider(current,setSliderOptionsWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks);
+            canvasSlider = new CanvasSlider(current, setSliderPropertiesWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks);
             canvasSlider.setCanvas(this);
             canvasSlider.setHmiApp(hmiApp);
             canvasSlider.setUser(hmiApp.getUser());

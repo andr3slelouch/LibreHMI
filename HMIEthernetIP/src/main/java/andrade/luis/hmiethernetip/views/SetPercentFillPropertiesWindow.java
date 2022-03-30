@@ -1,7 +1,7 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
-import andrade.luis.hmiethernetip.models.PercentFillOrientation;
+import andrade.luis.hmiethernetip.models.CanvasOrientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -58,13 +58,13 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
 
         Label orientationLabel = new Label("Seleccione la orientación:");
         RadioButton horizontalRadioButton = new RadioButton("Horizontal");
-        horizontalRadioButton.setId(String.valueOf(PercentFillOrientation.HORIZONTAL));
+        horizontalRadioButton.setId(String.valueOf(CanvasOrientation.HORIZONTAL));
         RadioButton verticalRadioButton = new RadioButton("Vertical");
-        verticalRadioButton.setId(String.valueOf(PercentFillOrientation.VERTICAL));
+        verticalRadioButton.setId(String.valueOf(CanvasOrientation.VERTICAL));
         RadioButton horizontalReversedRadioButton = new RadioButton("Horizontal en reversa");
-        horizontalReversedRadioButton.setId(String.valueOf(PercentFillOrientation.HORIZONTAL_REVERSED));
+        horizontalReversedRadioButton.setId(String.valueOf(CanvasOrientation.HORIZONTAL_REVERSED));
         RadioButton verticalReversedRadioButton = new RadioButton("Vertical en reversa");
-        verticalReversedRadioButton.setId(String.valueOf(PercentFillOrientation.VERTICAL_REVERSED));
+        verticalReversedRadioButton.setId(String.valueOf(CanvasOrientation.VERTICAL_REVERSED));
         radioGroup = new ToggleGroup();
 
         horizontalRadioButton.setToggleGroup(radioGroup);
@@ -97,21 +97,21 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         this.finishSelectionButton.setOnAction(actionEvent -> this.finishingAction());
     }
 
-    public PercentFillOrientation getSelectedOrientation() {
+    public CanvasOrientation getSelectedOrientation() {
         RadioButton selectedRadioButton = (RadioButton) radioGroup.getSelectedToggle();
         if (selectedRadioButton != null) {
             switch (selectedRadioButton.getText()) {
                 case "Vertical":
-                    return PercentFillOrientation.VERTICAL;
+                    return CanvasOrientation.VERTICAL;
                 case "Horizontal en reversa":
-                    return PercentFillOrientation.HORIZONTAL_REVERSED;
+                    return CanvasOrientation.HORIZONTAL_REVERSED;
                 case "Vertical en reversa":
-                    return PercentFillOrientation.VERTICAL_REVERSED;
+                    return CanvasOrientation.VERTICAL_REVERSED;
                 default:
-                    return PercentFillOrientation.HORIZONTAL;
+                    return CanvasOrientation.HORIZONTAL;
             }
         }
-        return PercentFillOrientation.HORIZONTAL;
+        return CanvasOrientation.HORIZONTAL;
     }
 
     public void setSelectedOrientation(String selected) {
