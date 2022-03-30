@@ -72,8 +72,8 @@ public class CanvasText extends CanvasLabel {
                     )
             );
         }
-        if(this.getCanvasObjectData().getPrimaryColor()!=null){
-            this.getLabel().setTextFill(this.getCanvasObjectData().getPrimaryColor().getColor());
+        if(this.getCanvasObjectData().getFontColor()!=null){
+            this.getLabel().setTextFill(this.getCanvasObjectData().getFontColor().getColor());
         }
         this.setRotate(this.getCanvasObjectData().getRotation());
     }
@@ -102,11 +102,10 @@ public class CanvasText extends CanvasLabel {
         double rotation = Double.parseDouble(propertiesWindow.getRotationTextField().getText());
         this.setRotate(rotation);
         this.getCanvasObjectData().setRotation(rotation);
-        this.getCanvasObjectData().setPrimaryColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
+        this.getCanvasObjectData().setFontColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
         this.getCanvasObjectData().setFontStyle(propertiesWindow.getFontStyle().name());
         this.getCanvasObjectData().setFontFamily(propertiesWindow.getFontFamilyComboBox().getValue());
         this.getCanvasObjectData().setFontSize(Double.parseDouble(propertiesWindow.getFontSizeField().getText()));
-        this.getCanvasObjectData().setPrimaryColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
         this.getHmiApp().setWasModified(true);
     }
 

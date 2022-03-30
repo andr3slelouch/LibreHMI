@@ -1,9 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.SizeVBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 
 public class SetInputTextPropertiesWindow extends SetTextPropertiesWindow{
 

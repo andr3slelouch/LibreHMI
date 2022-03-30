@@ -6,11 +6,19 @@ import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SelectWindowsWindow;
+import andrade.luis.hmiethernetip.views.SetButtonPropertiesWindow;
 import andrade.luis.hmiethernetip.views.SetGeometricFigurePropertiesWindow;
+import andrade.luis.hmiethernetip.views.SetInputTextPropertiesWindow;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -67,10 +75,27 @@ public class CanvasButton extends CanvasObject {
         this.button.setDisable(true);
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
+        this.setSize(width,height);
         this.button.setPrefWidth(width);
         this.button.setPrefHeight(height);
         this.setCenter(this.button);
         setNewMenuItem();
+        this.setRotate(this.getCanvasObjectData().getRotation());
+        if(this.getCanvasObjectData().getPrimaryColor()!=null){
+            this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+        }
+        if(this.getCanvasObjectData().getFontFamily()!=null && this.getCanvasObjectData().getFontStyle()!=null){
+            this.button.setFont(
+                    Font.font(
+                            this.getCanvasObjectData().getFontFamily(),
+                            FontWeight.valueOf(this.getCanvasObjectData().getFontStyle()),
+                            this.getCanvasObjectData().getFontSize()
+                    )
+            );
+        }
+        if(this.getCanvasObjectData().getFontColor()!=null){
+            this.button.setTextFill(this.getCanvasObjectData().getFontColor().getColor());
+        }
     }
 
     /**
@@ -116,34 +141,54 @@ public class CanvasButton extends CanvasObject {
 
     @Override
     public void setProperties(){
-        SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
-        setGeometricFigurePropertiesWindow.setTitle("Propiedades del Botón");
-        setGeometricFigurePropertiesWindow.setHeight(375);
-
+        SetButtonPropertiesWindow propertiesWindow = new SetButtonPropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
+        propertiesWindow.setTitle("Propiedades del Botón");
+        propertiesWindow.setHeight(375);
+        propertiesWindow.getColorPickerLabel().setValue((Color) this.button.getTextFill());
+        propertiesWindow.getFontStyleComboBox().getSelectionModel().select(this.button.getFont().getStyle());
+        propertiesWindow.getFontFamilyComboBox().getSelectionModel().select(this.button.getFont().getFamily());
+        propertiesWindow.getFontSizeField().setText(String.valueOf(this.button.getFont().getSize()));
+        propertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
-            setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
+            propertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
         }else{
-            setGeometricFigurePropertiesWindow.getColorPicker().setValue((Color) this.button.getBackground().getFills().get(0).getFill());
+            propertiesWindow.getColorPicker().setValue(Color.WHITE);
         }
-        setGeometricFigurePropertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
-        setGeometricFigurePropertiesWindow.showAndWait();
+        if(this.getCanvasObjectData().getPrimaryColor()!=null){
+            propertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
+        }else{
+            propertiesWindow.getColorPicker().setValue((Color) this.button.getBackground().getFills().get(0).getFill());
+        }
+        propertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
+        propertiesWindow.showAndWait();
 
-        boolean isModifyingColor = setGeometricFigurePropertiesWindow.isModifyingColor();
-        this.getCanvasObjectData().setModifyingColors(isModifyingColor);
-        double rotation = Double.parseDouble(setGeometricFigurePropertiesWindow.getRotationTextField().getText());
+        double rotation = Double.parseDouble(propertiesWindow.getRotationTextField().getText());
         this.getCanvasObjectData().setRotation(rotation);
         this.setRotate(rotation);
-        CanvasColor color = new CanvasColor(setGeometricFigurePropertiesWindow.getColorPicker().getValue());
-        //TODO Apply colors
-        this.getCanvasObjectData().setWidth(setGeometricFigurePropertiesWindow.getVbox().getWidthFromField());
-        this.getCanvasObjectData().setHeight(setGeometricFigurePropertiesWindow.getVbox().getHeightFromField());
-        this.setSize(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
+        this.getCanvasObjectData().setWidth(propertiesWindow.getSizeVBox().getWidthFromField());
+        this.getCanvasObjectData().setHeight(propertiesWindow.getSizeVBox().getHeightFromField());
         this.getHmiApp().setWasModified(true);
         this.button.setPrefWidth(this.getCanvasObjectData().getWidth());
         this.button.setPrefHeight(this.getCanvasObjectData().getHeight());
-    }
-
-    private void modifyColors(CanvasColor color, double contrast, double brightness, double saturation, double hue) {
+        this.setSize(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
+        this.getCanvasObjectData().setPrimaryColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
+        if(this.getCanvasObjectData().getType().equals("Button")){
+            this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+        }
+        this.getCanvasObjectData().setFontColor(new CanvasColor(propertiesWindow.getColorPickerLabel().getValue()));
+        this.getCanvasObjectData().setFontStyle(propertiesWindow.getFontStyle().name());
+        this.getCanvasObjectData().setFontFamily(propertiesWindow.getFontFamilyComboBox().getValue());
+        this.getCanvasObjectData().setFontSize(Double.parseDouble(propertiesWindow.getFontSizeField().getText()));
+        this.button.setFont(
+                Font.font(
+                        propertiesWindow.getFontFamilyComboBox().getValue(),
+                        propertiesWindow.getFontStyle(),
+                        Double.parseDouble(propertiesWindow.getFontSizeField().getText()
+                        )
+                )
+        );
+        this.button.setTextFill(propertiesWindow.getColorPickerLabel().getValue());
+        this.getHmiApp().setWasModified(true);
     }
 
     @Override

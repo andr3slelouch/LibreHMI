@@ -226,7 +226,6 @@ public class CanvasTextField extends CanvasObject {
         this.getCanvasObjectData().setFontStyle(propertiesWindow.getFontStyle().name());
         this.getCanvasObjectData().setFontFamily(propertiesWindow.getFontFamilyComboBox().getValue());
         this.getCanvasObjectData().setFontSize(Double.parseDouble(propertiesWindow.getFontSizeField().getText()));
-        this.getCanvasObjectData().setPrimaryColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
         this.getHmiApp().setWasModified(true);
     }
 

@@ -74,7 +74,6 @@ public class CanvasPushbutton extends CanvasButton {
     public void setDynamicColors(String buttonText, String mode, Tag linkedTag, CanvasColor primaryColor, CanvasColor backgroundColor) {
         this.getCanvasObjectData().setData(buttonText);
         this.button.setText(buttonText);
-        this.button.setStyle("-fx-font-family: \"Verdana\"; -fx-font-size: 18px;-fx-font-weight: bold;");
         this.button.setBackground(new Background(new BackgroundFill(backgroundColor.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
         this.getCanvasObjectData().setMode(mode);
         this.getCanvasObjectData().setTag(linkedTag);

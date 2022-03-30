@@ -71,6 +71,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("backgroundColor")
     @Expose
     private CanvasColor backgroundColor;
+    @SerializedName("fontColor")
+    @Expose
+    private CanvasColor fontColor;
     @SerializedName("orientation")
     @Expose
     private PercentFillOrientation orientation;
@@ -689,5 +692,13 @@ public class CanvasObjectData implements Serializable, Transferable {
 
     public void setFontSize(double fontSize) {
         this.fontSize = fontSize;
+    }
+
+    public CanvasColor getFontColor() {
+        return fontColor;
+    }
+
+    public void setFontColor(CanvasColor fontColor) {
+        this.fontColor = fontColor;
     }
 }
