@@ -7,6 +7,7 @@ import andrade.luis.hmiethernetip.models.canvas.input.CanvasButton;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasPushbutton;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasSlider;
 import andrade.luis.hmiethernetip.models.canvas.input.CanvasTextField;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
@@ -414,6 +415,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private void addSliderOnCanvasClicked(CanvasPoint current) {
         SetSliderPropertiesWindow setSliderPropertiesWindow = new SetSliderPropertiesWindow(150,150);
         setSliderPropertiesWindow.showAndWait();
+        double width = setSliderPropertiesWindow.getSizeVBox().getWidthFromField();
+        double height = setSliderPropertiesWindow.getSizeVBox().getHeightFromField();
         double minValue = Double.parseDouble(setSliderPropertiesWindow.getMinValueField().getText());
         double maxValue = Double.parseDouble(setSliderPropertiesWindow.getMaxValueField().getText());
         double minorTickValue = Double.parseDouble(setSliderPropertiesWindow.getMinorTickField().getText());
@@ -421,9 +424,15 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         boolean snapHandleToTick = setSliderPropertiesWindow.getSnapHandleToTick().isSelected();
         boolean showTicks = setSliderPropertiesWindow.getShowTicks().isSelected();
         boolean showLabelsTicks = setSliderPropertiesWindow.getShowLabelsTicks().isSelected();
+        double rotation = Double.parseDouble(setSliderPropertiesWindow.getRotationTextField().getText());
+        CanvasOrientation orientation = CanvasOrientation.HORIZONTAL;
+        if(setSliderPropertiesWindow.getSelectedOrientation() == CanvasOrientation.VERTICAL){
+            orientation = CanvasOrientation.VERTICAL;
+        }
         CanvasSlider canvasSlider = null;
         try {
-            canvasSlider = new CanvasSlider(current, setSliderPropertiesWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks);
+            canvasSlider = new CanvasSlider(current, width,height,setSliderPropertiesWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks,rotation,orientation);
+
             canvasSlider.setCanvas(this);
             canvasSlider.setHmiApp(hmiApp);
             canvasSlider.setUser(hmiApp.getUser());

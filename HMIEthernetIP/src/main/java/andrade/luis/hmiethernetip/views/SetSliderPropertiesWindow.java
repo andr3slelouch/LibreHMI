@@ -14,6 +14,25 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
     private SizeVBox sizeVBox;
     private ToggleGroup radioGroup;
 
+    public RadioButton getHorizontalRadioButton() {
+        return horizontalRadioButton;
+    }
+
+    public void setHorizontalRadioButton(RadioButton horizontalRadioButton) {
+        this.horizontalRadioButton = horizontalRadioButton;
+    }
+
+    public RadioButton getVerticalRadioButton() {
+        return verticalRadioButton;
+    }
+
+    public void setVerticalRadioButton(RadioButton verticalRadioButton) {
+        this.verticalRadioButton = verticalRadioButton;
+    }
+
+    private RadioButton horizontalRadioButton;
+    private RadioButton verticalRadioButton;
+
     public String getRotationValue() {
         return rotationValue;
     }
@@ -54,15 +73,16 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
 
     private void init(double width, double height) {
         textField.setEditable(false);
+        this.setTitle("Propiedades del Slider");
         Label minValueLabel = new Label("Defina el valor mínimo:");
         minValueField = new TextField("0");
         HBox minValueHBox = new HBox(minValueLabel, minValueField);
-        minValueHBox.setSpacing(25);
+        minValueHBox.setSpacing(90);
 
         Label maxValueLabel = new Label("Defina el valor máximo:");
         maxValueField = new TextField("100");
         HBox maxValueHBox = new HBox(maxValueLabel, maxValueField);
-        maxValueHBox.setSpacing(25);
+        maxValueHBox.setSpacing(89);
 
         Label majorTickLabel = new Label("Defina el valor de la marca mayor:");
         majorTickField = new TextField("10");
@@ -72,7 +92,7 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
         Label minorTickLabel = new Label("Defina el valor de la marca menor:");
         minorTickField = new TextField("5");
         HBox minorTickHBox = new HBox(minorTickLabel, minorTickField);
-        minorTickHBox.setSpacing(25);
+        minorTickHBox.setSpacing(23);
 
         snapHandleToTick = new CheckBox("Ajustar el indicador a las marcas");
         showTicks = new CheckBox("Mostrar marcas");
@@ -81,10 +101,13 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
         showLabelsTicks.setSelected(true);
 
         sizeVBox = new SizeVBox(width, height, -1, -1);
+        sizeVBox.getWidthValueHBox().setSpacing(135);
+        sizeVBox.getHeightValueHBox().setSpacing(149);
+        sizeVBox.setSpacing(5);
 
         Label rotationLabel = new Label("Rotar:");
         rotationTextField = new TextField("0");
-        rotationTextField.setPrefWidth(150);
+        rotationTextField.setPrefWidth(116);
         rotationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             rotationValue = newValue;
@@ -98,20 +121,26 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
         rotationInputHBox.getChildren().addAll(rotationTextField, rotationButton);
         HBox rotationHBox = new HBox();
         rotationHBox.getChildren().addAll(rotationLabel, rotationInputHBox);
-        rotationHBox.setSpacing(92);
+        rotationHBox.setSpacing(196);
 
         Label orientationLabel = new Label("Seleccione la orientación:");
-        RadioButton horizontalRadioButton = new RadioButton("Horizontal");
+        horizontalRadioButton = new RadioButton("Horizontal");
         horizontalRadioButton.setId(String.valueOf(CanvasOrientation.HORIZONTAL));
-        RadioButton verticalRadioButton = new RadioButton("Vertical");
+        horizontalRadioButton.setSelected(true);
+        verticalRadioButton = new RadioButton("Vertical");
         verticalRadioButton.setId(String.valueOf(CanvasOrientation.VERTICAL));
         radioGroup = new ToggleGroup();
 
         horizontalRadioButton.setToggleGroup(radioGroup);
         verticalRadioButton.setToggleGroup(radioGroup);
+        HBox radioButtons = new HBox();
+        radioButtons.getChildren().addAll(horizontalRadioButton,verticalRadioButton);
+        radioButtons.setSpacing(5);
 
-        HBox orientationHBox = new HBox(orientationLabel, horizontalRadioButton, verticalRadioButton);
-        orientationHBox.setSpacing(20);
+        this.getFloatPrecisionHBox().setSpacing(91);
+
+        HBox orientationHBox = new HBox(orientationLabel, radioButtons);
+        orientationHBox.setSpacing(75);
 
         this.getVbox().getChildren().add(2, snapHandleToTick);
         this.getVbox().getChildren().add(3, showTicks);
