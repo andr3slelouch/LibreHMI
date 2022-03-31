@@ -8,7 +8,6 @@ import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SetInputTextPropertiesWindow;
 import andrade.luis.hmiethernetip.views.SetTagInputPropertiesWindow;
-import andrade.luis.hmiethernetip.views.SetTextPropertiesWindow;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -230,14 +229,17 @@ public class CanvasTextField extends CanvasObject {
     }
 
     @Override
-    public void setEnable(String enabled) {
-        if (user.getRole().equals("Operador")) {
-            enabled = "Stop";
-        }
-        switch (enabled) {
-            case "Play":
-                super.setEnable("Play");
-                this.textField.setDisable(false);
+    public void setEnable(String mode) {
+        switch (mode) {
+            case "Ejecutar":
+                if(!this.getUser().getRole().equals("Administrador")){
+                    this.enableListeners(false);
+                    this.setOnMousePressed(this.onDoubleClick);
+                    this.textField.setDisable(true);
+                }else{
+                    this.enableListeners(true);
+                    this.textField.setDisable(false);
+                }
                 break;
             case "Stop":
                 super.setEnable("Stop");
@@ -245,6 +247,7 @@ public class CanvasTextField extends CanvasObject {
                 break;
             default:
                 super.setEnable("True");
+                this.enableListeners(true);
                 this.textField.setDisable(true);
                 break;
         }

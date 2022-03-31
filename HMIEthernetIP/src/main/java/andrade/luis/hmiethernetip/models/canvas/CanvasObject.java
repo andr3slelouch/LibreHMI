@@ -3,6 +3,7 @@ package andrade.luis.hmiethernetip.models.canvas;
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.MouseOverMode;
+import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SetSizeWindow;
 import andrade.luis.hmiethernetip.views.SetVisibilityAnimationWindow;
 import javafx.animation.Animation;
@@ -30,6 +31,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DEFAULT;
@@ -56,6 +58,15 @@ public class CanvasObject extends BorderPane {
     private double startHeight;
     private double endWidth;
     private double endHeight;
+    public HMIUser getUser() {
+        return user;
+    }
+
+    public void setUser(HMIUser user) {
+        this.user = user;
+    }
+
+    private HMIUser user;
 
     public void setPosition(CanvasPoint center, boolean force) {
         this.canvasObjectData.setPosition(center);
@@ -126,6 +137,15 @@ public class CanvasObject extends BorderPane {
         rightClickMenu.show(CanvasObject.this, screenX, screenY);
         showBorder();
     }
+
+    protected EventHandler<MouseEvent> onDoubleClick = new EventHandler<>() {
+        @Override
+        public void handle(MouseEvent t) {
+            if (t.getButton() == MouseButton.PRIMARY && t.getClickCount() == 2) {
+                CanvasObject.this.hmiApp.loginUser();
+            }
+        }
+    };
 
     private EventHandler<MouseEvent> onMyMousePressed = new EventHandler<>() {
         @Override
@@ -386,6 +406,20 @@ public class CanvasObject extends BorderPane {
         setPrefHeight(height);
     }
 
+    public void enableListeners(boolean enabled) {
+        if (enabled) {
+            this.setOnMousePressed(onMyMousePressed);
+            this.setOnMouseDragged(onMyMouseDragged);
+            this.setOnMouseReleased(onMyMouseReleased);
+            this.setOnMouseClicked(onMyMouseClicked);
+        } else {
+            this.setOnMousePressed(null);
+            this.setOnMouseDragged(null);
+            this.setOnMouseReleased(null);
+            this.setOnMouseClicked(null);
+        }
+    }
+
     /**
      * Este método permite cambiar el tamaño(propiedades) del CanvasObject.
      * Muestra una ventana para la definición de los nuevos valores de Ancho y Alto del objeto
@@ -471,10 +505,14 @@ public class CanvasObject extends BorderPane {
 
     /**
      * Habilita el objeto si el argumento es diferente de Stop
-     * @param enabled Argumento para habilitar el objeto
+     * @param mode Argumento para habilitar el objeto
      */
-    public void setEnable(String enabled) {
-        this.setDisable(enabled.equals("Stop"));
+    public void setEnable(String mode) {
+        if(mode.equals("Stop")){
+            this.setDisable(true);
+        }else{
+            enableListeners(!mode.equals("Ejecutar"));
+        }
     }
 
     public HMIApp getHmiApp() {

@@ -7,8 +7,6 @@ import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SelectWindowsWindow;
 import andrade.luis.hmiethernetip.views.SetButtonPropertiesWindow;
-import andrade.luis.hmiethernetip.views.SetGeometricFigurePropertiesWindow;
-import andrade.luis.hmiethernetip.views.SetInputTextPropertiesWindow;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -124,18 +122,22 @@ public class CanvasButton extends CanvasObject {
     public void setSelectedPages(ArrayList<String> selectedPages) {
         if(selectedPages != null){
             this.getCanvasObjectData().setSelectedPages(selectedPages);
-            boolean pagesReadyState = true;
-            for (String selectedPage : selectedPages) {
-                pagesReadyState = pagesReadyState && (this.getHmiApp().getIndexForScene(selectedPage) != -1);
-            }
-            if(pagesReadyState){
-                this.button.setOnAction(mouseEvent -> this.getHmiApp().generateStagesForPages(this.getCanvasObjectData().getSelectedPages()));
-                this.setTop(null);
-            }else{
-                this.errorLabel = new Label("Error en páginas asociadas");
-                this.setTop(errorLabel);
-            }
+            this.button.setOnAction(mouseEvent -> onAction());
             this.getHmiApp().setWasModified(true);
+        }
+    }
+
+    public void onAction(){
+        boolean pagesReadyState = true;
+        for (String selectedPage : this.getCanvasObjectData().getSelectedPages()) {
+            pagesReadyState = pagesReadyState && (this.getHmiApp().getIndexForScene(selectedPage) != -1);
+        }
+        if(pagesReadyState){
+            this.getHmiApp().generateStagesForPages(this.getCanvasObjectData().getSelectedPages());
+            this.setTop(null);
+        }else{
+            this.errorLabel = new Label("Error en páginas asociadas");
+            this.setTop(errorLabel);
         }
     }
 
@@ -192,12 +194,9 @@ public class CanvasButton extends CanvasObject {
     }
 
     @Override
-    public void setEnable(String enabled) {
-        if(user.getRole().equals("Operador")){
-            enabled = "Stop";
-        }
-        switch (enabled) {
-            case "Play":
+    public void setEnable(String mode) {
+        switch (mode) {
+            case "Ejecutar":
                 super.setEnable("Play");
                 this.button.setDisable(false);
                 break;

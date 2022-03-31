@@ -147,4 +147,29 @@ public class CanvasPushbutton extends CanvasButton {
             e.printStackTrace();
         }
     };
+
+    @Override
+    public void setEnable(String mode) {
+        switch (mode) {
+            case "Ejecutar":
+                logger.log(Level.INFO,"Ejecutar con Rol"+this.getUser().getRole());
+                if(!this.getUser().getRole().equals("Administrador")){
+                    this.enableListeners(false);
+                    this.setOnMousePressed(this.onDoubleClick);
+                    this.button.setDisable(true);
+                }else{
+                    this.button.setDisable(false);
+                }
+                break;
+            case "Stop":
+                super.setEnable("Stop");
+                this.button.setDisable(true);
+                break;
+            default:
+                super.setEnable("True");
+                this.enableListeners(true);
+                this.button.setDisable(true);
+                break;
+        }
+    }
 }

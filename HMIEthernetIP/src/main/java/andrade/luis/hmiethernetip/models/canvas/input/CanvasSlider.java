@@ -13,7 +13,6 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.util.Duration;
 
@@ -158,14 +157,17 @@ public class CanvasSlider extends CanvasObject {
     }
 
     @Override
-    public void setEnable(String enabled) {
-        if (user.getRole().equals("Operador")) {
-            enabled = "Stop";
-        }
-        switch (enabled) {
-            case "Play":
-                super.setEnable("Play");
-                this.slider.setDisable(false);
+    public void setEnable(String mode) {
+        switch (mode) {
+            case "Ejecutar":
+                if(!this.getUser().getRole().equals("Administrador")){
+                    this.enableListeners(false);
+                    this.setOnMousePressed(this.onDoubleClick);
+                    this.slider.setDisable(true);
+                }else{
+                    this.enableListeners(true);
+                    this.slider.setDisable(false);
+                }
                 break;
             case "Stop":
                 super.setEnable("Stop");
@@ -173,6 +175,7 @@ public class CanvasSlider extends CanvasObject {
                 break;
             default:
                 super.setEnable("True");
+                this.enableListeners(true);
                 this.slider.setDisable(true);
                 break;
         }

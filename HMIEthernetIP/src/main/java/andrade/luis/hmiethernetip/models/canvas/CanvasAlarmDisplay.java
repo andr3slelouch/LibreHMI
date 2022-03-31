@@ -226,13 +226,13 @@ public class CanvasAlarmDisplay extends CanvasObject {
     }
 
     @Override
-    public void setEnable(String enabled) {
+    public void setEnable(String mode) {
         if (user.getRole().equals("Operador")) {
-            enabled = "Stop";
+            mode = "Stop";
         }
-        switch (enabled) {
-            case "Play":
-                super.setEnable("Play");
+        switch (mode) {
+            case "Ejecutar":
+                super.setEnable("Ejecutar");
                 this.alarmsTable.setDisable(false);
                 break;
             case "Stop":

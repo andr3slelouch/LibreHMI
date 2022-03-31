@@ -210,9 +210,7 @@ public class HMIScene extends Scene implements Cloneable {
         });
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), this::copy);
         this.getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_ANY), this::cut);
-        this.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), () -> {
-            getCanvas().paste();
-        });
+        this.getAccelerators().put(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_ANY), () -> getCanvas().paste());
 
     }
 

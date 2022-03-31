@@ -60,6 +60,7 @@ public class HMIApp extends Application {
     private final ArrayList<HMIScene> pages = new ArrayList<>();
     private final ArrayList<Stage> createdWindows = new ArrayList<>();
     private String currentProjectFilePath = null;
+    private String currentFilename = null;
     private boolean wasModified = false;
     private final BooleanProperty updateTitleFlag = new SimpleBooleanProperty(false);
     private HMIAppData hmiAppData = new HMIAppData();
@@ -118,18 +119,12 @@ public class HMIApp extends Application {
      */
     private final Image imageIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "image.png").toExternalForm());
     /**
-     * Alarm icon source: <a href="https://www.flaticon.com/free-icons/notification" title="notification icons">Notification icons created by Freepik - Flaticon</a>
-     */
-    private final Image alarmIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "notification.png").toExternalForm());
-    /**
-     * Circle icon source: <a href="https://www.flaticon.com/free-icons/circle" title="circle icons">Circle icons created by Voysla - Flaticon</a>
-     */
-    private final Image circleIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "circle.png").toExternalForm());
-
-    /**
      * Ellipse icon source: <a href="https://www.flaticon.com/free-icons/oval" title="oval icons">Oval icons created by Freepik - Flaticon</a>
      */
-    private final Image ellipseIcon = new Image(getClass().getResource(IMAGES_DIR_STR+File.separator+"ellipse.png").toExternalForm());
+    private final Image ellipseIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "ellipse.png").toExternalForm());
+    private MenuItem runEditMI;
+    private String modeLabel="";
+    private String mode="";
 
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
@@ -245,9 +240,13 @@ public class HMIApp extends Application {
     }
 
     public void setHMIStage(String filenamePath, String mode) throws IOException {
-        if (!mode.equals("Play")) {
+        if (mode.equals("Default")) {
             loginUser();
+            this.modeLabel ="Ejecutar";
+            this.mode = "Editar";
         } else {
+            this.modeLabel ="Editar";
+            this.mode = "Ejecutar";
             user = new HMIUser("", "", "", "", "Operador", "");
         }
         if (user != null) {
@@ -388,7 +387,7 @@ public class HMIApp extends Application {
             manageUsersWindow.showAndWait();
         });
         userMI.getItems().addAll(changeUserMI, manageUsersMI);
-        MenuItem propertiesMI = new MenuItem("Editar Propiedades de Conexión de Base de Datos");
+        MenuItem propertiesMI = new MenuItem("Editar Conexión de Base de Datos");
         propertiesMI.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         propertiesMI.setOnAction(mouseEvent -> {
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
@@ -397,6 +396,7 @@ public class HMIApp extends Application {
         menuConfiguration.getItems().addAll(userMI, propertiesMI);
 
         Menu menuHelp = new Menu("Ayuda");
+
 
         menuBar.getMenus().addAll(menuFile, menuEdit, menuAlarm, menuConfiguration, menuHelp);
 
@@ -469,6 +469,10 @@ public class HMIApp extends Application {
             }
         });
 
+        SeparatorMenuItem runEditSeparatorMI = new SeparatorMenuItem();
+        runEditMI = new MenuItem(modeLabel);
+
+
         MenuItem exitMI = new MenuItem("Salir");
         exitMI.setAccelerator(KeyCombination.keyCombination("Alt+F4"));
         exitMI.setOnAction(mouseEvent -> closeProcess(new WindowEvent(
@@ -478,7 +482,7 @@ public class HMIApp extends Application {
 
         SeparatorMenuItem exitSeparatorMenuItem = new SeparatorMenuItem();
 
-        menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, exitSeparatorMenuItem, exitMI);
+        menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, runEditSeparatorMI, runEditMI, exitSeparatorMenuItem, exitMI);
 
         return menuFile;
     }
@@ -634,10 +638,14 @@ public class HMIApp extends Application {
         return designToolsVBox;
     }
 
-    private void loginUser() {
+    public void loginUser() {
         LogInWindow logInWindow = new LogInWindow();
         logInWindow.showAndWait();
-        user = logInWindow.getLoggedUser();
+        if(logInWindow.getLoggedUser()!=null){
+            this.user = logInWindow.getLoggedUser();
+            logger.log(Level.INFO, mode);
+            enableInputRepresentations(mode);
+        }
     }
 
     private void addAlarm(Alarm alarm) {
@@ -787,11 +795,9 @@ public class HMIApp extends Application {
         this.setHmiAppData(localHmiAppData);
         this.currentProjectFilePath = filenamePath;
         String[] filenameArr = filenamePath.split(File.separator);
-        String filename = filenameArr[filenameArr.length - 1];
+        currentFilename = filenameArr[filenameArr.length - 1];
         this.setWasModified(false);
-        if (!mainStage.getTitle().contains(filename)) {
-            mainStage.setTitle(filename + " - " + mainStage.getTitle());
-        }
+        updateTitleWithFilename();
         addRecentUsedFilePath(filenamePath);
     }
 
@@ -862,7 +868,7 @@ public class HMIApp extends Application {
         Gson gson = new Gson();
         if (filenamePath != null) {
             String[] filenameArr = filenamePath.split(File.separator);
-            String filename = filenameArr[filenameArr.length - 1];
+            this.currentFilename = filenameArr[filenameArr.length - 1];
             Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
             this.hmiAppData.setType("LibreHMIProject");
             gson.toJson(this.hmiAppData, writer);
@@ -870,9 +876,7 @@ public class HMIApp extends Application {
             this.currentProjectFilePath = filenamePath;
             this.setWasModified(false);
             addRecentUsedFilePath(filenamePath);
-            if (!mainStage.getTitle().contains(filename)) {
-                mainStage.setTitle(filename + " - " + mainStage.getTitle());
-            }
+            updateTitleWithFilename();
         }
     }
 
@@ -883,8 +887,10 @@ public class HMIApp extends Application {
      * @param value Valor del estado, puede ser "Play","Stop","Default"
      */
     public void enableInputRepresentations(String value) {
+        logger.log(Level.INFO, "USER ROLE:"+this.user.getRole());
         for (HMIScene page : this.pages) {
             for (int i = 0; i < page.getCanvas().getShapeArrayList().size(); i++) {
+                page.getCanvas().getShapeArrayList().get(i).setUser(this.user);
                 page.getCanvas().getShapeArrayList().get(i).setEnable(value);
             }
         }
@@ -960,6 +966,7 @@ public class HMIApp extends Application {
         mainStage.setScene(pages.get(index));
         String compliment = wasModified ? "*" : "";
         mainStage.setTitle(pages.get(index).getTitle() + " - " + HMI_TITLE + compliment);
+        updateTitleWithFilename();
         pages.get(index).getListViewReference().getSelectionModel().select(index);
     }
 
@@ -1061,6 +1068,15 @@ public class HMIApp extends Application {
 
         mainStage.setScene(newScene);
         mainStage.setTitle(newScene.getTitle() + " - " + HMI_TITLE);
+        updateTitleWithFilename();
+    }
+
+    public void updateTitleWithFilename() {
+        if (this.currentFilename != null) {
+            if (!mainStage.getTitle().contains(this.currentFilename)) {
+                mainStage.setTitle(this.currentFilename + " - " + mainStage.getTitle());
+            }
+        }
     }
 
     public int getIndexForAlarm(String name) {
@@ -1077,7 +1093,7 @@ public class HMIApp extends Application {
      * Busca el índice de la Escena basada en su título
      *
      * @param sceneTitle Título de la escena buscada
-     * @return El indice de la escena en el arrayList
+     * @return El índice de la escena en el arrayList
      */
     public int getIndexForScene(String sceneTitle) {
         for (int i = 0; i < pages.size(); i++) {

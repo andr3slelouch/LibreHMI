@@ -59,7 +59,7 @@ public class RecentUsedFilesItem {
         editButton.setText("");
         editButton.setOnAction(mouseEvent -> {
             try {
-                hmiApp.setHMIStage(filepath, "Default");
+                hmiApp.setHMIStage(filepath, "Editar");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -68,7 +68,7 @@ public class RecentUsedFilesItem {
         playButton.setText("");
         playButton.setOnAction(mouseEvent -> {
             try {
-                hmiApp.setHMIStage(filepath, "Play");
+                hmiApp.setHMIStage(filepath, "Ejecutar");
             } catch (IOException e) {
                 e.printStackTrace();
             }
