@@ -142,7 +142,7 @@ public class CanvasObject extends BorderPane {
         @Override
         public void handle(MouseEvent t) {
             if (t.getButton() == MouseButton.PRIMARY && t.getClickCount() == 2) {
-                CanvasObject.this.hmiApp.loginUser();
+                CanvasObject.this.hmiApp.loginUser("Ejecutar");
             }
         }
     };

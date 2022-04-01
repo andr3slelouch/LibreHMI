@@ -39,6 +39,9 @@ public class HMIAppData implements Serializable, Transferable {
     @SerializedName("type")
     @Expose
     private String type;
+    @SerializedName("blockingTimeout")
+    @Expose
+    private int blockingTimeout;
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
@@ -53,6 +56,14 @@ public class HMIAppData implements Serializable, Transferable {
     @Override
     public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
         return null;
+    }
+
+    public int getBlockingTimeout() {
+        return blockingTimeout;
+    }
+
+    public void setBlockingTimeout(int blockingTimeout) {
+        this.blockingTimeout = blockingTimeout;
     }
 
     public String getType() {

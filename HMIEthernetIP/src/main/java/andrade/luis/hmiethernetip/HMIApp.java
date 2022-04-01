@@ -16,6 +16,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -59,20 +60,21 @@ public class HMIApp extends Application {
     private static final String FILE_ERROR_TITLE = "El archivo de proyecto no es válido";
     private final ArrayList<HMIScene> pages = new ArrayList<>();
     private final ArrayList<Stage> createdWindows = new ArrayList<>();
+    private ArrayList<String> pagesTitles = new ArrayList<>();
+    private ArrayList<Alarm> projectAlarms = new ArrayList<>();
+    private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
+    private ArrayList<MenuItem> updateMenuItemFlags = new ArrayList<>();
     private String currentProjectFilePath = null;
     private String currentFilename = null;
     private boolean wasModified = false;
     private final BooleanProperty updateTitleFlag = new SimpleBooleanProperty(false);
     private HMIAppData hmiAppData = new HMIAppData();
-    private ArrayList<String> pagesTitles = new ArrayList<>();
-    private ArrayList<Alarm> projectAlarms = new ArrayList<>();
-    private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
     private static final String HMI_TITLE = "LibreHMI";
-    private static final int CAPACITY = 10;
     private static final String ERROR_STR = "Error:";
     private static final String IMAGES_DIR_STR = "images";
     private static final String ALERT_SAVE_TITLE = "¿Desea guardar los cambios del proyecto actual?";
     private static final String ALERT_SAVE_DESCRIPTION = "Los cambios se perderán si elige No Guardar";
+    private static final int CAPACITY = 10;
     private HMIUser user;
     /**
      * Calendar Icon source : <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Freepik - Flaticon</a>
@@ -122,9 +124,9 @@ public class HMIApp extends Application {
      * Ellipse icon source: <a href="https://www.flaticon.com/free-icons/oval" title="oval icons">Oval icons created by Freepik - Flaticon</a>
      */
     private final Image ellipseIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "ellipse.png").toExternalForm());
-    private MenuItem runEditMI;
-    private String modeLabel="";
-    private String mode="";
+    private String modeLabel = "";
+    private String mode = "";
+    private Timeline autoBlockTimeline;
 
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
@@ -240,12 +242,12 @@ public class HMIApp extends Application {
     }
 
     public void setHMIStage(String filenamePath, String mode) throws IOException {
-        if (mode.equals("Default")) {
-            loginUser();
-            this.modeLabel ="Ejecutar";
+        if (mode.equals("Editar")) {
+            loginUser(mode);
+            this.modeLabel = "Ejecutar";
             this.mode = "Editar";
         } else {
-            this.modeLabel ="Editar";
+            this.modeLabel = "Editar";
             this.mode = "Ejecutar";
             user = new HMIUser("", "", "", "", "Operador", "");
         }
@@ -337,6 +339,7 @@ public class HMIApp extends Application {
         });
 
         MenuBar menuBar = generateMenuBar(scene, root);
+        menuBar.setId("#menuBar");
 
         root.getChildren().add(menuBar);
         root.getChildren().add(expandHBox);
@@ -379,7 +382,7 @@ public class HMIApp extends Application {
         Menu userMI = new Menu("Usuarios");
         MenuItem changeUserMI = new MenuItem("Cambiar de Usuario");
         changeUserMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+U"));
-        changeUserMI.setOnAction(mouseEvent -> loginUser());
+        changeUserMI.setOnAction(mouseEvent -> loginUser(this.mode));
         MenuItem manageUsersMI = new MenuItem("Administrar Usuarios");
         manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
         manageUsersMI.setOnAction(mouseEvent -> {
@@ -387,13 +390,22 @@ public class HMIApp extends Application {
             manageUsersWindow.showAndWait();
         });
         userMI.getItems().addAll(changeUserMI, manageUsersMI);
-        MenuItem propertiesMI = new MenuItem("Editar Conexión de Base de Datos");
+        MenuItem propertiesMI = new MenuItem("Conexión de Base de Datos");
         propertiesMI.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         propertiesMI.setOnAction(mouseEvent -> {
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.show();
         });
-        menuConfiguration.getItems().addAll(userMI, propertiesMI);
+
+        MenuItem blockingTimeoutMI = new MenuItem("Tiempo de Bloqueo");
+        blockingTimeoutMI.setAccelerator(KeyCombination.keyCombination("Ctrl+T"));
+        blockingTimeoutMI.setOnAction(mouseEvent -> {
+            SetBlockingTimeoutWindow setBlockingTimeoutWindow = new SetBlockingTimeoutWindow(this.getHmiAppData().getBlockingTimeout());
+            setBlockingTimeoutWindow.showAndWait();
+            this.hmiAppData.setBlockingTimeout(setBlockingTimeoutWindow.getTimeout());
+            this.setWasModified(true);
+        });
+        menuConfiguration.getItems().addAll(userMI, blockingTimeoutMI);
 
         Menu menuHelp = new Menu("Ayuda");
 
@@ -470,7 +482,22 @@ public class HMIApp extends Application {
         });
 
         SeparatorMenuItem runEditSeparatorMI = new SeparatorMenuItem();
-        runEditMI = new MenuItem(modeLabel);
+
+        MenuItem runEditMI = new MenuItem(modeLabel);
+
+        updateMenuItemFlags.add(runEditMI);
+        runEditMI.setOnAction(actionEvent -> {
+            if (modeLabel.equals("Editar")) {
+                loginUser(modeLabel);
+                this.modeLabel = "Ejecutar";
+                this.mode = "Editar";
+            } else {
+                this.modeLabel = "Editar";
+                this.mode = "Ejecutar";
+                enableInputRepresentations(this.mode);
+            }
+            updateMenuItemFlags(this.modeLabel);
+        });
 
 
         MenuItem exitMI = new MenuItem("Salir");
@@ -485,6 +512,12 @@ public class HMIApp extends Application {
         menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, runEditSeparatorMI, runEditMI, exitSeparatorMenuItem, exitMI);
 
         return menuFile;
+    }
+
+    private void updateMenuItemFlags(String mode){
+        for(MenuItem menuItem : updateMenuItemFlags){
+            menuItem.setText(mode);
+        }
     }
 
     private Menu generateMenuAlarm() {
@@ -638,14 +671,29 @@ public class HMIApp extends Application {
         return designToolsVBox;
     }
 
-    public void loginUser() {
+    public void loginUser(String mode) {
         LogInWindow logInWindow = new LogInWindow();
         logInWindow.showAndWait();
-        if(logInWindow.getLoggedUser()!=null){
+        if (logInWindow.getLoggedUser() != null) {
             this.user = logInWindow.getLoggedUser();
-            logger.log(Level.INFO, mode);
-            enableInputRepresentations(mode);
+            if (this.user.getRole().equals("Operador") && this.mode.equals("Editar")) {
+                showAlert(Alert.AlertType.ERROR, "Error de Privilegios", "Error un usuario con el Rol \"Operador\" no puede editar el proyecto", false, false);
+            } else {
+                enableInputRepresentations(mode);
+            }
         }
+    }
+
+    public void setAutoBlockObjectsTimeline() {
+        this.autoBlockTimeline = new Timeline(
+                new KeyFrame(
+                        Duration.seconds(0),
+                        (ActionEvent actionEvent) -> {
+                            logger.log(Level.INFO, "Executing autoBlockTimeline");
+                            user = new HMIUser("", "", "", "", "Operador", "");
+                            enableInputRepresentations(mode);
+                        }), new KeyFrame(Duration.seconds(1)));
+        this.autoBlockTimeline.setDelay(Duration.seconds(60));
     }
 
     private void addAlarm(Alarm alarm) {
@@ -887,18 +935,21 @@ public class HMIApp extends Application {
      * @param value Valor del estado, puede ser "Play","Stop","Default"
      */
     public void enableInputRepresentations(String value) {
-        logger.log(Level.INFO, "USER ROLE:"+this.user.getRole());
         for (HMIScene page : this.pages) {
             for (int i = 0; i < page.getCanvas().getShapeArrayList().size(); i++) {
                 page.getCanvas().getShapeArrayList().get(i).setUser(this.user);
                 page.getCanvas().getShapeArrayList().get(i).setEnable(value);
             }
         }
+        if (mode.equals("Ejecutar") && this.user.getRole().equals("Administrador")) {
+            setAutoBlockObjectsTimeline();
+            this.autoBlockTimeline.play();
+        }
     }
 
     /**
      * Este método permite la creación de ventanas para las Escenas si son mayores que uno,
-     * si es solo uno solamente cambia la Escena de la Ventana mostrada a la seleccionada
+     * si es solo uno cambia la Escena de la Ventana mostrada a la seleccionada
      * Además de crear ventanas(Stage) adicionales también las muestra
      *
      * @param selectedPages ArrayList de los títulos de las Páginas Seleccionadas
