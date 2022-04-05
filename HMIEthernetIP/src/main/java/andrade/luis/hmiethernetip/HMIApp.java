@@ -63,7 +63,13 @@ public class HMIApp extends Application {
     private ArrayList<String> pagesTitles = new ArrayList<>();
     private ArrayList<Alarm> projectAlarms = new ArrayList<>();
     private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
-    private ArrayList<MenuItem> updateMenuItemFlags = new ArrayList<>();
+    private ArrayList<MenuItem> editExecuteMenuItems = new ArrayList<>();
+    private ArrayList<Menu> fileMenus = new ArrayList<>();
+    private ArrayList<Menu> editMenus = new ArrayList<>();
+    private ArrayList<Menu> alarmsMenus = new ArrayList<>();
+    private ArrayList<Menu> configMenus = new ArrayList<>();
+    private ArrayList<Menu> windowsMenus = new ArrayList<>();
+    private ArrayList<Menu> helpMenus = new ArrayList<>();
     private String currentProjectFilePath = null;
     private String currentFilename = null;
     private boolean wasModified = false;
@@ -127,6 +133,7 @@ public class HMIApp extends Application {
     private String modeLabel = "";
     private String mode = "";
     private Timeline autoBlockTimeline;
+    private String selectedPage;
 
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
@@ -340,6 +347,7 @@ public class HMIApp extends Application {
 
         MenuBar menuBar = generateMenuBar(scene, root);
         menuBar.setId("#menuBar");
+        //menuBars.add(menuBar);
 
         root.getChildren().add(menuBar);
         root.getChildren().add(expandHBox);
@@ -358,9 +366,12 @@ public class HMIApp extends Application {
 
         //Menu file
         Menu menuFile = generateMenuFile();
+        fileMenus.add(menuFile);
 
         // --- Menu Edit
         Menu menuEdit = new Menu("Editar");
+        editMenus.add(menuEdit);
+        menuEdit.setId("#editMI");
         MenuItem copyMI = new MenuItem("Copiar");
         copyMI.setAccelerator(KeyCombination.keyCombination("Ctrl+C"));
         copyMI.setOnAction(mouseEvent -> scene.copy());
@@ -376,10 +387,14 @@ public class HMIApp extends Application {
         menuEdit.getItems().addAll(copyMI, cutMI, pasteMI);
 
         Menu menuAlarm = generateMenuAlarm();
+        alarmsMenus.add(menuAlarm);
 
         // --- Menu Configuration
         Menu menuConfiguration = new Menu("Configurar");
+        configMenus.add(menuConfiguration);
+        menuConfiguration.setId("#configurationMI");
         Menu userMI = new Menu("Usuarios");
+        userMI.setId("#usersMI");
         MenuItem changeUserMI = new MenuItem("Cambiar de Usuario");
         changeUserMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+U"));
         changeUserMI.setOnAction(mouseEvent -> loginUser(this.mode));
@@ -405,12 +420,26 @@ public class HMIApp extends Application {
             this.hmiAppData.setBlockingTimeout(setBlockingTimeoutWindow.getTimeout());
             this.setWasModified(true);
         });
-        menuConfiguration.getItems().addAll(userMI, blockingTimeoutMI);
+        menuConfiguration.getItems().addAll(userMI, blockingTimeoutMI, propertiesMI);
+
+        Menu menuWindows = new Menu("Ventanas");
+        MenuItem selectWindowsMI = new MenuItem("Mostrar Ventanas");
+        selectWindowsMI.setAccelerator(KeyCombination.keyCombination("Ctrl+W"));
+        selectWindowsMI.setOnAction(mouseEvent -> {
+            ArrayList<String> showPages = new ArrayList<>();
+            showPages.add(selectedPage);
+            SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(getPagesTitles(), showPages);
+            selectWindowsWindow.showAndWait();
+            generateStagesForPages(selectWindowsWindow.getSelectedItems());
+        });
+        menuWindows.getItems().add(selectWindowsMI);
+
+        windowsMenus.add(menuWindows);
 
         Menu menuHelp = new Menu("Ayuda");
+        helpMenus.add(menuHelp);
 
-
-        menuBar.getMenus().addAll(menuFile, menuEdit, menuAlarm, menuConfiguration, menuHelp);
+        menuBar.getMenus().addAll(menuFile, menuEdit, menuAlarm, menuConfiguration,menuWindows ,menuHelp);
 
         return menuBar;
     }
@@ -434,6 +463,7 @@ public class HMIApp extends Application {
     private Menu generateMenuFile() {
         // --- Menu File
         Menu menuFile = new Menu("Archivo");
+        menuFile.setId("#fileMI");
         MenuItem newProjectMI = new MenuItem("Nuevo");
         newProjectMI.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
         newProjectMI.setOnAction(mouseEvent -> this.createNewProject());
@@ -461,6 +491,7 @@ public class HMIApp extends Application {
         SeparatorMenuItem separatorMenuItem = new SeparatorMenuItem();
 
         MenuItem saveMI = new MenuItem("Guardar");
+        saveMI.setId("#saveMI");
         saveMI.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
         saveMI.setOnAction(mouseEvent -> {
             try {
@@ -471,6 +502,7 @@ public class HMIApp extends Application {
             }
         });
         MenuItem saveAsMI = new MenuItem("Guardar como");
+        saveAsMI.setId("#saveAsMI");
         saveAsMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+G"));
         saveAsMI.setOnAction(mouseEvent -> {
             try {
@@ -485,7 +517,7 @@ public class HMIApp extends Application {
 
         MenuItem runEditMI = new MenuItem(modeLabel);
 
-        updateMenuItemFlags.add(runEditMI);
+        editExecuteMenuItems.add(runEditMI);
         runEditMI.setOnAction(actionEvent -> {
             if (modeLabel.equals("Editar")) {
                 loginUser(modeLabel);
@@ -496,7 +528,7 @@ public class HMIApp extends Application {
                 this.mode = "Ejecutar";
                 enableInputRepresentations(this.mode);
             }
-            updateMenuItemFlags(this.modeLabel);
+            updateMenuBarsMode(this.modeLabel);
         });
 
 
@@ -514,15 +546,39 @@ public class HMIApp extends Application {
         return menuFile;
     }
 
-    private void updateMenuItemFlags(String mode){
-        for(MenuItem menuItem : updateMenuItemFlags){
+    private void updateMenuBarsMode(String mode) {
+        for (MenuItem menuItem : editExecuteMenuItems) {
             menuItem.setText(mode);
         }
+
+        for (Menu menu : fileMenus) {
+            for(MenuItem subMenu: menu.getItems()){
+                if (subMenu.getId() != null) {
+                    if (subMenu.getId().equals("#saveMI") || subMenu.getId().equals("#saveAsMI")) {
+                        subMenu.setDisable(this.mode.equals("Ejecutar"));
+                    }
+                }
+            }
+        }
+
+        for(Menu menu: editMenus){
+            menu.setDisable(this.mode.equals("Ejecutar"));
+        }
+
+        for(Menu menu: alarmsMenus){
+            menu.setDisable(this.mode.equals("Ejecutar"));
+        }
+
+        for(Menu menu: configMenus){
+            menu.setDisable(this.mode.equals("Ejecutar"));
+        }
+
     }
 
     private Menu generateMenuAlarm() {
         // --- Menu View
         Menu menuAlarm = new Menu("Alarmas");
+        menuAlarm.setId("#alarmMI");
         MenuItem alarmMI = new MenuItem("Crear Alarma");
         alarmMI.setAccelerator(KeyCombination.keyCombination("Ctrl+A"));
         alarmMI.setOnAction(mouseEvent -> {
@@ -941,6 +997,7 @@ public class HMIApp extends Application {
                 page.getCanvas().getShapeArrayList().get(i).setEnable(value);
             }
         }
+        updateMenuBarsMode(this.modeLabel);
         if (mode.equals("Ejecutar") && this.user.getRole().equals("Administrador")) {
             setAutoBlockObjectsTimeline();
             this.autoBlockTimeline.play();
@@ -956,15 +1013,16 @@ public class HMIApp extends Application {
      */
     public void generateStagesForPages(ArrayList<String> selectedPages) {
         boolean mainStageWasUpdated = false;
-
         for (String selectedPage : selectedPages) {
+            logger.log(Level.INFO, "Page"+selectedPage+"Flag"+mainStageWasUpdated);
             int index = getIndexForStageWithScene(selectedPage);
             if (index == -1) {
                 if (!mainStageWasUpdated) {
                     changeSelectedScene(selectedPage);
                     mainStageWasUpdated = true;
                 } else {
-                    generateStage(pages.get(index));
+                    int hmiSceneIndex = getIndexForScene(selectedPage);
+                    generateStage(pages.get(hmiSceneIndex));
                 }
             } else {
                 if (createdWindows.get(index).isShowing()) {
@@ -998,8 +1056,11 @@ public class HMIApp extends Application {
      */
     private int getIndexForStageWithScene(String title) {
         int index = -1;
+        logger.log(Level.INFO, "Title"+title);
         for (int i = 0; i < createdWindows.size(); i++) {
-            if (((HMIScene) createdWindows.get(i).getScene()).getTitle().equals(title)) {
+            logger.log(Level.INFO, "Current"+((HMIScene) createdWindows.get(i).getScene()).getId());
+            logger.log(Level.INFO, "Current"+((HMIScene) createdWindows.get(i).getScene()).getTitle());
+            if (((HMIScene) createdWindows.get(i).getScene()).getId().equals(title)) {
                 index = i;
             }
         }
@@ -1014,6 +1075,7 @@ public class HMIApp extends Application {
      */
     public void changeSelectedScene(String sceneTitle) {
         int index = getIndexForScene(sceneTitle);
+        this.selectedPage = sceneTitle;
         mainStage.setScene(pages.get(index));
         String compliment = wasModified ? "*" : "";
         mainStage.setTitle(pages.get(index).getTitle() + " - " + HMI_TITLE + compliment);
@@ -1102,6 +1164,7 @@ public class HMIApp extends Application {
         setWindowPropertiesWindow.showAndWait();
         if (!setWindowPropertiesWindow.isCancelled()) {
             HMIScene newScene = generatePage(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
+
             addScene(newScene);
             setWasModified(true);
         }
@@ -1114,9 +1177,9 @@ public class HMIApp extends Application {
      */
     private void addScene(HMIScene newScene) {
         this.pages.add(newScene);
+        this.selectedPage = newScene.getTitle();
         this.pagesTitles.add(newScene.getTitle());
         updateScenesInListView(pagesTitles);
-
         mainStage.setScene(newScene);
         mainStage.setTitle(newScene.getTitle() + " - " + HMI_TITLE);
         updateTitleWithFilename();

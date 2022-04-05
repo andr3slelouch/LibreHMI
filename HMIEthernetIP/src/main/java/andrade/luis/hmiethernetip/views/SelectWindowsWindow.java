@@ -45,7 +45,6 @@ public class SelectWindowsWindow extends Stage {
                 }
             }
         }
-
         
         setSelectedItems();
 
@@ -81,6 +80,7 @@ public class SelectWindowsWindow extends Stage {
     }
 
     private void setSelectedItems() {
+        selectedItems.clear();
         for(SceneItem sceneItem : items){
             if(sceneItem.isSelected()){
                 selectedItems.add(sceneItem.getScene());

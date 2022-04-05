@@ -43,7 +43,7 @@ public class HMIScene extends Scene implements Cloneable {
     private Color background;
     private HMICanvas hmiCanvas;
     private HMISceneData hmiSceneData = new HMISceneData();
-
+    private String id;
     public HMISceneData getHmiSceneData() {
         return hmiSceneData;
     }
@@ -265,5 +265,13 @@ public class HMIScene extends Scene implements Cloneable {
     public HMIScene clone() throws CloneNotSupportedException {
         HMIScene clonedScene = (HMIScene) super.clone();
         return clonedScene;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
