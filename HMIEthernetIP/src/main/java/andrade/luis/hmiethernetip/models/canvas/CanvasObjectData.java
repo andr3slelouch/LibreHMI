@@ -155,6 +155,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("fontSize")
     @Expose
     private double fontSize;
+    @SerializedName("samplingTime")
+    @Expose
+    private double samplingTime;
 
     private static final long serialVersionUID = 6976931227659398285L;
 
@@ -700,5 +703,13 @@ public class CanvasObjectData implements Serializable, Transferable {
 
     public void setFontColor(CanvasColor fontColor) {
         this.fontColor = fontColor;
+    }
+
+    public double getSamplingTime() {
+        return samplingTime;
+    }
+
+    public void setSamplingTime(double samplingTime) {
+        this.samplingTime = samplingTime;
     }
 }

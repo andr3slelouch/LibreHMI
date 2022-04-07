@@ -47,6 +47,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private static final String SLIDER_STR = "Slider";
     private static final String TEXTFIELD_STR = "TextField";
     private static final String ALARM_DISPLAY_STR = "AlarmDisplay";
+    private static final String TREND_STR = "TrendChart";
     private static final String FIGURE_ID = "#createdShape";
     private final ContextMenu rightClickMenu;
     private CanvasPoint lastClickPoint;
@@ -194,9 +195,29 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             case ALARM_DISPLAY_STR:
                 addAlarmDisplayOnCanvasClicked(current);
                 break;
+            case TREND_STR:
+                addTrendChartOnCanvasClicked(current);
+                break;
             default:
                 break;
         }
+    }
+
+    private void addTrendChartOnCanvasClicked(CanvasPoint current) {
+        CanvasTrendChart canvasTrendChart = new CanvasTrendChart(current);
+        canvasTrendChart.setCanvas(this);
+        canvasTrendChart.setHmiApp(hmiApp);
+        if (this.getShapeArrayList().isEmpty()) {
+            canvasTrendChart.setObjectId(FIGURE_ID + "0");
+        } else {
+            canvasTrendChart.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
+        }
+        this.addNewShape(canvasTrendChart);
+        this.getChildren().add(canvasTrendChart);
+        canvasTrendChart.getHmiApp().setWasModified(true);
+        this.setAddOnClickEnabled(false);
+        canvasTrendChart.setTrendTimeline();
+        canvasTrendChart.getTrendTimeline().play();
     }
 
     private void addEllipseOnCanvasClicked(CanvasPoint current) {

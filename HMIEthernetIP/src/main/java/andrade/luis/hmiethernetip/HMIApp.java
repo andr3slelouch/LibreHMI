@@ -130,6 +130,9 @@ public class HMIApp extends Application {
      * Ellipse icon source: <a href="https://www.flaticon.com/free-icons/oval" title="oval icons">Oval icons created by Freepik - Flaticon</a>
      */
     private final Image ellipseIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "ellipse.png").toExternalForm());
+    /**
+     * Trend icon source: <a href="https://www.flaticon.com/free-icons/trend" title="trend icons">Trend icons created by adriansyah - Flaticon</a>
+     */
     private String modeLabel = "";
     private String mode = "";
     private Timeline autoBlockTimeline;
@@ -296,7 +299,7 @@ public class HMIApp extends Application {
         Button stopBtn = new Button("Stop");
         Button defaultBtn = new Button("Default");
 
-        HBox fifthHBox = new HBox(playBtn, stopBtn, defaultBtn);
+        HBox fifthHBox = new HBox(playBtn);
         fifthHBox.setAlignment(CENTER);
 
 
@@ -352,7 +355,10 @@ public class HMIApp extends Application {
         root.getChildren().add(menuBar);
         root.getChildren().add(expandHBox);
 
-        playBtn.setOnAction(mouseEvent -> enableInputRepresentations("Play"));
+        playBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("TrendChart");
+        });
         stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
         defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
         scene.setHmiApp(this);

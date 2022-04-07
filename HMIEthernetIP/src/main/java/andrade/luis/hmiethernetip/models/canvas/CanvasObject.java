@@ -31,7 +31,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static andrade.luis.hmiethernetip.models.MouseOverMode.DEFAULT;
