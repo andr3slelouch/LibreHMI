@@ -37,6 +37,14 @@ public class CanvasColor implements Serializable {
 
     }
 
+    public String toHexString() {
+        int r = ((int) Math.round(red     * 255)) << 24;
+        int g = ((int) Math.round(green   * 255)) << 16;
+        int b = ((int) Math.round(blue    * 255)) << 8;
+        int a = ((int) Math.round(opacity * 255));
+        return String.format("#%08X", (r + g + b + a));
+    }
+
     public Color getColor() {
         return new Color(red, green, blue, opacity);
     }

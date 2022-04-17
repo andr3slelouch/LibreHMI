@@ -61,9 +61,9 @@ public class TrendChartExpressionHBox extends HBox {
                 expressionTF.setText(this.expression.getExpressionToEvaluate());
             }
         });
-        ColorPicker setExpressionColor = new ColorPicker();
+        expressionColorPicker = new ColorPicker();
         HBox chartExpressionHBox = new HBox();
-        chartExpressionHBox.getChildren().addAll(expressionNameLbl,expressionNameTF,setExpressionBtn,expressionTF,setExpressionColor);
+        chartExpressionHBox.getChildren().addAll(expressionNameLbl,expressionNameTF,setExpressionBtn,expressionTF,expressionColorPicker);
         this.getChildren().addAll(enableChartExpression,chartExpressionHBox);
         chartExpressionHBox.setDisable(true);
         enableChartExpression.setSelected(false);

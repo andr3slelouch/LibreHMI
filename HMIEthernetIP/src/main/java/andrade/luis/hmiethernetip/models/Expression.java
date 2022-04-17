@@ -161,6 +161,7 @@ public class Expression implements Serializable {
                     this.expressionToEvaluate = sb.toString();
                     return BOOLEAN_STR;
                 case FLOAT_STR:
+                case INT_STR:
                     sb.append("*1");
                     this.expressionToEvaluate = sb.toString();
                     return FLOAT_STR;

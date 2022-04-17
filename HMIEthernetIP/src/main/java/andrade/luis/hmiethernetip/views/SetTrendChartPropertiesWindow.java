@@ -80,7 +80,7 @@ public class SetTrendChartPropertiesWindow extends Stage {
 
     public void updateTrendChartSerieDataArrayList() {
         for (TrendChartExpressionHBox expressionHBox : expressionHBoxes) {
-            if (expressionHBox.getEnableChartExpression().isSelected()) {
+            if (expressionHBox.getEnableChartExpression().isSelected() && trendChartSerieDataArrayList!=null) {
                 trendChartSerieDataArrayList.add(new TrendChartSerieData(expressionHBox.getExpression(), new CanvasColor(expressionHBox.getExpressionColorPicker().getValue()), expressionHBox.getExpressionNameTF().getText()));
             }
         }
