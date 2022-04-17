@@ -204,20 +204,24 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addTrendChartOnCanvasClicked(CanvasPoint current) {
-        CanvasTrendChart canvasTrendChart = new CanvasTrendChart(current);
-        canvasTrendChart.setCanvas(this);
-        canvasTrendChart.setHmiApp(hmiApp);
-        if (this.getShapeArrayList().isEmpty()) {
-            canvasTrendChart.setObjectId(FIGURE_ID + "0");
-        } else {
-            canvasTrendChart.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
+        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,350);
+        setTrendChartPropertiesWindow.showAndWait();
+        if(!setTrendChartPropertiesWindow.isCanceled()){
+            CanvasTrendChart canvasTrendChart = new CanvasTrendChart(current,setTrendChartPropertiesWindow.getTrendChartSerieDataArrayList());
+            canvasTrendChart.setCanvas(this);
+            canvasTrendChart.setHmiApp(hmiApp);
+            if (this.getShapeArrayList().isEmpty()) {
+                canvasTrendChart.setObjectId(FIGURE_ID + "0");
+            } else {
+                canvasTrendChart.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
+            }
+            this.addNewShape(canvasTrendChart);
+            this.getChildren().add(canvasTrendChart);
+            canvasTrendChart.getHmiApp().setWasModified(true);
+            this.setAddOnClickEnabled(false);
+            canvasTrendChart.setTrendTimeline();
+            canvasTrendChart.getTrendTimeline().play();
         }
-        this.addNewShape(canvasTrendChart);
-        this.getChildren().add(canvasTrendChart);
-        canvasTrendChart.getHmiApp().setWasModified(true);
-        this.setAddOnClickEnabled(false);
-        canvasTrendChart.setTrendTimeline();
-        canvasTrendChart.getTrendTimeline().play();
     }
 
     private void addEllipseOnCanvasClicked(CanvasPoint current) {

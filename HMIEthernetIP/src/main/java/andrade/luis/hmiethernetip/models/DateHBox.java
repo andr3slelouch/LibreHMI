@@ -3,8 +3,12 @@ package andrade.luis.hmiethernetip.models;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.text.DateFormat;
@@ -119,10 +123,22 @@ public class DateHBox extends HBox {
         hoursTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, integerFilter));
         hoursTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             double value = Double.parseDouble(newValue);
-            if (value > 59) {
-                hoursTextField.setText(oldValue);
+            if (value > 23) {
+                hoursTextField.setText(String.valueOf((int) value%24));
             } else {
                 this.setSliderValue();
+            }
+        });
+        hoursTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode().equals(KeyCode.UP)) {
+                    setDateTime(DateHBox.this.localDateTime.plusHours(1));
+                    setSliderValue();
+                }else if (keyEvent.getCode().equals(KeyCode.DOWN)) {
+                    setDateTime(DateHBox.this.localDateTime.minusHours(1));
+                    setSliderValue();
+                }
             }
         });
         Label hoursLabel = new Label(":");
@@ -133,11 +149,24 @@ public class DateHBox extends HBox {
         minutesTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             double value = Double.parseDouble(newValue);
             if (value > 59) {
-                minutesTextField.setText(oldValue);
+                minutesTextField.setText(String.valueOf((int) value%60));
             } else {
                 this.setSliderValue();
             }
         });
+        minutesTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode().equals(KeyCode.UP)) {
+                    setDateTime(DateHBox.this.localDateTime.plusMinutes(1));
+                    setSliderValue();
+                }else if (keyEvent.getCode().equals(KeyCode.DOWN)) {
+                    setDateTime(DateHBox.this.localDateTime.minusMinutes(1));
+                    setSliderValue();
+                }
+            }
+        });
+
         Label minutesLabel = new Label(":");
         secondsTextField = new TextField("");
         secondsTextField.setPrefWidth(50);
@@ -146,9 +175,18 @@ public class DateHBox extends HBox {
         secondsTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             double value = Double.parseDouble(newValue);
             if (value > 59) {
-                secondsTextField.setText(oldValue);
+                secondsTextField.setText(String.valueOf((int) value%60));
             } else {
                 this.setSliderValue();
+            }
+        });
+        secondsTextField.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.UP)) {
+                setDateTime(DateHBox.this.localDateTime.plusSeconds(1));
+                setSliderValue();
+            }else if (keyEvent.getCode().equals(KeyCode.DOWN)) {
+                setDateTime(DateHBox.this.localDateTime.minusSeconds(1));
+                setSliderValue();
             }
         });
         this.getChildren().addAll(datePicker, hoursTextField, hoursLabel, minutesTextField, minutesLabel, secondsTextField);
@@ -176,18 +214,14 @@ public class DateHBox extends HBox {
 
     public void setSliderValue() {
         if (this.dateSlider != null && this.sliderDateTime != null && isLocalUpdate) {
-            logger.log(Level.INFO, "setSliderValue if");
             String dateFormatString = this.datePicker.getValue() + " " + hoursTextField.getText() + ":" + minutesTextField.getText() + ":" + secondsTextField.getText();
             try {
                 this.localDateTime = getDateTimeFromString(dateFormatString);
-                int sliderValue = convertDateFormatStringToSliderValue(this.sliderDateTime,this.localDateTime);
-                logger.log(Level.INFO, "Slider value" + sliderValue);
+                int sliderValue = convertDateFormatStringToSliderValue(this.sliderDateTime, this.localDateTime);
                 this.dateSlider.setValue(sliderValue);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }else{
-            logger.log(Level.INFO, "setSliderValue else");
         }
     }
 

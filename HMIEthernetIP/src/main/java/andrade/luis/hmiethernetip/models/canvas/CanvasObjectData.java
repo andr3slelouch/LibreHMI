@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.CanvasOrientation;
 import andrade.luis.hmiethernetip.models.Tag;
+import andrade.luis.hmiethernetip.models.TrendChartSerieData;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -158,6 +159,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("samplingTime")
     @Expose
     private double samplingTime;
+    @SerializedName("trendChartSerieDataArr")
+    @Expose
+    private TrendChartSerieData[] trendChartSerieDataArr;
 
     private static final long serialVersionUID = 6976931227659398285L;
 
@@ -421,9 +425,13 @@ public class CanvasObjectData implements Serializable, Transferable {
         double tempY = position.getY() + getHeight()/2;
         return new CanvasPoint(tempX, tempY);
     }
+    public TrendChartSerieData[] getTrendChartSerieDataArr() {
+        return trendChartSerieDataArr;
+    }
 
-
-
+    public void setTrendChartSerieDataArr(TrendChartSerieData[] trendChartSerieDataArr) {
+        this.trendChartSerieDataArr = trendChartSerieDataArr;
+    }
     public ArrayList<Double> getPolygonPoints() {
         return polygonPoints;
     }

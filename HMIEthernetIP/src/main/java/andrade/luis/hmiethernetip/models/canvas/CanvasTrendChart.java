@@ -72,8 +72,9 @@ public class CanvasTrendChart extends CanvasObject{
     }
 
     private Timeline trendTimeline;
+    private ArrayList<TrendChartSerieData> trendChartSerieDataArrayList;
 
-    public CanvasTrendChart(CanvasPoint positionCanvasPoint){
+    public CanvasTrendChart(CanvasPoint positionCanvasPoint,ArrayList<TrendChartSerieData> trendChartSerieDataArrayList){
         super(positionCanvasPoint);
         //Defining the x axis
         CategoryAxis xAxis = new CategoryAxis();
@@ -169,6 +170,13 @@ public class CanvasTrendChart extends CanvasObject{
         VBox downContent = new VBox(startRangeHBox,endRangeHBox,buttonsHBox);
         downContent.setAlignment(Pos.CENTER);
 
+        this.trendChartSerieDataArrayList = trendChartSerieDataArrayList;
+        TrendChartSerieData[] data = new TrendChartSerieData[8];
+        for(int i=0;i<trendChartSerieDataArrayList.size();i++){
+            data[i] = trendChartSerieDataArrayList.get(i);
+        }
+        this.getCanvasObjectData().setTrendChartSerieDataArr(data);
+
         this.setCenter(lineChart);
         this.setBottom(downContent);
     }
@@ -181,7 +189,7 @@ public class CanvasTrendChart extends CanvasObject{
     public void zoomOutOperation(){
         if(this.zoomedIn){
             this.zoomedIn = false;
-            updateSliders(this.lastUpdatedTime,90000,false,null);
+            updateSliders(LocalDateTime.now().minusSeconds(86400),90000,false,null);
         }
     }
 
@@ -205,6 +213,8 @@ public class CanvasTrendChart extends CanvasObject{
                 lineChart.getData().get(i).getNode().setStyle("-fx-stroke: blue;");
             }
         }else{
+            this.startRangeHBox.setDateTime(sliderDateTime);
+            this.endRangeHBox.setDateTime(sliderDateTime.plusSeconds(90000));
             this.lineChart.getData().clear();
             for (XYChart.Series<String, Number> lineChartSerie : this.linechartSeries) {
                 this.lineChart.getData().add(lineChartSerie);

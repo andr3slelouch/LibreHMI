@@ -5,12 +5,12 @@ import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import java.io.Serializable;
 
 public class TrendChartSerieData implements Serializable {
-    public Tag getTag() {
-        return tag;
+    public Expression getExpression() {
+        return expression;
     }
 
-    public void setTag(Tag tag) {
-        this.tag = tag;
+    public void setExpression(Expression expression) {
+        this.expression = expression;
     }
 
     public CanvasColor getColor() {
@@ -20,7 +20,21 @@ public class TrendChartSerieData implements Serializable {
     public void setColor(CanvasColor color) {
         this.color = color;
     }
+    public String getSerieDataName() {
+        return serieDataName;
+    }
 
-    private Tag tag;
+    public void setSerieDataName(String serieDataName) {
+        this.serieDataName = serieDataName;
+    }
+
+    private Expression expression;
     private CanvasColor color;
+    private String serieDataName;
+
+    public TrendChartSerieData(Expression expression, CanvasColor color, String serieDataName) {
+        this.expression = expression;
+        this.color = color;
+        this.serieDataName = serieDataName;
+    }
 }
