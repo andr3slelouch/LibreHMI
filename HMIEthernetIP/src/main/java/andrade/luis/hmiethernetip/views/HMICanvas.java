@@ -204,12 +204,13 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addTrendChartOnCanvasClicked(CanvasPoint current) {
-        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,350);
+        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,375);
         setTrendChartPropertiesWindow.showAndWait();
         if(!setTrendChartPropertiesWindow.isCanceled()){
             CanvasTrendChart canvasTrendChart = new CanvasTrendChart(current,setTrendChartPropertiesWindow.getTrendChartSerieDataArrayList());
             canvasTrendChart.setCanvas(this);
             canvasTrendChart.setHmiApp(hmiApp);
+            canvasTrendChart.getCanvasObjectData().setSamplingTime(Double.parseDouble(setTrendChartPropertiesWindow.getSamplingTimeTF().getText()));
             if (this.getShapeArrayList().isEmpty()) {
                 canvasTrendChart.setObjectId(FIGURE_ID + "0");
             } else {
