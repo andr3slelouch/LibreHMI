@@ -1,1 +1,5 @@
 /HMIEthernetIP/target/
+/HMIEthernetIP/.idea/sonarlint/
+*.xml
+HMIEthernetIP/.idea/sonarlint/issuestore/index.pb
+*.pb

@@ -1,7 +1,6 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.DateHBox;
-import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.TrendChartSerieData;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -9,23 +8,28 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.codehaus.commons.compiler.CompileException;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -77,6 +81,8 @@ public class CanvasTrendChart extends CanvasObject {
 
     private Timeline trendTimeline;
     private ArrayList<TrendChartSerieData> trendChartSerieDataArrayList;
+    private ArrayList<CheckBox> enabledExpressionCheckBoxes = new ArrayList<>();
+    private ArrayList<String> showingExpressions = new ArrayList<>();
 
     public CanvasTrendChart(CanvasPoint positionCanvasPoint, ArrayList<TrendChartSerieData> trendChartSerieDataArrayList) {
         super(positionCanvasPoint);
@@ -90,6 +96,7 @@ public class CanvasTrendChart extends CanvasObject {
 
         //Creating the line chart
         this.lineChart = new LineChart<>(xAxis, yAxis);
+        this.trendChartSerieDataArrayList = trendChartSerieDataArrayList;
 
         //Prepare XYChart.Series objects by setting data
         for (TrendChartSerieData data : trendChartSerieDataArrayList) {
@@ -98,27 +105,7 @@ public class CanvasTrendChart extends CanvasObject {
             this.lineChartSeries.add(serie);
         }
         lineChart.getData().addAll(lineChartSeries);
-        //Setting the data to Line chart
-        for (int i = 0; i < lineChart.getData().size(); i++) {
-            XYChart.Series<String, Number> serie = lineChart.getData().get(i);
-            String colorString = "";
-            for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
-                if (serie.getName().equals(trendChartSerieData.getSerieDataName())) {
-                    colorString = trendChartSerieData.getColor().toHexString();
-                }
-            }
-            serie.getNode().setStyle("-fx-stroke: " + colorString + ";");
-        }
-        for (Node node : lineChart.lookupAll("Label.chart-legend-item")) {
-            String colorString = "";
-            Label label = (Label) node;
-            for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
-                if (label.getText().equals(trendChartSerieData.getSerieDataName())) {
-                    colorString = trendChartSerieData.getColor().toHexString();
-                }
-            }
-            label.getGraphic().setStyle("-fx-background-color: " + colorString + ", white");
-        }
+        updateLineChartColors();
 
 
         this.lastUpdatedTime = LocalDateTime.now();
@@ -129,7 +116,7 @@ public class CanvasTrendChart extends CanvasObject {
 
         lineChart.setTitle("Datos en el Tiempo");
         lineChart.setCreateSymbols(false);
-        //lineChart.setLegendVisible(false);
+        lineChart.setLegendVisible(false);
         this.getCanvasObjectData().setSamplingTime(1);
         this.startRangeHBox = new DateHBox();
         this.startRangeSlider = new Slider(0, 90000, 0) {
@@ -201,8 +188,22 @@ public class CanvasTrendChart extends CanvasObject {
         HBox buttonsHBox = new HBox();
         buttonsHBox.setAlignment(Pos.CENTER);
         buttonsHBox.getChildren().addAll(zoomInButton, zoomOutButton, reloadButton);
-        VBox downContent = new VBox(startRangeHBox, endRangeHBox, buttonsHBox);
+        HBox enabledExpressionsHBox = new HBox();
+        enabledExpressionsHBox.setAlignment(Pos.CENTER);
+        for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
+            CheckBox expressionCheckBox = new CheckBox(trendChartSerieData.getSerieDataName());
+            expressionCheckBox.setGraphic(new Circle(0,0,5,trendChartSerieData.getColor().getColor()));
+            expressionCheckBox.setSelected(true);
+            expressionCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
+                updateSeries();
+            });
+            enabledExpressionCheckBoxes.add(expressionCheckBox);
+        }
+        enabledExpressionsHBox.getChildren().addAll(enabledExpressionCheckBoxes);
+        enabledExpressionsHBox.setSpacing(5);
+        VBox downContent = new VBox(enabledExpressionsHBox,startRangeHBox, endRangeHBox, buttonsHBox);
         downContent.setAlignment(Pos.CENTER);
+        downContent.setSpacing(5);
 
         this.trendChartSerieDataArrayList = trendChartSerieDataArrayList;
         TrendChartSerieData[] data = new TrendChartSerieData[8];
@@ -228,6 +229,52 @@ public class CanvasTrendChart extends CanvasObject {
         }
     }
 
+    public void updateLineChartColors(){
+        for (int i = 0; i < lineChart.getData().size(); i++) {
+            XYChart.Series<String, Number> serie = lineChart.getData().get(i);
+            String colorString = "";
+            for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
+                if (serie.getName().equals(trendChartSerieData.getSerieDataName())) {
+                    colorString = trendChartSerieData.getColor().toHexString();
+                }
+            }
+            serie.getNode().setStyle("-fx-stroke: " + colorString + ";");
+        }
+    }
+
+    public void updateSeries(){
+        ArrayList<XYChart.Series<String,Number>> seriesToDelete = new ArrayList<>();
+        ArrayList<XYChart.Series<String,Number>> seriesToAdd = new ArrayList<>();
+        this.showingExpressions.clear();
+        for (CheckBox enabledExpressionCheckBox : enabledExpressionCheckBoxes) {
+            if (!enabledExpressionCheckBox.isSelected()) {
+                this.showingExpressions.remove(enabledExpressionCheckBox.getText());
+                for (int j = 0; j < this.lineChart.getData().size(); j++) {
+                    if (this.lineChart.getData().get(j).getName().equals(enabledExpressionCheckBox.getText())) {
+                        seriesToDelete.add(this.lineChart.getData().get(j));
+                    }
+                }
+            } else {
+                this.showingExpressions.add(enabledExpressionCheckBox.getText());
+                for (XYChart.Series<String, Number> lineChartSerie : this.lineChartSeries) {
+                    if (lineChartSerie.getName().equals(enabledExpressionCheckBox.getText())) {
+                        seriesToAdd.add(lineChartSerie);
+                    }
+                }
+            }
+        }
+        this.lineChart.getData().removeAll(seriesToDelete);
+        for (XYChart.Series<String, Number> stringNumberSeries : seriesToAdd) {
+            if (!this.lineChart.getData().contains(stringNumberSeries)) {
+                this.lineChart.getData().add(stringNumberSeries);
+            }
+            updateLineChartColors();
+        }
+        if(this.zoomedIn){
+            zoomInOperation();
+        }
+    }
+
     public void updateSliders(LocalDateTime sliderDateTime, double sliderRange, boolean isFilterEnabled, ArrayList<TrendChartSerieData> selectedData) {
         this.sliderLocalDateTime = sliderDateTime;
         this.startRangeSlider.setMin(0.0);
@@ -242,7 +289,14 @@ public class CanvasTrendChart extends CanvasObject {
             LocalDateTime endD = convertStringToLocalDateTime(convertSliderValueToString(sliderLocalDateTime, endRangeSlider.getValue()));
             this.lineChart.getData().clear();
             for (XYChart.Series<String, Number> lineChartSerie : this.lineChartSeries) {
-                this.lineChart.getData().add(filterSerie(startD, endD, lineChartSerie));
+                XYChart.Series<String,Number> filteredSerie = filterSerie(startD, endD, lineChartSerie);
+                if(showingExpressions.contains(filteredSerie.getName())){
+                    this.lineChart.getData().add(filteredSerie);
+                    logger.log(Level.INFO,"Added serie:"+filteredSerie.getName());
+                }else{
+                    logger.log(Level.INFO,"showingExpressions element count:"+showingExpressions.size());
+                    logger.log(Level.INFO,"Not Added serie:"+filteredSerie.getName());
+                }
             }
         } else {
             this.startRangeHBox.setDateTime(sliderDateTime);
@@ -250,31 +304,14 @@ public class CanvasTrendChart extends CanvasObject {
             if (!new HashSet<>(this.lineChart.getData()).containsAll(this.lineChartSeries)) {
                 this.lineChart.getData().clear();
                 for (XYChart.Series<String, Number> lineChartSerie : this.lineChartSeries) {
-                    this.lineChart.getData().add(lineChartSerie);
+                    if(showingExpressions.contains(lineChartSerie.getName()) && !this.lineChart.getData().contains(lineChartSerie) ){
+                        this.lineChart.getData().add(lineChartSerie);
+                    }
                 }
             }
 
         }
-        for (int i = 0; i < lineChart.getData().size(); i++) {
-            XYChart.Series<String, Number> serie = lineChart.getData().get(i);
-            String colorString = "";
-            for (int j = 0; j < trendChartSerieDataArrayList.size(); j++) {
-                if (serie.getName().equals(trendChartSerieDataArrayList.get(j).getSerieDataName())) {
-                    colorString = trendChartSerieDataArrayList.get(j).getColor().toHexString();
-                }
-            }
-            serie.getNode().setStyle("-fx-stroke: " + colorString + ";");
-        }
-        for (Node node : lineChart.lookupAll("Label.chart-legend-item")) {
-            String colorString = "";
-            Label label = (Label) node;
-            for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
-                if (label.getText().equals(trendChartSerieData.getSerieDataName())) {
-                    colorString = trendChartSerieData.getColor().toHexString();
-                }
-            }
-            label.getGraphic().setStyle("-fx-background-color: " + colorString + ", white");
-        }
+        updateLineChartColors();
     }
 
     public XYChart.Series<String, Number> filterSerie(LocalDateTime start, LocalDateTime end, XYChart.Series<String, Number> serie) {
