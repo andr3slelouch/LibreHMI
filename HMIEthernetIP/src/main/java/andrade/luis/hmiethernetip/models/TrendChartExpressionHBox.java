@@ -7,6 +7,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
 public class TrendChartExpressionHBox extends HBox {
+    public TextField getExpressionTF() {
+        return expressionTF;
+    }
+
+    public void setExpressionTF(TextField expressionTF) {
+        this.expressionTF = expressionTF;
+    }
+
+    private TextField expressionTF;
+
     public TextField getExpressionNameTF() {
         return expressionNameTF;
     }
@@ -51,7 +61,7 @@ public class TrendChartExpressionHBox extends HBox {
         expressionNameTF = new TextField();
         expressionNameTF.setPromptText("Nombre de la serie");
         Button setExpressionBtn = new Button("Definir Expresión");
-        TextField expressionTF = new TextField();
+        expressionTF = new TextField();
         expressionTF.setDisable(true);
         setExpressionBtn.setOnAction(actionEvent -> {
             WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();

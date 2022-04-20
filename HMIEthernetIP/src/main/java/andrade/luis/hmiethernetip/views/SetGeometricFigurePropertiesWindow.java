@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.RotationHBox;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.util.converter.DoubleStringConverter;
@@ -7,15 +8,7 @@ import javafx.util.converter.DoubleStringConverter;
 import java.util.function.UnaryOperator;
 
 public class SetGeometricFigurePropertiesWindow extends SetSizeWindow {
-
-    private final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        return change;
-    };
+    private RotationHBox rotationHBox;
 
     public boolean isModifyingColor() {
         return modifyingColor;
@@ -35,23 +28,8 @@ public class SetGeometricFigurePropertiesWindow extends SetSizeWindow {
         super(width, height);
         this.getVbox().getWidthValueHBox().setSpacing(16);
         this.getVbox().getHeightValueHBox().setSpacing(30);
-        Label rotationLabel = new Label("Rotar:");
-        rotationTextField = new TextField("0");
-        rotationTextField.setPrefWidth(115);
-        rotationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
-        rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
-            rotationValue = newValue;
-        });
-        Button rotationButton = new Button("+90°");
-        rotationButton.setOnAction(mouseEvent -> {
-            double value = Double.parseDouble(rotationTextField.getText());
-            rotationTextField.setText(String.valueOf(value + 90));
-        });
-        HBox rotationInputHBox = new HBox();
-        rotationInputHBox.getChildren().addAll(rotationTextField,rotationButton);
 
-        HBox rotationHBox = new HBox();
-        rotationHBox.getChildren().addAll(rotationLabel, rotationInputHBox);
+        rotationHBox = new RotationHBox(this.rotationValue);
         rotationHBox.setSpacing(78);
         Label selectColor = new Label("Seleccione el color:");
 
@@ -65,7 +43,7 @@ public class SetGeometricFigurePropertiesWindow extends SetSizeWindow {
     }
 
     public TextField getRotationTextField() {
-        return rotationTextField;
+        return rotationHBox.getRotationTextField();
     }
 
     public void setRotationTextField(TextField rotationTextField) {

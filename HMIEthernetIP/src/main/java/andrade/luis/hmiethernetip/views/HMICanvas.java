@@ -95,12 +95,14 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                 case ALARM_DISPLAY_STR:
                     addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
                     continue;
+                case TREND_STR:
+                    addPastedTrendChartOnCanvasClicked(canvasObjectData);
+                    continue;
                 default:
             }
         }
         pasteOffset = 10;
     }
-
     private final ArrayList<CanvasObject> shapeArrayList = new ArrayList<>();
     private CanvasPoint currentMousePosition;
     private HMIApp hmiApp;
@@ -204,12 +206,19 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addTrendChartOnCanvasClicked(CanvasPoint current) {
-        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,375);
+        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,475);
         setTrendChartPropertiesWindow.showAndWait();
         if(!setTrendChartPropertiesWindow.isCanceled()){
-            CanvasTrendChart canvasTrendChart = new CanvasTrendChart(current,setTrendChartPropertiesWindow.getTrendChartSerieDataArrayList());
+            CanvasTrendChart canvasTrendChart = new CanvasTrendChart(
+                    current,
+                    setTrendChartPropertiesWindow.getTrendChartSerieDataArrayList(),
+                    Double.parseDouble(setTrendChartPropertiesWindow.getSizeVBox().getWidthField().getText()),
+                    Double.parseDouble(setTrendChartPropertiesWindow.getSizeVBox().getHeightField().getText()),
+                    Double.parseDouble(setTrendChartPropertiesWindow.getRotationHBox().getRotationTextField().getText())
+            );
             canvasTrendChart.setCanvas(this);
             canvasTrendChart.setHmiApp(hmiApp);
+
             canvasTrendChart.getCanvasObjectData().setSamplingTime(Double.parseDouble(setTrendChartPropertiesWindow.getSamplingTimeTF().getText()));
             if (this.getShapeArrayList().isEmpty()) {
                 canvasTrendChart.setObjectId(FIGURE_ID + "0");
@@ -644,6 +653,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                     case ALARM_DISPLAY_STR:
                         addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
                         break;
+                    case TREND_STR:
+                        addPastedTrendChartOnCanvasClicked(canvasObjectData);
+                        break;
                     default:
                         break;
                 }
@@ -651,6 +663,18 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         } catch (ClassNotFoundException | IOException | UnsupportedFlavorException e) {
             e.printStackTrace();
         }
+    }
+    private void addPastedTrendChartOnCanvasClicked(CanvasObjectData canvasObjectData) {
+        CanvasTrendChart canvasTrendChart = new CanvasTrendChart(canvasObjectData);
+        canvasTrendChart.setCanvas(this);
+        canvasTrendChart.setHmiApp(hmiApp);
+        canvasTrendChart.setObjectId(generateIdForPasteOperation(canvasObjectData));
+        canvasTrendChart.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
+        this.addNewShape(canvasTrendChart);
+        this.getChildren().add(canvasTrendChart);
+        canvasTrendChart.getHmiApp().setWasModified(true);
+        canvasTrendChart.setTrendTimeline();
+        canvasTrendChart.getTrendTimeline().play();
     }
 
     private void addPastedEllipse(CanvasObjectData canvasObjectData) {

@@ -1,5 +1,7 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.RotationHBox;
+import andrade.luis.hmiethernetip.models.SizeVBox;
 import andrade.luis.hmiethernetip.models.TrendChartExpressionHBox;
 import andrade.luis.hmiethernetip.models.TrendChartSerieData;
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
@@ -24,6 +26,36 @@ public class SetTrendChartPropertiesWindow extends Stage {
     private final HBox buttonsHBox;
     private final Scene mainScene;
 
+    public SizeVBox getSizeVBox() {
+        return sizeVBox;
+    }
+
+    public void setSizeVBox(SizeVBox sizeVBox) {
+        this.sizeVBox = sizeVBox;
+    }
+
+    private SizeVBox sizeVBox;
+
+    public RotationHBox getRotationHBox() {
+        return rotationHBox;
+    }
+
+    public void setRotationHBox(RotationHBox rotationHBox) {
+        this.rotationHBox = rotationHBox;
+    }
+
+    private RotationHBox rotationHBox;
+
+    public String getRotationValue() {
+        return rotationValue;
+    }
+
+    public void setRotationValue(String rotationValue) {
+        this.rotationValue = rotationValue;
+    }
+
+    private String rotationValue;
+
     public TextField getSamplingTimeTF() {
         return samplingTimeTF;
     }
@@ -33,6 +65,15 @@ public class SetTrendChartPropertiesWindow extends Stage {
     }
 
     private TextField samplingTimeTF;
+
+    public ArrayList<TrendChartExpressionHBox> getExpressionHBoxes() {
+        return expressionHBoxes;
+    }
+
+    public void setExpressionHBoxes(ArrayList<TrendChartExpressionHBox> expressionHBoxes) {
+        this.expressionHBoxes = expressionHBoxes;
+    }
+
     private ArrayList<TrendChartExpressionHBox> expressionHBoxes = new ArrayList<>();
 
     public ArrayList<TrendChartSerieData> getTrendChartSerieDataArrayList() {
@@ -65,7 +106,7 @@ public class SetTrendChartPropertiesWindow extends Stage {
     private boolean canceled=true;
 
     public SetTrendChartPropertiesWindow(double width, double height) {
-        this.setTitle("Definir Expresiones para el Gráfico de tendencias");
+        this.setTitle("Propiedades para el Gráfico de tendencias");
         root = new StackPane();
         HBox samplingTimeHBox = new HBox();
         Label samplingTimeLbl = new Label("Tiempo de Muestreo(segundos):");
@@ -82,7 +123,18 @@ public class SetTrendChartPropertiesWindow extends Stage {
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().add(samplingTimeHBox);
+
+        sizeVBox = new SizeVBox(700,500,482,482);
+        sizeVBox.getHeightValueHBox().setSpacing(19);
+        sizeVBox.getWidthValueHBox().setSpacing(5);
+        sizeVBox.setSpacing(5);
+        vbox.getChildren().add(sizeVBox);
+        rotationHBox = new RotationHBox(this.rotationValue);
+        rotationHBox.setSpacing(66);
+        rotationHBox.getRotationTextField().setPrefWidth(435);
+        vbox.getChildren().add(rotationHBox);
         vbox.getChildren().addAll(expressionHBoxes);
+
 
         finishSelectionButton = new Button("OK");
         finishSelectionButton.setAlignment(Pos.CENTER);

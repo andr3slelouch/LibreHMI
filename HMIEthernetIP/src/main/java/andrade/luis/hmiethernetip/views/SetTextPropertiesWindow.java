@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.RotationHBox;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,6 +20,7 @@ public class SetTextPropertiesWindow extends Stage {
     private final StackPane root;
     protected final VBox vbox;
     private final Scene mainScene;
+    private RotationHBox rotationHBox;
 
     public boolean isCancelled() {
         return cancelled;
@@ -41,7 +43,7 @@ public class SetTextPropertiesWindow extends Stage {
     private HBox colorHBox;
 
     public TextField getRotationTextField() {
-        return rotationTextField;
+        return rotationHBox.getRotationTextField();
     }
 
     public void setRotationTextField(TextField rotationTextField) {
@@ -115,22 +117,7 @@ public class SetTextPropertiesWindow extends Stage {
         colorHBox.setSpacing(13);
         colorHBox.getChildren().addAll(selectColor, colorPicker);
 
-        Label rotationLabel = new Label("Rotar:");
-        rotationTextField = new TextField("0");
-        rotationTextField.setPrefWidth(150);
-        rotationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
-        rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
-            rotationValue = newValue;
-        });
-        Button rotationButton = new Button("+90°");
-        rotationButton.setOnAction(mouseEvent -> {
-            double value = Double.parseDouble(rotationTextField.getText());
-            rotationTextField.setText(String.valueOf(value + 90));
-        });
-        HBox rotationInputHBox = new HBox();
-        rotationInputHBox.getChildren().addAll(rotationTextField,rotationButton);
-        HBox rotationHBox = new HBox();
-        rotationHBox.getChildren().addAll(rotationLabel, rotationInputHBox);
+        rotationHBox = new RotationHBox(rotationValue);
         rotationHBox.setSpacing(92);
 
         vbox = new VBox();

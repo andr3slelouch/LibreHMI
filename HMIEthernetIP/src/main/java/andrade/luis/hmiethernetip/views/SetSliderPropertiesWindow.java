@@ -1,6 +1,7 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.CanvasOrientation;
+import andrade.luis.hmiethernetip.models.RotationHBox;
 import andrade.luis.hmiethernetip.models.SizeVBox;
 import andrade.luis.hmiethernetip.models.Tag;
 import javafx.scene.control.*;
@@ -13,6 +14,7 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
     private String rotationValue;
     private SizeVBox sizeVBox;
     private ToggleGroup radioGroup;
+    private RotationHBox rotationHBox;
 
     public RadioButton getHorizontalRadioButton() {
         return horizontalRadioButton;
@@ -42,7 +44,7 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
     }
 
     public TextField getRotationTextField() {
-        return rotationTextField;
+        return rotationHBox.getRotationTextField();
     }
 
     public void setRotationTextField(TextField rotationTextField) {
@@ -105,22 +107,7 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
         sizeVBox.getHeightValueHBox().setSpacing(149);
         sizeVBox.setSpacing(5);
 
-        Label rotationLabel = new Label("Rotar:");
-        rotationTextField = new TextField("0");
-        rotationTextField.setPrefWidth(116);
-        rotationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
-        rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
-            rotationValue = newValue;
-        });
-        Button rotationButton = new Button("+90°");
-        rotationButton.setOnAction(mouseEvent -> {
-            double value = Double.parseDouble(rotationTextField.getText());
-            rotationTextField.setText(String.valueOf(value + 90));
-        });
-        HBox rotationInputHBox = new HBox();
-        rotationInputHBox.getChildren().addAll(rotationTextField, rotationButton);
-        HBox rotationHBox = new HBox();
-        rotationHBox.getChildren().addAll(rotationLabel, rotationInputHBox);
+        rotationHBox = new RotationHBox(this.rotationValue);
         rotationHBox.setSpacing(196);
 
         Label orientationLabel = new Label("Seleccione la orientación:");

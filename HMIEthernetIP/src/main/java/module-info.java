@@ -16,6 +16,8 @@ module andrade.luis.hmiethernetip {
     requires janino;
     requires org.mybatis;
     requires java.sql;
+    requires com.opencsv;
+    requires jasypt;
 
     opens andrade.luis.hmiethernetip to javafx.fxml;
     exports andrade.luis.hmiethernetip;

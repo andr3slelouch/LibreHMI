@@ -47,6 +47,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
+
 
 import static javafx.geometry.Pos.CENTER;
 
@@ -486,7 +489,7 @@ public class HMIApp extends Application {
                 recentMenuItem.setOnAction(mouseEvent -> {
                     try {
                         this.loadHMIData(menuItems.get(finalI));
-                    } catch (FileNotFoundException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 });
@@ -512,7 +515,18 @@ public class HMIApp extends Application {
         saveAsMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+G"));
         saveAsMI.setOnAction(mouseEvent -> {
             try {
-                this.saveAsHMIData();
+                this.saveAsHMIData(false);
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
+                e.printStackTrace();
+            }
+        });
+        MenuItem saveAsEncryptedMI = new MenuItem("Guardar como Archivo Protegido");
+        saveAsEncryptedMI.setId("#saveAsEncryptedMI");
+        saveAsEncryptedMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+G"));
+        saveAsEncryptedMI.setOnAction(mouseEvent -> {
+            try {
+                this.saveAsHMIData(true);
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
                 e.printStackTrace();
@@ -547,7 +561,7 @@ public class HMIApp extends Application {
 
         SeparatorMenuItem exitSeparatorMenuItem = new SeparatorMenuItem();
 
-        menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, runEditSeparatorMI, runEditMI, exitSeparatorMenuItem, exitMI);
+        menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, saveAsEncryptedMI,runEditSeparatorMI, runEditMI, exitSeparatorMenuItem, exitMI);
 
         return menuFile;
     }
@@ -856,7 +870,7 @@ public class HMIApp extends Application {
         if (currentProjectFilePath != null) {
             this.saveHMIData(currentProjectFilePath);
         } else {
-            this.saveAsHMIData();
+            this.saveAsHMIData(false);
         }
     }
 
@@ -878,12 +892,39 @@ public class HMIApp extends Application {
 
     }
 
-    public void loadHMIData(String filenamePath) throws FileNotFoundException {
+    public void loadHMIData(String filenamePath) throws IOException {
+        String[] filenamePathArr = filenamePath.split("\\.");
+        String type = filenamePathArr[filenamePathArr.length-1];
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath));
+        HMIAppData localHmiAppData = null;
+        if(type.equals("json") || type.equals("JSON")){
+            localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
+        }else if(type.equals("lhmi") || type.equals("LHMI")){
+            SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(false);
+            setFilePasswordWindow.showAndWait();
+            if(!setFilePasswordWindow.isCanceled()){
+                StringBuilder rawEncryptedDataSB= new StringBuilder();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    rawEncryptedDataSB.append(line);
+                }
+                StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+                encryptor.setPassword(setFilePasswordWindow.getPassword());
+                encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
+                try{
+                    String rawJson = encryptor.decrypt(rawEncryptedDataSB.toString());
+                    localHmiAppData = gson.fromJson(rawJson,HMIAppData.class);
+                }catch (EncryptionOperationNotPossibleException e){
+                    showAlert(Alert.AlertType.ERROR,"Contraseña incorrecta","La contraseña ingresada no es correcta, reintente",false,false);
+                }
 
-        HMIAppData localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
+            }
+        }
+
+
+
         if (localHmiAppData != null) {
             if (localHmiAppData.getType() == null) {
                 if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?", false, false)) {
@@ -942,11 +983,17 @@ public class HMIApp extends Application {
         }
     }
 
-    private void saveAsHMIData() throws IOException {
+    private void saveAsHMIData(boolean encrypted) throws IOException {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("JSON", "*.json", "*.JSON")
-        );
+        if(encrypted){
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("LHMI", "*.lhmi", "*.LHMI")
+            );
+        }else {
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("JSON", "*.json", "*.JSON")
+            );
+        }
         fileChooser.setTitle("Guardar Proyecto");
         fileChooser.setInitialDirectory(
                 new File(System.getProperty("user.home"))
@@ -954,7 +1001,11 @@ public class HMIApp extends Application {
 
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            saveHMIData(file.getAbsolutePath());
+            if(encrypted){
+                saveEncryptedHMIData(file.getAbsolutePath());
+            }else{
+                saveHMIData(file.getAbsolutePath());
+            }
         }
     }
 
@@ -987,6 +1038,46 @@ public class HMIApp extends Application {
             this.setWasModified(false);
             addRecentUsedFilePath(filenamePath);
             updateTitleWithFilename();
+        }
+    }
+    /**
+     * Este método inicia el proceso para guardar el proyecto dentro de un archivo json.
+     *
+     * @throws IOException Si hay algún problema en la lectura o escritura.
+     */
+    private void saveEncryptedHMIData(String filenamePath) throws IOException {
+        SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(true);
+        setFilePasswordWindow.showAndWait();
+        if(!setFilePasswordWindow.isCanceled()){
+            ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
+            for (HMIScene hmiScene : pages) {
+                ArrayList<CanvasObjectData> shapeArrayList = new ArrayList<>();
+                for (CanvasObject canvasObject : hmiScene.getCanvas().getCurrentCanvasObjects()) {
+                    shapeArrayList.add(canvasObject.getCanvasObjectData());
+                }
+                hmiScene.getHmiSceneData().setShapeArrayList(shapeArrayList);
+                hmiSceneDataArrayList.add(hmiScene.getHmiSceneData());
+            }
+            this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
+            this.hmiAppData.setHmiAlarms(manageableAlarms);
+            Gson gson = new Gson();
+            if (filenamePath != null) {
+                String[] filenameArr = filenamePath.split(File.separator);
+                this.currentFilename = filenameArr[filenameArr.length - 1];
+                Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
+                this.hmiAppData.setType("LibreHMIProject");
+                String rawJson = gson.toJson(this.hmiAppData);
+                StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+                encryptor.setPassword(setFilePasswordWindow.getPassword());
+                encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
+                String encryptedJSON = encryptor.encrypt(rawJson);
+                writer.write(encryptedJSON);
+                writer.close();
+                this.currentProjectFilePath = filenamePath;
+                this.setWasModified(false);
+                addRecentUsedFilePath(filenamePath);
+                updateTitleWithFilename();
+            }
         }
     }
 

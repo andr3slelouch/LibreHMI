@@ -1,5 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.RotationHBox;
 import andrade.luis.hmiethernetip.models.SizeVBox;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,6 +26,7 @@ public class SetImageOptionsWindow extends Stage {
         return change;
     };
     protected final VBox vbox;
+    private RotationHBox rotationHBox;
 
     public SizeVBox getSizeVBox() {
         return sizeVBox;
@@ -179,7 +181,7 @@ public class SetImageOptionsWindow extends Stage {
     }
 
     public TextField getRotationTextField() {
-        return rotationTextField;
+        return rotationHBox.getRotationTextField();
     }
 
     public void setRotationTextField(TextField rotationTextField) {
@@ -262,24 +264,8 @@ public class SetImageOptionsWindow extends Stage {
         mirrorVerticalCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> {
             mirroringVertical = newBoolean;
         });
-        Label rotationLabel = new Label("Rotar:");
-        rotationTextField = new TextField("0");
-        rotationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
-        rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
-            rotationValue = newValue;
-        });
-        rotationTextField.setPrefWidth(200);
-        Button rotationButton = new Button("+90°");
-        rotationButton.setOnAction(mouseEvent -> {
-            double value = Double.parseDouble(rotationTextField.getText());
-            rotationTextField.setText(String.valueOf(value + 90));
-        });
 
-        HBox rotationInputHBox = new HBox();
-        rotationInputHBox.getChildren().addAll(rotationTextField,rotationButton);
-
-        HBox rotationHBox = new HBox();
-        rotationHBox.getChildren().addAll(rotationLabel, rotationInputHBox);
+        rotationHBox = new RotationHBox(rotationValue);
         rotationHBox.setSpacing(100);
 
         Label colorMode = new Label("Modo de Color:");
