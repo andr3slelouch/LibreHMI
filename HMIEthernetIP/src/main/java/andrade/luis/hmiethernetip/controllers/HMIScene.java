@@ -141,7 +141,7 @@ public class HMIScene extends Scene implements Cloneable {
                         String item = getItem();
                         hmiApp.updateScene(item);
                     });
-                    contextMenu.getItems().addAll(newItem,exportItem,deleteItem,propertiesItem);
+                    contextMenu.getItems().addAll(newItem,exportItem,exportEncryptedItem,deleteItem,propertiesItem);
                     setContextMenu(contextMenu);
                     setOnMouseClicked(event -> {
                         if(event.getClickCount()==2){
