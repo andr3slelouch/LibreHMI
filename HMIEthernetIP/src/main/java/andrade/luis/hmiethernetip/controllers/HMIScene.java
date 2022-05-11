@@ -124,27 +124,24 @@ public class HMIScene extends Scene implements Cloneable {
                     ContextMenu contextMenu = new ContextMenu();
 
                     MenuItem newItem = new MenuItem();
-                    newItem.setText("New...");
+                    newItem.setText("Nueva");
                     newItem.setOnAction(event -> hmiApp.addNewScene());
-                    MenuItem saveItem = new MenuItem();
-                    saveItem.setText("Save");
-                    saveItem.setOnAction(event -> {
-                        String item = getItem();
-                        // code to edit item...
-                    });
-                    /*MenuItem duplicateItem = new MenuItem();
-                    duplicateItem.setText("Duplicate");
-                    duplicateItem.setOnAction(event -> hmiApp.duplicateScene(getItem()));*/
+                    MenuItem exportItem = new MenuItem();
+                    exportItem.setText("Exportar");
+                    exportItem.setOnAction(event -> hmiApp.exportSceneData(name,false));
+                    MenuItem exportEncryptedItem = new MenuItem();
+                    exportEncryptedItem.setText("Exportar con contraseña");
+                    exportEncryptedItem.setOnAction(event -> hmiApp.exportSceneData(name,true));
                     MenuItem deleteItem = new MenuItem();
-                    deleteItem.setText("Delete");
+                    deleteItem.setText("Eliminar");
                     deleteItem.setOnAction(event -> hmiApp.deleteScene(getItem()));
                     MenuItem propertiesItem = new MenuItem();
-                    propertiesItem.setText("Properties...");
+                    propertiesItem.setText("Propiedades");
                     propertiesItem.setOnAction(event -> {
                         String item = getItem();
                         hmiApp.updateScene(item);
                     });
-                    contextMenu.getItems().addAll(newItem,saveItem,deleteItem,propertiesItem);
+                    contextMenu.getItems().addAll(newItem,exportItem,deleteItem,propertiesItem);
                     setContextMenu(contextMenu);
                     setOnMouseClicked(event -> {
                         if(event.getClickCount()==2){
