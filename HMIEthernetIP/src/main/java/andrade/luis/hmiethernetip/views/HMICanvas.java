@@ -553,7 +553,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             this.getChildren().add(canvasText);
             canvasText.getHmiApp().setWasModified(true);
             this.setAddOnClickEnabled(false);
-
         }
     }
 

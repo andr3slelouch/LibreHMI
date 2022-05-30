@@ -76,6 +76,7 @@ public class Alarm implements Serializable {
                 this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                 this.type="Condición: "+ this.condition;
                 this.status=ACTIVATED_STR;
+                this.setAlarmExecutionDateTime();
                 return true;
             }else{
                 this.status=DEACTIVATED_STR;
@@ -92,6 +93,7 @@ public class Alarm implements Serializable {
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Alto Alto";
                     this.status=ACTIVATED_STR;
+                    this.setAlarmExecutionDateTime();
                     return true;
                 }
             }
@@ -105,6 +107,7 @@ public class Alarm implements Serializable {
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Alto";
                     this.status=ACTIVATED_STR;
+                    this.setAlarmExecutionDateTime();
                     return true;
                 }
             }
@@ -118,6 +121,7 @@ public class Alarm implements Serializable {
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Bajo Bajo";
                     this.status=ACTIVATED_STR;
+                    this.setAlarmExecutionDateTime();
                     return true;
                 }
             }
@@ -131,6 +135,7 @@ public class Alarm implements Serializable {
                     this.acknowledgement = this.acknowledgement==null ? UNACKNOWLEDGED_STATUS_STR :this.acknowledgement;
                     this.type="Condición: Bajo";
                     this.status=ACTIVATED_STR;
+                    this.setAlarmExecutionDateTime();
                     return true;
                 }
             }

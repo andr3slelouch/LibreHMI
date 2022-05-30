@@ -140,6 +140,7 @@ public class HMIApp extends Application {
     /**
      * Trend icon source: <a href="https://www.flaticon.com/free-icons/trend" title="trend icons">Trend icons created by adriansyah - Flaticon</a>
      */
+    private final Image trendIcon = new Image(getClass().getResource(IMAGES_DIR_STR + File.separator + "trending.png").toExternalForm());
     private String modeLabel = "";
     private String mode = "";
     private Timeline autoBlockTimeline;
@@ -302,13 +303,6 @@ public class HMIApp extends Application {
         designElementsLabel.setFont(new Font("Arial", 15));
         VBox designToolsVBox = generateDesignVBox(scene, root);
 
-        Button playBtn = new Button("Play");
-        Button stopBtn = new Button("Stop");
-        Button defaultBtn = new Button("Default");
-
-        HBox fifthHBox = new HBox(playBtn);
-        fifthHBox.setAlignment(CENTER);
-
 
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
@@ -318,7 +312,7 @@ public class HMIApp extends Application {
         Label pagesLabel = new Label("Páginas");
         pagesLabel.setFont(new Font("Arial", 15));
 
-        VBox vbox = new VBox(designElementsLabel, designToolsVBox, fifthHBox, pagesLabel, scene.getListViewReference());
+        VBox vbox = new VBox(designElementsLabel, designToolsVBox, pagesLabel, scene.getListViewReference());
         vbox.setPadding(new Insets(50, 0, 0, 0));
         vbox.setSpacing(10);
         vbox.setPrefWidth(150);
@@ -361,13 +355,6 @@ public class HMIApp extends Application {
 
         root.getChildren().add(menuBar);
         root.getChildren().add(expandHBox);
-
-        playBtn.setOnAction(mouseEvent -> {
-            scene.getCanvas().setAddOnClickEnabled(true);
-            root.setType("TrendChart");
-        });
-        stopBtn.setOnAction(mouseEvent -> enableInputRepresentations("Stop"));
-        defaultBtn.setOnAction(mouseEvent -> enableInputRepresentations("Default"));
         scene.setHmiApp(this);
 
         return scene;
@@ -756,7 +743,18 @@ public class HMIApp extends Application {
             scene.getCanvas().setAddOnClickEnabled(true);
             root.setType("Pushbutton");
         });
-        VBox designToolsVBox = new VBox(firstHBox, secondHBox, thirdHBox, fourthHBox);
+        Button trendGraphBtn = new Button("");
+        trendGraphBtn.setTooltip(new Tooltip("Gráfico de Tendencias"));
+        trendGraphBtn.setGraphic(new ImageView(trendIcon));
+        trendGraphBtn.setOnAction(mouseEvent -> {
+            scene.getCanvas().setAddOnClickEnabled(true);
+            root.setType("TrendChart");
+        });
+
+
+        HBox fifthHBox = new HBox(trendGraphBtn);
+        fifthHBox.setAlignment(CENTER);
+        VBox designToolsVBox = new VBox(firstHBox, secondHBox, thirdHBox, fourthHBox, fifthHBox);
         designToolsVBox.setAlignment(CENTER);
         return designToolsVBox;
     }

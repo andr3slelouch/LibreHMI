@@ -12,6 +12,7 @@ public class CanvasLine extends CanvasObject{
         super(positionCanvasPoint);
         if(positionCanvasPoints.size()==4){
             this.getCanvasObjectData().setPolygonPoints(positionCanvasPoints);
+            this.getCanvasObjectData().setWidth(1);
             setData(this.getCanvasObjectData().getPolygonPoints().get(0), this.getCanvasObjectData().getPolygonPoints().get(1),this.getCanvasObjectData().getPolygonPoints().get(2),this.getCanvasObjectData().getPolygonPoints().get(3));
         }
     }

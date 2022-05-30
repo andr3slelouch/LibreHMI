@@ -67,6 +67,10 @@ public class CanvasTrendChart extends CanvasObject {
      * Reload : <a href="https://www.flaticon.com/free-icons/refresh" title="refresh icons">Refresh icons created by Gregor Cresnar - Flaticon</a>
      */
     Image reloadIcon = new Image(this.getClass().getResource("reload.png").toExternalForm());
+    /**
+     * CSV : <a href="https://www.flaticon.com/free-icons/csv" title="csv icons">Csv icons created by Freepik - Flaticon</a>
+     */
+    Image csvIcon = new Image(this.getClass().getResource("csv.png").toExternalForm());
     private LineChart<String, Number> lineChart;
     private LocalDateTime lastUpdatedTime;
     private LocalDateTime sliderLocalDateTime;
@@ -227,9 +231,8 @@ public class CanvasTrendChart extends CanvasObject {
             zoomOutButton.setDisable(true);
         });
         Button exportButton = new Button("Exportar");
-        exportButton.setOnAction(actionEvent -> {
-            exportDataToCSV();
-        });
+        exportButton.setGraphic(new ImageView(csvIcon));
+        exportButton.setOnAction(actionEvent -> exportDataToCSV());
         HBox buttonsHBox = new HBox();
         buttonsHBox.setAlignment(Pos.CENTER);
         buttonsHBox.getChildren().addAll(zoomInButton, zoomOutButton, reloadButton,exportButton);
@@ -242,6 +245,7 @@ public class CanvasTrendChart extends CanvasObject {
                 expressionCheckBox.setGraphic(new Circle(0, 0, 5, trendChartSerieData.getColor().getColor()));
                 expressionCheckBox.setSelected(true);
                 expressionCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> updateSeries());
+                this.showingExpressions.add(trendChartSerieData.getSerieDataName());
                 enabledExpressionCheckBoxes.add(expressionCheckBox);
             }
         }
@@ -422,6 +426,9 @@ public class CanvasTrendChart extends CanvasObject {
                 XYChart.Series<String, Number> filteredSerie = filterSerie(startD, endD, lineChartSerie);
                 if (showingExpressions.contains(filteredSerie.getName())) {
                     this.lineChart.getData().add(filteredSerie);
+                    logger.log(Level.INFO,"Filtered");
+                }else{
+                    logger.log(Level.INFO,"Not Filtered");
                 }
             }
         } else {
@@ -431,6 +438,9 @@ public class CanvasTrendChart extends CanvasObject {
             for (XYChart.Series<String, Number> lineChartSerie : this.lineChartSeries) {
                 if (showingExpressions.contains(lineChartSerie.getName()) && !this.lineChart.getData().contains(lineChartSerie)) {
                     this.lineChart.getData().add(lineChartSerie);
+                    logger.log(Level.INFO,"UnFiltered");
+                }else{
+                    logger.log(Level.INFO,"Not UnFiltered");
                 }
             }
         }
