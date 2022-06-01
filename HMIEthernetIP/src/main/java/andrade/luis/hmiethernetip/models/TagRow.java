@@ -140,6 +140,14 @@ public class TagRow implements Serializable {
         this.tagValue = new SimpleStringProperty(tagValue);
     }
 
+    public Tag generateTag(){
+        Tag tag = new Tag(getPlcName(),getPlcAddress(),getPlcDeviceGroup(),getTagName(),getTagType(),getTagAddress(),getTagAction(),getTagValue(),0);
+        if(tag.getPlcName().equals("LibreHMI") && tag.getPlcAddress().equals("localhost")&& tag.getPlcDeviceGroup().equals("Local") && tag.getAddress().equals("Local")){
+            tag.setLocalTag(true);
+        }
+        return tag;
+    }
+
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();

@@ -1,9 +1,6 @@
 package andrade.luis.hmiethernetip.views;
 
-import andrade.luis.hmiethernetip.models.RotationHBox;
-import andrade.luis.hmiethernetip.models.SizeVBox;
-import andrade.luis.hmiethernetip.models.TrendChartExpressionHBox;
-import andrade.luis.hmiethernetip.models.TrendChartSerieData;
+import andrade.luis.hmiethernetip.models.*;
 import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -105,8 +102,20 @@ public class SetTrendChartPropertiesWindow extends Stage {
 
     private boolean canceled=true;
 
-    public SetTrendChartPropertiesWindow(double width, double height) {
+    public ArrayList<Tag> getLocalTags() {
+        return localTags;
+    }
+
+    public void setLocalTags(ArrayList<Tag> localTags) {
+        this.localTags = localTags;
+    }
+
+    private ArrayList<Tag> localTags;
+
+
+    public SetTrendChartPropertiesWindow(double width, double height,ArrayList<Tag> localTags) {
         this.setTitle("Propiedades para el Gráfico de tendencias");
+        this.localTags = localTags;
         root = new StackPane();
         HBox samplingTimeHBox = new HBox();
         Label samplingTimeLbl = new Label("Tiempo de Muestreo(segundos):");
@@ -116,7 +125,7 @@ public class SetTrendChartPropertiesWindow extends Stage {
         samplingTimeTF.setPrefWidth(385);
         samplingTimeHBox.getChildren().addAll(samplingTimeLbl,samplingTimeTF);
         for (int i = 0; i < 9; i++) {
-            expressionHBoxes.add(new TrendChartExpressionHBox());
+            expressionHBoxes.add(new TrendChartExpressionHBox(localTags));
         }
         expressionHBoxes.get(0).getEnableChartExpression().setSelected(true);
         vbox = new VBox();

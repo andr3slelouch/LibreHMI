@@ -444,6 +444,7 @@ public class CanvasObject extends BorderPane {
      */
     protected void setVisibilityAnimation() throws SQLException, CompileException, IOException, InvocationTargetException {
         SetVisibilityAnimationWindow setVisibilityAnimationWindow = new SetVisibilityAnimationWindow();
+        setVisibilityAnimationWindow.setLocalTags(getHmiApp().getLocalTags());
         if (this.canvasObjectData.getVisibilityExpression() != null) {
             setVisibilityAnimationWindow.setAddedTags(this.canvasObjectData.getVisibilityExpression().getParameters());
             setVisibilityAnimationWindow.setLocalExpression(this.canvasObjectData.getVisibilityExpression());

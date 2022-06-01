@@ -108,7 +108,7 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
 
     @Override
     protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),"",false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),"",false,this.getLocalTags());
         selectTagWindow.showAndWait();
         if(!selectTagWindow.isCancelled()){
             clearAll();

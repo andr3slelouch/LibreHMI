@@ -129,6 +129,7 @@ public class CanvasRectangle extends CanvasObject {
         SetPercentFillPropertiesWindow writeExpressionWindow;
         if (this.getCanvasObjectData().getExpression() != null) {
             writeExpressionWindow = new SetPercentFillPropertiesWindow(this.getCanvasObjectData().getPrimaryColor().getColor(), this.getCanvasObjectData().getBackgroundColor().getColor());
+            writeExpressionWindow.setLocalTags(this.getHmiApp().getLocalTags());
             writeExpressionWindow.setAddedTags(this.getCanvasObjectData().getExpression().getParameters());
             writeExpressionWindow.setLocalExpression(this.getCanvasObjectData().getExpression());
             writeExpressionWindow.getTextField().setText(this.getCanvasObjectData().getExpression().getExpressionToEvaluate());
@@ -138,6 +139,7 @@ public class CanvasRectangle extends CanvasObject {
             writeExpressionWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getExpression().getFloatPrecision()));
         } else {
             writeExpressionWindow = new SetPercentFillPropertiesWindow();
+            writeExpressionWindow.setLocalTags(getHmiApp().getLocalTags());
         }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();

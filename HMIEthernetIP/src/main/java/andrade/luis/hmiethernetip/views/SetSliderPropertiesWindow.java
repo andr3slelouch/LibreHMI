@@ -145,7 +145,7 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
 
     @Override
     protected void addTag() {
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(), "numbers", false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(), "numbers", false,this.getLocalTags());
         selectTagWindow.showAndWait();
         if (!selectTagWindow.isCancelled()) {
             clearAll();

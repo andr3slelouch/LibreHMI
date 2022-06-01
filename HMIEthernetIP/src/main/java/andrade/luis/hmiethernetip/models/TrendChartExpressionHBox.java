@@ -6,6 +6,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
+import java.util.ArrayList;
+
 public class TrendChartExpressionHBox extends HBox {
     public TextField getExpressionTF() {
         return expressionTF;
@@ -55,7 +57,18 @@ public class TrendChartExpressionHBox extends HBox {
 
     private ColorPicker expressionColorPicker;
     private Expression expression;
-    public TrendChartExpressionHBox(){
+
+    public ArrayList<Tag> getLocalTags() {
+        return localTags;
+    }
+
+    public void setLocalTags(ArrayList<Tag> localTags) {
+        this.localTags = localTags;
+    }
+
+    private ArrayList<Tag> localTags;
+    public TrendChartExpressionHBox(ArrayList<Tag> localTags){
+        this.localTags = localTags;
         enableChartExpression = new CheckBox();
         Label expressionNameLbl = new Label("Nombre de la serie:");
         expressionNameTF = new TextField();
@@ -65,6 +78,7 @@ public class TrendChartExpressionHBox extends HBox {
         expressionTF.setDisable(true);
         setExpressionBtn.setOnAction(actionEvent -> {
             WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
+            writeExpressionWindow.setLocalTags(this.getLocalTags());
             writeExpressionWindow.showAndWait();
             this.expression = writeExpressionWindow.getLocalExpression();
             if(this.expression!=null){

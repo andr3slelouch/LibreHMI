@@ -311,7 +311,7 @@ public class CanvasTrendChart extends CanvasObject {
 
     @Override
     public void setProperties(){
-        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,475);
+        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,475,getHmiApp().getLocalTags());
         setTrendChartPropertiesWindow.getRotationHBox().getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
         setTrendChartPropertiesWindow.getSizeVBox().getWidthField().setText(String.valueOf(this.getCanvasObjectData().getWidth()));
         setTrendChartPropertiesWindow.getSizeVBox().getHeightField().setText(String.valueOf(this.getCanvasObjectData().getHeight()));

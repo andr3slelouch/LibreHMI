@@ -206,7 +206,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     }
 
     private void addTrendChartOnCanvasClicked(CanvasPoint current) {
-        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,475);
+        SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,475,hmiApp.getLocalTags());
         setTrendChartPropertiesWindow.showAndWait();
         if(!setTrendChartPropertiesWindow.isCanceled()){
             CanvasTrendChart canvasTrendChart = new CanvasTrendChart(
@@ -356,6 +356,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     private void addPushbuttonOnCanvasClicked(CanvasPoint current) {
         SetColorCommandPushButtonWindow setColorCommandPushButtonWindow = new SetColorCommandPushButtonWindow();
+        setColorCommandPushButtonWindow.setLocalTags(hmiApp.getLocalTags());
         setColorCommandPushButtonWindow.showAndWait();
         CanvasPushbutton canvasPushbutton = new CanvasPushbutton(current);
         canvasPushbutton.setCanvas(this);
@@ -430,6 +431,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {
         SetTagInputPropertiesWindow setTagInputPropertiesWindow = new SetTagInputPropertiesWindow();
+        setTagInputPropertiesWindow.setLocalTags(hmiApp.getLocalTags());
         setTagInputPropertiesWindow.showAndWait();
         CanvasTextField canvasTextField = new CanvasTextField(current, setTagInputPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTagInputPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTagInputPropertiesWindow.getMaxValueField().getText()), setTagInputPropertiesWindow.getType());
         canvasTextField.setCanvas(this);
@@ -449,6 +451,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     private void addSliderOnCanvasClicked(CanvasPoint current) {
         SetSliderPropertiesWindow setSliderPropertiesWindow = new SetSliderPropertiesWindow(150,150);
+        setSliderPropertiesWindow.setLocalTags(hmiApp.getLocalTags());
         setSliderPropertiesWindow.showAndWait();
         double width = setSliderPropertiesWindow.getSizeVBox().getWidthFromField();
         double height = setSliderPropertiesWindow.getSizeVBox().getHeightFromField();
@@ -537,6 +540,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     public void addTextOnCanvasClicked(CanvasPoint current) {
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
+        writeExpressionWindow.setLocalTags(hmiApp.getLocalTags());
         writeExpressionWindow.showAndWait();
         if(writeExpressionWindow.isDone()){
             Expression expression = writeExpressionWindow.getLocalExpression();;

@@ -36,6 +36,16 @@ public class WriteExpressionWindow extends Stage {
     private TextField floatPrecisionTextField;
     private boolean done = false;
 
+    public ArrayList<Tag> getLocalTags() {
+        return localTags;
+    }
+
+    public void setLocalTags(ArrayList<Tag> localTags) {
+        this.localTags = localTags;
+    }
+
+    private ArrayList<Tag> localTags;
+
     public WriteExpressionWindow(){
         this(750,250);
     }
@@ -95,7 +105,7 @@ public class WriteExpressionWindow extends Stage {
     }
 
     protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,"",false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,"",false,this.localTags);
         selectTagWindow.showAndWait();
         Tag tag = selectTagWindow.getSelectedTag();
         if(tag!=null){

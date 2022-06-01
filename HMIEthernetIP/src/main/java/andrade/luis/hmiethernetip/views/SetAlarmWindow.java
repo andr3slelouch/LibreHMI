@@ -31,6 +31,7 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     public SetAlarmWindow(HMIApp hmiApp) {
         super(750, 300);
         this.hmiApp = hmiApp;
+        setLocalTags(this.hmiApp.getLocalTags());
         textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             deleteUnneededTags();
             if (prepareExpression(false)) {

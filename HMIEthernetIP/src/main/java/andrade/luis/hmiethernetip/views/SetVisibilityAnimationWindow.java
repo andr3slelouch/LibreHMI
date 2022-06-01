@@ -1,10 +1,13 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.models.Tag;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+
+import java.util.ArrayList;
 
 public class SetVisibilityAnimationWindow extends WriteExpressionWindow{
     private RadioButton falseRadioButton;
@@ -19,6 +22,18 @@ public class SetVisibilityAnimationWindow extends WriteExpressionWindow{
     }
 
     private ToggleGroup toggleGroup;
+
+    @Override
+    public ArrayList<Tag> getLocalTags() {
+        return localTags;
+    }
+
+    @Override
+    public void setLocalTags(ArrayList<Tag> localTags) {
+        this.localTags = localTags;
+    }
+
+    private ArrayList<Tag> localTags;
 
     public SetVisibilityAnimationWindow(){
         Label visibilityLabel = new Label("Visible si:");

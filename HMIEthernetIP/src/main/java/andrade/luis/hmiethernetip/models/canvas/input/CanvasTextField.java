@@ -121,7 +121,7 @@ public class CanvasTextField extends CanvasObject {
                 linkedTag.setValue(this.getCanvasObjectData().getData());
                 try {
                     timeline.pause();
-                    if (!linkedTag.updateInDatabase()) {
+                    if (!linkedTag.update()) {
                         this.errorLabel = new Label("Error en Tag de Escritura");
                         this.setTop(errorLabel);
                     } else {
@@ -184,6 +184,7 @@ public class CanvasTextField extends CanvasObject {
 
     private void buttonAction() {
         SetTagInputPropertiesWindow setTagInputPropertiesWindow = new SetTagInputPropertiesWindow();
+        setTagInputPropertiesWindow.setLocalTags(this.getHmiApp().getLocalTags());
         setTagInputPropertiesWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
         setTagInputPropertiesWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
         setTagInputPropertiesWindow.setSelectedRadioButton(this.getCanvasObjectData().getType());
@@ -264,17 +265,17 @@ public class CanvasTextField extends CanvasObject {
                                 switch (type) {
                                     case ENTERO_STR:
                                     case "Bool":
-                                        evaluatedValue = String.valueOf(Integer.parseInt(this.linkedTag.readFromDatabase()));
+                                        evaluatedValue = String.valueOf(Integer.parseInt(this.linkedTag.read()));
                                         break;
                                     case FLOTANTE_STR:
-                                        evaluatedValue = String.valueOf(Double.parseDouble(this.linkedTag.readFromDatabase()));
+                                        evaluatedValue = String.valueOf(Double.parseDouble(this.linkedTag.read()));
                                         if(this.linkedTag.getFloatPrecision()>-1){
                                             DecimalFormat decimalFormat = this.linkedTag.generateDecimalFormat();
                                             evaluatedValue = decimalFormat.format(Double.parseDouble(evaluatedValue));
                                         }
                                         break;
                                     case "String":
-                                        evaluatedValue = this.linkedTag.readFromDatabase();
+                                        evaluatedValue = this.linkedTag.read();
                                         break;
                                     default:
                                         break;

@@ -68,6 +68,7 @@ public class HMIApp extends Application {
     private ArrayList<String> pagesTitles = new ArrayList<>();
     private ArrayList<Alarm> projectAlarms = new ArrayList<>();
     private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
+    private ArrayList<Tag> localTags = new ArrayList<>();
     private final ArrayList<MenuItem> editExecuteMenuItems = new ArrayList<>();
     private final ArrayList<Menu> fileMenus = new ArrayList<>();
     private final ArrayList<Menu> editMenus = new ArrayList<>();
@@ -145,6 +146,8 @@ public class HMIApp extends Application {
     private String mode = "";
     private Timeline autoBlockTimeline;
     private String selectedPage;
+    private Timeline refreshLocalTagsTimeline;
+    private HMICanvas root;
 
     public String getCurrentProjectFilePath() {
         return currentProjectFilePath;
@@ -186,8 +189,6 @@ public class HMIApp extends Application {
             }
         }
     }
-
-
 
     public void clearProject() {
         this.pages.clear();
@@ -292,7 +293,7 @@ public class HMIApp extends Application {
      */
     private HMIScene generatePage(String sceneTitle, String sceneCommentary, Color backgroundColor) {
         var canvas = new Canvas(300, 300);
-        HMICanvas root = new HMICanvas();
+        this.root = new HMICanvas();
         root.getChildren().add(canvas);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
@@ -405,6 +406,24 @@ public class HMIApp extends Application {
             manageUsersWindow.showAndWait();
         });
         userMI.getItems().addAll(changeUserMI, manageUsersMI);
+        Menu tagsMI = new Menu("Tags Locales");
+        tagsMI.setId("#tagsMI");
+        MenuItem createLocalTagMI = new MenuItem("Crear Tag Local");
+        //createLocalTagMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+U"));
+        createLocalTagMI.setOnAction(mouseEvent -> {
+            CreateLocalTagWindow createLocalTagWindow = new CreateLocalTagWindow(null);
+            createLocalTagWindow.showAndWait();
+            if(createLocalTagWindow.getTag()!=null){
+                localTags.add(createLocalTagWindow.getTag());
+            }
+
+        });
+        MenuItem manageLocalTagsMI = new MenuItem("Administrar Tag Locales");
+        //manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
+        manageLocalTagsMI.setOnAction(mouseEvent -> {
+            SelectTagWindow tagWindow = new SelectTagWindow(false,"",false,localTags);
+        });
+        tagsMI.getItems().addAll(createLocalTagMI, manageLocalTagsMI);
         MenuItem propertiesMI = new MenuItem("Conexión de Base de Datos");
         propertiesMI.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         propertiesMI.setOnAction(mouseEvent -> {
@@ -420,7 +439,7 @@ public class HMIApp extends Application {
             this.hmiAppData.setBlockingTimeout(setBlockingTimeoutWindow.getTimeout());
             this.setWasModified(true);
         });
-        menuConfiguration.getItems().addAll(userMI, blockingTimeoutMI, propertiesMI);
+        menuConfiguration.getItems().addAll(userMI, tagsMI, blockingTimeoutMI, propertiesMI);
 
         Menu menuWindows = new Menu("Ventanas");
         MenuItem selectWindowsMI = new MenuItem("Mostrar Ventanas");
@@ -782,6 +801,23 @@ public class HMIApp extends Application {
                             enableInputRepresentations(mode);
                         }), new KeyFrame(Duration.seconds(1)));
         this.autoBlockTimeline.setDelay(Duration.seconds(60));
+    }
+
+    public void setRefreshLocalTagsTimeline() {
+        this.refreshLocalTagsTimeline = new Timeline(
+                new KeyFrame(
+                        Duration.seconds(0),
+                        (ActionEvent actionEvent) -> {
+                            refreshLocalTags();
+                        }), new KeyFrame(Duration.seconds(1)));
+        this.refreshLocalTagsTimeline.play();
+    }
+
+    public void refreshLocalTags(){
+        for (int i=0;i<root.getShapeArrayList().size();i++){
+            //TODO Hacer una rutina que permita solamente mandarle el objeto Tag y que el objeto CanvasObject determine
+            // si requiere actualizar, reduciendo la complejidad de esta clase
+        }
     }
 
     private void addAlarm(Alarm alarm) {
@@ -1594,5 +1630,12 @@ public class HMIApp extends Application {
 
     public void setManageableAlarms(ArrayList<Alarm> manageableAlarms) {
         this.manageableAlarms = manageableAlarms;
+    }
+    public ArrayList<Tag> getLocalTags() {
+        return localTags;
+    }
+
+    public void setLocalTags(ArrayList<Tag> localTags) {
+        this.localTags = localTags;
     }
 }

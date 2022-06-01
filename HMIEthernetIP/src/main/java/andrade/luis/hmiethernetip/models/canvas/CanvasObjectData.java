@@ -629,7 +629,7 @@ public class CanvasObjectData implements Serializable, Transferable {
     }
 
     public String readTagFromDatabase() throws SQLException, IOException {
-        return this.tag.readFromDatabase();
+        return this.tag.read();
     }
 
     public boolean isImageSymbol() {

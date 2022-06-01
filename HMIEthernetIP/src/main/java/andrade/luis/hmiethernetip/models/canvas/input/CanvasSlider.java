@@ -83,7 +83,7 @@ public class CanvasSlider extends CanvasObject {
                 linkedTag.setValue(this.getCanvasObjectData().getData());
                 try {
                     timeline.pause();
-                    if (!linkedTag.updateInDatabase()) {
+                    if (!linkedTag.update()) {
                         this.errorLabel = new Label("Error en Tag de Escritura");
                         this.setTop(errorLabel);
                     } else {
@@ -98,7 +98,7 @@ public class CanvasSlider extends CanvasObject {
             }
         });
         if (linkedTag != null) {
-            linkedTag.readFromDatabase();
+            linkedTag.read();
             slider.setValue(Double.parseDouble(linkedTag.getValue()));
             this.setTimeline();
         }
@@ -117,6 +117,7 @@ public class CanvasSlider extends CanvasObject {
     @Override
     public void setProperties() {
         SetSliderPropertiesWindow setSliderPropertiesWindow = new SetSliderPropertiesWindow(this.slider.getPrefWidth(),this.slider.getPrefHeight());
+        setSliderPropertiesWindow.setLocalTags(this.getHmiApp().getLocalTags());
         setSliderPropertiesWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
         setSliderPropertiesWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
         setSliderPropertiesWindow.getMinorTickField().setText(String.valueOf(this.getCanvasObjectData().getMinorTickValue()));
@@ -188,7 +189,7 @@ public class CanvasSlider extends CanvasObject {
                         (ActionEvent actionEvent) -> {
                             double evaluatedValue = 0;
                             try {
-                                String value = this.getCanvasObjectData().getTag().readFromDatabase();
+                                String value = this.getCanvasObjectData().getTag().read();
                                 if (value != null) {
                                     evaluatedValue = Double.parseDouble(value);
                                 }

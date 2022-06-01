@@ -75,7 +75,7 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
 
     @Override
     protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),"bool",false);
+        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),"bool",false,this.getLocalTags());
         selectTagWindow.showAndWait();
         if(!selectTagWindow.isCancelled()){
             clearAll();

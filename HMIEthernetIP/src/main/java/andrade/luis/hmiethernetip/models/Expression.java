@@ -273,10 +273,10 @@ public class Expression implements Serializable {
             switch (parameters.get(i).getType()) {
                 case INT_STR:
                 case FLOAT_STR:
-                    valuesToEvaluate[i] = Double.valueOf(parameters.get(i).readFromDatabase());
+                    valuesToEvaluate[i] = Double.valueOf(parameters.get(i).read());
                     break;
                 case BOOLEAN_STR:
-                    valuesToEvaluate[i] = parameters.get(i).readFromDatabase().equals("1");
+                    valuesToEvaluate[i] = parameters.get(i).read().equals("1");
                     break;
                 default:
                     throw new IllegalArgumentException();

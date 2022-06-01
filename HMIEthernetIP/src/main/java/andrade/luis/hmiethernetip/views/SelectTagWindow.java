@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +44,7 @@ public class SelectTagWindow extends Stage {
     }
 
     private Tag selectedTagRow;
-    public SelectTagWindow(boolean inputMode,String filter,boolean testMode) {
+    public SelectTagWindow(boolean inputMode, String filter, boolean testMode, ArrayList<Tag> localTags) {
         StackPane root = new StackPane();
 
 
@@ -69,10 +70,25 @@ public class SelectTagWindow extends Stage {
         TableColumn<TagRow, String> valueColumn = new TableColumn<>("Valor");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("tagValue"));
 
-        if(getExistingTags(inputMode,filter).isEmpty() || testMode){
+        ObservableList<TagRow> existingTagsObsList = getExistingTags(inputMode,filter);
+        if(localTags!=null){
+            for (Tag localTag : localTags) {
+                existingTagsObsList.add(new TagRow(
+                        localTag.getPlcName(),
+                        localTag.getPlcAddress(),
+                        localTag.getPlcDeviceGroup(),
+                        localTag.getName(),
+                        localTag.getType(),
+                        localTag.getAddress(),
+                        localTag.getAction(),
+                        localTag.getValue()
+                ));
+            }
+        }
+        if(existingTagsObsList.isEmpty() || testMode){
             setAlertIfTableIsEmpty();
         }else{
-            table.setItems(getExistingTags(inputMode,filter));
+            table.setItems(existingTagsObsList);
         }
         table.setPlaceholder(new Label("No existen Tags definidos en la base de datos"));
 
@@ -105,13 +121,13 @@ public class SelectTagWindow extends Stage {
 
     }
 
-    public ObservableList<TagRow> getExistingTags(boolean inputMode, String boolOnly) {
+    public ObservableList<TagRow> getExistingTags(boolean inputMode, String filter) {
         String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
         if(inputMode){
             query = query +"AND t.accion = 'Escritura' ";
         }
 
-        switch(boolOnly){
+        switch(filter){
             case "bool":
                 query = query +"AND t.tipoTag = 'Bool' ";
                 break;
@@ -156,7 +172,8 @@ public class SelectTagWindow extends Stage {
 
         if(!selected.isEmpty()){
             logger.log(Level.INFO,selected.get(0).getTagName());
-            this.selectedTagRow = new Tag(selected.get(0).getPlcName(),selected.get(0).getPlcAddress(),selected.get(0).getPlcDeviceGroup(),selected.get(0).getTagName(),selected.get(0).getTagType(),selected.get(0).getTagAddress(),selected.get(0).getTagAction(),selected.get(0).getTagValue(),0);
+            //this.selectedTagRow = new Tag(selected.get(0).getPlcName(),selected.get(0).getPlcAddress(),selected.get(0).getPlcDeviceGroup(),selected.get(0).getTagName(),selected.get(0).getTagType(),selected.get(0).getTagAddress(),selected.get(0).getTagAction(),selected.get(0).getTagValue(),0);
+            this.selectedTagRow = selected.get(0).generateTag();
             this.cancelled = false;
             this.close();
         }else{

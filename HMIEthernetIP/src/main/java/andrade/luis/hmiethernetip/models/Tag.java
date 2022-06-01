@@ -10,13 +10,51 @@ import java.io.Serializable;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Tag implements Serializable {
     private static final String NULL_STR = "<null>";
-    private static final Map<String, String> selectQueries = Map.of("Entero", "select valor from entero where nombreTag=", "Flotante", "select valor from flotante where nombreTag=", "Bool", "select valor from boolean where nombreTag=");
-    private static final Map<String, String> updateQueries = Map.of("Entero", "update entero SET valor=? where nombreTag=", "Flotante", "update flotante SET valor=? where nombreTag=", "Bool", "update boolean SET valor=? where nombreTag=");
+    public static final String ENTERO_STR = "Entero";
+    public static final String FLOTANTE_STR = "Flotante";
+    public static final String BOOL_STR = "Bool";
+    private static final Map<String, String> selectQueries = Map.of(ENTERO_STR, "select valor from entero where nombreTag=", FLOTANTE_STR, "select valor from flotante where nombreTag=", BOOL_STR, "select valor from boolean where nombreTag=");
+    private static final Map<String, String> updateQueries = Map.of(ENTERO_STR, "update entero SET valor=? where nombreTag=", FLOTANTE_STR, "update flotante SET valor=? where nombreTag=", BOOL_STR, "update boolean SET valor=? where nombreTag=");
+
+    public boolean isLocalTag() {
+        return localTag;
+    }
+
+    public void setLocalTag(boolean localTag) {
+        this.localTag = localTag;
+    }
+
+    private boolean localTag = false;
+    @SerializedName("plcName")
+    @Expose
+    private String plcName;
+    @SerializedName("plcAddress")
+    @Expose
+    private String plcAddress;
+    @SerializedName("plcDeviceGroup")
+    @Expose
+    private String plcDeviceGroup;
+    @SerializedName("name")
+    @Expose
+    private String name;
+    @SerializedName("type")
+    @Expose
+    private String type;
+    @SerializedName("address")
+    @Expose
+    private String address;
+    @SerializedName("action")
+    @Expose
+    private String action;
+    @SerializedName("value")
+    @Expose
+    private String value;
+    @SerializedName("floatPrecision")
+    @Expose
+    private int floatPrecision = -1;
 
     public Tag() {
 
@@ -94,60 +132,71 @@ public class Tag implements Serializable {
         this.floatPrecision = floatPrecision;
     }
 
-    public String readFromDatabase() throws SQLException, IOException {
-        try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
-            try(Statement statement = con.createStatement()){
-                if (this.getType() != null && this.getName() != null) {
-                    String query = selectQueries.get(this.getType()) + "'" + this.getName() + "'";
-                    ResultSet resultSet = statement.executeQuery(query);
-                    while (resultSet.next()) {
-                        if (!resultSet.getString("valor").isEmpty()) {
-                            String result = resultSet.getString("valor");
-                            this.value = result;
-                            return result;
+    public String read() throws SQLException, IOException {
+        if(!localTag){
+            try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
+                try(Statement statement = con.createStatement()){
+                    if (this.getType() != null && this.getName() != null) {
+                        String query = selectQueries.get(this.getType()) + "'" + this.getName() + "'";
+                        ResultSet resultSet = statement.executeQuery(query);
+                        while (resultSet.next()) {
+                            if (!resultSet.getString("valor").isEmpty()) {
+                                String result = resultSet.getString("valor");
+                                this.value = result;
+                                return result;
+                            }
                         }
                     }
                 }
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        } catch (IOException e) {
-            throw new IOException(e);
+            return null;
+        }else{
+            return this.value;
         }
-        return null;
+
     }
 
-    public boolean updateInDatabase() throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToBDDriverEIP()){
-            if (this.getType() != null && this.getName() != null) {
-                String query = updateQueries.get(this.getType()) + "'" + this.getName() + "'";
-                try(PreparedStatement preparedStatement = con.prepareStatement(query)){
-                    String updateValue;
-                    switch (this.getType()) {
-                        case "Entero":
-                        case "Bool":
-                            updateValue = String.valueOf((int) Double.parseDouble(this.value.isEmpty() ? "0" : this.value));
-                            break;
-                        case "Flotante":
-                            updateValue = String.valueOf(Double.parseDouble(this.value));
-                            break;
-                        default:
-                            updateValue = this.value;
+    public boolean update() throws SQLException, IOException {
+        if(!localTag){
+            try(Connection con = DBConnection.createConnectionToBDDriverEIP()){
+                if (this.getType() != null && this.getName() != null) {
+                    String query = updateQueries.get(this.getType()) + "'" + this.getName() + "'";
+                    try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                        preparedStatement.setString(1, prepareValue());
+                        int insertRowResult = preparedStatement.executeUpdate();
+                        return insertRowResult > 0;
                     }
-                    preparedStatement.setString(1, updateValue);
-                    int insertRowResult = preparedStatement.executeUpdate();
-                    return insertRowResult > 0;
-                }
 
-            } else {
-                return false;
+                } else {
+                    return false;
+                }
+            } catch (SQLException e) {
+                throw new SQLException(e);
+            } catch (IOException e) {
+                throw new IOException(e);
             }
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        } catch (IOException e) {
-            throw new IOException(e);
+        }else{
+            return true;
         }
 
+    }
+
+    private String prepareValue(){
+        String updateValue;
+        switch (this.getType()) {
+            case ENTERO_STR:
+            case BOOL_STR:
+                updateValue = String.valueOf((int) Double.parseDouble(this.value.isEmpty() ? "0" : this.value));
+                break;
+            case FLOTANTE_STR:
+                updateValue = String.valueOf(Double.parseDouble(this.value));
+                break;
+            default:
+                updateValue = this.value;
+        }
+        return updateValue;
     }
 
     public DecimalFormat generateDecimalFormat() {
@@ -157,34 +206,6 @@ public class Tag implements Serializable {
         }
         return new DecimalFormat(precisionStr);
     }
-
-    @SerializedName("plcName")
-    @Expose
-    private String plcName;
-    @SerializedName("plcAddress")
-    @Expose
-    private String plcAddress;
-    @SerializedName("plcDeviceGroup")
-    @Expose
-    private String plcDeviceGroup;
-    @SerializedName("name")
-    @Expose
-    private String name;
-    @SerializedName("type")
-    @Expose
-    private String type;
-    @SerializedName("address")
-    @Expose
-    private String address;
-    @SerializedName("action")
-    @Expose
-    private String action;
-    @SerializedName("value")
-    @Expose
-    private String value;
-    @SerializedName("floatPrecision")
-    @Expose
-    private int floatPrecision = -1;
 
     public Tag(String plcName, String plcAddress, String plcDeviceGroup, String name, String type, String address, String action, String value, int floatPrecision) {
         this.plcName = plcName;
@@ -196,6 +217,19 @@ public class Tag implements Serializable {
         this.action = action;
         this.value = value;
         this.floatPrecision = floatPrecision;
+        this.localTag = false;
+    }
+    public Tag(String name, String type, String action, String value, int floatPrecision){
+        this.plcName = "LibreHMI";
+        this.plcAddress = "localhost";
+        this.plcDeviceGroup = "Local";
+        this.name = name;
+        this.type = type;
+        this.address = "Local";
+        this.action = action;
+        this.value = value;
+        this.floatPrecision = floatPrecision;
+        this.localTag = true;
     }
 
     @Override
@@ -233,6 +267,10 @@ public class Tag implements Serializable {
         sb.append("tagValue");
         sb.append('=');
         sb.append(((this.value == null) ? NULL_STR : this.value));
+        sb.append(',');
+        sb.append("isLocalTag");
+        sb.append('=');
+        sb.append(this.localTag);
         sb.append(',');
         if (sb.charAt((sb.length() - 1)) == ',') {
             sb.setCharAt((sb.length() - 1), ']');

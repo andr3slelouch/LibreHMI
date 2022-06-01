@@ -55,6 +55,7 @@ public class CanvasPushbutton extends CanvasButton {
     @Override
     public void buttonAction() {
         SetColorCommandPushButtonWindow setColorCommandPushButtonWindow = new SetColorCommandPushButtonWindow();
+        setColorCommandPushButtonWindow.setLocalTags(this.getHmiApp().getLocalTags());
         if(this.getCanvasObjectData().getPrimaryColor()!=null && this.getCanvasObjectData().getBackgroundColor()!=null && this.getCanvasObjectData().getMode()!=null){
             setColorCommandPushButtonWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
             setColorCommandPushButtonWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
@@ -89,7 +90,7 @@ public class CanvasPushbutton extends CanvasButton {
             this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
             if (this.getCanvasObjectData().getTag() != null) {
                 this.getCanvasObjectData().getTag().setValue("1");
-                if(!this.getCanvasObjectData().getTag().updateInDatabase()){
+                if(!this.getCanvasObjectData().getTag().update()){
                     this.errorLabel = new Label("Error en Tag de Escritura");
                     this.setTop(this.errorLabel);
                 }else{
@@ -101,7 +102,7 @@ public class CanvasPushbutton extends CanvasButton {
             this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getBackgroundColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
             if (this.getCanvasObjectData().getTag() != null) {
                 this.getCanvasObjectData().getTag().setValue("0");
-                if(!this.getCanvasObjectData().getTag().updateInDatabase()){
+                if(!this.getCanvasObjectData().getTag().update()){
                     this.errorLabel = new Label("Error en Tag de Escritura");
                     this.setTop(this.errorLabel);
                 }else{

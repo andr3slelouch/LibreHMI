@@ -111,6 +111,7 @@ public class CanvasText extends CanvasLabel {
 
     private void setExpression() {
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
+        writeExpressionWindow.setLocalTags(getHmiApp().getLocalTags());
         if (this.getCanvasObjectData().getExpression() != null) {
             writeExpressionWindow.setAddedTags(this.getCanvasObjectData().getExpression().getParameters());
             writeExpressionWindow.setLocalExpression(this.getCanvasObjectData().getExpression());
