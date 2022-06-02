@@ -1,6 +1,7 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.Expression;
+import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.views.SetTextPropertiesWindow;
 import andrade.luis.hmiethernetip.views.WriteExpressionWindow;
 import javafx.animation.Animation;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class CanvasText extends CanvasLabel {
     private String text;
@@ -45,12 +48,14 @@ public class CanvasText extends CanvasLabel {
     public CanvasText(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("Text");
+        this.getCanvasObjectData().setSuperType("TagOutputObject");
         setData();
     }
 
     public CanvasText(String content, CanvasPoint center) {
         super(content, center);
         this.getCanvasObjectData().setType("Text");
+        this.getCanvasObjectData().setSuperType("TagOutputObject");
         this.getCanvasObjectData().setWidth(this.getWidth());
         this.getCanvasObjectData().setHeight(this.getHeight());
         setData();
@@ -183,5 +188,22 @@ public class CanvasText extends CanvasLabel {
                         }), new KeyFrame(Duration.seconds(1)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+    }
+
+    @Override
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
+        if(timeline != null){
+            ArrayList<Tag> parameters = this.getCanvasObjectData().getExpression().getParameters();
+            for(int i=0;i<parameters.size();i++){
+                if(parameters.get(i).compareToTag(tag)){
+                    parameters.set(i,tag);
+                    //logger.log(Level.INFO,"UPDATED TAG WITH VALUE"+tag.getValue());
+                }else{
+                    //logger.log(Level.INFO,"NOT UPDATED");
+                }
+            }
+            this.getCanvasObjectData().getExpression().setParameters(parameters);
+        }
     }
 }

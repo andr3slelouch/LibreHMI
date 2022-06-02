@@ -1,6 +1,7 @@
 package andrade.luis.hmiethernetip.models.canvas;
 
 import andrade.luis.hmiethernetip.models.DateHBox;
+import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.TrendChartSerieData;
 import andrade.luis.hmiethernetip.views.SetTrendChartPropertiesWindow;
 import javafx.animation.Animation;
@@ -112,6 +113,7 @@ public class CanvasTrendChart extends CanvasObject {
         //Creating the line chart
         this.lineChart = new LineChart<>(xAxis, yAxis);
         this.getCanvasObjectData().setType("TrendChart");
+        this.getCanvasObjectData().setSuperType("TagOutputObject");
 
         this.trendChartSerieDataArrayList = trendChartSerieDataArrayList;
         TrendChartSerieData[] trendChartSerieDataArr = new TrendChartSerieData[8];
@@ -514,5 +516,20 @@ public class CanvasTrendChart extends CanvasObject {
                         }), new KeyFrame(Duration.seconds(this.getCanvasObjectData().getSamplingTime())));
         this.trendTimeline.setCycleCount(Animation.INDEFINITE);
         this.trendTimeline.play();
+    }
+    @Override
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
+        if(trendTimeline != null){
+            for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
+                ArrayList<Tag> parameters = trendChartSerieData.getExpression().getParameters();
+                for (int j = 0; j < parameters.size(); j++) {
+                    if (parameters.get(j).compareToTag(tag)) {
+                        parameters.set(j, tag);
+                    }
+                }
+                trendChartSerieData.getExpression().setParameters(parameters);
+            }
+        }
     }
 }

@@ -55,6 +55,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
 
     private void setData(double x, double y, double width, double height, boolean isOnCanvas) {
         this.getCanvasObjectData().setType("AlarmDisplay");
+        this.getCanvasObjectData().setSuperType("AlarmManagementObject");
         this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.alarmsTable = new TableView<>();
 
@@ -190,7 +191,6 @@ public class CanvasAlarmDisplay extends CanvasObject {
                             for (int i = 0; i < this.getHmiApp().getProjectAlarms().size(); i++) {
                                 addAlarmFromTimeline(this.getHmiApp().getProjectAlarms().get(i));
                             }
-
                         }), new KeyFrame(Duration.seconds(1)));
         this.updateTableTimeline.setCycleCount(Animation.INDEFINITE);
         this.updateTableTimeline.play();

@@ -24,6 +24,7 @@ public class CanvasEllipse extends CanvasObject{
         this.getCanvasObjectData().setHeight(height);
         this.setCenter(this.ellipse);
         this.getCanvasObjectData().setType("Ellipse");
+        this.getCanvasObjectData().setSuperType("Figure");
         this.setContextMenu();
         this.setRotate(this.getCanvasObjectData().getRotation());
         if(this.getCanvasObjectData().getPrimaryColor()!=null){

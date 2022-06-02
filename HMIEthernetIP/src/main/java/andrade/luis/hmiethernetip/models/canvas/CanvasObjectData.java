@@ -54,6 +54,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     @SerializedName("type")
     @Expose
     private String type;
+    @SerializedName("superType")
+    @Expose
+    private String superType;
     @SerializedName("dataType")
     @Expose
     private String dataType;
@@ -573,8 +576,8 @@ public class CanvasObjectData implements Serializable, Transferable {
     @Override
     public DataFlavor[] getTransferDataFlavors() {
         DataFlavor[] flavors = new DataFlavor[2];
-        Class<?> type = this.getClass();
-        String mimeType = "application/x-java-serialized-object;class=" + type.getName();
+        Class<?> typeClass = this.getClass();
+        String mimeType = "application/x-java-serialized-object;class=" + typeClass.getName();
         try {
             flavors[0] = new DataFlavor(mimeType);
             flavors[1] = DataFlavor.stringFlavor;
@@ -719,5 +722,12 @@ public class CanvasObjectData implements Serializable, Transferable {
 
     public void setSamplingTime(double samplingTime) {
         this.samplingTime = samplingTime;
+    }
+    public String getSuperType() {
+        return superType;
+    }
+
+    public void setSuperType(String superType) {
+        this.superType = superType;
     }
 }

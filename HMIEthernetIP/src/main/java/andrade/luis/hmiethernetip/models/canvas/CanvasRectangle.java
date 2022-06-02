@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 
 import static javafx.geometry.Pos.CENTER;
@@ -72,6 +73,7 @@ public class CanvasRectangle extends CanvasObject {
 
         this.setCenter(rectangle);
         this.getCanvasObjectData().setType("Rectangle");
+        this.getCanvasObjectData().setSuperType("TagOutputObject");
         this.setContextMenu();
         MenuItem percentFillMI = new MenuItem("Animación de Relleno Porcentual");
         percentFillMI.setId("#percentFillMI");
@@ -326,6 +328,19 @@ public class CanvasRectangle extends CanvasObject {
             refillRectangleTimeline.stop();
         } else if (refillRectangleTimeline.getStatus().toString().equals("STOPPED")) {
             refillRectangleTimeline.play();
+        }
+    }
+    @Override
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
+        if(refillRectangleTimeline != null){
+            ArrayList<Tag> parameters = this.getCanvasObjectData().getExpression().getParameters();
+            for(int i=0;i<parameters.size();i++){
+                if(parameters.get(i).compareToTag(tag)){
+                    parameters.set(i,tag);
+                }
+            }
+            this.getCanvasObjectData().getExpression().setParameters(parameters);
         }
     }
 }

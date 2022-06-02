@@ -42,6 +42,7 @@ public class CanvasPushbutton extends CanvasButton {
             setDynamicColors(this.getCanvasObjectData().getData(),this.getCanvasObjectData().getMode(),this.getCanvasObjectData().getTag(),this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getBackgroundColor());
         }
         this.getCanvasObjectData().setType("Pushbutton");
+        this.getCanvasObjectData().setSuperType("TagInputObject");
     }
 
     @Override
@@ -90,6 +91,7 @@ public class CanvasPushbutton extends CanvasButton {
             this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
             if (this.getCanvasObjectData().getTag() != null) {
                 this.getCanvasObjectData().getTag().setValue("1");
+                this.setLastTimeSelected();
                 if(!this.getCanvasObjectData().getTag().update()){
                     this.errorLabel = new Label("Error en Tag de Escritura");
                     this.setTop(this.errorLabel);
@@ -102,6 +104,7 @@ public class CanvasPushbutton extends CanvasButton {
             this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getBackgroundColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
             if (this.getCanvasObjectData().getTag() != null) {
                 this.getCanvasObjectData().getTag().setValue("0");
+                this.setLastTimeSelected();
                 if(!this.getCanvasObjectData().getTag().update()){
                     this.errorLabel = new Label("Error en Tag de Escritura");
                     this.setTop(this.errorLabel);
@@ -171,6 +174,13 @@ public class CanvasPushbutton extends CanvasButton {
                 this.enableListeners(true);
                 this.button.setDisable(true);
                 break;
+        }
+    }
+    @Override
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
+        if(this.getCanvasObjectData().getTag().compareToTag(tag)){
+            this.getCanvasObjectData().setTag(tag);
         }
     }
 }

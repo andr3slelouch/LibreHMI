@@ -22,6 +22,7 @@ public class CanvasSystemDateTime extends CanvasLabel {
     public CanvasSystemDateTime(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("SystemDateTime");
+        this.getCanvasObjectData().setSuperType("Figure");
         if(this.getCanvasObjectData().getFontFamily()!=null && this.getCanvasObjectData().getFontStyle()!=null){
             this.getLabel().setFont(
                     Font.font(

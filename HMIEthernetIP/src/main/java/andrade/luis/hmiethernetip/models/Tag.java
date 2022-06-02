@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Tag implements Serializable {
     private static final String NULL_STR = "<null>";
@@ -27,6 +29,8 @@ public class Tag implements Serializable {
         this.localTag = localTag;
     }
 
+    @SerializedName("localTag")
+    @Expose
     private boolean localTag = false;
     @SerializedName("plcName")
     @Expose
@@ -133,9 +137,9 @@ public class Tag implements Serializable {
     }
 
     public String read() throws SQLException, IOException {
-        if(!localTag){
+        if (!localTag) {
             try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
-                try(Statement statement = con.createStatement()){
+                try (Statement statement = con.createStatement()) {
                     if (this.getType() != null && this.getName() != null) {
                         String query = selectQueries.get(this.getType()) + "'" + this.getName() + "'";
                         ResultSet resultSet = statement.executeQuery(query);
@@ -152,18 +156,35 @@ public class Tag implements Serializable {
                 throw new RuntimeException(e);
             }
             return null;
-        }else{
+        } else {
             return this.value;
         }
+    }
 
+    public boolean compareToTag(Tag comparedTag) {
+        if (comparedTag != null) {
+            return
+                    this.plcName.equals(comparedTag.getPlcName()) &&
+                            this.plcAddress.equals(comparedTag.getPlcAddress()) &&
+                            this.plcDeviceGroup.equals(comparedTag.getPlcDeviceGroup()) &&
+                            this.name.equals(comparedTag.getName()) &&
+                            this.type.equals(comparedTag.getType()) &&
+                            this.address.equals(comparedTag.getAddress()) &&
+                            this.action.equals(comparedTag.getAction()) &&
+                            this.localTag &&
+                            this.floatPrecision == comparedTag.getFloatPrecision()
+                    ;
+        } else {
+            return false;
+        }
     }
 
     public boolean update() throws SQLException, IOException {
-        if(!localTag){
-            try(Connection con = DBConnection.createConnectionToBDDriverEIP()){
+        if (!localTag) {
+            try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
                 if (this.getType() != null && this.getName() != null) {
                     String query = updateQueries.get(this.getType()) + "'" + this.getName() + "'";
-                    try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                    try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
                         preparedStatement.setString(1, prepareValue());
                         int insertRowResult = preparedStatement.executeUpdate();
                         return insertRowResult > 0;
@@ -177,13 +198,13 @@ public class Tag implements Serializable {
             } catch (IOException e) {
                 throw new IOException(e);
             }
-        }else{
+        } else {
             return true;
         }
 
     }
 
-    private String prepareValue(){
+    private String prepareValue() {
         String updateValue;
         switch (this.getType()) {
             case ENTERO_STR:
@@ -219,7 +240,8 @@ public class Tag implements Serializable {
         this.floatPrecision = floatPrecision;
         this.localTag = false;
     }
-    public Tag(String name, String type, String action, String value, int floatPrecision){
+
+    public Tag(String name, String type, String action, String value, int floatPrecision) {
         this.plcName = "LibreHMI";
         this.plcAddress = "localhost";
         this.plcDeviceGroup = "Local";

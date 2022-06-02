@@ -71,6 +71,7 @@ public class CanvasSlider extends CanvasObject {
         this.getCanvasObjectData().setType("Slider");
         this.getCanvasObjectData().setOrientation(orientation);
         this.getCanvasObjectData().setRotation(rotation);
+        this.getCanvasObjectData().setSuperType("TagInputObject");
         this.setCenter(this.slider);
         slider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
             if ((double) newValue < this.getCanvasObjectData().getMinValue() || (double) newValue > this.getCanvasObjectData().getMaxValue()) {
@@ -83,6 +84,7 @@ public class CanvasSlider extends CanvasObject {
                 linkedTag.setValue(this.getCanvasObjectData().getData());
                 try {
                     timeline.pause();
+                    this.setLastTimeSelected();
                     if (!linkedTag.update()) {
                         this.errorLabel = new Label("Error en Tag de Escritura");
                         this.setTop(errorLabel);
@@ -200,6 +202,14 @@ public class CanvasSlider extends CanvasObject {
                         }), new KeyFrame(Duration.seconds(5)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+    }
+
+    @Override
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
+        if(this.getCanvasObjectData().getTag().compareToTag(tag)){
+            this.getCanvasObjectData().setTag(tag);
+        }
     }
 }
 

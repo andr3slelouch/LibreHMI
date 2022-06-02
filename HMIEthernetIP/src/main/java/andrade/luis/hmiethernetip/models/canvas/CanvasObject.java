@@ -3,6 +3,7 @@ package andrade.luis.hmiethernetip.models.canvas;
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.Expression;
 import andrade.luis.hmiethernetip.models.MouseOverMode;
+import andrade.luis.hmiethernetip.models.Tag;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.views.SetSizeWindow;
 import andrade.luis.hmiethernetip.views.SetVisibilityAnimationWindow;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -105,6 +107,18 @@ public class CanvasObject extends BorderPane {
         }
     }
 
+    public void updateTag(Tag tag){
+        if(visibilityTimeline!=null){
+            ArrayList<Tag> parameters = this.getCanvasObjectData().getVisibilityExpression().getParameters();
+            for(int i=0;i<parameters.size();i++){
+                if(parameters.get(i).compareToTag(tag)){
+                    parameters.set(i,tag);
+                }
+            }
+            this.getCanvasObjectData().getVisibilityExpression().setParameters(parameters);
+        }
+    }
+
     public void hideBorder() {
         CanvasObject.this.borderActive.set(false);
         CanvasObject.this.setStyle("");
@@ -137,12 +151,9 @@ public class CanvasObject extends BorderPane {
         showBorder();
     }
 
-    protected EventHandler<MouseEvent> onDoubleClick = new EventHandler<>() {
-        @Override
-        public void handle(MouseEvent t) {
-            if (t.getButton() == MouseButton.PRIMARY && t.getClickCount() == 2) {
-                CanvasObject.this.hmiApp.loginUser("Ejecutar");
-            }
+    protected EventHandler<MouseEvent> onDoubleClick = t -> {
+        if (t.getButton() == MouseButton.PRIMARY && t.getClickCount() == 2) {
+            CanvasObject.this.hmiApp.loginUser("Ejecutar");
         }
     };
 

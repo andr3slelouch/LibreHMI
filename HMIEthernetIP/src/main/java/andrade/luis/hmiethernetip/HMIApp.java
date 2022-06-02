@@ -42,11 +42,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 
@@ -56,6 +58,7 @@ import static javafx.geometry.Pos.CENTER;
 public class HMIApp extends Application {
     public static final String EDITAR_STR = "Editar";
     public static final String EJECUTAR_STR = "Ejecutar";
+    public static final String USER_HOME = "user.home";
     private Stage mainStage;
     Logger logger
             = Logger.getLogger(
@@ -183,10 +186,12 @@ public class HMIApp extends Application {
         }
         manageableAlarms.clear();
         projectAlarms.clear();
+        localTags.clear();
         if (this.hmiAppData.getHmiAlarms() != null) {
             for (int i = 0; i < this.hmiAppData.getHmiAlarms().size(); i++) {
                 addAlarm(this.hmiAppData.getHmiAlarms().get(i));
             }
+            localTags.addAll(this.hmiAppData.getHmiLocalTags());
         }
     }
 
@@ -413,7 +418,7 @@ public class HMIApp extends Application {
         createLocalTagMI.setOnAction(mouseEvent -> {
             CreateLocalTagWindow createLocalTagWindow = new CreateLocalTagWindow(null);
             createLocalTagWindow.showAndWait();
-            if(createLocalTagWindow.getTag()!=null){
+            if (createLocalTagWindow.getTag() != null) {
                 localTags.add(createLocalTagWindow.getTag());
             }
 
@@ -421,7 +426,7 @@ public class HMIApp extends Application {
         MenuItem manageLocalTagsMI = new MenuItem("Administrar Tag Locales");
         //manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
         manageLocalTagsMI.setOnAction(mouseEvent -> {
-            SelectTagWindow tagWindow = new SelectTagWindow(false,"",false,localTags);
+            SelectTagWindow tagWindow = new SelectTagWindow(false, "", false, localTags);
         });
         tagsMI.getItems().addAll(createLocalTagMI, manageLocalTagsMI);
         MenuItem propertiesMI = new MenuItem("Conexión de Base de Datos");
@@ -454,10 +459,10 @@ public class HMIApp extends Application {
         MenuItem importWindowsMI = new MenuItem("Importar Ventanas");
         importWindowsMI.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         importWindowsMI.setOnAction(mouseEvent -> {
-            try{
+            try {
                 loadSceneData();
-            }catch (Exception e){
-                showAlert(Alert.AlertType.ERROR,"Error al cargar el archivo", "Existió un error al cargar el archivo: "+e.getMessage(),false,false);
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Error al cargar el archivo", "Existió un error al cargar el archivo: " + e.getMessage(), false, false);
             }
         });
         menuWindows.getItems().add(selectWindowsMI);
@@ -468,7 +473,7 @@ public class HMIApp extends Application {
         Menu menuHelp = new Menu("Ayuda");
         helpMenus.add(menuHelp);
 
-        menuBar.getMenus().addAll(menuFile, menuEdit, menuAlarm, menuConfiguration,menuWindows ,menuHelp);
+        menuBar.getMenus().addAll(menuFile, menuEdit, menuAlarm, menuConfiguration, menuWindows, menuHelp);
 
         return menuBar;
     }
@@ -581,7 +586,7 @@ public class HMIApp extends Application {
 
         SeparatorMenuItem exitSeparatorMenuItem = new SeparatorMenuItem();
 
-        menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, saveAsEncryptedMI,runEditSeparatorMI, runEditMI, exitSeparatorMenuItem, exitMI);
+        menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, saveAsEncryptedMI, runEditSeparatorMI, runEditMI, exitSeparatorMenuItem, exitMI);
 
         return menuFile;
     }
@@ -592,7 +597,7 @@ public class HMIApp extends Application {
         }
 
         for (Menu menu : fileMenus) {
-            for(MenuItem subMenu: menu.getItems()){
+            for (MenuItem subMenu : menu.getItems()) {
                 if (subMenu.getId() != null) {
                     if (subMenu.getId().equals("#saveMI") || subMenu.getId().equals("#saveAsMI")) {
                         subMenu.setDisable(this.mode.equals(EJECUTAR_STR));
@@ -601,15 +606,15 @@ public class HMIApp extends Application {
             }
         }
 
-        for(Menu menu: editMenus){
+        for (Menu menu : editMenus) {
             menu.setDisable(this.mode.equals(EJECUTAR_STR));
         }
 
-        for(Menu menu: alarmsMenus){
+        for (Menu menu : alarmsMenus) {
             menu.setDisable(this.mode.equals(EJECUTAR_STR));
         }
 
-        for(Menu menu: configMenus){
+        for (Menu menu : configMenus) {
             menu.setDisable(this.mode.equals(EJECUTAR_STR));
         }
 
@@ -807,17 +812,57 @@ public class HMIApp extends Application {
         this.refreshLocalTagsTimeline = new Timeline(
                 new KeyFrame(
                         Duration.seconds(0),
-                        (ActionEvent actionEvent) -> {
-                            refreshLocalTags();
-                        }), new KeyFrame(Duration.seconds(1)));
+                        (ActionEvent actionEvent) -> refreshLocalTags()), new KeyFrame(Duration.seconds(1)));
+        this.refreshLocalTagsTimeline.setCycleCount(Animation.INDEFINITE);
         this.refreshLocalTagsTimeline.play();
     }
 
-    public void refreshLocalTags(){
-        for (int i=0;i<root.getShapeArrayList().size();i++){
-            //TODO Hacer una rutina que permita solamente mandarle el objeto Tag y que el objeto CanvasObject determine
-            // si requiere actualizar, reduciendo la complejidad de esta clase
+    public void refreshLocalTags() {
+        logger.log(Level.INFO,"Beginning refreshLocalTags method");
+        updateLocalTags();
+        for (int i = 0; i < root.getShapeArrayList().size(); i++) {
+            for (Tag localTag : localTags) {
+                root.getShapeArrayList().get(i).updateTag(localTag);
+            }
         }
+        for (int i = 0; i < projectAlarms.size(); i++) {
+            for (Tag localTag : localTags) {
+                for(Alarm alarm : projectAlarms){
+                    ArrayList<Tag> parameters = alarm.getExpression().getParameters();
+                    for (int j = 0; j < parameters.size(); j++) {
+                        if (parameters.get(j).compareToTag(localTag)) {
+                            parameters.set(j, localTag);
+                        }
+                    }
+                    alarm.getExpression().setParameters(parameters);
+                }
+            }
+        }
+    }
+
+    public void updateLocalTags() {
+        ArrayList<CanvasObject> canvasObjects = root.getShapeArrayList();
+        LocalDateTime max = null;
+        int index = -1;
+        for (int i = 0; i < canvasObjects.size(); i++) {
+            CanvasObject canvasObject = canvasObjects.get(i);
+            if (max == null && canvasObject.getCanvasObjectData().getSuperType().equals("TagInputObject")) {
+                max = canvasObject.getLastTimeSelected();
+                index = i;
+            } else if (canvasObject.getLastTimeSelected() != null && max != null) {
+                if (max.isBefore(canvasObject.getLastTimeSelected())) {
+                    max = canvasObjects.get(i).getLastTimeSelected();
+                    index = i;
+                }
+            }
+        }
+        for (int i = 0; i < localTags.size() && index > -1; i++) {
+            Tag tagToUpdate = canvasObjects.get(index).getCanvasObjectData().getTag();
+            if (localTags.get(i).compareToTag(tagToUpdate)) {
+                localTags.set(i, tagToUpdate);
+            }
+        }
+
     }
 
     private void addAlarm(Alarm alarm) {
@@ -928,7 +973,7 @@ public class HMIApp extends Application {
 
         fileChooser.setTitle("Seleccione un archivo de proyecto LibreHMI");
         fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home"))
+                new File(System.getProperty(USER_HOME))
         );
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("JSON", "*.json", "*.JSON"),
@@ -943,17 +988,17 @@ public class HMIApp extends Application {
 
     public void loadHMIData(String filenamePath) throws IOException {
         String[] filenamePathArr = filenamePath.split("\\.");
-        String type = filenamePathArr[filenamePathArr.length-1];
+        String type = filenamePathArr[filenamePathArr.length - 1];
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         HMIAppData localHmiAppData = null;
-        if(type.equals("json") || type.equals("JSON")){
+        if (type.equals("json") || type.equals("JSON")) {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath));
             localHmiAppData = gson.fromJson(bufferedReader, HMIAppData.class);
-        }else if(type.equals("lhmi") || type.equals("LHMI")){
-            do{
+        } else if (type.equals("lhmi") || type.equals("LHMI")) {
+            do {
                 localHmiAppData = getEncryptedHmiAppData(gson, filenamePath);
-            }while(!wasEncryptedFileInputPasswordCanceled && localHmiAppData==null);
+            } while (!wasEncryptedFileInputPasswordCanceled && localHmiAppData == null);
         }
 
 
@@ -978,27 +1023,27 @@ public class HMIApp extends Application {
         HMIAppData localHmiAppData = null;
         SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(false);
         setFilePasswordWindow.showAndWait();
-        if(!setFilePasswordWindow.isCanceled()){
-            StringBuilder rawEncryptedDataSB= new StringBuilder();
+        if (!setFilePasswordWindow.isCanceled()) {
+            StringBuilder rawEncryptedDataSB = new StringBuilder();
             String line;
-            try(BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath))){
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath))) {
                 while ((line = bufferedReader.readLine()) != null) {
                     rawEncryptedDataSB.append(line);
                 }
                 StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
                 encryptor.setPassword(setFilePasswordWindow.getPassword());
                 encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
-                try{
+                try {
                     String rawJson = encryptor.decrypt(rawEncryptedDataSB.toString());
-                    localHmiAppData = gson.fromJson(rawJson,HMIAppData.class);
+                    localHmiAppData = gson.fromJson(rawJson, HMIAppData.class);
                     wasEncryptedFileInputPasswordCanceled = false;
-                }catch (EncryptionOperationNotPossibleException e){
-                    wasEncryptedFileInputPasswordCanceled = !showAlert(Alert.AlertType.ERROR,"Contraseña incorrecta","La contraseña ingresada no es correcta, reintente",false,false);
+                } catch (EncryptionOperationNotPossibleException e) {
+                    wasEncryptedFileInputPasswordCanceled = !showAlert(Alert.AlertType.ERROR, "Contraseña incorrecta", "La contraseña ingresada no es correcta, reintente", false, false);
                 }
-            }finally {
+            } finally {
                 wasEncryptedFileInputPasswordCanceled = false;
             }
-        }else{
+        } else {
             wasEncryptedFileInputPasswordCanceled = true;
         }
         return localHmiAppData;
@@ -1047,36 +1092,31 @@ public class HMIApp extends Application {
 
     private void saveAsHMIData(boolean encrypted) throws IOException {
         FileChooser fileChooser = new FileChooser();
-        if(encrypted){
+        if (encrypted) {
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("LHMI", "*.lhmi", "*.LHMI")
             );
-        }else {
+        } else {
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("JSON", "*.json", "*.JSON")
             );
         }
         fileChooser.setTitle("Guardar Proyecto");
         fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home"))
+                new File(System.getProperty(USER_HOME))
         );
 
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            if(encrypted){
+            if (encrypted) {
                 saveEncryptedHMIData(file.getAbsolutePath());
-            }else{
+            } else {
                 saveHMIData(file.getAbsolutePath());
             }
         }
     }
 
-    /**
-     * Este método inicia el proceso para guardar el proyecto dentro de un archivo json.
-     *
-     * @throws IOException Si hay algún problema en la lectura o escritura.
-     */
-    private void saveHMIData(String filenamePath) throws IOException {
+    private void prepareHMIData(){
         ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
         for (HMIScene hmiScene : pages) {
             ArrayList<CanvasObjectData> shapeArrayList = new ArrayList<>();
@@ -1088,12 +1128,22 @@ public class HMIApp extends Application {
         }
         this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
         this.hmiAppData.setHmiAlarms(manageableAlarms);
+        this.hmiAppData.setHmiLocalTags(localTags);
+        this.hmiAppData.setType(HMI_PROJECT);
+    }
+
+    /**
+     * Este método inicia el proceso para guardar el proyecto dentro de un archivo json.
+     *
+     * @throws IOException Si hay algún problema en la lectura o escritura.
+     */
+    private void saveHMIData(String filenamePath) throws IOException {
+        prepareHMIData();
         Gson gson = new Gson();
         if (filenamePath != null) {
             String[] filenameArr = filenamePath.split(File.separator);
             this.currentFilename = filenameArr[filenameArr.length - 1];
             Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
-            this.hmiAppData.setType(HMI_PROJECT);
             gson.toJson(this.hmiAppData, writer);
             writer.close();
             this.currentProjectFilePath = filenamePath;
@@ -1102,6 +1152,7 @@ public class HMIApp extends Application {
             updateTitleWithFilename();
         }
     }
+
     /**
      * Este método inicia el proceso para guardar el proyecto dentro de un archivo json.
      *
@@ -1110,24 +1161,13 @@ public class HMIApp extends Application {
     private void saveEncryptedHMIData(String filenamePath) throws IOException {
         SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(true);
         setFilePasswordWindow.showAndWait();
-        if(!setFilePasswordWindow.isCanceled()){
-            ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
-            for (HMIScene hmiScene : pages) {
-                ArrayList<CanvasObjectData> shapeArrayList = new ArrayList<>();
-                for (CanvasObject canvasObject : hmiScene.getCanvas().getCurrentCanvasObjects()) {
-                    shapeArrayList.add(canvasObject.getCanvasObjectData());
-                }
-                hmiScene.getHmiSceneData().setShapeArrayList(shapeArrayList);
-                hmiSceneDataArrayList.add(hmiScene.getHmiSceneData());
-            }
-            this.hmiAppData.setHmiAppPages(hmiSceneDataArrayList);
-            this.hmiAppData.setHmiAlarms(manageableAlarms);
+        if (!setFilePasswordWindow.isCanceled()) {
+            prepareHMIData();
             Gson gson = new Gson();
             if (filenamePath != null) {
                 String[] filenameArr = filenamePath.split(File.separator);
                 this.currentFilename = filenameArr[filenameArr.length - 1];
                 Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
-                this.hmiAppData.setType(HMI_PROJECT);
                 String rawJson = gson.toJson(this.hmiAppData);
                 StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
                 encryptor.setPassword(setFilePasswordWindow.getPassword());
@@ -1161,6 +1201,7 @@ public class HMIApp extends Application {
             setAutoBlockObjectsTimeline();
             this.autoBlockTimeline.play();
         }
+        setRefreshLocalTagsTimeline();
     }
 
     /**
@@ -1173,7 +1214,7 @@ public class HMIApp extends Application {
     public void generateStagesForPages(ArrayList<String> selectedPages) {
         boolean mainStageWasUpdated = false;
         for (String selectedPage : selectedPages) {
-            logger.log(Level.INFO, "Page"+selectedPage+"Flag"+mainStageWasUpdated);
+            logger.log(Level.INFO, "Page" + selectedPage + "Flag" + mainStageWasUpdated);
             int index = getIndexForStageWithScene(selectedPage);
             if (index == -1) {
                 if (!mainStageWasUpdated) {
@@ -1215,10 +1256,10 @@ public class HMIApp extends Application {
      */
     private int getIndexForStageWithScene(String title) {
         int index = -1;
-        logger.log(Level.INFO, "Title"+title);
+        logger.log(Level.INFO, "Title" + title);
         for (int i = 0; i < createdWindows.size(); i++) {
-            logger.log(Level.INFO, "Current"+((HMIScene) createdWindows.get(i).getScene()).getId());
-            logger.log(Level.INFO, "Current"+((HMIScene) createdWindows.get(i).getScene()).getTitle());
+            logger.log(Level.INFO, "Current" + ((HMIScene) createdWindows.get(i).getScene()).getId());
+            logger.log(Level.INFO, "Current" + ((HMIScene) createdWindows.get(i).getScene()).getTitle());
             if (((HMIScene) createdWindows.get(i).getScene()).getId().equals(title)) {
                 index = i;
             }
@@ -1344,47 +1385,48 @@ public class HMIApp extends Application {
         updateTitleWithFilename();
     }
 
-    private void addScene(HMISceneData hmiSceneData){
+    private void addScene(HMISceneData hmiSceneData) {
         HMIScene hmiScene = generatePage(hmiSceneData.getTitle(), hmiSceneData.getSceneCommentary(), hmiSceneData.getBackground().getColor());
         addScene(hmiScene);
         hmiScene.setHmiSceneData(hmiSceneData);
     }
 
-    public void exportSceneData(String sceneName, boolean encrypted){
+    public void exportSceneData(String sceneName, boolean encrypted) {
         int index = getIndexForScene(sceneName);
         HMIScene scene = (index != -1 && index < pages.size()) ? pages.get(index) : null;
         FileChooser fileChooser = new FileChooser();
-        if(encrypted){
+        if (encrypted) {
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("SECURE WINDOW", "*.swindow", "*.SWINDOW")
             );
-        }else {
+        } else {
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("WINDOW", "*.window", "*.WINDOW")
             );
         }
         fileChooser.setTitle("Exportar Ventana");
         fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home"))
+                new File(System.getProperty(USER_HOME))
         );
 
         File file = fileChooser.showSaveDialog(null);
         if (file != null && scene != null) {
-            if(encrypted){
-                try{
-                    exportSceneEncryptedData(scene.getHmiSceneData(),file.getAbsolutePath());
-                }catch (IOException e){
-                    showAlert(Alert.AlertType.ERROR,"Error al guardar el archivo: "+e.getMessage(),"Error al escribir el archivo",false,true);
+            if (encrypted) {
+                try {
+                    exportSceneEncryptedData(scene.getHmiSceneData(), file.getAbsolutePath());
+                } catch (IOException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error al guardar el archivo: " + e.getMessage(), "Error al escribir el archivo", false, true);
                 }
-            }else{
-                try{
-                    exportSceneData(scene.getHmiSceneData(),file.getAbsolutePath());
-                }catch (IOException e){
-                    showAlert(Alert.AlertType.ERROR,"Error al guardar el archivo: "+e.getMessage(),"Error al escribir el archivo",false,true);
+            } else {
+                try {
+                    exportSceneData(scene.getHmiSceneData(), file.getAbsolutePath());
+                } catch (IOException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error al guardar el archivo: " + e.getMessage(), "Error al escribir el archivo", false, true);
                 }
             }
         }
     }
+
     public void exportSceneData(HMISceneData hmiSceneData, String filePathName) throws IOException {
         Gson gson = new Gson();
         if (filePathName != null) {
@@ -1393,12 +1435,13 @@ public class HMIApp extends Application {
             writer.close();
         }
     }
+
     private void loadSceneData() throws IOException {
         FileChooser fileChooser = new FileChooser();
 
         fileChooser.setTitle("Seleccione un archivo de proyecto LibreHMI");
         fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home"))
+                new File(System.getProperty(USER_HOME))
         );
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("WINDOW", "*.window", "*.WINDOW"),
@@ -1412,17 +1455,17 @@ public class HMIApp extends Application {
 
     private void loadSceneData(String filenamePath) throws IOException {
         String[] filenamePathArr = filenamePath.split("\\.");
-        String type = filenamePathArr[filenamePathArr.length-1];
+        String type = filenamePathArr[filenamePathArr.length - 1];
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         HMISceneData localHmiAppData = null;
-        if(type.equals("window") || type.equals("WINDOW")){
+        if (type.equals("window") || type.equals("WINDOW")) {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath));
             localHmiAppData = gson.fromJson(bufferedReader, HMISceneData.class);
-        }else if(type.equals("swindow") || type.equals("SWINDOW")){
-            do{
+        } else if (type.equals("swindow") || type.equals("SWINDOW")) {
+            do {
                 localHmiAppData = getEncryptedHmiSceneData(gson, filenamePath);
-            }while(!wasEncryptedFileInputPasswordCanceled && localHmiAppData==null);
+            } while (!wasEncryptedFileInputPasswordCanceled && localHmiAppData == null);
         }
 
 
@@ -1437,27 +1480,27 @@ public class HMIApp extends Application {
         HMISceneData localHmiSceneData = null;
         SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(false);
         setFilePasswordWindow.showAndWait();
-        if(!setFilePasswordWindow.isCanceled()){
-            StringBuilder rawEncryptedDataSB= new StringBuilder();
+        if (!setFilePasswordWindow.isCanceled()) {
+            StringBuilder rawEncryptedDataSB = new StringBuilder();
             String line;
-            try(BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath))){
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath))) {
                 while ((line = bufferedReader.readLine()) != null) {
                     rawEncryptedDataSB.append(line);
                 }
                 StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
                 encryptor.setPassword(setFilePasswordWindow.getPassword());
                 encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
-                try{
+                try {
                     String rawJson = encryptor.decrypt(rawEncryptedDataSB.toString());
-                    localHmiSceneData = gson.fromJson(rawJson,HMISceneData.class);
+                    localHmiSceneData = gson.fromJson(rawJson, HMISceneData.class);
                     wasEncryptedFileInputPasswordCanceled = false;
-                }catch (EncryptionOperationNotPossibleException e){
-                    wasEncryptedFileInputPasswordCanceled = !showAlert(Alert.AlertType.ERROR,"Contraseña incorrecta","La contraseña ingresada no es correcta, reintente",false,false);
+                } catch (EncryptionOperationNotPossibleException e) {
+                    wasEncryptedFileInputPasswordCanceled = !showAlert(Alert.AlertType.ERROR, "Contraseña incorrecta", "La contraseña ingresada no es correcta, reintente", false, false);
                 }
-            }finally {
+            } finally {
                 wasEncryptedFileInputPasswordCanceled = false;
             }
-        }else{
+        } else {
             wasEncryptedFileInputPasswordCanceled = true;
         }
         return localHmiSceneData;
@@ -1466,7 +1509,7 @@ public class HMIApp extends Application {
     public void exportSceneEncryptedData(HMISceneData hmiSceneData, String filePathName) throws IOException {
         SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(true);
         setFilePasswordWindow.showAndWait();
-        if(!setFilePasswordWindow.isCanceled()){
+        if (!setFilePasswordWindow.isCanceled()) {
             Gson gson = new Gson();
             if (filePathName != null) {
                 Writer writer = Files.newBufferedWriter(Path.of(filePathName));
@@ -1631,6 +1674,7 @@ public class HMIApp extends Application {
     public void setManageableAlarms(ArrayList<Alarm> manageableAlarms) {
         this.manageableAlarms = manageableAlarms;
     }
+
     public ArrayList<Tag> getLocalTags() {
         return localTags;
     }

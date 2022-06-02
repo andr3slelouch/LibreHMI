@@ -232,7 +232,6 @@ public class HMIScene extends Scene implements Cloneable {
             } else {
                 CanvasObject canvasObject = canvasObjects.get(i);
                 if (canvasObject.getLastTimeSelected() != null && max != null) {
-                    logger.log(Level.INFO,"Checking object:"+canvasObjects.get(i).getId());
                     if (max.isBefore(canvasObject.getLastTimeSelected())) {
                         max = canvasObjects.get(i).getLastTimeSelected();
                         index = i;
@@ -241,7 +240,6 @@ public class HMIScene extends Scene implements Cloneable {
             }
         }
         if (index > -1 && max != null) {
-            logger.log(Level.INFO,String.valueOf(index));
             for (int i = 0; i < canvasObjects.size(); i++) {
                 if (i != index) {
                     canvasObjects.get(i).setSelected(false);

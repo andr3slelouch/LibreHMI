@@ -90,6 +90,7 @@ public class CanvasImage extends CanvasObject {
         this.getCanvasObjectData().setImageSymbol(isImageSymbol);
         this.setCenter(this.imageView);
         this.getCanvasObjectData().setType("Image");
+        this.getCanvasObjectData().setSuperType("Figure");
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
         this.getCanvasObjectData().setData(imagePath);

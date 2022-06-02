@@ -73,6 +73,7 @@ public class CanvasButton extends CanvasObject {
         this.button.setDisable(true);
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
+        this.getCanvasObjectData().setSuperType("InterfaceInputObject");
         this.setSize(width,height);
         this.button.setPrefWidth(width);
         this.button.setPrefHeight(height);

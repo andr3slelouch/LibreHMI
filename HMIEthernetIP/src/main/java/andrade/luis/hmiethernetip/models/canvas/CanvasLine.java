@@ -31,6 +31,7 @@ public class CanvasLine extends CanvasObject{
         this.line.setEndY(y2);
 
         this.getCanvasObjectData().setType("Line");
+        this.getCanvasObjectData().setSuperType("Figure");
         this.setCenter(this.line);
         if(this.getCanvasObjectData().isRotated()){
             this.line.setRotate(this.getCanvasObjectData().getRotation());

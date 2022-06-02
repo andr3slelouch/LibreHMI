@@ -35,6 +35,9 @@ public class HMIAppData implements Serializable, Transferable {
     @SerializedName("hmiAlarms")
     @Expose
     private ArrayList<Alarm> hmiAlarms;
+    @SerializedName("hmiLocalTags")
+    @Expose
+    private ArrayList<Tag> hmiLocalTags;
 
     @SerializedName("type")
     @Expose
@@ -72,5 +75,12 @@ public class HMIAppData implements Serializable, Transferable {
 
     public void setType(String type) {
         this.type = type;
+    }
+    public ArrayList<Tag> getHmiLocalTags() {
+        return hmiLocalTags;
+    }
+
+    public void setHmiLocalTags(ArrayList<Tag> hmiLocalTags) {
+        this.hmiLocalTags = hmiLocalTags;
     }
 }

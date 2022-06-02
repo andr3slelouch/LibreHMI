@@ -105,6 +105,7 @@ public class CanvasTextField extends CanvasObject {
         this.getCanvasObjectData().setMinValue(minValue);
         this.getCanvasObjectData().setMaxValue(maxValue);
         this.getCanvasObjectData().setDataType(type);
+        this.getCanvasObjectData().setSuperType("TagInputObject");
         this.textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.isEmpty() && (this.type.equals(ENTERO_STR) || this.type.equals(FLOTANTE_STR))) {
                 double value = Double.parseDouble(newValue);
@@ -121,6 +122,7 @@ public class CanvasTextField extends CanvasObject {
                 linkedTag.setValue(this.getCanvasObjectData().getData());
                 try {
                     timeline.pause();
+                    this.setLastTimeSelected();
                     if (!linkedTag.update()) {
                         this.errorLabel = new Label("Error en Tag de Escritura");
                         this.setTop(errorLabel);
@@ -289,4 +291,11 @@ public class CanvasTextField extends CanvasObject {
         timeline.play();
     }
 
+    @Override
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
+        if(this.getCanvasObjectData().getTag().compareToTag(tag)){
+            this.getCanvasObjectData().setTag(tag);
+        }
+    }
 }
