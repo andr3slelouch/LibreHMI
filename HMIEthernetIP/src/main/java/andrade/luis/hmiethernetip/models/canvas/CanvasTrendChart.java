@@ -518,13 +518,15 @@ public class CanvasTrendChart extends CanvasObject {
         this.trendTimeline.play();
     }
     @Override
-    public void updateTag(Tag tag){
-        super.updateTag(tag);
+    public void updateTag(Tag tag,boolean forceUpdate){
+        super.updateTag(tag,forceUpdate);
         if(trendTimeline != null){
             for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
                 ArrayList<Tag> parameters = trendChartSerieData.getExpression().getParameters();
                 for (int j = 0; j < parameters.size(); j++) {
                     if (parameters.get(j).compareToTag(tag)) {
+                        int floatPrecision = parameters.get(j).getFloatPrecision();
+                        tag.setFloatPrecision(floatPrecision);
                         parameters.set(j, tag);
                     }
                 }

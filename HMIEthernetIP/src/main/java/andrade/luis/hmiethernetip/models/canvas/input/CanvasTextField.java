@@ -28,6 +28,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasTextField extends CanvasObject {
@@ -292,10 +293,15 @@ public class CanvasTextField extends CanvasObject {
     }
 
     @Override
-    public void updateTag(Tag tag){
-        super.updateTag(tag);
+    public void updateTag(Tag tag,boolean forceUpdate){
+        int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
+        super.updateTag(tag,forceUpdate);
         if(this.getCanvasObjectData().getTag().compareToTag(tag)){
             this.getCanvasObjectData().setTag(tag);
+            this.getCanvasObjectData().getTag().setFloatPrecision(floatPrecision);
+        }
+        if(forceUpdate){
+            this.textField.setText(tag.getValue());
         }
     }
 }

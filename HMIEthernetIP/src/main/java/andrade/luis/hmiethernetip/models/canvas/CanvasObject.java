@@ -107,7 +107,7 @@ public class CanvasObject extends BorderPane {
         }
     }
 
-    public void updateTag(Tag tag){
+    public void updateTag(Tag tag, boolean forceUpdate){
         if(visibilityTimeline!=null){
             ArrayList<Tag> parameters = this.getCanvasObjectData().getVisibilityExpression().getParameters();
             for(int i=0;i<parameters.size();i++){

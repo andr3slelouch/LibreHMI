@@ -205,10 +205,19 @@ public class CanvasSlider extends CanvasObject {
     }
 
     @Override
-    public void updateTag(Tag tag){
-        super.updateTag(tag);
+    public void updateTag(Tag tag,boolean forceUpdate){
+        int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
+        super.updateTag(tag,forceUpdate);
         if(this.getCanvasObjectData().getTag().compareToTag(tag)){
             this.getCanvasObjectData().setTag(tag);
+            this.getCanvasObjectData().getTag().setFloatPrecision(floatPrecision);
+        }
+        if(forceUpdate){
+            String value = this.getCanvasObjectData().getTag().getValue();
+            if (value != null) {
+                double evaluatedValue = Double.parseDouble(value);
+                this.slider.setValue(evaluatedValue);
+            }
         }
     }
 }

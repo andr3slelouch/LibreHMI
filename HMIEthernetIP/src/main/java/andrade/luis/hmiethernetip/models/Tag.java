@@ -171,8 +171,7 @@ public class Tag implements Serializable {
                             this.type.equals(comparedTag.getType()) &&
                             this.address.equals(comparedTag.getAddress()) &&
                             this.action.equals(comparedTag.getAction()) &&
-                            this.localTag &&
-                            this.floatPrecision == comparedTag.getFloatPrecision()
+                            this.localTag
                     ;
         } else {
             return false;

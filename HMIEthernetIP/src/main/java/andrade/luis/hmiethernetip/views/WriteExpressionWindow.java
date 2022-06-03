@@ -23,6 +23,7 @@ import java.util.function.UnaryOperator;
 public class WriteExpressionWindow extends Stage {
 
     private HBox floatPrecisionHBox;
+    private HBox samplingTimeHBox;
     private final Button addTagButton;
     private final HBox buttonsHBox;
     protected TextField textField;
@@ -34,6 +35,7 @@ public class WriteExpressionWindow extends Stage {
     private Expression localExpression;
     private boolean inputMode;
     private TextField floatPrecisionTextField;
+    private TextField samplingTimeTextField;
     private boolean done = false;
 
     public ArrayList<Tag> getLocalTags() {
@@ -79,10 +81,18 @@ public class WriteExpressionWindow extends Stage {
             }
         });
 
+        Label samplingTime = new Label("Tiempo de muestreo en segundos:");
+        samplingTimeTextField = new TextField();
+        samplingTimeTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 1, integerFilter));
+        samplingTimeTextField.setPromptText("Segundos");
+        samplingTimeHBox = new HBox();
+        samplingTimeHBox.getChildren().addAll(samplingTime,samplingTimeTextField);
+        samplingTimeHBox.setVisible(false);
+
         vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, textField,floatPrecisionHBox);
+        vbox.getChildren().addAll(label, textField,floatPrecisionHBox,samplingTimeHBox);
 
         finishSelectionButton = new Button("OK");
         finishSelectionButton.setAlignment(Pos.CENTER);
@@ -263,6 +273,21 @@ public class WriteExpressionWindow extends Stage {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+    public HBox getSamplingTimeHBox() {
+        return samplingTimeHBox;
+    }
+
+    public void setSamplingTimeHBox(HBox samplingTimeHBox) {
+        this.samplingTimeHBox = samplingTimeHBox;
+    }
+
+    public TextField getSamplingTimeTextField() {
+        return samplingTimeTextField;
+    }
+
+    public void setSamplingTimeTextField(TextField samplingTimeTextField) {
+        this.samplingTimeTextField = samplingTimeTextField;
     }
 
 }

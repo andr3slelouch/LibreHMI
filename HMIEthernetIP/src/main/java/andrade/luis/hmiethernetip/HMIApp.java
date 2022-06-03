@@ -416,17 +416,19 @@ public class HMIApp extends Application {
         MenuItem createLocalTagMI = new MenuItem("Crear Tag Local");
         //createLocalTagMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+U"));
         createLocalTagMI.setOnAction(mouseEvent -> {
-            CreateLocalTagWindow createLocalTagWindow = new CreateLocalTagWindow(null);
-            createLocalTagWindow.showAndWait();
-            if (createLocalTagWindow.getTag() != null) {
-                localTags.add(createLocalTagWindow.getTag());
+            ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(null);
+            manageLocalTagWindow.showAndWait();
+            if (manageLocalTagWindow.getTag() != null) {
+                localTags.add(manageLocalTagWindow.getTag());
             }
 
         });
         MenuItem manageLocalTagsMI = new MenuItem("Administrar Tag Locales");
         //manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
         manageLocalTagsMI.setOnAction(mouseEvent -> {
-            SelectTagWindow tagWindow = new SelectTagWindow(false, "", false, localTags);
+            SelectTagWindow tagWindow = new SelectTagWindow(false, "LocalTags", false, localTags);
+            tagWindow.showAndWait();
+            updateLocalTags(true);
         });
         tagsMI.getItems().addAll(createLocalTagMI, manageLocalTagsMI);
         MenuItem propertiesMI = new MenuItem("Conexión de Base de Datos");
@@ -818,16 +820,19 @@ public class HMIApp extends Application {
     }
 
     public void refreshLocalTags() {
-        logger.log(Level.INFO,"Beginning refreshLocalTags method");
-        updateLocalTags();
+        updateLocalTagsFromInputs();
+        updateLocalTags(false);
+    }
+
+    public void updateLocalTags(boolean forceUpdate) {
         for (int i = 0; i < root.getShapeArrayList().size(); i++) {
             for (Tag localTag : localTags) {
-                root.getShapeArrayList().get(i).updateTag(localTag);
+                root.getShapeArrayList().get(i).updateTag(localTag,forceUpdate);
             }
         }
         for (int i = 0; i < projectAlarms.size(); i++) {
             for (Tag localTag : localTags) {
-                for(Alarm alarm : projectAlarms){
+                for (Alarm alarm : projectAlarms) {
                     ArrayList<Tag> parameters = alarm.getExpression().getParameters();
                     for (int j = 0; j < parameters.size(); j++) {
                         if (parameters.get(j).compareToTag(localTag)) {
@@ -840,7 +845,7 @@ public class HMIApp extends Application {
         }
     }
 
-    public void updateLocalTags() {
+    public void updateLocalTagsFromInputs() {
         ArrayList<CanvasObject> canvasObjects = root.getShapeArrayList();
         LocalDateTime max = null;
         int index = -1;
@@ -1116,7 +1121,7 @@ public class HMIApp extends Application {
         }
     }
 
-    private void prepareHMIData(){
+    private void prepareHMIData() {
         ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
         for (HMIScene hmiScene : pages) {
             ArrayList<CanvasObjectData> shapeArrayList = new ArrayList<>();
@@ -1200,8 +1205,8 @@ public class HMIApp extends Application {
         if (mode.equals(EJECUTAR_STR) && this.user.getRole().equals("Administrador")) {
             setAutoBlockObjectsTimeline();
             this.autoBlockTimeline.play();
+            setRefreshLocalTagsTimeline();
         }
-        setRefreshLocalTagsTimeline();
     }
 
     /**
@@ -1213,15 +1218,14 @@ public class HMIApp extends Application {
      */
     public void generateStagesForPages(ArrayList<String> selectedPages) {
         boolean mainStageWasUpdated = false;
-        for (String selectedPage : selectedPages) {
-            logger.log(Level.INFO, "Page" + selectedPage + "Flag" + mainStageWasUpdated);
-            int index = getIndexForStageWithScene(selectedPage);
+        for (String selectedPageToGenerate : selectedPages) {
+            int index = getIndexForStageWithScene(selectedPageToGenerate);
             if (index == -1) {
                 if (!mainStageWasUpdated) {
-                    changeSelectedScene(selectedPage);
+                    changeSelectedScene(selectedPageToGenerate);
                     mainStageWasUpdated = true;
                 } else {
-                    int hmiSceneIndex = getIndexForScene(selectedPage);
+                    int hmiSceneIndex = getIndexForScene(selectedPageToGenerate);
                     generateStage(pages.get(hmiSceneIndex));
                 }
             } else {

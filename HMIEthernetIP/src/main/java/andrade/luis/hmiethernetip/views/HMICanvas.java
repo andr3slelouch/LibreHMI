@@ -541,12 +541,15 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     public void addTextOnCanvasClicked(CanvasPoint current) {
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
         writeExpressionWindow.setLocalTags(hmiApp.getLocalTags());
+        writeExpressionWindow.getSamplingTimeHBox().setVisible(true);
         writeExpressionWindow.showAndWait();
         if(writeExpressionWindow.isDone()){
-            Expression expression = writeExpressionWindow.getLocalExpression();;
+            Expression expression = writeExpressionWindow.getLocalExpression();
             CanvasText canvasText = new CanvasText("0.0", current);
             canvasText.setCanvas(this);
             canvasText.setHmiApp(hmiApp);
+            double samplingTime = Double.parseDouble(writeExpressionWindow.getSamplingTimeTextField().getText());
+            canvasText.getCanvasObjectData().setSamplingTime(samplingTime <1 ? 1 : samplingTime);
             if (this.getShapeArrayList().isEmpty()) {
                 canvasText.setObjectId(FIGURE_ID + "0");
             } else {

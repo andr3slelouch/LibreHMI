@@ -24,9 +24,21 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
+
 public class SelectTagWindow extends Stage {
     private final TableView.TableViewSelectionModel<TagRow> selectionModel;
     private TableView<TagRow> table;
+
+    public ArrayList<Tag> getLocalTags() {
+        return localTags;
+    }
+
+    public void setLocalTags(ArrayList<Tag> localTags) {
+        this.localTags = localTags;
+    }
+
+    private ArrayList<Tag> localTags;
     private Button finishSelectionButton;
     private Alert alert;
 
@@ -39,16 +51,18 @@ public class SelectTagWindow extends Stage {
     }
 
     private boolean cancelled = true;
+
     public Tag getSelectedTag() {
         return selectedTagRow;
     }
 
     private Tag selectedTagRow;
+
     public SelectTagWindow(boolean inputMode, String filter, boolean testMode, ArrayList<Tag> localTags) {
         StackPane root = new StackPane();
 
-
-        final Label label = new Label("Seleccione el Tag a ser asociado");
+        this.localTags = localTags;
+        Label label = new Label("");
         label.setFont(new Font("Arial", 20));
 
         table = new TableView<>();
@@ -70,8 +84,53 @@ public class SelectTagWindow extends Stage {
         TableColumn<TagRow, String> valueColumn = new TableColumn<>("Valor");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("tagValue"));
 
-        ObservableList<TagRow> existingTagsObsList = getExistingTags(inputMode,filter);
-        if(localTags!=null){
+        ObservableList<TagRow> existingTagsObsList = FXCollections.observableArrayList();
+        if (filter.equals("LocalTags")) {
+            label = new Label("Seleccione un Tag Local a modificar");
+            table.setPlaceholder(new Label("No existen Tags Locales definidos en el proyecto"));
+            table.setRowFactory(param -> new TableRow<>() {
+                @Override
+                public void updateItem(TagRow row, boolean empty) {
+                    super.updateItem(row, empty);
+                    if (!empty) {
+                        ContextMenu contextMenu = new ContextMenu();
+                        MenuItem newItem = new MenuItem();
+                        newItem.setText("Nuevo");
+                        newItem.setOnAction(event -> {
+                            ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(null);
+                            manageLocalTagWindow.showAndWait();
+                            if (manageLocalTagWindow.getTag() != null) {
+                                localTags.add(manageLocalTagWindow.getTag());
+                            }
+                        });
+                        MenuItem saveItem = new MenuItem();
+                        saveItem.setText("Editar");
+                        saveItem.setOnAction(event -> {
+                            ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(row.generateTag());
+                            manageLocalTagWindow.showAndWait();
+                            if (manageLocalTagWindow.getTag() != null) {
+                                localTags.set(super.getIndex(), manageLocalTagWindow.getTag());
+                            }
+                        });
+                        MenuItem deleteItem = new MenuItem();
+                        deleteItem.setText("Eliminar");
+                        deleteItem.setOnAction(event -> {
+                            if (showAlert(CONFIRMATION, "Confirmar eliminación de Tag Local", "Esta seguro de eliminar el Tag '" + row.getTagName() + "'? Al ser eliminado se limitará que este Tag pueda ser enlazado\na futuras figuras,sin embargo en aquellas que ya fue enlazado previamente conservará su último\nestado actual, se recomienda actualizar las figuras afectadas a otro Tag disponible")) {
+                                localTags.remove(super.getIndex());
+                            }
+                        });
+
+                        contextMenu.getItems().addAll(newItem, saveItem, deleteItem);
+                        setContextMenu(contextMenu);
+                    }
+                }
+            });
+        } else {
+            existingTagsObsList = getExistingTags(inputMode, filter);
+            label = new Label("Seleccione el Tag a ser asociado");
+            table.setPlaceholder(new Label("No existen Tags definidos en la base de datos"));
+        }
+        if (localTags != null) {
             for (Tag localTag : localTags) {
                 existingTagsObsList.add(new TagRow(
                         localTag.getPlcName(),
@@ -85,12 +144,11 @@ public class SelectTagWindow extends Stage {
                 ));
             }
         }
-        if(existingTagsObsList.isEmpty() || testMode){
+        if (existingTagsObsList.isEmpty() || testMode) {
             setAlertIfTableIsEmpty();
-        }else{
+        } else {
             table.setItems(existingTagsObsList);
         }
-        table.setPlaceholder(new Label("No existen Tags definidos en la base de datos"));
 
         table.getColumns().addAll(namePLCColumn,
                 ipColumn,
@@ -116,38 +174,38 @@ public class SelectTagWindow extends Stage {
         hbox.setAlignment(Pos.BASELINE_RIGHT);
         vbox.getChildren().add(hbox);
         root.getChildren().add(vbox);
-        Scene scene = new Scene(root,500,400);
+        Scene scene = new Scene(root, 500, 400);
         this.setScene(scene);
 
     }
 
     public ObservableList<TagRow> getExistingTags(boolean inputMode, String filter) {
         String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
-        if(inputMode){
-            query = query +"AND t.accion = 'Escritura' ";
+        if (inputMode) {
+            query = query + "AND t.accion = 'Escritura' ";
         }
 
-        switch(filter){
+        switch (filter) {
             case "bool":
-                query = query +"AND t.tipoTag = 'Bool' ";
+                query = query + "AND t.tipoTag = 'Bool' ";
                 break;
             case "numbers":
-                query = query +"AND t.tipoTag != 'Bool' ";
+                query = query + "AND t.tipoTag != 'Bool' ";
                 break;
             default:
                 break;
         }
         ObservableList<TagRow> data = FXCollections.observableArrayList();
         try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
-            readTags(con,data,query);
+            readTags(con, data, query);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
         return data;
     }
 
-    private ObservableList<TagRow> readTags(Connection con, ObservableList<TagRow> data, String query){
-        try(Statement statement = con.createStatement()){
+    private ObservableList<TagRow> readTags(Connection con, ObservableList<TagRow> data, String query) {
+        try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 data.add(new TagRow(
@@ -160,55 +218,53 @@ public class SelectTagWindow extends Stage {
                         resultSet.getString("accion"),
                         ""));
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return data;
     }
 
-    public void setSelectedTag(){
+    public void setSelectedTag() {
         ObservableList<TagRow> selected = selectionModel.getSelectedItems();
         Logger logger = Logger.getLogger(this.getClass().getName());
 
-        if(!selected.isEmpty()){
-            logger.log(Level.INFO,selected.get(0).getTagName());
+        if (!selected.isEmpty()) {
+            logger.log(Level.INFO, selected.get(0).getTagName());
             //this.selectedTagRow = new Tag(selected.get(0).getPlcName(),selected.get(0).getPlcAddress(),selected.get(0).getPlcDeviceGroup(),selected.get(0).getTagName(),selected.get(0).getTagType(),selected.get(0).getTagAddress(),selected.get(0).getTagAction(),selected.get(0).getTagValue(),0);
             this.selectedTagRow = selected.get(0).generateTag();
             this.cancelled = false;
             this.close();
-        }else{
+        } else {
             confirmExit();
         }
     }
 
-    public void confirmExit(){
+    public void confirmExit() {
         alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia");
         alert.setHeaderText("Debe seleccionar un Tag de la tabla para continuar");
 
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
 
         alert.getButtonTypes().setAll(okButton);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
+        if (result.isPresent() && result.get() == okButton) {
             alert.close();
         }
     }
 
-    public void setAlertIfTableIsEmpty(){
+    public void setAlertIfTableIsEmpty() {
         alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia");
         alert.setHeaderText("No existen tags disponibles");
 
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
-        
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+
         alert.getButtonTypes().setAll(okButton);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
+        if (result.isPresent() && result.get() == okButton) {
             alert.close();
             this.close();
         }
@@ -229,12 +285,34 @@ public class SelectTagWindow extends Stage {
     public void setFinishSelectionButton(Button finishSelectionButton) {
         this.finishSelectionButton = finishSelectionButton;
     }
+
     public Alert getAlert() {
         return alert;
     }
 
     public void setAlert(Alert alert) {
         this.alert = alert;
+    }
+
+    private boolean showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
+
+        ButtonType okButton = new ButtonType("Sí", ButtonBar.ButtonData.YES);
+        ButtonType cancelButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+
+        alert.getButtonTypes().setAll(cancelButton, okButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == okButton) {
+            alert.close();
+            return true;
+        } else if (result.isPresent() && result.get() == cancelButton) {
+            alert.close();
+            return false;
+        }
+        return false;
     }
 }
 

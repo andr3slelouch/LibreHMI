@@ -227,23 +227,6 @@ public class CanvasAlarmDisplay extends CanvasObject {
 
     @Override
     public void setEnable(String mode) {
-        /*if (user.getRole().equals("Operador")) {
-            mode = "Stop";
-        }
-        switch (mode) {
-            case "Ejecutar":
-                super.setEnable("Ejecutar");
-                this.alarmsTable.setDisable(false);
-                break;
-            case "Stop":
-                super.setEnable("Stop");
-                this.alarmsTable.setDisable(true);
-                break;
-            default:
-                super.setEnable("True");
-                this.alarmsTable.setDisable(true);
-                break;
-        }*/
         switch (mode) {
             case "Ejecutar":
                 if(!this.getUser().getRole().equals("Administrador")){

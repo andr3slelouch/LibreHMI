@@ -139,9 +139,12 @@ public class CanvasRectangle extends CanvasObject {
             writeExpressionWindow.getMinValueField().setText(this.getCanvasObjectData().getMinValue() + "");
             writeExpressionWindow.getMaxValueField().setText(this.getCanvasObjectData().getMaxValue() + "");
             writeExpressionWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getExpression().getFloatPrecision()));
+            writeExpressionWindow.getSamplingTimeHBox().setVisible(true);
+            writeExpressionWindow.getSamplingTimeTextField().setText(String.valueOf(this.getCanvasObjectData().getSamplingTime()<1 ? 1:this.getCanvasObjectData().getSamplingTime()));
         } else {
             writeExpressionWindow = new SetPercentFillPropertiesWindow();
             writeExpressionWindow.setLocalTags(getHmiApp().getLocalTags());
+            writeExpressionWindow.getSamplingTimeHBox().setVisible(true);
         }
         writeExpressionWindow.showAndWait();
         Expression expression = writeExpressionWindow.getLocalExpression();
@@ -157,6 +160,7 @@ public class CanvasRectangle extends CanvasObject {
                 this.getHmiApp().setWasModified(true);
                 this.getCanvasObjectData().setMinValue(writeExpressionWindow.getMinValue());
                 this.getCanvasObjectData().setMaxValue(writeExpressionWindow.getMaxValue());
+                this.getCanvasObjectData().setSamplingTime(this.getCanvasObjectData().getSamplingTime()<1 ? 1:this.getCanvasObjectData().getSamplingTime());
             }
         } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -292,7 +296,7 @@ public class CanvasRectangle extends CanvasObject {
                                 this.setTop(this.errorLabel);
                                 e.printStackTrace();
                             }
-                        }), new KeyFrame(Duration.seconds(1)));
+                        }), new KeyFrame(Duration.seconds(this.getCanvasObjectData().getSamplingTime())));
         this.refillRectangleTimeline.setCycleCount(Animation.INDEFINITE);
     }
 
@@ -331,12 +335,14 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
     @Override
-    public void updateTag(Tag tag){
-        super.updateTag(tag);
+    public void updateTag(Tag tag,boolean forceUpdate){
+        super.updateTag(tag,forceUpdate);
         if(refillRectangleTimeline != null){
             ArrayList<Tag> parameters = this.getCanvasObjectData().getExpression().getParameters();
             for(int i=0;i<parameters.size();i++){
                 if(parameters.get(i).compareToTag(tag)){
+                    int floatPrecision = parameters.get(i).getFloatPrecision();
+                    tag.setFloatPrecision(floatPrecision);
                     parameters.set(i,tag);
                 }
             }

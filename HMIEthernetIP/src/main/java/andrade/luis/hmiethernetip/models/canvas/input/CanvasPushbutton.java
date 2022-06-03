@@ -177,8 +177,8 @@ public class CanvasPushbutton extends CanvasButton {
         }
     }
     @Override
-    public void updateTag(Tag tag){
-        super.updateTag(tag);
+    public void updateTag(Tag tag,boolean forceUpdate){
+        super.updateTag(tag,forceUpdate);
         if(this.getCanvasObjectData().getTag().compareToTag(tag)){
             this.getCanvasObjectData().setTag(tag);
         }

@@ -1,15 +1,11 @@
 package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.models.Tag;
-import andrade.luis.hmiethernetip.models.users.HMIUser;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -24,7 +20,7 @@ import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CreateLocalTagWindow extends Stage {
+public class ManageLocalTagWindow extends Stage {
 
     public static final String FLOTANTE_STR = "Flotante";
     public static final String ENTERO_STR = "Entero";
@@ -75,7 +71,7 @@ public class CreateLocalTagWindow extends Stage {
         return change;
     };
 
-    public CreateLocalTagWindow(Tag localTag) {
+    public ManageLocalTagWindow(Tag localTag) {
         StackPane root = new StackPane();
 
         Label firstNameLabel = new Label("Nombre:");
@@ -152,14 +148,11 @@ public class CreateLocalTagWindow extends Stage {
                         value = "0";
                     }
                 }
-                if(CreateLocalTagWindow.this.tag == null){
+                if(ManageLocalTagWindow.this.tag == null){
                     this.tag = new Tag(firstNameField.getText(),typesComboBox.getSelectionModel().getSelectedItem(),actionsComboBox.getSelectionModel().getSelectedItem(),value,3);
                 }else{
-                    this.tag.setName(firstNameField.getText());
-                    this.tag.setType(typesComboBox.getSelectionModel().getSelectedItem());
-                    this.tag.setAction(actionsComboBox.getSelectionModel().getSelectedItem());
                     this.tag.setValue(value);
-                    this.tag.setFloatPrecision(3);
+                    logger.log(Level.INFO,this.tag.getValue());
                 }
                 this.close();
             }
@@ -169,15 +162,29 @@ public class CreateLocalTagWindow extends Stage {
         buttonsHBox.getChildren().addAll(cancelButton, registerButton);
         buttonsHBox.setAlignment(Pos.BOTTOM_RIGHT);
 
+        this.vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.getChildren().addAll(firstNameHBox, typeHBox, rolesHBox ,doubleLimitHBox, booleanConditionsHBox, buttonsHBox);
+
+        root.getChildren().add(vbox);
+
+        Logger logger = Logger.getLogger(getClass().getName());
         if (localTag != null) {
             this.tag = localTag;
             this.setTitle("Actualizar Tag");
+            firstNameField.setDisable(true);
             firstNameField.setText(localTag.getName());
+            typesComboBox.setDisable(true);
             typesComboBox.getSelectionModel().select(localTag.getType());
+            actionsComboBox.setDisable(true);
             actionsComboBox.getSelectionModel().select(localTag.getAction());
             try {
+                logger.log(Level.INFO,localTag.read());
+                logger.log(Level.INFO,localTag.getValue());
                 switch (localTag.getType()) {
                     case BOOL_STR:
+                        enableInputs(localTag.getType());
                         if (localTag.read().equals("0")) {
                             falseRadioButton.setSelected(true);
                         } else {
@@ -185,12 +192,14 @@ public class CreateLocalTagWindow extends Stage {
                         }
                         break;
                     case FLOTANTE_STR:
+                        enableInputs(localTag.getType());
                         double valueDouble;
                         valueDouble = Double.parseDouble(localTag.read());
                         valueField.setText(String.valueOf(valueDouble));
                         break;
 
                     case ENTERO_STR:
+                        enableInputs(localTag.getType());
                         int valueInt;
                         valueInt = Integer.parseInt(localTag.read());
                         valueField.setText(String.valueOf(valueInt));
@@ -205,13 +214,6 @@ public class CreateLocalTagWindow extends Stage {
         } else {
             this.setTitle("Creación de Tag");
         }
-
-        this.vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(firstNameHBox, typeHBox, rolesHBox ,doubleLimitHBox, booleanConditionsHBox, buttonsHBox);
-
-        root.getChildren().add(vbox);
 
         this.setScene(new Scene(root, 250, 200));
     }

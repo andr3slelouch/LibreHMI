@@ -122,6 +122,9 @@ public class CanvasText extends CanvasLabel {
             writeExpressionWindow.setLocalExpression(this.getCanvasObjectData().getExpression());
             writeExpressionWindow.getTextField().setText(this.getCanvasObjectData().getExpression().getExpressionToEvaluate());
             writeExpressionWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getExpression().getFloatPrecision()));
+            writeExpressionWindow.getSamplingTimeTextField().setText(String.valueOf(this.getCanvasObjectData().getSamplingTime()<1 ? 1:this.getCanvasObjectData().getSamplingTime()));
+            writeExpressionWindow.getSamplingTimeHBox().setVisible(true);
+            writeExpressionWindow.getSamplingTimeTextField().setText(String.valueOf(this.getCanvasObjectData().getSamplingTime()<1 ? 1:this.getCanvasObjectData().getSamplingTime()));
         }
         writeExpressionWindow.showAndWait();
         if (writeExpressionWindow.isDone()) {
@@ -131,6 +134,7 @@ public class CanvasText extends CanvasLabel {
                     expression.evaluate();
                     this.setExpression(expression);
                     this.getHmiApp().setWasModified(true);
+                    this.getCanvasObjectData().setSamplingTime(this.getCanvasObjectData().getSamplingTime()<1 ? 1:this.getCanvasObjectData().getSamplingTime());
                 }
             } catch (Exception e) {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -185,22 +189,19 @@ public class CanvasText extends CanvasLabel {
                             this.getLabel().setText(this.text);
                             this.getCanvasObjectData().setWidth(this.getLabel().getWidth() * 2);
                             this.getCanvasObjectData().setHeight(this.getLabel().getHeight());
-                        }), new KeyFrame(Duration.seconds(1)));
+                        }), new KeyFrame(Duration.seconds(this.getCanvasObjectData().getSamplingTime())));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
 
     @Override
-    public void updateTag(Tag tag){
-        super.updateTag(tag);
+    public void updateTag(Tag tag,boolean forceUpdate){
+        super.updateTag(tag,forceUpdate);
         if(timeline != null){
             ArrayList<Tag> parameters = this.getCanvasObjectData().getExpression().getParameters();
             for(int i=0;i<parameters.size();i++){
                 if(parameters.get(i).compareToTag(tag)){
                     parameters.set(i,tag);
-                    //logger.log(Level.INFO,"UPDATED TAG WITH VALUE"+tag.getValue());
-                }else{
-                    //logger.log(Level.INFO,"NOT UPDATED");
                 }
             }
             this.getCanvasObjectData().getExpression().setParameters(parameters);
