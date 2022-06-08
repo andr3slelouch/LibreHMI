@@ -191,6 +191,8 @@ public class HMIApp extends Application {
             for (int i = 0; i < this.hmiAppData.getHmiAlarms().size(); i++) {
                 addAlarm(this.hmiAppData.getHmiAlarms().get(i));
             }
+        }
+        if(this.hmiAppData.getHmiLocalTags() != null){
             localTags.addAll(this.hmiAppData.getHmiLocalTags());
         }
     }

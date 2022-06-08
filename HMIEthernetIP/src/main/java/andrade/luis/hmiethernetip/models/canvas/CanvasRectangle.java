@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 
 import static javafx.geometry.Pos.CENTER;
@@ -282,13 +283,13 @@ public class CanvasRectangle extends CanvasObject {
                                     default:
                                         break;
                                 }
-                                double value = calculatePercentFillValue(evaluatedValue);
                                 String captionValue = String.valueOf(evaluatedValue);
                                 if (this.getCanvasObjectData().getExpression().getFloatPrecision() > -1) {
                                     DecimalFormat decimalFormat = this.getCanvasObjectData().getExpression().generateDecimalFormat();
-                                    captionValue = decimalFormat.format(value);
+                                    captionValue = decimalFormat.format(evaluatedValue);
                                 }
                                 captionLabel.setText(captionValue);
+                                double value = calculatePercentFillValue(evaluatedValue);
                                 life.set(value);
                                 this.setTop(null);
                             } catch (CompileException | InvocationTargetException | SQLException | IOException | NullPointerException e) {
