@@ -58,6 +58,7 @@ public class CanvasPushbutton extends CanvasButton {
         SetColorCommandPushButtonWindow setColorCommandPushButtonWindow = new SetColorCommandPushButtonWindow();
         setColorCommandPushButtonWindow.setLocalTags(this.getHmiApp().getLocalTags());
         if(this.getCanvasObjectData().getPrimaryColor()!=null && this.getCanvasObjectData().getBackgroundColor()!=null && this.getCanvasObjectData().getMode()!=null){
+            setColorCommandPushButtonWindow.getButtonLabelTextField().setText(this.getCanvasObjectData().getData());
             setColorCommandPushButtonWindow.setAddedTags(new ArrayList<>(List.of(this.getCanvasObjectData().getTag())));
             setColorCommandPushButtonWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
             setColorCommandPushButtonWindow.getBackgroundColorPicker().setValue(this.getCanvasObjectData().getBackgroundColor().getColor());
@@ -74,15 +75,19 @@ public class CanvasPushbutton extends CanvasButton {
     }
 
     public void setDynamicColors(String buttonText, String mode, Tag linkedTag, CanvasColor primaryColor, CanvasColor backgroundColor) {
-        this.getCanvasObjectData().setData(buttonText);
         this.button.setText(buttonText);
-        this.button.setBackground(new Background(new BackgroundFill(backgroundColor.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+        if(mode.equals(REVERSE_STR)){
+            this.button.setBackground(new Background(new BackgroundFill(this.getCanvasObjectData().getPrimaryColor().getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+        }else{
+            this.button.setBackground(new Background(new BackgroundFill(backgroundColor.getColor(), CornerRadii.EMPTY, Insets.EMPTY)));
+        }
+        this.button.setOnMousePressed(onPushbuttonOnMyMousePressed);
+        this.button.setOnMouseReleased(onPushbuttonOnMyMouseReleased);
         this.getCanvasObjectData().setMode(mode);
         this.getCanvasObjectData().setTag(linkedTag);
         this.getCanvasObjectData().setPrimaryColor(primaryColor);
         this.getCanvasObjectData().setBackgroundColor(backgroundColor);
-        this.button.setOnMousePressed(onPushbuttonOnMyMousePressed);
-        this.button.setOnMouseReleased(onPushbuttonOnMyMouseReleased);
+        this.getCanvasObjectData().setData(buttonText);
     }
 
     private void changeValues(boolean clicked) throws SQLException, IOException {

@@ -91,7 +91,7 @@ public class CanvasRectangle extends CanvasObject {
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
         setGeometricFigurePropertiesWindow.setTitle("Propiedades del Rectángulo");
         setGeometricFigurePropertiesWindow.setHeight(210);
-        setGeometricFigurePropertiesWindow.setWidth(295);
+        setGeometricFigurePropertiesWindow.setWidth(325);
 
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
@@ -141,6 +141,9 @@ public class CanvasRectangle extends CanvasObject {
             writeExpressionWindow.getMaxValueField().setText(this.getCanvasObjectData().getMaxValue() + "");
             writeExpressionWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getExpression().getFloatPrecision()));
             writeExpressionWindow.getSamplingTimeHBox().setVisible(true);
+            if(this.getCanvasObjectData().getData()!=null){
+                writeExpressionWindow.getShowLabelChB().setSelected(this.getCanvasObjectData().getData().equals("Show"));
+            }
             writeExpressionWindow.getSamplingTimeTextField().setText(String.valueOf(this.getCanvasObjectData().getSamplingTime()<1 ? 1:this.getCanvasObjectData().getSamplingTime()));
         } else {
             writeExpressionWindow = new SetPercentFillPropertiesWindow();
@@ -152,6 +155,7 @@ public class CanvasRectangle extends CanvasObject {
         try {
             if (expression != null) {
                 expression.evaluate();
+                this.getCanvasObjectData().setData(writeExpressionWindow.getShowLabelChB().isSelected() ? "Show":"Hide");
                 this.setPercentFill(
                         expression,
                         writeExpressionWindow.getPrimaryColor(),
@@ -257,7 +261,9 @@ public class CanvasRectangle extends CanvasObject {
             bottomHBox.setAlignment(CENTER);
             bottomHBox.getChildren().add(captionLabel);
             this.setBottom(bottomHBox);
-
+            if(this.getCanvasObjectData().getData()!=null){
+                this.getBottom().setVisible(this.getCanvasObjectData().getData().equals("Show"));
+            }
             this.setRefillRectangleTimeline();
             this.refillRectangleTimeline.play();
             this.setOnMouseClicked(onMyMouseClicked);
@@ -273,7 +279,7 @@ public class CanvasRectangle extends CanvasObject {
                                 String type = this.getCanvasObjectData().getExpression().getResultType() != null ? this.getCanvasObjectData().getExpression().getResultType() : "";
                                 double evaluatedValue = 0;
                                 switch (type) {
-                                    case "Booleano":
+                                    case "Bool":
                                         evaluatedValue = (boolean) this.getCanvasObjectData().getExpression().evaluate() ? 100 : 0;
                                         break;
                                     case "Flotante":

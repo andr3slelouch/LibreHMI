@@ -88,7 +88,7 @@ public class CanvasText extends CanvasLabel {
         SetTextPropertiesWindow propertiesWindow = new SetTextPropertiesWindow();
         propertiesWindow.setTitle("Propiedades de Texto");
         propertiesWindow.setWidth(340);
-        propertiesWindow.setHeight(245);
+        propertiesWindow.setHeight(265);
         propertiesWindow.getFontStyleComboBox().getSelectionModel().select(this.getLabel().getFont().getStyle());
         propertiesWindow.getFontFamilyComboBox().getSelectionModel().select(this.getLabel().getFont().getFamily());
         propertiesWindow.getFontSizeField().setText(String.valueOf(this.getLabel().getFont().getSize()));

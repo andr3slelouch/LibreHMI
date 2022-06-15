@@ -8,6 +8,16 @@ import javafx.scene.paint.Color;
 
 
 public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
+    public CheckBox getShowLabelChB() {
+        return showLabelChB;
+    }
+
+    public void setShowLabelChB(CheckBox showLabelChB) {
+        this.showLabelChB = showLabelChB;
+    }
+
+    private CheckBox showLabelChB;
+
     public CanvasColor getPrimaryColor() {
         return primaryColor;
     }
@@ -32,12 +42,12 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
     private TextField maxValueField;
 
     public SetPercentFillPropertiesWindow() {
-        super(750, 300);
+        super(750, 340);
         this.init(Color.BLACK, Color.GREEN);
     }
 
     public SetPercentFillPropertiesWindow(Color primaryColor, Color backgroundColor) {
-        super(750, 300);
+        super(750, 340);
         this.primaryColor = new CanvasColor(primaryColor);
         this.backgroundColor = new CanvasColor(backgroundColor);
         this.init(this.primaryColor.getColor(), this.backgroundColor.getColor());
@@ -55,6 +65,13 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         ColorPicker backgroundColorPicker = new ColorPicker(background);
         backgroundColorPicker.setOnAction(actionEvent -> backgroundColor = new CanvasColor(backgroundColorPicker.getValue()));
         backgroundHBox.getChildren().addAll(backgroundLabel, backgroundColorPicker);
+
+        HBox showLabelHBox = new HBox();
+        Label showLabel = new Label("Mostrar etiqueta de valor:");
+        this.showLabelChB = new CheckBox();
+        showLabelChB.setSelected(true);
+        showLabelHBox.getChildren().addAll(showLabel,showLabelChB);
+        showLabelHBox.setSpacing(25);
 
         Label orientationLabel = new Label("Seleccione la orientación:");
         RadioButton horizontalRadioButton = new RadioButton("Horizontal");
@@ -86,12 +103,14 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         maxValueField.setTooltip(new Tooltip("El valor máximo(así como todos los que sean mayores) se tomarán como 100%"));
         HBox maxValueHBox = new HBox(maxValueLabel, maxValueField);
         maxValueHBox.setSpacing(25);
+        getFloatPrecisionHBox().setSpacing(25);
 
         this.getVbox().getChildren().add(2, primaryHBox);
         this.getVbox().getChildren().add(3, backgroundHBox);
-        this.getVbox().getChildren().add(4, orientationHBox);
-        this.getVbox().getChildren().add(5, minValueHBox);
-        this.getVbox().getChildren().add(6, maxValueHBox);
+        this.getVbox().getChildren().add(4, showLabelHBox);
+        this.getVbox().getChildren().add(5, orientationHBox);
+        this.getVbox().getChildren().add(6, minValueHBox);
+        this.getVbox().getChildren().add(7, maxValueHBox);
         this.getVbox().setSpacing(5);
 
         this.finishSelectionButton.setOnAction(actionEvent -> this.finishingAction());

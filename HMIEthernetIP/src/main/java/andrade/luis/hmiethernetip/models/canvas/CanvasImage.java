@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 
 public class CanvasImage extends CanvasObject {
     private ImageView imageView;
@@ -28,13 +29,11 @@ public class CanvasImage extends CanvasObject {
 
     public CanvasImage(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
-
         try {
             this.image = new Image(new FileInputStream(canvasObjectData.getData()));
         } catch (FileNotFoundException e) {
             this.image = imageNotFound;
         }
-
         this.setData(this.image, this.getCanvasObjectData().getData(), true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().isImageSymbol());
         this.modifyImageViewSizeRotation(this.getCanvasObjectData().isMirroringHorizontal(),this.getCanvasObjectData().isMirroringVertical(),this.getCanvasObjectData().getRotation());
         if(this.getCanvasObjectData().isModifyingColors()){
@@ -84,15 +83,13 @@ public class CanvasImage extends CanvasObject {
             this.image = imageNotFound;
         }
         this.imageView = new ImageView(this.image);
-        this.imageView.setFitWidth(width);
-        this.imageView.setFitHeight(height);
-        this.imageView.setPreserveRatio(true);
         this.getCanvasObjectData().setImageSymbol(isImageSymbol);
         this.setCenter(this.imageView);
         this.getCanvasObjectData().setType("Image");
         this.getCanvasObjectData().setSuperType("Figure");
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
+        this.setSize(width, height);
         this.getCanvasObjectData().setData(imagePath);
         if (!isOnCanvas) {
             this.setOnMouseDragged(mouseEvent -> {
@@ -100,6 +97,14 @@ public class CanvasImage extends CanvasObject {
         }
         this.setSelected(false);
         this.setContextMenu();
+    }
+
+    @Override
+    public void setSize(double width,double height){
+        super.setSize(width, height);
+        this.imageView.setFitWidth(width);
+        this.imageView.setFitHeight(height);
+        this.imageView.setPreserveRatio(this.getCanvasObjectData().isPreservingRatio());
     }
 
     private void setCanvasImage() throws FileNotFoundException {
@@ -114,8 +119,9 @@ public class CanvasImage extends CanvasObject {
     private void setSymbolImageProcess() throws FileNotFoundException {
         SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow(this.imageView.getFitWidth(),this.imageView.getFitHeight());
         if (this.getCanvasObjectData() != null) {
+            selectHMISymbolWindow.setPreservingRatio(this.getCanvasObjectData().isPreservingRatio());
             selectHMISymbolWindow.setMirroringHorizontal(this.getCanvasObjectData().isMirroringHorizontal());
-            selectHMISymbolWindow.setMirroringVertical(this.getCanvasObjectData().isMirroringHorizontal());
+            selectHMISymbolWindow.setMirroringVertical(this.getCanvasObjectData().isMirroringVertical());
             selectHMISymbolWindow.setRotation(this.getCanvasObjectData().getRotation());
             selectHMISymbolWindow.setSymbolCategory(this.getCanvasObjectData().getSymbolCategory());
             selectHMISymbolWindow.setSelectedImagePath(this.getCanvasObjectData().getData());
@@ -129,7 +135,6 @@ public class CanvasImage extends CanvasObject {
             }
         }
         selectHMISymbolWindow.showAndWait();
-
         this.getCanvasObjectData().setWidth(selectHMISymbolWindow.getImageViewWidth());
         this.getCanvasObjectData().setHeight(selectHMISymbolWindow.getImageViewHeight());
         String selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
@@ -200,8 +205,6 @@ public class CanvasImage extends CanvasObject {
 
     @Override
     public void setProperties() {
-        /*super.setProperties();
-        */
         try {
             this.setCanvasImage();
         } catch (FileNotFoundException e) {

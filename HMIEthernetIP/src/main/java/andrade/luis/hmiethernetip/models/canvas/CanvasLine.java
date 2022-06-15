@@ -53,7 +53,7 @@ public class CanvasLine extends CanvasObject{
         setGeometricFigurePropertiesWindow.setTitle("Propiedades de Línea");
         setGeometricFigurePropertiesWindow.getVbox().getHeightField().setDisable(true);
         setGeometricFigurePropertiesWindow.setHeight(210);
-        setGeometricFigurePropertiesWindow.setWidth(295);
+        setGeometricFigurePropertiesWindow.setWidth(325);
 
         setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
         setGeometricFigurePropertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));

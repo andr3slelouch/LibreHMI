@@ -98,7 +98,7 @@ public class WelcomeWindow extends Stage {
         newProjectButton.setOnAction(mouseEvent -> {
             if(this.hmiApp!=null){
                 try {
-                    this.hmiApp.setHMIStage(null,"Default");
+                    this.hmiApp.setHMIStage(null,"Editar");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

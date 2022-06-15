@@ -69,7 +69,7 @@ public class CanvasButton extends CanvasObject {
      */
     public void setData(double x, double y, double width, double height) {
         this.getCanvasObjectData().setType("Button");
-        this.button = new Button("Action");
+        this.button = new Button(this.getCanvasObjectData().getData());
         this.button.setDisable(true);
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
@@ -152,6 +152,9 @@ public class CanvasButton extends CanvasObject {
         propertiesWindow.getFontFamilyComboBox().getSelectionModel().select(this.button.getFont().getFamily());
         propertiesWindow.getFontSizeField().setText(String.valueOf(this.button.getFont().getSize()));
         propertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
+        if(this.getCanvasObjectData().getData()!=null){
+            propertiesWindow.getButtonLabelField().setText(this.getCanvasObjectData().getData());
+        }
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             propertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
         }else{
@@ -182,6 +185,8 @@ public class CanvasButton extends CanvasObject {
         this.getCanvasObjectData().setFontStyle(propertiesWindow.getFontStyle().name());
         this.getCanvasObjectData().setFontFamily(propertiesWindow.getFontFamilyComboBox().getValue());
         this.getCanvasObjectData().setFontSize(Double.parseDouble(propertiesWindow.getFontSizeField().getText()));
+        this.getCanvasObjectData().setData(propertiesWindow.getButtonLabelField().getText());
+        this.button.setText(this.getCanvasObjectData().getData());
         this.button.setFont(
                 Font.font(
                         propertiesWindow.getFontFamilyComboBox().getValue(),

@@ -145,11 +145,15 @@ public class SelectHMISymbolWindow extends Stage {
             }else{
                 setImageOptionsWindow.getOriginalColorRB().setSelected(true);
             }
+            setImageOptionsWindow.getPreserveRatioCheckBox().setSelected(preservingRatio);
+            setImageOptionsWindow.getMirrorHorizontalCheckBox().setSelected(mirroringHorizontal);
+            setImageOptionsWindow.getMirrorVerticalCheckBox().setSelected(mirroringVertical);
+            setImageOptionsWindow.getRotationTextField().setText(String.valueOf(rotation));
             setImageOptionsWindow.showAndWait();
             preservingRatio = setImageOptionsWindow.isPreservingRatio();
             mirroringVertical = setImageOptionsWindow.isMirroringVertical();
             mirroringHorizontal = setImageOptionsWindow.isMirroringHorizontal();
-            rotation = Double.parseDouble(setImageOptionsWindow.getRotationValue());
+            rotation = Double.parseDouble(setImageOptionsWindow.getRotationTextField().getText());
             SelectHMISymbolWindow.this.imageViewWidth= setImageOptionsWindow.getSizeVBox().getWidthFromField();
             SelectHMISymbolWindow.this.imageViewHeight = setImageOptionsWindow.getSizeVBox().getHeightFromField();
             if (setImageOptionsWindow.isModifyingColor()) {
@@ -160,10 +164,10 @@ public class SelectHMISymbolWindow extends Stage {
                 saturation = Double.parseDouble(setImageOptionsWindow.getSaturationTextField().getText());
                 hue = Double.parseDouble(setImageOptionsWindow.getHueTextField().getText());
             }
-            setImageOptionsWindow.setMirroringHorizontal(isMirroringHorizontal());
-            setImageOptionsWindow.setMirroringVertical(isMirroringVertical());
-            setImageOptionsWindow.getRotationTextField().setText(String.valueOf(rotation));
 
+            /*setImageOptionsWindow.setMirroringHorizontal(mirroringHorizontal);
+            setImageOptionsWindow.setMirroringVertical(mirroringVertical);
+            setImageOptionsWindow.getRotationTextField().setText(String.valueOf(rotation));*/
         });
         Button okButton = new Button("OK");
         okButton.setOnAction(mouseEvent -> this.close());

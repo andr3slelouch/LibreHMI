@@ -37,7 +37,7 @@ public class CanvasEllipse extends CanvasObject{
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
         setGeometricFigurePropertiesWindow.setTitle("Propiedades de la Elipse");
         setGeometricFigurePropertiesWindow.setHeight(210);
-        setGeometricFigurePropertiesWindow.setWidth(295);
+        setGeometricFigurePropertiesWindow.setWidth(325);
 
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());

@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Expression implements Serializable {
     private static final ArrayList<String> arithmeticOperators = new ArrayList<>(Arrays.asList("+", "-", "*", "/", "%", "++", "--"));
@@ -132,27 +134,14 @@ public class Expression implements Serializable {
 
         for (String arithmeticOperator : arithmeticOperators) {
             for(String parameterType : parameterTypes){
-                if(parameterType.equals("String")) break;
+                if(parameterType.equals(STRING_STR)) break;
             }
-            if (expressionToEvaluate.contains(arithmeticOperator)) {
+            if (expressionToEvaluate.contains(arithmeticOperator) && expressionToEvaluate.matches(".*\\d+.*")) {
                 return FLOAT_STR;
             }
         }
 
-        for (String stringOperator : stringOperators) {
-            if (expressionToEvaluate.contains(stringOperator)) {
-                if(parameters.isEmpty()){
-                    this.expressionToEvaluate = expressionToEvaluate + "+\"\"";
-                }else{
-                    for(int i = 0; i < parameters.size(); i++) {
-                        if(!this.expressionToEvaluate.contains("String.valueOf("+parameterNames[i]+")")){
-                            this.expressionToEvaluate = this.expressionToEvaluate.replace(parameterNames[i],"String.valueOf("+parameterNames[i]+")");
-                        }
-                    }
-                }
-                return STRING_STR;
-            }
-        }
+        if(determineString(expressionToEvaluate).equals(STRING_STR)) return STRING_STR;
 
         if(parameters.size()==1){
             switch (parameters.get(0).getType()) {
@@ -166,7 +155,6 @@ public class Expression implements Serializable {
                     this.expressionToEvaluate = sb.toString();
                     return FLOAT_STR;
                 case STRING_STR:
-                    sb.append("+\"\"");
                     this.expressionToEvaluate = sb.toString();
                     return STRING_STR;
                 default:
@@ -177,6 +165,25 @@ public class Expression implements Serializable {
 
         return FLOAT_STR;
 
+    }
+
+    private String determineString(String expressionToEvaluate){
+        for (String stringOperator : stringOperators) {
+            if (expressionToEvaluate.contains(stringOperator)) {
+                if(parameters.isEmpty() && !expressionToEvaluate.contains("+\"\"")){
+                    this.expressionToEvaluate = expressionToEvaluate + "+\"\"";
+                }else{
+                    for(int i = 0; i < parameters.size(); i++) {
+                        if(!this.expressionToEvaluate.contains("String.valueOf("+parameterNames[i]+")")){
+                            this.expressionToEvaluate = this.expressionToEvaluate.replace(parameterNames[i]," String.valueOf("+parameterNames[i]+")");
+                        }
+                    }
+                }
+                return STRING_STR;
+            }
+        }
+
+        return "";
     }
 
     @Override
@@ -232,6 +239,7 @@ public class Expression implements Serializable {
 
     public ExpressionEvaluator prepareExpression() throws CompileException {
         ExpressionEvaluator ee = new ExpressionEvaluator();
+        this.determineResultType();
         if (parameterNames.length == parameterTypes.length) {
             ee.setParameters(parameterNames, getParameterTypesClasses());
         }
@@ -252,7 +260,6 @@ public class Expression implements Serializable {
                 ee.setExpressionType(void.class);
                 break;
         }
-
         ee.cook(this.expressionToEvaluate);
         return ee;
 

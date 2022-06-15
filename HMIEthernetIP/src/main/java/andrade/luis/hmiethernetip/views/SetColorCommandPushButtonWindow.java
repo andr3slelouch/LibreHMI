@@ -14,6 +14,7 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
     private CanvasColor primaryColor = new CanvasColor(Color.BLACK);
     private CanvasColor backgroundColor = new CanvasColor(Color.GREEN);
     public SetColorCommandPushButtonWindow(){
+        super(750,300);
         textField.setEditable(false);
         HBox buttonLabelHBox = new HBox();
         Label buttonLabel = new Label("Etiqueta del Botón:");

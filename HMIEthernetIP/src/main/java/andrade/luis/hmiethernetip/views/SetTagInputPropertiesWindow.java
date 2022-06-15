@@ -43,7 +43,7 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
     private ArrayList<RadioButton> radioButtons;
 
     public SetTagInputPropertiesWindow(){
-        super(750, 275);
+        super(750, 320);
         this.init();
     }
     private void init(){
