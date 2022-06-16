@@ -1,6 +1,5 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.SimpleStringProperty;

@@ -1,6 +1,6 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
+import andrade.luis.hmiethernetip.views.canvas.CanvasColor;
 
 import java.io.Serializable;
 

@@ -1,8 +1,6 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
-import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
-import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
+import andrade.luis.hmiethernetip.views.canvas.CanvasColor;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

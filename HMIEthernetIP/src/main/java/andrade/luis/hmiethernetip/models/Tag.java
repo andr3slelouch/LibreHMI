@@ -1,6 +1,5 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -10,8 +9,6 @@ import java.io.Serializable;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Tag implements Serializable {
     private static final String NULL_STR = "<null>";

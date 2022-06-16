@@ -2,12 +2,12 @@ package andrade.luis.hmiethernetip.views;
 
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.*;
-import andrade.luis.hmiethernetip.models.canvas.*;
-import andrade.luis.hmiethernetip.models.canvas.input.CanvasButton;
-import andrade.luis.hmiethernetip.models.canvas.input.CanvasPushbutton;
-import andrade.luis.hmiethernetip.models.canvas.input.CanvasSlider;
-import andrade.luis.hmiethernetip.models.canvas.input.CanvasTextField;
-import javafx.geometry.Orientation;
+import andrade.luis.hmiethernetip.views.canvas.*;
+import andrade.luis.hmiethernetip.views.canvas.input.CanvasButton;
+import andrade.luis.hmiethernetip.views.canvas.input.CanvasPushbutton;
+import andrade.luis.hmiethernetip.views.canvas.input.CanvasSlider;
+import andrade.luis.hmiethernetip.views.canvas.input.CanvasTextField;
+import andrade.luis.hmiethernetip.views.windows.*;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
@@ -27,7 +27,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HMICanvas extends Pane implements CanvasObjectInterface {

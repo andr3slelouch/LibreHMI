@@ -2,10 +2,10 @@ package andrade.luis.hmiethernetip.controllers;
 
 import andrade.luis.hmiethernetip.HMIApp;
 import andrade.luis.hmiethernetip.models.HMISceneData;
-import andrade.luis.hmiethernetip.models.canvas.CanvasColor;
-import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
-import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
-import andrade.luis.hmiethernetip.models.canvas.CanvasPoint;
+import andrade.luis.hmiethernetip.views.canvas.CanvasColor;
+import andrade.luis.hmiethernetip.views.canvas.CanvasObject;
+import andrade.luis.hmiethernetip.models.CanvasObjectData;
+import andrade.luis.hmiethernetip.views.canvas.CanvasPoint;
 import andrade.luis.hmiethernetip.views.HMICanvas;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,7 +23,6 @@ import javafx.scene.paint.Paint;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HMIScene extends Scene implements Cloneable {
@@ -199,7 +198,7 @@ public class HMIScene extends Scene implements Cloneable {
         });
         this.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.DELETE) {
-                andrade.luis.hmiethernetip.models.canvas.CanvasObject selected = getCanvas().getSelectedFigure();
+                CanvasObject selected = getCanvas().getSelectedFigure();
                 if (selected != null) {
                     selected.delete();
                 }

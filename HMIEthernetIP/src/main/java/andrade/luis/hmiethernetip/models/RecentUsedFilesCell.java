@@ -1,11 +1,8 @@
 package andrade.luis.hmiethernetip.models;
 
 import andrade.luis.hmiethernetip.HMIApp;
-import andrade.luis.hmiethernetip.views.WelcomeWindow;
+import andrade.luis.hmiethernetip.views.RecentUsedFilesItem;
 import javafx.scene.control.ListCell;
-
-import java.io.IOException;
-import java.util.logging.Level;
 
 public class RecentUsedFilesCell extends ListCell<String> {
     HMIApp hmiApp;

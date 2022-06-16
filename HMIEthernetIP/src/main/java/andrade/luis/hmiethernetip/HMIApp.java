@@ -2,11 +2,12 @@ package andrade.luis.hmiethernetip;
 
 import andrade.luis.hmiethernetip.controllers.HMIScene;
 import andrade.luis.hmiethernetip.models.*;
-import andrade.luis.hmiethernetip.models.canvas.CanvasObject;
-import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
+import andrade.luis.hmiethernetip.views.canvas.CanvasObject;
+import andrade.luis.hmiethernetip.models.CanvasObjectData;
 import andrade.luis.hmiethernetip.models.users.HMIUser;
 import andrade.luis.hmiethernetip.util.DBConnection;
 import andrade.luis.hmiethernetip.views.*;
+import andrade.luis.hmiethernetip.views.windows.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import javafx.animation.Animation;
@@ -1370,7 +1371,6 @@ public class HMIApp extends Application {
         setWindowPropertiesWindow.showAndWait();
         if (!setWindowPropertiesWindow.isCancelled()) {
             HMIScene newScene = generatePage(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
-
             addScene(newScene);
             setWasModified(true);
         }

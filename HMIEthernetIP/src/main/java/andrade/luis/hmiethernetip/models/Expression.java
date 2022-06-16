@@ -1,6 +1,5 @@
 package andrade.luis.hmiethernetip.models;
 
-import andrade.luis.hmiethernetip.models.canvas.CanvasObjectData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.codehaus.commons.compiler.CompileException;
@@ -13,8 +12,6 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Expression implements Serializable {
     private static final ArrayList<String> arithmeticOperators = new ArrayList<>(Arrays.asList("+", "-", "*", "/", "%", "++", "--"));

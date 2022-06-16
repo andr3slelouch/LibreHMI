@@ -1,10 +1,11 @@
 package andrade.luis.hmiethernetip.views;
 
+import andrade.luis.hmiethernetip.views.windows.SetTextPropertiesWindow;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
-public class SetDateTimeProperties extends SetTextPropertiesWindow{
+public class SetDateTimeProperties extends SetTextPropertiesWindow {
     public TextField getDateTimeField() {
         return dateTimeField;
     }
