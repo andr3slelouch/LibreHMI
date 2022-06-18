@@ -19,19 +19,19 @@ module andrade.luis.hmiethernetip {
     requires com.opencsv;
     requires jasypt;
 
-    opens andrade.luis.hmiethernetip to javafx.fxml;
-    exports andrade.luis.hmiethernetip;
-    exports andrade.luis.hmiethernetip.views;
-    exports andrade.luis.hmiethernetip.models;
-    exports andrade.luis.hmiethernetip.controllers;
-    opens andrade.luis.hmiethernetip.models to javafx.base, com.google.gson, javafx.fxml;
-    exports andrade.luis.hmiethernetip.views.canvas;
-    exports andrade.luis.hmiethernetip.models.users;
-    opens andrade.luis.hmiethernetip.views.canvas to javafx.base, com.google.gson;
-    exports andrade.luis.hmiethernetip.views.canvas.input;
-    opens andrade.luis.hmiethernetip.views.canvas.input to javafx.base;
-    opens andrade.luis.hmiethernetip.models.users to javafx.base, com.google.gson;
-    opens andrade.luis.hmiethernetip.views to com.google.gson, javafx.base, javafx.fxml;
-    exports andrade.luis.hmiethernetip.views.windows;
-    opens andrade.luis.hmiethernetip.views.windows to com.google.gson, javafx.base, javafx.fxml;
+    opens andrade.luis.librehmi to javafx.fxml;
+    exports andrade.luis.librehmi;
+    exports andrade.luis.librehmi.views;
+    exports andrade.luis.librehmi.models;
+    exports andrade.luis.librehmi.controllers;
+    opens andrade.luis.librehmi.models to javafx.base, com.google.gson, javafx.fxml;
+    exports andrade.luis.librehmi.views.canvas;
+    exports andrade.luis.librehmi.models.users;
+    opens andrade.luis.librehmi.views.canvas to javafx.base, com.google.gson;
+    exports andrade.luis.librehmi.views.canvas.input;
+    opens andrade.luis.librehmi.views.canvas.input to javafx.base;
+    opens andrade.luis.librehmi.models.users to javafx.base, com.google.gson;
+    opens andrade.luis.librehmi.views to com.google.gson, javafx.base, javafx.fxml;
+    exports andrade.luis.librehmi.views.windows;
+    opens andrade.luis.librehmi.views.windows to com.google.gson, javafx.base, javafx.fxml;
 }

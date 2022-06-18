@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>andrade.luis</groupId>
-    <artifactId>HMIEthernetIP</artifactId>
+    <artifactId>LibreHMI</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>HMIEthernetIP</name>
+    <name>LibreHMI</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -222,7 +222,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>andrade.luis.hmiethernetip/andrade.luis.hmiethernetip.HMIApp
+                            <mainClass>andrade.luis.LibreHMI/andrade.luis.librehmi.HMIApp
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
