@@ -54,17 +54,22 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
     }
 
     private void init(Color primary, Color background) {
+        setTitle("Propiedades de Animación de Relleno Porcentual");
         HBox primaryHBox = new HBox();
         Label primaryLabel = new Label("Seleccione el color primario:");
         ColorPicker primaryColorPicker = new ColorPicker(primary);
+        primaryColorPicker.setPrefWidth(150);
         primaryColorPicker.setOnAction(actionEvent -> primaryColor = new CanvasColor(primaryColorPicker.getValue()));
         primaryHBox.getChildren().addAll(primaryLabel, primaryColorPicker);
+        primaryHBox.setSpacing(10);
 
         HBox backgroundHBox = new HBox();
         Label backgroundLabel = new Label("Seleccione el color de fondo:");
         ColorPicker backgroundColorPicker = new ColorPicker(background);
+        backgroundColorPicker.setPrefWidth(150);
         backgroundColorPicker.setOnAction(actionEvent -> backgroundColor = new CanvasColor(backgroundColorPicker.getValue()));
         backgroundHBox.getChildren().addAll(backgroundLabel, backgroundColorPicker);
+        backgroundHBox.setSpacing(8);
 
         HBox showLabelHBox = new HBox();
         Label showLabel = new Label("Mostrar etiqueta de valor:");
@@ -89,21 +94,29 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         horizontalReversedRadioButton.setToggleGroup(radioGroup);
         verticalReversedRadioButton.setToggleGroup(radioGroup);
 
-        HBox orientationHBox = new HBox(orientationLabel, horizontalRadioButton, verticalRadioButton, horizontalReversedRadioButton, verticalReversedRadioButton);
-        orientationHBox.setSpacing(20);
+        HBox orientationRadioButtons = new HBox(horizontalRadioButton, verticalRadioButton, horizontalReversedRadioButton, verticalReversedRadioButton);
+        orientationRadioButtons.setSpacing(20);
+        HBox orientationHBox = new HBox(orientationLabel,orientationRadioButtons);
+        orientationHBox.setSpacing(25);
 
         Label minValueLabel = new Label("Defina el valor mínimo:");
         minValueField = new TextField("0");
+        minValueField.setPrefWidth(150);
         minValueField.setTooltip(new Tooltip("El valor mínimo(así como todos los que sean menores) se tomarán como 0%"));
         HBox minValueHBox = new HBox(minValueLabel, minValueField);
-        minValueHBox.setSpacing(25);
+        minValueHBox.setSpacing(40);
 
         Label maxValueLabel = new Label("Defina el valor máximo:");
         maxValueField = new TextField("100");
+        maxValueField.setPrefWidth(150);
         maxValueField.setTooltip(new Tooltip("El valor máximo(así como todos los que sean mayores) se tomarán como 100%"));
         HBox maxValueHBox = new HBox(maxValueLabel, maxValueField);
-        maxValueHBox.setSpacing(25);
-        getFloatPrecisionHBox().setSpacing(25);
+        maxValueHBox.setSpacing(39);
+
+        getFloatPrecisionHBox().setSpacing(41);
+        getFloatPrecisionTextField().setPrefWidth(150);
+        getSamplingTimeHBox().setSpacing(53);
+        getSamplingTimeTextField().setPrefWidth(150);
 
         this.getVbox().getChildren().add(2, primaryHBox);
         this.getVbox().getChildren().add(3, backgroundHBox);

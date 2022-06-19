@@ -20,6 +20,7 @@ public class SetDateTimeProperties extends SetTextPropertiesWindow {
         HBox dateTimeHBox = new HBox();
         dateTimeHBox.getChildren().addAll(dateTimeFormat,dateTimeField);
         dateTimeHBox.setSpacing(8);
+        getRotationTextField().setPrefWidth(150);
         vbox.getChildren().add(vbox.getChildren().size()-1,dateTimeHBox);
     }
 }

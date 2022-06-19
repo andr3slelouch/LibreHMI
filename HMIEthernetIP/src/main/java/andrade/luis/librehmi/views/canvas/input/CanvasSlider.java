@@ -71,6 +71,7 @@ public class CanvasSlider extends CanvasObject {
         this.getCanvasObjectData().setShowingLabelsTicks(showLabelsTicks);
         this.getCanvasObjectData().setTag(linkedTag);
         this.getCanvasObjectData().setType("Slider");
+        this.getCanvasObjectData().setDataType("Slider");
         this.getCanvasObjectData().setOrientation(orientation);
         this.getCanvasObjectData().setRotation(rotation);
         this.getCanvasObjectData().setSuperType("TagInputObject");

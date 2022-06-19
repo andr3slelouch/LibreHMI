@@ -13,6 +13,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class CanvasImage extends CanvasObject {
+    public ImageView getImageView() {
+        return imageView;
+    }
+
     private ImageView imageView;
     /**
      * Image Not found attribution:
@@ -85,6 +89,11 @@ public class CanvasImage extends CanvasObject {
         this.getCanvasObjectData().setImageSymbol(isImageSymbol);
         this.setCenter(this.imageView);
         this.getCanvasObjectData().setType("Image");
+        if(isImageSymbol){
+            this.getCanvasObjectData().setDataType("Símbolo HMI");
+        }else{
+            this.getCanvasObjectData().setDataType("Imagen");
+        }
         this.getCanvasObjectData().setSuperType("Figure");
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);

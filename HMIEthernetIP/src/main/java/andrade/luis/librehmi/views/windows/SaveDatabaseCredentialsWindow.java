@@ -117,12 +117,12 @@ public class SaveDatabaseCredentialsWindow extends Stage {
 
         VBox vbox = new VBox();
         vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.setPadding(new Insets(10, 0, 0, 30));
         vbox.getChildren().addAll(hostnameHBox,portHBox,usernameHBox,passwordHBox,buttonsHBox);
 
         root.getChildren().add(vbox);
 
-        this.setScene(new Scene(root,300,200));
+        this.setScene(new Scene(root,320,180));
 
     }
 

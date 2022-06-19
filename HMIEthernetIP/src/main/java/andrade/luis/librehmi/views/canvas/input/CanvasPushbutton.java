@@ -32,6 +32,7 @@ public class CanvasPushbutton extends CanvasButton {
     public CanvasPushbutton(CanvasPoint center) {
         super(center);
         this.getCanvasObjectData().setType("Pushbutton");
+        this.getCanvasObjectData().setDataType("Pulsador");
     }
 
     public CanvasPushbutton(CanvasObjectData canvasObjectData){

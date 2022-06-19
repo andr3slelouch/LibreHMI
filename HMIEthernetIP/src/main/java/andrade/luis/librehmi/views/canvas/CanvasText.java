@@ -44,6 +44,7 @@ public class CanvasText extends CanvasLabel {
     public CanvasText(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("Text");
+        this.getCanvasObjectData().setDataType("Texto");
         this.getCanvasObjectData().setSuperType("TagOutputObject");
         setData();
     }
@@ -112,6 +113,8 @@ public class CanvasText extends CanvasLabel {
 
     private void setExpression() {
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
+        writeExpressionWindow.setTitle("Propiedades de valor del Texto");
+        writeExpressionWindow.setHeight(200);
         writeExpressionWindow.setLocalTags(getHmiApp().getLocalTags());
         if (this.getCanvasObjectData().getExpression() != null) {
             writeExpressionWindow.setAddedTags(this.getCanvasObjectData().getExpression().getParameters());

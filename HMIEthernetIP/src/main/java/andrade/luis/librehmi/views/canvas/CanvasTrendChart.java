@@ -108,6 +108,7 @@ public class CanvasTrendChart extends CanvasObject {
         //Creating the line chart
         this.lineChart = new LineChart<>(xAxis, yAxis);
         this.getCanvasObjectData().setType("TrendChart");
+        this.getCanvasObjectData().setDataType("Gráfico de Tendencias");
         this.getCanvasObjectData().setSuperType("TagOutputObject");
 
         this.trendChartSerieDataArrayList = trendChartSerieDataArrayList;

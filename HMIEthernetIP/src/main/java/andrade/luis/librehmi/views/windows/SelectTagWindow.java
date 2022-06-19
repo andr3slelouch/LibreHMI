@@ -27,6 +27,7 @@ import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 public class SelectTagWindow extends Stage {
     private final TableView.TableViewSelectionModel<TagRow> selectionModel;
     private final TableView<TagRow> table;
+    private final Button finishSelectionButton;
 
     public ArrayList<Tag> getLocalTags() {
         return localTags;
@@ -59,12 +60,14 @@ public class SelectTagWindow extends Stage {
         table = new TableView<>();
 
         TableColumn<TagRow, String> namePLCColumn = new TableColumn<>("Nombre del PLC");
+        namePLCColumn.setPrefWidth(120);
         namePLCColumn.setCellValueFactory(new PropertyValueFactory<>("plcName"));
         TableColumn<TagRow, String> ipColumn = new TableColumn<>("IP");
         ipColumn.setCellValueFactory(new PropertyValueFactory<>("plcAddress"));
         TableColumn<TagRow, String> groupColumn = new TableColumn<>("Grupo");
         groupColumn.setCellValueFactory(new PropertyValueFactory<>("plcDeviceGroup"));
         TableColumn<TagRow, String> tagNameColumn = new TableColumn<>("Nombre del Tag");
+        tagNameColumn.setPrefWidth(120);
         tagNameColumn.setCellValueFactory(new PropertyValueFactory<>("tagName"));
         TableColumn<TagRow, String> typeColumn = new TableColumn<>("Tipo");
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("tagType"));
@@ -74,8 +77,8 @@ public class SelectTagWindow extends Stage {
         actionColumn.setCellValueFactory(new PropertyValueFactory<>("tagAction"));
         TableColumn<TagRow, String> valueColumn = new TableColumn<>("Valor");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("tagValue"));
-
-        ObservableList<TagRow> existingTagsObsList = initExistingTags(inputMode,filter);
+        this.finishSelectionButton = new Button("OK");
+        ObservableList<TagRow> existingTagsObsList = initExistingTags(inputMode, filter);
 
         if (localTags != null) {
             for (Tag localTag : localTags) {
@@ -110,23 +113,23 @@ public class SelectTagWindow extends Stage {
 
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
         vbox.getChildren().addAll(table);
 
-        Button finishSelectionButton = new Button("OK");
+
         finishSelectionButton.setAlignment(Pos.CENTER);
         finishSelectionButton.setOnAction(actionEvent -> setSelectedTag());
         HBox hbox = new HBox();
         hbox.getChildren().add(finishSelectionButton);
         hbox.setAlignment(Pos.BASELINE_RIGHT);
         vbox.getChildren().add(hbox);
+        vbox.setPadding(new Insets(5, 5, 5, 5));
         root.getChildren().add(vbox);
-        Scene scene = new Scene(root, 500, 400);
+        Scene scene = new Scene(root, 650, 400);
         this.setScene(scene);
 
     }
 
-    private ObservableList<TagRow> initExistingTags(boolean inputMode, String filter){
+    private ObservableList<TagRow> initExistingTags(boolean inputMode, String filter) {
         ObservableList<TagRow> existingTagsObsList = FXCollections.observableArrayList();
         if (filter.equals("LocalTags")) {
             setTitle("Seleccione un Tag Local a modificar");
@@ -138,13 +141,14 @@ public class SelectTagWindow extends Stage {
                     if (!empty) {
                         ContextMenu contextMenu = new ContextMenu();
                         MenuItem newItem = createNewMenuItem();
-                        MenuItem saveItem = createSaveMenuItem(row,super.getIndex());
-                        MenuItem deleteItem = createDeleteMenuItem(row,super.getIndex());
+                        MenuItem saveItem = createSaveMenuItem(row, super.getIndex());
+                        MenuItem deleteItem = createDeleteMenuItem(row, super.getIndex());
                         contextMenu.getItems().addAll(newItem, saveItem, deleteItem);
                         setContextMenu(contextMenu);
                     }
                 }
             });
+            finishSelectionButton.setVisible(false);
         } else {
             existingTagsObsList = getExistingTags(inputMode, filter);
             setTitle("Seleccione el Tag a ser asociado");
@@ -153,7 +157,7 @@ public class SelectTagWindow extends Stage {
         return existingTagsObsList;
     }
 
-    private MenuItem createNewMenuItem(){
+    private MenuItem createNewMenuItem() {
         MenuItem newItem = new MenuItem();
         newItem.setText("Nuevo");
         newItem.setOnAction(event -> {
@@ -166,7 +170,7 @@ public class SelectTagWindow extends Stage {
         return newItem;
     }
 
-    private MenuItem createSaveMenuItem(TagRow row, int index){
+    private MenuItem createSaveMenuItem(TagRow row, int index) {
         MenuItem saveItem = new MenuItem();
         saveItem.setText("Editar");
         saveItem.setOnAction(event -> {
@@ -179,7 +183,7 @@ public class SelectTagWindow extends Stage {
         return saveItem;
     }
 
-    private MenuItem createDeleteMenuItem(TagRow row, int index){
+    private MenuItem createDeleteMenuItem(TagRow row, int index) {
         MenuItem deleteItem = new MenuItem();
         deleteItem.setText("Eliminar");
         deleteItem.setOnAction(event -> {

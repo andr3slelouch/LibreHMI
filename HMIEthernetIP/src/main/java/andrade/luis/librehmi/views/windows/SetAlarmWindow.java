@@ -37,7 +37,7 @@ public class SetAlarmWindow extends WriteExpressionWindow {
 
     public SetAlarmWindow(HMIApp hmiApp) {
         super(750, 300);
-        setTitle("Crear de alarma");
+        setTitle("Crear alarma");
         this.hmiApp = hmiApp;
         setLocalTags(this.hmiApp.getLocalTags());
         textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
@@ -51,6 +51,7 @@ public class SetAlarmWindow extends WriteExpressionWindow {
         Label alarmName = new Label("Nombre de Alarma:");
         alarmNameTF = new TextField();
         HBox alarmNameHBox = new HBox();
+        alarmNameHBox.setSpacing(22);
         alarmNameHBox.getChildren().addAll(alarmName, alarmNameTF);
 
         Label alarmComment = new Label("Comentario de Alarma:");

@@ -32,6 +32,7 @@ public class CanvasLine extends CanvasObject{
         this.line.setEndY(y2);
 
         this.getCanvasObjectData().setType("Line");
+        this.getCanvasObjectData().setDataType("Línea");
         this.getCanvasObjectData().setSuperType("Figure");
         this.setCenter(this.line);
         if(this.getCanvasObjectData().isRotated()){
@@ -53,8 +54,8 @@ public class CanvasLine extends CanvasObject{
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.line.getStrokeWidth(),this.getCanvasObjectData().getHeight());
         setGeometricFigurePropertiesWindow.setTitle("Propiedades de Línea");
         setGeometricFigurePropertiesWindow.getVbox().getHeightField().setDisable(true);
-        setGeometricFigurePropertiesWindow.setHeight(210);
-        setGeometricFigurePropertiesWindow.setWidth(325);
+        setGeometricFigurePropertiesWindow.setHeight(220);
+        setGeometricFigurePropertiesWindow.setWidth(293);
 
         setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
         setGeometricFigurePropertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));

@@ -31,10 +31,11 @@ public class SetSizeWindow extends Stage {
 
     public SetSizeWindow(double width, double height) {
         root = new StackPane();
-        
+        setTitle("Propiedades de tamaño");
         titleLabel = new Label("Defina los tamaños");
 
         vbox = new SizeVBox(width,height,-1,-1);
+        vbox.getHeightValueHBox().setSpacing(15);
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
 
@@ -52,7 +53,7 @@ public class SetSizeWindow extends Stage {
         vbox.getChildren().add(hbox);
 
         root.getChildren().add(vbox);
-        mainScene = new Scene(root,300,150);
+        mainScene = new Scene(root,310,130);
         this.setScene(mainScene);
 
     }

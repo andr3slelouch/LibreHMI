@@ -30,8 +30,7 @@ public class ManageUsersWindow extends Stage {
     public ManageUsersWindow(){
         StackPane root = new StackPane();
 
-        final Label label = new Label("Seleccione el Usuario a administrar");
-        label.setFont(new Font("Arial", 20));
+        setTitle("Seleccione el usuario a administrar");
 
         this.table= new TableView<>();
 
@@ -60,14 +59,8 @@ public class ManageUsersWindow extends Stage {
 
         TableView.TableViewSelectionModel<HMIUserRow> selectionModel = table.getSelectionModel();
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
-
-        final VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, table);
-
-        root.getChildren().add(vbox);
-        Scene scene = new Scene(root,500,400);
+        root.getChildren().add(table);
+        Scene scene = new Scene(root,510,400);
         this.setScene(scene);
     }
 

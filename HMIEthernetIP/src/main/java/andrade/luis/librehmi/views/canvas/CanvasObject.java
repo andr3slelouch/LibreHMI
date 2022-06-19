@@ -82,7 +82,7 @@ public class CanvasObject extends BorderPane {
     public void delete() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar eliminación");
-        alert.setHeaderText("¿Confirmar eliminación del objeto seleccionado?");
+        alert.setHeaderText("¿Confirmar eliminación del objeto seleccionado, del tipo \""+this.getCanvasObjectData().getDataType()+"\"?");
         ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButton = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
 
@@ -333,6 +333,7 @@ public class CanvasObject extends BorderPane {
      */
     protected void setVisibilityAnimation() {
         SetVisibilityAnimationWindow setVisibilityAnimationWindow = new SetVisibilityAnimationWindow();
+        setVisibilityAnimationWindow.setHeight(220);
         setVisibilityAnimationWindow.setLocalTags(getHmiApp().getLocalTags());
         if (this.canvasObjectData.getVisibilityExpression() != null) {
             setVisibilityAnimationWindow.setAddedTags(this.canvasObjectData.getVisibilityExpression().getParameters());

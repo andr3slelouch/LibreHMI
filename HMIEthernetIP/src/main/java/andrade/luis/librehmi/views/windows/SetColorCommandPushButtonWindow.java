@@ -15,23 +15,29 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
     private CanvasColor backgroundColor = new CanvasColor(Color.GREEN);
     public SetColorCommandPushButtonWindow(){
         super(750,300);
+        setTitle("Propiedades de valor de botón pulsador");
         textField.setEditable(false);
         HBox buttonLabelHBox = new HBox();
         Label buttonLabel = new Label("Etiqueta del Botón:");
         buttonLabelTextField = new TextField("Button");
         buttonLabelHBox.getChildren().addAll(buttonLabel,buttonLabelTextField);
+        buttonLabelHBox.setSpacing(20);
 
         HBox primaryHBox = new HBox();
         Label primaryLabel = new Label("Color en Verdadero:");
         primaryColorPicker = new ColorPicker(Color.GREEN);
+        primaryColorPicker.setPrefWidth(160);
         primaryColorPicker.setOnAction(actionEvent -> primaryColor = new CanvasColor(primaryColorPicker.getValue()));
         primaryHBox.getChildren().addAll(primaryLabel, primaryColorPicker);
+        primaryHBox.setSpacing(15);
 
         HBox backgroundHBox = new HBox();
         Label backgroundLabel = new Label("Color en Falso:");
         backgroundColorPicker = new ColorPicker(Color.RED);
+        backgroundColorPicker.setPrefWidth(160);
         backgroundColorPicker.setOnAction(actionEvent -> backgroundColor = new CanvasColor(backgroundColorPicker.getValue()));
         backgroundHBox.getChildren().addAll(backgroundLabel, backgroundColorPicker);
+        backgroundHBox.setSpacing(48);
 
         Label actionLabel = new Label("Modo de Acción:");
         RadioButton toggleRadioButton = new RadioButton("Toggle");
@@ -46,7 +52,7 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
         reverseRadioButton.setToggleGroup(radioGroup);
 
         HBox orientationHBox = new HBox(actionLabel, toggleRadioButton, directRadioButton, reverseRadioButton);
-        orientationHBox.setSpacing(20);
+        orientationHBox.setSpacing(35);
 
         this.getVbox().getChildren().add(2, buttonLabelHBox);
         this.getVbox().getChildren().add(3, primaryHBox);

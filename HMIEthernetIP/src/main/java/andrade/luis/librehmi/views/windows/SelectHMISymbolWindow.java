@@ -105,8 +105,7 @@ public class SelectHMISymbolWindow extends Stage {
         Collections.sort(categories);
         StackPane superRoot = new StackPane();
         Group root = new Group();
-        final Label label = new Label("Seleccione un símbolo HMI para añadir");
-        label.setFont(new Font("Arial", 20));
+        setTitle("Seleccione un símbolo HMI para añadir");
 
         final Accordion accordion = new Accordion();
 
@@ -175,7 +174,7 @@ public class SelectHMISymbolWindow extends Stage {
         okHBox.setAlignment(Pos.BOTTOM_RIGHT);
         VBox vbox = new VBox();
         root.getChildren().add(accordion);
-        vbox.getChildren().addAll(label, root, okHBox);
+        vbox.getChildren().addAll(root, okHBox);
         superRoot.getChildren().add(vbox);
         Scene scene = new Scene(superRoot, 500, 350);
         this.setScene(scene);
@@ -194,6 +193,8 @@ public class SelectHMISymbolWindow extends Stage {
                 imagesFilenames.add(imageFile.getAbsolutePath());
                 Image image = new Image(new FileInputStream(imageFile.getAbsolutePath()));
                 CanvasImage canvasImage = new CanvasImage(image, new CanvasPoint(0, 0), false, imageFile.getAbsolutePath(), true);
+                canvasImage.getCanvasObjectData().setPreservingRatio(true);
+                canvasImage.getImageView().setPreserveRatio(true);
                 canvasImage.clearContextMenu();
                 currentImages.add(canvasImage);
                 imagesHBox.getChildren().add(canvasImage);

@@ -43,12 +43,12 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
         Label minValueLabel = new Label("Defina el valor mínimo:");
         minValueField = new TextField("0");
         HBox minValueHBox = new HBox(minValueLabel, minValueField);
-        minValueHBox.setSpacing(25);
+        minValueHBox.setSpacing(17);
 
         Label maxValueLabel = new Label("Defina el valor máximo:");
         maxValueField = new TextField("100");
         HBox maxValueHBox = new HBox(maxValueLabel, maxValueField);
-        maxValueHBox.setSpacing(25);
+        maxValueHBox.setSpacing(15);
 
         final ToggleGroup group = new ToggleGroup();
 
@@ -73,14 +73,24 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
         rb4.setToggleGroup(group);
         radioButtons.add(rb4);
 
-        VBox defineTypeVBox = new VBox();
+        HBox defineTypeVBox = new HBox();
         defineTypeVBox.getChildren().addAll(typeLabel,rb1,rb2,rb4,rb3);
+        defineTypeVBox.setSpacing(10);
+
+        getFloatPrecisionHBox().setSpacing(17);
 
         this.getVbox().getChildren().add(2,minValueHBox);
         this.getVbox().getChildren().add(3,maxValueHBox);
-        this.getVbox().getChildren().add(4,defineTypeVBox);
+        this.getVbox().getChildren().add(5,defineTypeVBox);
         this.getVbox().setSpacing(5);
         this.setInputMode(true);
+        textField.textProperty().addListener((observableValue,oldValue,newValue) ->{
+            if(prepareExpression(false)){
+                getFloatPrecisionTextField().setDisable(!this.getLocalExpression().getResultType().equals("Flotante"));
+                maxValueField.setDisable(this.getLocalExpression().getResultType().equals("Bool"));
+                minValueField.setDisable(this.getLocalExpression().getResultType().equals("Bool"));
+            }
+        });
 
 
     }

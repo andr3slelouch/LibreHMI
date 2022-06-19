@@ -39,7 +39,7 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
 
 
     public SetSliderPropertiesWindow(double width, double height) {
-        super(415, 450);
+        super(415, 475);
         this.init(width, height);
     }
 

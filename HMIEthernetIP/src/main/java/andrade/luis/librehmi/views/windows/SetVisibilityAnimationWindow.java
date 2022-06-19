@@ -26,6 +26,7 @@ public class SetVisibilityAnimationWindow extends WriteExpressionWindow{
     private ArrayList<Tag> localTags;
 
     public SetVisibilityAnimationWindow(){
+        setTitle("Propiedades de Animación de Visibilidad");
         Label visibilityLabel = new Label("Visible si:");
         ToggleGroup toggleGroup = new ToggleGroup();
         trueRadioButton = new RadioButton("Verdadero");

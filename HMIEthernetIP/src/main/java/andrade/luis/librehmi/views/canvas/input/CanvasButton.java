@@ -5,7 +5,7 @@ import andrade.luis.librehmi.models.CanvasObjectData;
 import andrade.luis.librehmi.views.canvas.CanvasPoint;
 import andrade.luis.librehmi.views.canvas.CanvasObject;
 import andrade.luis.librehmi.models.users.HMIUser;
-import andrade.luis.librehmi.views.windows.SelectWindowsWindow;
+import andrade.luis.librehmi.views.windows.SelectPagesWindow;
 import andrade.luis.librehmi.views.windows.SetButtonPropertiesWindow;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -67,6 +67,7 @@ public class CanvasButton extends CanvasObject {
      */
     public void setData(double x, double y, double width, double height) {
         this.getCanvasObjectData().setType("Button");
+        this.getCanvasObjectData().setDataType("Botón");
         this.button = new Button(this.getCanvasObjectData().getData());
         this.button.setDisable(true);
         this.getCanvasObjectData().setWidth(width);
@@ -109,9 +110,9 @@ public class CanvasButton extends CanvasObject {
      * Este método es la acción ejecutada cuando el MenuItem para Editar es ejecutado
      */
     public void buttonAction() {
-        SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(this.getHmiApp().getPagesTitles(), this.getCanvasObjectData().getSelectedPages());
-        selectWindowsWindow.showAndWait();
-        this.setSelectedPages(selectWindowsWindow.getSelectedItems());
+        SelectPagesWindow selectPagesWindow = new SelectPagesWindow(this.getHmiApp().getPagesTitles(), this.getCanvasObjectData().getSelectedPages());
+        selectPagesWindow.showAndWait();
+        this.setSelectedPages(selectPagesWindow.getSelectedItems());
     }
 
     /**

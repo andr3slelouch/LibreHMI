@@ -56,33 +56,39 @@ public class CanvasAlarmDisplay extends CanvasObject {
 
     private void setData(double x, double y, double width, double height, boolean isOnCanvas) {
         this.getCanvasObjectData().setType("AlarmDisplay");
+        this.getCanvasObjectData().setDataType("Resumen de Alarmas");
         this.getCanvasObjectData().setSuperType("AlarmManagementObject");
         this.getCanvasObjectData().setPosition(new CanvasPoint(x, y));
         this.alarmsTable = new TableView<>();
 
         TableColumn<AlarmRow, String> rowNumberColumn = new TableColumn<>("#");
+        rowNumberColumn.setPrefWidth(40);
         rowNumberColumn.setCellValueFactory(new PropertyValueFactory<>("rowNumber"));
         TableColumn<AlarmRow, String> nameColumn = new TableColumn<>("Nombre");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         TableColumn<AlarmRow, String> expressionColumn = new TableColumn<>("Alarma");
         expressionColumn.setCellValueFactory(new PropertyValueFactory<>("expression"));
         TableColumn<AlarmRow, String> datetimeColumn = new TableColumn<>("Fecha y Hora");
+        datetimeColumn.setPrefWidth(120);
         datetimeColumn.setCellValueFactory(new PropertyValueFactory<>("datetime"));
         TableColumn<AlarmRow, String> typeColumn = new TableColumn<>("Tipo");
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         TableColumn<AlarmRow, String> hiHiValueColumn = new TableColumn<>("Límite Alto Alto");
+        hiHiValueColumn.setPrefWidth(120);
         hiHiValueColumn.setCellValueFactory(new PropertyValueFactory<>("hiHiValue"));
         TableColumn<AlarmRow, String> maxValueColumn = new TableColumn<>("Límite Alto");
         maxValueColumn.setCellValueFactory(new PropertyValueFactory<>("maxValue"));
         TableColumn<AlarmRow, String> minValueColumn = new TableColumn<>("Límite Bajo");
         minValueColumn.setCellValueFactory(new PropertyValueFactory<>("minValue"));
         TableColumn<AlarmRow, String> loLoValueColumn = new TableColumn<>("Límite Bajo Bajo");
+        loLoValueColumn.setPrefWidth(120);
         loLoValueColumn.setCellValueFactory(new PropertyValueFactory<>("loLoValue"));
         TableColumn<AlarmRow, String> valueColumn = new TableColumn<>("Valor");
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         TableColumn<AlarmRow, String> statusColumn = new TableColumn<>("Estado");
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         TableColumn<AlarmRow, String> acknowledgementColumn = new TableColumn<>("Reconocimiento");
+        acknowledgementColumn.setPrefWidth(120);
         acknowledgementColumn.setCellValueFactory(new PropertyValueFactory<>("acknowledgement"));
 
         ObservableList<AlarmRow> data = FXCollections.observableArrayList();

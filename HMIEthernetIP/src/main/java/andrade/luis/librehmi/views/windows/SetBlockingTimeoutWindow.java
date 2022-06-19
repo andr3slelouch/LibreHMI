@@ -57,15 +57,15 @@ public class SetBlockingTimeoutWindow extends Stage {
         HBox hbox = new HBox();
         hbox.getChildren().addAll(cancelButton, finishSelectionButton);
         hbox.setAlignment(Pos.BASELINE_RIGHT);
-        hbox.setPadding(new Insets(5, 5, 5, 5));
 
         VBox vbox = new VBox();
         vbox.getChildren().addAll(dataHBox,hbox);
         vbox.setSpacing(5);
+        vbox.setPadding(new Insets(25,5,25,5));
 
         root.getChildren().add(vbox);
 
-        this.setScene(new Scene(root,418,75));
+        this.setScene(new Scene(root,422,75));
     }
 
     private void finishingAction() {

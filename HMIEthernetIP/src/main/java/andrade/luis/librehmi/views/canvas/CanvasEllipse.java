@@ -25,6 +25,7 @@ public class CanvasEllipse extends CanvasObject{
         this.getCanvasObjectData().setHeight(height);
         this.setCenter(this.ellipse);
         this.getCanvasObjectData().setType("Ellipse");
+        this.getCanvasObjectData().setDataType("Elipse");
         this.getCanvasObjectData().setSuperType("Figure");
         this.setContextMenu();
         this.setRotate(this.getCanvasObjectData().getRotation());
@@ -37,8 +38,8 @@ public class CanvasEllipse extends CanvasObject{
     public void setProperties(){
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
         setGeometricFigurePropertiesWindow.setTitle("Propiedades de la Elipse");
-        setGeometricFigurePropertiesWindow.setHeight(210);
-        setGeometricFigurePropertiesWindow.setWidth(325);
+        setGeometricFigurePropertiesWindow.setHeight(220);
+        setGeometricFigurePropertiesWindow.setWidth(293);
 
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());

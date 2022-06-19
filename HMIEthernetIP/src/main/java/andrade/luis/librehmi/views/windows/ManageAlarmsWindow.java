@@ -5,46 +5,34 @@ import andrade.luis.librehmi.models.Alarm;
 import andrade.luis.librehmi.models.AlarmRow;
 import andrade.luis.librehmi.views.canvas.CanvasAlarmDisplay;
 import andrade.luis.librehmi.views.canvas.CanvasPoint;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class ManageAlarmsWindow extends Stage {
-    Logger logger = Logger.getLogger(this.getClass().getName());
     private final CanvasAlarmDisplay canvasAlarmDisplay;
 
     public ArrayList<Alarm> getAlarmsList() {
         return alarmsList;
     }
 
-    public void setAlarmsList(ArrayList<Alarm> alarmsList) {
-        this.alarmsList = alarmsList;
-    }
-
     public HMIApp getHmiApp() {
         return hmiApp;
     }
 
-    public void setHmiApp(HMIApp hmiApp) {
-        this.hmiApp = hmiApp;
-    }
-
-    private HMIApp hmiApp;
-    private ArrayList<Alarm> alarmsList = new ArrayList<>();
+    private final HMIApp hmiApp;
+    private final ArrayList<Alarm> alarmsList;
 
     public ManageAlarmsWindow(ArrayList<Alarm> alarmsList, HMIApp hmiApp) {
         this.alarmsList = alarmsList;
         this.hmiApp = hmiApp;
         StackPane root = new StackPane();
-        final Label label = new Label("Seleccione la alarma a administrar");
+        setTitle("Seleccione alarma a ser administrada");
         canvasAlarmDisplay= new CanvasAlarmDisplay(new CanvasPoint(0,0),false);
         canvasAlarmDisplay.setSelected(false);
         canvasAlarmDisplay.setTableItems(alarmsList);
@@ -54,28 +42,9 @@ public class ManageAlarmsWindow extends Stage {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
                         ContextMenu contextMenu = new ContextMenu();
-
-                        MenuItem newItem = new MenuItem();
-                        newItem.setText("Nueva");
-                        newItem.setOnAction(event -> {
-                            SetAlarmWindow setAlarmWindow = new SetAlarmWindow(hmiApp);
-                            createNewAlarm(setAlarmWindow);
-                        });
-                        MenuItem editItem = new MenuItem();
-                        editItem.setText("Editar");
-                        editItem.setOnAction(event -> {
-                            int index = hmiApp.getIndexForAlarm(item.getName());
-                            if(index>=0){
-                                editAlarm(alarmsList.get(index));
-                            }
-                        });
-                        MenuItem deleteItem = new MenuItem();
-                        deleteItem.setText("Eliminar");
-                        deleteItem.setOnAction(event -> {
-                            if(showAlert(CONFIRMATION,"Confirmar eliminación","Desea eliminar la alarma seleccionada \"" + item.getName() + "\"?")){
-                                deleteAlarm(item.getName());
-                            }
-                        });
+                        MenuItem newItem = createNewMenuIteM();
+                        MenuItem editItem = createEditMenuItem(item);
+                        MenuItem deleteItem = createDeleteMenuItem(item);
                         contextMenu.getItems().addAll(newItem,editItem,deleteItem);
                         setContextMenu(contextMenu);
 
@@ -84,14 +53,43 @@ public class ManageAlarmsWindow extends Stage {
                 }
             }
         });
-        final VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, canvasAlarmDisplay);
 
-        root.getChildren().add(vbox);
-        Scene scene = new Scene(root,980,500);
+        root.getChildren().add(canvasAlarmDisplay);
+        Scene scene = new Scene(root,1080,400);
         this.setScene(scene);
+    }
+
+    private MenuItem createNewMenuIteM(){
+        MenuItem newItem = new MenuItem();
+        newItem.setText("Nueva");
+        newItem.setOnAction(event -> {
+            SetAlarmWindow setAlarmWindow = new SetAlarmWindow(hmiApp);
+            createNewAlarm(setAlarmWindow);
+        });
+        return newItem;
+    }
+
+    private MenuItem createEditMenuItem(AlarmRow item){
+        MenuItem editItem = new MenuItem();
+        editItem.setText("Editar");
+        editItem.setOnAction(event -> {
+            int index = hmiApp.getIndexForAlarm(item.getName());
+            if(index>=0){
+                editAlarm(alarmsList.get(index));
+            }
+        });
+        return editItem;
+    }
+
+    private MenuItem createDeleteMenuItem(AlarmRow item){
+        MenuItem deleteItem = new MenuItem();
+        deleteItem.setText("Eliminar");
+        deleteItem.setOnAction(event -> {
+            if(showAlert(CONFIRMATION,"Confirmar eliminación","Desea eliminar la alarma seleccionada \"" + item.getName() + "\"?")){
+                deleteAlarm(item.getName());
+            }
+        });
+        return deleteItem;
     }
 
     private void deleteAlarm(String name){

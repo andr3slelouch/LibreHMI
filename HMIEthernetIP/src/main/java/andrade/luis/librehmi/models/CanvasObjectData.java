@@ -406,6 +406,9 @@ public class CanvasObjectData implements Serializable, Transferable {
     public void setPolygonPoints(ArrayList<Double> polygonPoints) {
         this.polygonPoints = polygonPoints;
     }
+    public String getDataType() {
+        return dataType;
+    }
 
 
 

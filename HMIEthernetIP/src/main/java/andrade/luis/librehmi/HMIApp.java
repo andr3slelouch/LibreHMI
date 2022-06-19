@@ -457,9 +457,9 @@ public class HMIApp extends Application {
         selectWindowsMI.setOnAction(mouseEvent -> {
             ArrayList<String> showPages = new ArrayList<>();
             showPages.add(selectedPage);
-            SelectWindowsWindow selectWindowsWindow = new SelectWindowsWindow(getPagesTitles(), showPages);
-            selectWindowsWindow.showAndWait();
-            generateStagesForPages(selectWindowsWindow.getSelectedItems());
+            SelectPagesWindow selectPagesWindow = new SelectPagesWindow(getPagesTitles(), showPages);
+            selectPagesWindow.showAndWait();
+            generateStagesForPages(selectPagesWindow.getSelectedItems());
         });
         MenuItem importWindowsMI = new MenuItem("Importar Ventanas");
         importWindowsMI.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));

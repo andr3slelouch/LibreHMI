@@ -79,13 +79,15 @@ public class WriteExpressionWindow extends Stage {
             }
         });
 
-        Label samplingTime = new Label("Tiempo de muestreo en segundos:");
+        Label samplingTime = new Label("Tiempo de muestreo:");
         samplingTimeTextField = new TextField();
         samplingTimeTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 1, integerFilter));
         samplingTimeTextField.setPromptText("Segundos");
+        samplingTimeTextField.setTooltip(new Tooltip("En Segundos"));
         samplingTimeHBox = new HBox();
         samplingTimeHBox.getChildren().addAll(samplingTime,samplingTimeTextField);
         samplingTimeHBox.setVisible(false);
+        samplingTimeHBox.setSpacing(12);
 
         vbox = new VBox();
         vbox.setSpacing(5);
@@ -107,9 +109,11 @@ public class WriteExpressionWindow extends Stage {
         buttonsHBox.getChildren().add(0,clearAllButton);
         clearAllButton.setOnAction(mouseEvent -> clearAll());
         vbox.getChildren().add(buttonsHBox);
+        vbox.setPadding(new Insets(5,5,10,5));
         root.getChildren().add(vbox);
         Scene mainScene = new Scene(root, width, height);
         this.setScene(mainScene);
+
     }
 
     protected void addTag(){

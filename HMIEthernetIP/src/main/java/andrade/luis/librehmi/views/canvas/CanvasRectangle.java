@@ -64,6 +64,7 @@ public class CanvasRectangle extends CanvasObject {
 
         this.setCenter(rectangle);
         this.getCanvasObjectData().setType("Rectangle");
+        this.getCanvasObjectData().setDataType("Rectángulo");
         this.getCanvasObjectData().setSuperType("TagOutputObject");
         this.setContextMenu();
         MenuItem percentFillMI = new MenuItem("Animación de Relleno Porcentual");
@@ -80,8 +81,8 @@ public class CanvasRectangle extends CanvasObject {
     public void setProperties() {
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
         setGeometricFigurePropertiesWindow.setTitle("Propiedades del Rectángulo");
-        setGeometricFigurePropertiesWindow.setHeight(210);
-        setGeometricFigurePropertiesWindow.setWidth(325);
+        setGeometricFigurePropertiesWindow.setHeight(220);
+        setGeometricFigurePropertiesWindow.setWidth(293);
 
         if(this.getCanvasObjectData().getPrimaryColor()!=null){
             setGeometricFigurePropertiesWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());

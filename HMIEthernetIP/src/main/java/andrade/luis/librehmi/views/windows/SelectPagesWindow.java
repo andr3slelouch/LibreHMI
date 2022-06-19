@@ -1,6 +1,7 @@
 package andrade.luis.librehmi.views.windows;
 
 import andrade.luis.librehmi.models.SceneItem;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -11,15 +12,15 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
-public class SelectWindowsWindow extends Stage {
+public class SelectPagesWindow extends Stage {
     private final StackPane root;
     private ArrayList<SceneItem> items = new ArrayList<>();
     private ArrayList<String> selectedItems = new ArrayList<>();
     private int height = 50;
 
-    public SelectWindowsWindow(ArrayList<String> itemsForList, ArrayList<String> selectedItems) {
+    public SelectPagesWindow(ArrayList<String> itemsForList, ArrayList<String> selectedItems) {
         root = new StackPane();
-        final Label label = new Label("Seleccione una Ventana");
+        setTitle("Seleccione una Ventana");
 
         VBox checkBoxesVBox = new VBox();
         checkBoxesVBox.setSpacing(15);
@@ -32,7 +33,7 @@ public class SelectWindowsWindow extends Stage {
             checkBoxHBox.getChildren().addAll(box, sceneName);
             checkBoxesVBox.getChildren().addAll(checkBoxHBox);
             items.add(new SceneItem(hmiScene,box));
-            height= height + 50;
+            height= height + 32;
         }
 
         if(selectedItems!=null){
@@ -64,8 +65,9 @@ public class SelectWindowsWindow extends Stage {
         selectAllButton.setOnAction(mouseEvent -> selectAllPages(true));
         clearAllButton.setOnAction(mouseEvent -> selectAllPages(false));
         VBox vbox = new VBox();
-        vbox.getChildren().addAll(label,checkBoxesVBox,buttonHBox);
+        vbox.getChildren().addAll(checkBoxesVBox,buttonHBox);
         vbox.setSpacing(15);
+        vbox.setPadding(new Insets(5,5,10,5));
         root.getChildren().add(vbox);
 
         this.setScene(new Scene(root,400,height));

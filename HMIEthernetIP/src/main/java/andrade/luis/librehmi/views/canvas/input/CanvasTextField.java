@@ -84,7 +84,7 @@ public class CanvasTextField extends CanvasObject {
     public CanvasTextField(CanvasPoint center, Tag linkedTag, double minValue, double maxValue, String type) {
         super(center);
         this.getCanvasObjectData().setType("TextField");
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150, linkedTag, minValue, maxValue,type);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 50, linkedTag, minValue, maxValue,type);
         setNewMenuItem();
     }
 
@@ -104,7 +104,7 @@ public class CanvasTextField extends CanvasObject {
         this.getCanvasObjectData().setTag(linkedTag);
         this.getCanvasObjectData().setMinValue(minValue);
         this.getCanvasObjectData().setMaxValue(maxValue);
-        this.getCanvasObjectData().setDataType(type);
+        this.getCanvasObjectData().setDataType("Campo de Entrada de Texto");
         this.getCanvasObjectData().setSuperType("TagInputObject");
         initTextField(width,height);
         switch (type) {
@@ -194,6 +194,8 @@ public class CanvasTextField extends CanvasObject {
 
     private void buttonAction() {
         SetTagInputPropertiesWindow setTagInputPropertiesWindow = new SetTagInputPropertiesWindow();
+        setTagInputPropertiesWindow.setTitle("Propiedades de valor de campo de entrada de texto");
+        setTagInputPropertiesWindow.setHeight(280);
         setTagInputPropertiesWindow.setLocalTags(this.getHmiApp().getLocalTags());
         setTagInputPropertiesWindow.getMinValueField().setText(String.valueOf(this.getCanvasObjectData().getMinValue()));
         setTagInputPropertiesWindow.getMaxValueField().setText(String.valueOf(this.getCanvasObjectData().getMaxValue()));
