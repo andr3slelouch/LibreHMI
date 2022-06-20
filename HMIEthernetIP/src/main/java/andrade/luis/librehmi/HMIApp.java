@@ -410,8 +410,13 @@ public class HMIApp extends Application {
         MenuItem manageUsersMI = new MenuItem("Administrar Usuarios");
         manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
         manageUsersMI.setOnAction(mouseEvent -> {
-            ManageUsersWindow manageUsersWindow = new ManageUsersWindow();
-            manageUsersWindow.showAndWait();
+            if(user.getRole().equals("Administrador")){
+                ManageUsersWindow manageUsersWindow = new ManageUsersWindow();
+                manageUsersWindow.showAndWait();
+            }else{
+                showAlert(Alert.AlertType.ERROR,"Error de privilegios","Para administrar los usuarios, ud debe tener un rol de \"Administrador\"",false,false);
+            }
+
         });
         userMI.getItems().addAll(changeUserMI, manageUsersMI);
         Menu tagsMI = new Menu("Tags Locales");

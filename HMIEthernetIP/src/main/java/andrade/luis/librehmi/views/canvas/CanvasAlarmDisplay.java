@@ -205,7 +205,6 @@ public class CanvasAlarmDisplay extends CanvasObject {
 
     private void addAlarmFromTimeline(Alarm alarm) {
         try {
-            logger.log(Level.INFO, alarm.getAcknowledgement());
             boolean alarmStatus = alarm.checkAlarm();
             int alarmIndex = -1;
             for (int j = 0; j < activatedAlarms.size(); j++) {
