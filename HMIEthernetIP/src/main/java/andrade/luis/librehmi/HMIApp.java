@@ -472,7 +472,7 @@ public class HMIApp extends Application {
             try {
                 loadSceneData();
             } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "Error al cargar el archivo", "Existió un error al cargar el archivo: " + e.getMessage(), false, false);
+                if(e.getMessage()!=null) showAlert(Alert.AlertType.ERROR, "Error al cargar el archivo", "Existió un error al cargar el archivo: " + e.getMessage(), false, false);
             }
         });
         menuWindows.getItems().add(selectWindowsMI);
@@ -1436,7 +1436,7 @@ public class HMIApp extends Application {
     private void loadSceneData() throws IOException {
         FileChooser fileChooser = new FileChooser();
 
-        fileChooser.setTitle("Seleccione un archivo de proyecto LibreHMI");
+        fileChooser.setTitle("Seleccione un archivo de ventana de proyecto LibreHMI");
         fileChooser.setInitialDirectory(
                 new File(System.getProperty(USER_HOME))
         );

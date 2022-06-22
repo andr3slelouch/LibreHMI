@@ -96,6 +96,7 @@ public class SetTextPropertiesWindow extends Stage {
         colorHBox.getChildren().addAll(selectColor, colorPicker);
 
         rotationHBox = new RotationHBox(rotationValue);
+        rotationHBox.getRotationTextField().setPrefWidth(150);
         rotationHBox.setSpacing(92);
 
         vbox = new VBox();
