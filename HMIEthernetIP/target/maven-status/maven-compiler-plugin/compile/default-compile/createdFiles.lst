@@ -6,6 +6,7 @@ andrade/luis/libreHMI/views/windows/LogInWindow.class
 andrade/luis/libreHMI/models/TrendChartSerieData.class
 andrade/luis/libreHMI/views/canvas/CanvasSystemDateTime.class
 andrade/luis/libreHMI/views/canvas/CanvasObject$2.class
+andrade/luis/libreHMI/models/HMISymbolsTree.class
 andrade/luis/libreHMI/views/RotationHBox.class
 andrade/luis/libreHMI/models/users/HMIPassword.class
 andrade/luis/libreHMI/controllers/HMIScene.class
