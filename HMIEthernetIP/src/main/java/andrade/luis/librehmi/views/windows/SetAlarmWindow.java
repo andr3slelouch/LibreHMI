@@ -10,6 +10,8 @@ import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+
 public class SetAlarmWindow extends WriteExpressionWindow {
     private final HBox doubleLimitHBox;
     private final HBox booleanConditionsHBox;
@@ -26,14 +28,6 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     private TextField loloLimitTF;
     private TextField lowLimitTF;
     private final HMIApp hmiApp;
-    private final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        return change;
-    };
 
     public SetAlarmWindow(HMIApp hmiApp) {
         super(750, 300);

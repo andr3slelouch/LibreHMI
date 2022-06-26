@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Esta es la clase que contiene define a un CanvasPushbutton, se utiliza para cambiar el valor de un Tag del tipo
@@ -132,7 +134,8 @@ public class CanvasPushbutton extends CanvasButton {
                     break;
             }
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(this.getClass().getName());
+            logger.log(Level.INFO,e.getMessage());
         }
     };
 
@@ -152,7 +155,8 @@ public class CanvasPushbutton extends CanvasButton {
                     break;
             }
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(this.getClass().getName());
+            logger.log(Level.INFO,e.getMessage());
         }
     };
 
@@ -180,8 +184,8 @@ public class CanvasPushbutton extends CanvasButton {
         }
     }
     @Override
-    public void updateTag(Tag tag,boolean forceUpdate){
-        super.updateTag(tag,forceUpdate);
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
         if(this.getCanvasObjectData().getTag().compareToTag(tag)){
             this.getCanvasObjectData().setTag(tag);
         }

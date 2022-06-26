@@ -9,6 +9,8 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.function.UnaryOperator;
 
+import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+
 public class SizeVBox extends VBox {
     private final HBox heightValueHBox;
     private final HBox widthValueHBox;
@@ -29,14 +31,6 @@ public class SizeVBox extends VBox {
         Label widthLabel = new Label("Defina el ancho:");
         widthField = new TextField(String.valueOf(defWidth));
         if(widthFieldWidth>0) widthField.setPrefWidth(widthFieldWidth);
-        UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-            String newText = change.getControlNewText();
-            if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-                change.setText("");
-                change.setRange(change.getRangeStart(), change.getRangeStart());
-            }
-            return change;
-        };
         widthField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), defWidth, numberFilter));
         widthValueHBox = new HBox(widthLabel, widthField);
         Label heightLabel = new Label("Defina el alto:");

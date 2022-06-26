@@ -224,7 +224,7 @@ public class HMIApp extends Application {
             mainStage.setTitle(HMI_TITLE);
             mainStage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            log(e.getMessage());
         }
 
         updateTitleFlag.addListener((observableValue, oldBoolean, newBoolean) -> {
@@ -251,7 +251,7 @@ public class HMIApp extends Application {
     private void closeProcess(WindowEvent windowEvent) {
         if (wasModified) {
             if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
-                logger.log(Level.INFO, "CANCELED");
+                log("CANCELED");
             } else {
                 windowEvent.consume();
             }
@@ -413,7 +413,12 @@ public class HMIApp extends Application {
         tagsMI.setId("#tagsMI");
         MenuItem createLocalTagMI = new MenuItem("Crear Tag Local");
         createLocalTagMI.setOnAction(mouseEvent -> {
-            ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(null);
+            ManageLocalTagWindow manageLocalTagWindow = null;
+            try {
+                manageLocalTagWindow = new ManageLocalTagWindow(null);
+            } catch (SQLException | IOException e) {
+                log(e.getMessage());
+            }
             manageLocalTagWindow.showAndWait();
             if (manageLocalTagWindow.getTag() != null) {
                 localTags.add(manageLocalTagWindow.getTag());
@@ -424,7 +429,7 @@ public class HMIApp extends Application {
         manageLocalTagsMI.setOnAction(mouseEvent -> {
             SelectTagWindow tagWindow = new SelectTagWindow(false, "LocalTags", false, localTags);
             tagWindow.showAndWait();
-            updateLocalTags(true);
+            updateLocalTags();
         });
         tagsMI.getItems().addAll(createLocalTagMI, manageLocalTagsMI);
         MenuItem propertiesMI = new MenuItem("Conexión de Base de Datos");
@@ -485,7 +490,7 @@ public class HMIApp extends Application {
 
     private void openProcess() {
         try {
-            logger.log(Level.INFO, "Closing Project...");
+            log("Closing Project...");
             if (wasModified) {
                 if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
                     loadHMIData();
@@ -495,7 +500,7 @@ public class HMIApp extends Application {
             }
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error al Cargar Proyecto", ERROR_STR + e.getMessage(), false, false);
-            e.printStackTrace();
+
         }
     }
 
@@ -520,7 +525,7 @@ public class HMIApp extends Application {
                     try {
                         this.loadHMIData(menuItems.get(finalI));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        showAlert(Alert.AlertType.ERROR,"Error al cargar archivo reciente",e.getMessage(),false,false);
                     }
                 });
                 openRecentProjectsMI.getItems().add(recentMenuItem);
@@ -537,7 +542,7 @@ public class HMIApp extends Application {
                 this.saveHMIDataProcess();
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
-                e.printStackTrace();
+                log(e.getMessage());
             }
         });
         MenuItem saveAsMI = new MenuItem("Guardar como");
@@ -548,7 +553,7 @@ public class HMIApp extends Application {
                 this.saveAsHMIData(false);
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
-                e.printStackTrace();
+                log(e.getMessage());
             }
         });
         MenuItem saveAsEncryptedMI = new MenuItem("Guardar como Archivo Protegido");
@@ -559,7 +564,7 @@ public class HMIApp extends Application {
                 this.saveAsHMIData(true);
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
-                e.printStackTrace();
+                log(e.getMessage());
             }
         });
 
@@ -583,6 +588,10 @@ public class HMIApp extends Application {
         menuFile.getItems().addAll(newProjectMI, openProjectMI, openRecentProjectsMI, separatorMenuItem, saveMI, saveAsMI, saveAsEncryptedMI, runEditSeparatorMI, runEditMI, exitSeparatorMenuItem, exitMI);
 
         return menuFile;
+    }
+
+    private void log(String e) {
+        logger.log(Level.INFO, e);
     }
 
     private void changeMode(){
@@ -620,15 +629,7 @@ public class HMIApp extends Application {
             menuItem.setText(mode);
         }
 
-        for (Menu menu : fileMenus) {
-            for (MenuItem subMenu : menu.getItems()) {
-                if (subMenu.getId() != null) {
-                    if (subMenu.getId().equals("#saveMI") || subMenu.getId().equals("#saveAsMI") || subMenu.getId().equals("#saveAsEncryptedMI") || subMenu.getId().equals("#recents")) {
-                        subMenu.setDisable(this.mode.equals(EJECUTAR_STR));
-                    }
-                }
-            }
-        }
+        updateMenuFileMode();
 
         for (Menu menu : editMenus) {
             menu.setDisable(this.mode.equals(EJECUTAR_STR));
@@ -642,6 +643,10 @@ public class HMIApp extends Application {
             menu.setDisable(this.mode.equals(EJECUTAR_STR));
         }
 
+        updateMenuWindowsMode();
+    }
+
+    private void updateMenuWindowsMode() {
         for (Menu menu : windowMenus) {
             for (MenuItem item: menu.getItems()) {
                 if(item.getId()!=null && item.getId().equals("#import")){
@@ -649,9 +654,18 @@ public class HMIApp extends Application {
                 }
             }
         }
-
-
     }
+
+    private void updateMenuFileMode() {
+        for (Menu menu : fileMenus) {
+            for (MenuItem subMenu : menu.getItems()) {
+                if (subMenu.getId() != null && (subMenu.getId().equals("#saveMI") || subMenu.getId().equals("#saveAsMI") || subMenu.getId().equals("#saveAsEncryptedMI") || subMenu.getId().equals("#recents"))) {
+                    subMenu.setDisable(this.mode.equals(EJECUTAR_STR));
+                }
+            }
+        }
+    }
+
 
     private Menu generateMenuAlarm() {
         // --- Menu View
@@ -666,17 +680,13 @@ public class HMIApp extends Application {
                 if (setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")) {
                     Alarm alarm = new Alarm(
                             setAlarmWindow.getLocalExpression(),
-                            Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
-                            Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
-                            Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
-                            Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
-                            setAlarmWindow.getHighLimitCheckBox().isSelected(),
-                            setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
-                            setAlarmWindow.getLowLimitCheckBox().isSelected(),
-                            setAlarmWindow.getLoloLimitCheckBox().isSelected(),
                             setAlarmWindow.getAlarmNameTF().getText(),
                             setAlarmWindow.getAlarmCommentTF().getText()
                     );
+                    alarm.setHighLimit(Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),setAlarmWindow.getHighLimitCheckBox().isSelected());
+                    alarm.setHiHiLimit(Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),setAlarmWindow.getHiHiLimitCheckBox().isSelected());
+                    alarm.setLowLimit(Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),setAlarmWindow.getLowLimitCheckBox().isSelected());
+                    alarm.setLoloLimit(Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),setAlarmWindow.getLoloLimitCheckBox().isSelected());
                     addAlarm(alarm);
                 } else if (setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")) {
                     Alarm alarm = new Alarm(
@@ -834,7 +844,7 @@ public class HMIApp extends Application {
                 new KeyFrame(
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
-                            logger.log(Level.INFO, "Executing autoBlockTimeline");
+                            log("Executing autoBlockTimeline");
                             user = new HMIUser("", "", "", "", OPERATOR_STR, "");
                             enableInputRepresentations(mode);
                         }), new KeyFrame(Duration.seconds(1)));
@@ -852,11 +862,11 @@ public class HMIApp extends Application {
 
     public void refreshLocalTags() {
         updateLocalTagsFromInputs();
-        updateLocalTags(false);
+        updateLocalTags();
     }
 
-    public void updateLocalTags(boolean forceUpdate) {
-        updateTagsInObjects(forceUpdate);
+    public void updateLocalTags() {
+        updateTagsInObjects();
         for (int i = 0; i < projectAlarms.size(); i++) {
             for (Tag localTag : localTags) {
                 for (Alarm alarm : projectAlarms) {
@@ -871,10 +881,10 @@ public class HMIApp extends Application {
             }
         }
     }
-    public void updateTagsInObjects(boolean forceUpdate){
+    public void updateTagsInObjects(){
         for (int i = 0; i < root.getShapeArrayList().size(); i++) {
             for (Tag localTag : localTags) {
-                root.getShapeArrayList().get(i).updateTag(localTag, forceUpdate);
+                root.getShapeArrayList().get(i).updateTag(localTag);
             }
         }
     }
@@ -888,11 +898,9 @@ public class HMIApp extends Application {
             if (max == null && canvasObject.getCanvasObjectData().getSuperType().equals("TagInputObject")) {
                 max = canvasObject.getLastTimeSelected();
                 index = i;
-            } else if (canvasObject.getLastTimeSelected() != null && max != null) {
-                if (max.isBefore(canvasObject.getLastTimeSelected())) {
-                    max = canvasObjects.get(i).getLastTimeSelected();
-                    index = i;
-                }
+            } else if (canvasObject.getLastTimeSelected() != null && max != null && max.isBefore(canvasObject.getLastTimeSelected())) {
+                max = canvasObjects.get(i).getLastTimeSelected();
+                index = i;
             }
         }
         for (int i = 0; i < localTags.size() && index > -1; i++) {
@@ -925,7 +933,7 @@ public class HMIApp extends Application {
             recentUsedFilesData = gson.fromJson(bufferedReader, RecentUsedFilesData.class);
             return new ArrayList<>(recentUsedFilesData.getRecentlyUsedFilePaths());
         } catch (IOException e) {
-            e.printStackTrace();
+            log(e.getMessage());
         }
         return new ArrayList<>();
     }
@@ -934,66 +942,49 @@ public class HMIApp extends Application {
         if (manageableAlarm.isHighAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
-                    manageableAlarm.getHighLimit(),
-                    manageableAlarm.getHiHiLimit(),
-                    manageableAlarm.getLowLimit(),
-                    manageableAlarm.getLoloLimit(),
-                    manageableAlarm.isHighAlarmEnabled(),
-                    false,
-                    false,
-                    false,
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
             );
+            alarm.setHighLimit(manageableAlarm.getHighLimit(),manageableAlarm.isHighAlarmEnabled());
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),false);
+            alarm.setLowLimit(manageableAlarm.getLowLimit(),false);
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),false);
             projectAlarms.add(alarm);
         }
         if (manageableAlarm.isHiHiAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
-                    manageableAlarm.getHighLimit(),
-                    manageableAlarm.getHiHiLimit(),
-                    manageableAlarm.getLowLimit(),
-                    manageableAlarm.getLoloLimit(),
-                    false,
-                    manageableAlarm.isHiHiAlarmEnabled(),
-                    false,
-                    false,
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
-
             );
+            alarm.setHighLimit(manageableAlarm.getHighLimit(),false);
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),manageableAlarm.isHiHiAlarmEnabled());
+            alarm.setLowLimit(manageableAlarm.getLowLimit(),false);
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),false);
             projectAlarms.add(alarm);
         }
         if (manageableAlarm.isLoloAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
-                    manageableAlarm.getHighLimit(),
-                    manageableAlarm.getHiHiLimit(),
-                    manageableAlarm.getLowLimit(),
-                    manageableAlarm.getLoloLimit(),
-                    false,
-                    false,
-                    false,
-                    manageableAlarm.isLoloAlarmEnabled(),
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
             );
+            alarm.setHighLimit(manageableAlarm.getHighLimit(),false);
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),false);
+            alarm.setLowLimit(manageableAlarm.getLowLimit(),false);
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),manageableAlarm.isLoloAlarmEnabled());
             projectAlarms.add(alarm);
         }
         if (manageableAlarm.isLowAlarmEnabled()) {
             Alarm alarm = new Alarm(
                     manageableAlarm.getExpression(),
-                    manageableAlarm.getHighLimit(),
-                    manageableAlarm.getHiHiLimit(),
-                    manageableAlarm.getLowLimit(),
-                    manageableAlarm.getLoloLimit(),
-                    false,
-                    false,
-                    manageableAlarm.isLowAlarmEnabled(),
-                    false,
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
             );
+            alarm.setHighLimit(manageableAlarm.getHighLimit(),false);
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),false);
+            alarm.setLowLimit(manageableAlarm.getLowLimit(),manageableAlarm.isLowAlarmEnabled());
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),false);
             projectAlarms.add(alarm);
         }
     }
@@ -1108,7 +1099,7 @@ public class HMIApp extends Application {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(recentFilesFilePath))) {
             recentUsedFilesData = gson.fromJson(bufferedReader, RecentUsedFilesData.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            log(e.getMessage());
         }
 
         RecentUsedFilesCache recentUsedFilesCache;
@@ -1127,7 +1118,7 @@ public class HMIApp extends Application {
         try (Writer writer = Files.newBufferedWriter(Path.of(recentFilesFilePath))) {
             gson.toJson(recentUsedFilesData, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            log(e.getMessage());
         }
     }
 
@@ -1542,10 +1533,8 @@ public class HMIApp extends Application {
     }
 
     public void updateTitleWithFilename() {
-        if (this.currentFilename != null) {
-            if (!mainStage.getTitle().contains(this.currentFilename)) {
-                mainStage.setTitle(this.currentFilename + " - " + mainStage.getTitle());
-            }
+        if (this.currentFilename != null && !mainStage.getTitle().contains(this.currentFilename)) {
+            mainStage.setTitle(this.currentFilename + " - " + mainStage.getTitle());
         }
     }
 
@@ -1614,7 +1603,7 @@ public class HMIApp extends Application {
             }
         } catch (SQLException sqlException) {
             showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", "Verifique que tiene acceso a MySQL a través de la ventana de credenciales que se mostrará a continuación\nError:" + sqlException.getMessage(), false, false);
-            sqlException.printStackTrace();
+            log(sqlException.getMessage());
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.showAndWait();
             generateDatabase();
@@ -1622,7 +1611,7 @@ public class HMIApp extends Application {
             if (!showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", "El archivo de propiedades no se encontró pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos", true, false)) {
                 generateDatabase();
             }
-            e.printStackTrace();
+            log(e.getMessage());
         }
     }
 
@@ -1660,7 +1649,7 @@ public class HMIApp extends Application {
                 saveHMIDataProcess();
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
-                e.printStackTrace();
+                log(e.getMessage());
             }
             return true;
         } else if (result.isPresent() && result.get() == dontSaveButton) {

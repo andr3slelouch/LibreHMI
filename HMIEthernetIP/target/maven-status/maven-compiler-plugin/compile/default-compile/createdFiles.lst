@@ -3,7 +3,7 @@ andrade/luis/librehmi/views/windows/ManageAlarmsWindow$1.class
 andrade/luis/librehmi/views/windows/SetTextPropertiesWindow.class
 andrade/luis/librehmi/models/HMIAppData.class
 andrade/luis/librehmi/models/Expression.class
-andrade/luis/librehmi/views/canvas/CanvasObject$2.class
+andrade/luis/librehmi/controllers/TextFormatters.class
 andrade/luis/librehmi/models/SceneItem.class
 andrade/luis/librehmi/views/windows/SetPercentFillPropertiesWindow.class
 andrade/luis/librehmi/views/windows/LogInWindow.class
@@ -16,7 +16,6 @@ module-info.class
 andrade/luis/librehmi/views/canvas/CanvasText.class
 andrade/luis/librehmi/controllers/HMIScene$1.class
 andrade/luis/librehmi/views/windows/SetColorCommandPushButtonWindow.class
-andrade/luis/librehmi/views/canvas/CanvasObject$3.class
 andrade/luis/librehmi/views/SetDateTimeProperties.class
 andrade/luis/librehmi/models/Tag.class
 andrade/luis/librehmi/models/users/HMIUserRow.class

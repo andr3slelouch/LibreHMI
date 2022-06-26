@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 
 public class CanvasImage extends CanvasObject {
     public ImageView getImageView() {
@@ -235,7 +236,7 @@ public class CanvasImage extends CanvasObject {
         try {
             this.setCanvasImage();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
         this.imageView.setFitWidth(this.getCanvasObjectData().getWidth());
         this.imageView.setFitHeight(this.getCanvasObjectData().getHeight());

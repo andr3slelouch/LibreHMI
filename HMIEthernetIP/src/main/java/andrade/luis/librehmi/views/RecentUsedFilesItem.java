@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -33,7 +34,8 @@ public class RecentUsedFilesItem {
         try {
             fxmlLoader.load();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(this.getClass().getName());
+            logger.log(Level.INFO,e.getMessage());
         }
         this.hmiApp = hmiApp;
     }
@@ -63,7 +65,7 @@ public class RecentUsedFilesItem {
             try {
                 hmiApp.setHMIStage(filepath, "Editar");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.INFO,e.getMessage());
             }
         });
         playButton.setGraphic(playImageView);
@@ -72,7 +74,7 @@ public class RecentUsedFilesItem {
             try {
                 hmiApp.setHMIStage(filepath, "Ejecutar");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.INFO,e.getMessage());
             }
         });
     }

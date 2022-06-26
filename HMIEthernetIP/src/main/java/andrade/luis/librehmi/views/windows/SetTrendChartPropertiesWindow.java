@@ -17,7 +17,8 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
+
+import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
 
 public class SetTrendChartPropertiesWindow extends Stage {
 
@@ -78,14 +79,6 @@ public class SetTrendChartPropertiesWindow extends Stage {
         Label samplingTimeLbl = new Label("Tiempo de Muestreo(segundos):");
         samplingTimeTF = new TextField();
         samplingTimeTF.setPromptText("Muestreo en Segundos");
-        UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-            String newText = change.getControlNewText();
-            if (!newText.matches("^\\d+\\.\\d+$")) {
-                change.setText("");
-                change.setRange(change.getRangeStart(), change.getRangeStart());
-            }
-            return change;
-        };
         samplingTimeTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 1.0, numberFilter));
         samplingTimeTF.setPrefWidth(385);
         samplingTimeHBox.getChildren().addAll(samplingTimeLbl,samplingTimeTF);

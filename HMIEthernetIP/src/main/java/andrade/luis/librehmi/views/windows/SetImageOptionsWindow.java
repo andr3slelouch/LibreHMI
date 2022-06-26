@@ -16,6 +16,8 @@ import javafx.util.converter.DoubleStringConverter;
 import java.io.File;
 import java.util.function.UnaryOperator;
 
+import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+
 public class SetImageOptionsWindow extends Stage {
     protected final VBox vbox;
     private final RotationHBox rotationHBox;
@@ -190,14 +192,6 @@ public class SetImageOptionsWindow extends Stage {
         contrastTextField = new TextField("0");
         contrastTextField.setPrefWidth(242);
         contrastTextField.setDisable(true);
-        UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-            String newText = change.getControlNewText();
-            if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-                change.setText("");
-                change.setRange(change.getRangeStart(), change.getRangeStart());
-            }
-            return change;
-        };
         contrastTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox contrastHBox = new HBox();
         contrastHBox.setSpacing(76);

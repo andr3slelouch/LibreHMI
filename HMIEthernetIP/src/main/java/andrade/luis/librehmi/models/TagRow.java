@@ -6,7 +6,10 @@ import javafx.beans.property.SimpleStringProperty;
 
 import java.io.Serializable;
 
-public class TagRow implements Serializable {
+public class TagRow {
+
+    public static final String NULL_STR = "<null>";
+
     public String getPlcName() {
         return plcName.get();
     }
@@ -126,17 +129,16 @@ public class TagRow implements Serializable {
     private final SimpleStringProperty tagAction;
     @SerializedName("tagValue")
     @Expose
-    private final SimpleStringProperty tagValue;
+    private SimpleStringProperty tagValue;
 
-    public TagRow(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction, String tagValue) {
+    public TagRow(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction) {
         this.plcName = new SimpleStringProperty(plcName);
-        this.plcAddress = new SimpleStringProperty(plcAddress);;
-        this.plcDeviceGroup = new SimpleStringProperty(plcDeviceGroup);;
+        this.plcAddress = new SimpleStringProperty(plcAddress);
+        this.plcDeviceGroup = new SimpleStringProperty(plcDeviceGroup);
         this.tagName = new SimpleStringProperty(tagName);
         this.tagType = new SimpleStringProperty(tagType);
         this.tagAddress = new SimpleStringProperty(tagAddress);
         this.tagAction = new SimpleStringProperty(tagAction);
-        this.tagValue = new SimpleStringProperty(tagValue);
     }
 
     public Tag generateTag(){
@@ -153,35 +155,35 @@ public class TagRow implements Serializable {
         sb.append(CanvasObjectData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("plcName");
         sb.append('=');
-        sb.append(((this.plcName == null)?"<null>":this.plcName));
+        sb.append(((this.plcName == null)? NULL_STR :this.plcName));
         sb.append(',');
         sb.append("plcAddress");
         sb.append('=');
-        sb.append(((this.plcAddress == null)?"<null>":this.plcAddress));
+        sb.append(((this.plcAddress == null)? NULL_STR :this.plcAddress));
         sb.append(',');
         sb.append("plcDeviceGroup");
         sb.append('=');
-        sb.append(((this.plcDeviceGroup == null)?"<null>":this.plcDeviceGroup));
+        sb.append(((this.plcDeviceGroup == null)? NULL_STR :this.plcDeviceGroup));
         sb.append(',');
         sb.append("tagName");
         sb.append('=');
-        sb.append(((this.tagName == null)?"<null>":this.tagName));
+        sb.append(((this.tagName == null)? NULL_STR :this.tagName));
         sb.append(',');
         sb.append("tagType");
         sb.append('=');
-        sb.append(((this.tagType == null)?"<null>":this.tagType));
+        sb.append(((this.tagType == null)? NULL_STR :this.tagType));
         sb.append(',');
         sb.append("tagAddress");
         sb.append('=');
-        sb.append(((this.tagAddress == null)?"<null>":this.tagAddress));
+        sb.append(((this.tagAddress == null)? NULL_STR :this.tagAddress));
         sb.append(',');
         sb.append("tagAction");
         sb.append('=');
-        sb.append(((this.tagAction == null)?"<null>":this.tagAction));
+        sb.append(((this.tagAction == null)? NULL_STR :this.tagAction));
         sb.append(',');
         sb.append("tagValue");
         sb.append('=');
-        sb.append(((this.tagValue == null)?"<null>":this.tagValue));
+        sb.append(((this.tagValue == null)? NULL_STR :this.tagValue));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');

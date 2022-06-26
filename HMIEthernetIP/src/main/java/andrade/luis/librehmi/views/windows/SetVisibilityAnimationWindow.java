@@ -43,10 +43,8 @@ public class SetVisibilityAnimationWindow extends WriteExpressionWindow{
 
     @Override
     public void finishingAction(){
-        if(!this.textField.getText().isEmpty() && this.getLocalExpression()!=null){
-            if(this.getLocalExpression().getResultType().equals("Bool")){
-                this.confirmExit(Alert.AlertType.ERROR, "Error de tipo de Expresión","La expresión debe tener un resultado del tipo Bool");
-            }
+        if (!this.textField.getText().isEmpty() && this.getLocalExpression() != null && this.getLocalExpression().getResultType().equals("Bool")) {
+            this.confirmExit(Alert.AlertType.ERROR, "Error de tipo de Expresión", "La expresión debe tener un resultado del tipo Bool");
         }
         super.finishingAction();
     }

@@ -9,6 +9,8 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.function.UnaryOperator;
 
+import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+
 public class RotationHBox extends HBox {
     public TextField getRotationTextField() {
         return rotationTextField;
@@ -23,14 +25,6 @@ public class RotationHBox extends HBox {
         Label rotationLabel = new Label("Rotar:");
         rotationTextField = new TextField("0");
         rotationTextField.setPrefWidth(115);
-        UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-            String newText = change.getControlNewText();
-            if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-                change.setText("");
-                change.setRange(change.getRangeStart(), change.getRangeStart());
-            }
-            return change;
-        };
         rotationTextField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         rotationTextField.textProperty().addListener((observableValue, oldValue, newValue) -> this.rotationValue = newValue);
         Button rotationButton = new Button("+90°");

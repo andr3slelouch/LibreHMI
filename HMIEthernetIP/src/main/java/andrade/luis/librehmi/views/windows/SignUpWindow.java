@@ -118,7 +118,7 @@ public class SignUpWindow extends Stage {
                     this.close();
                 }
             } catch (SQLException | IOException sqlException){
-                sqlException.printStackTrace();
+                logger.log(Level.INFO,sqlException.getMessage());
                 databaseConnectionFailed(sqlException.getMessage());
             }
         });
@@ -160,47 +160,36 @@ public class SignUpWindow extends Stage {
         String message = "";
         if(firstName.getText().isEmpty() || lastName.getText().isEmpty() || email.getText().isEmpty() || username.getText().isEmpty()){
             message = "Existen campos vacíos";
-            logger.log(Level.INFO,"EMPTY VALUEs");
         }else if((passwordField.getText().isEmpty() || repeatPasswordField.getText().isEmpty()) && this.hmiUser == null){
             message = "Existen campos vacíos";
-            logger.log(Level.INFO,"EMPTY VALUES PASSWORD");
         }else if(!validateEmailAddress(email.getText())){
             message = "Ingrese un correo electrónico válido";
-            logger.log(Level.INFO,"EMAIL CONDITION");
         }
         if (this.hmiUser != null) {
-            if(HMIUser.existsEmail(email.getText(), this.hmiUser.getUsername())){
-                message = "El correo electrónico ya se encuentra asociado a una cuenta";
-                logger.log(Level.INFO,"REPEATED EMAIL CONDITION");
-            }else if(!this.hmiUser.getUsername().equals(username.getText())){
-                if(HMIUser.existsUsername(username.getText())){
-                    message = "El nombre de usuario ya existe";
-                    logger.log(Level.INFO,"USER EXISTS");
-                }
-            }
+            message = checkUserCredentials(email, username);
         }
         if(rolesComboBox.getSelectionModel().getSelectedItem()==null){
             message = "Debe seleccionar un rol";
-            logger.log(Level.INFO,"ROLES CONDITION");
+
         }else if(!passwordField.getText().equals(repeatPasswordField.getText())){
             message = "Las contraseñas no condicen";
-            logger.log(Level.INFO,"PASSWORD NOT EQUAL");
+
         }
-        logger.log(Level.INFO,firstName.getText());
-        logger.log(Level.INFO,lastName.getText());
-        logger.log(Level.INFO,email.getText());
-        logger.log(Level.INFO,username.getText());
-        logger.log(Level.INFO, String.valueOf(rolesComboBox.getSelectionModel().getSelectedIndex()));
-        logger.log(Level.INFO, String.valueOf(rolesComboBox.getSelectionModel().getSelectedIndex() == -1));
-        logger.log(Level.INFO,rolesComboBox.getSelectionModel().getSelectedItem());
-        logger.log(Level.INFO,passwordField.getText());
-        logger.log(Level.INFO,repeatPasswordField.getText());
-        logger.log(Level.INFO,message);
         if(message.isEmpty()){
             return true;
         }else{
             showAlert(Alert.AlertType.WARNING,"Error en los campos ingresados",message);
             return false;
         }
+    }
+
+    private String checkUserCredentials(TextField email, TextField username) throws SQLException, IOException {
+        String message = "";
+        if(HMIUser.existsEmail(email.getText(), this.hmiUser.getUsername())){
+            message = "El correo electrónico ya se encuentra asociado a una cuenta";
+        }else if (!this.hmiUser.getUsername().equals(username.getText()) && HMIUser.existsUsername(username.getText())) {
+            message = "El nombre de usuario ya existe";
+        }
+        return message;
     }
 }

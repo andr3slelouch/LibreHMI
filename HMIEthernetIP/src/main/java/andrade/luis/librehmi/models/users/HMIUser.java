@@ -118,22 +118,26 @@ public class HMIUser {
     public void createInDatabase() throws SQLException, IOException {
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
             String query = "INSERT INTO Users(first,last,email,username,role,salt,saltedHashPassword) values (?,?,?,?,?,?,?)";
-            try(PreparedStatement prepareStatement = con.prepareStatement(query)){
-                prepareStatement.setString(1, this.firstName);
-                prepareStatement.setString(2, this.lastName);
-                prepareStatement.setString(3, this.email);
-                prepareStatement.setString(4, this.username);
-                prepareStatement.setString(5, this.role);
-                prepareStatement.setString(6, this.salt);
-                prepareStatement.setString(7, this.saltedHashPassword);
-                prepareStatement.executeUpdate();
-            }
+            prepareAndExecuteQuery(con, query);
         }catch(SQLException e){
             throw new SQLException(e);
         }catch (IOException e){
             throw new IOException(e);
         }
 
+    }
+
+    private void prepareAndExecuteQuery(Connection con, String query) throws SQLException {
+        try(PreparedStatement prepareStatement = con.prepareStatement(query)){
+            prepareStatement.setString(1, this.firstName);
+            prepareStatement.setString(2, this.lastName);
+            prepareStatement.setString(3, this.email);
+            prepareStatement.setString(4, this.username);
+            prepareStatement.setString(5, this.role);
+            prepareStatement.setString(6, this.salt);
+            prepareStatement.setString(7, this.saltedHashPassword);
+            prepareStatement.executeUpdate();
+        }
     }
 
     public static boolean existsEmail(String email, String username) throws SQLException, IOException {
@@ -221,20 +225,13 @@ public class HMIUser {
         }
 
     }
+    
+    
 
     public void updateInDatabase() throws SQLException, IOException {
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
             String query = "UPDATE Users SET first=?, last=?,email=?,username=?,role=?,salt=?,saltedHashPassword=? WHERE username='"+oldUsername+"'";
-            try(PreparedStatement prepareStatement = con.prepareStatement(query)){
-                prepareStatement.setString(1, this.firstName);
-                prepareStatement.setString(2, this.lastName);
-                prepareStatement.setString(3, this.email);
-                prepareStatement.setString(4, this.username);
-                prepareStatement.setString(5, this.role);
-                prepareStatement.setString(6, this.salt);
-                prepareStatement.setString(7, this.saltedHashPassword);
-                prepareStatement.executeUpdate();
-            }
+            prepareAndExecuteQuery(con, query);
         }catch(SQLException e){
             throw new SQLException(e);
         }catch (IOException e){

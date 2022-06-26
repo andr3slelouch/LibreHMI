@@ -49,7 +49,6 @@ public class SelectHMISymbolWindow extends Stage {
     private double imageViewWidth;
     private double imageViewHeight;
     Logger logger = Logger.getLogger(this.getClass().getName());
-    //private final String resourcesDirectory = getClass().getResource("HMISymbols").toExternalForm().substring(5);
 
     public double getHue() {
         return hue;
@@ -119,7 +118,7 @@ public class SelectHMISymbolWindow extends Stage {
         accordion.getPanes().addAll(categoriesTitlePanes);
         accordion.expandedPaneProperty().addListener((observableValue, oldTitledPane, newTitledPane) -> {
             if (newTitledPane != null) {
-                logger.log(Level.INFO, newTitledPane.getText());
+                log(newTitledPane.getText());
                 try {
                     if (newTitledPane.getContent() == null) {
                         ScrollPane scrollPane = generateSymbolsScrollPaneByCategory(newTitledPane.getText());
@@ -128,7 +127,7 @@ public class SelectHMISymbolWindow extends Stage {
                         categoriesPanes.add(scrollPane);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log(e.getMessage());
                 }
             }
         });
@@ -184,6 +183,10 @@ public class SelectHMISymbolWindow extends Stage {
 
     }
 
+    private void log(String e) {
+        logger.log(Level.INFO, e);
+    }
+
     private ArrayList<String> getCategoryFilesPaths(String category){
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
@@ -218,8 +221,8 @@ public class SelectHMISymbolWindow extends Stage {
             currentImages.add(canvasImage);
             imagesHBox.getChildren().add(canvasImage);
         }
-        logger.log(Level.INFO, categoriesDirectory.get(category));
-        logger.log(Level.INFO, DBConnection.readPropertiesFile().getProperty(categoriesDirectory.get(category)));
+        log(categoriesDirectory.get(category));
+        log(DBConnection.readPropertiesFile().getProperty(categoriesDirectory.get(category)));
         if (Boolean.parseBoolean(DBConnection.readPropertiesFile().getProperty(categoriesDirectory.get(category), String.valueOf(false)))) {
             ArrayList<File> importedFilesArrayList = new ArrayList<>(List.of(Objects.requireNonNull(importedCategoryDirectoryPath.listFiles())));
             for (File imageFile : importedFilesArrayList) {
@@ -239,7 +242,7 @@ public class SelectHMISymbolWindow extends Stage {
             try {
                 importAction(categoriesDirectory.get(category));
             } catch (IOException e) {
-                e.printStackTrace();
+                log(e.getMessage());
             }
         });
         directoryFileNames.put(category, imagesFilenames);
@@ -316,7 +319,9 @@ public class SelectHMISymbolWindow extends Stage {
             categoriesDirectoriesFlags.put(TANKS, Boolean.parseBoolean(properties.getProperty(TANKS)));
         }
         categoriesDirectoriesFlags.put(category, true);
-        DBConnection.writePropertiesFile(username, password, hostname, port, categoriesDirectoriesFlags.get(BOILER_FURNACE), categoriesDirectoriesFlags.get(CONVEYOR_BELTS), categoriesDirectoriesFlags.get(MOTOR_PUMPS), categoriesDirectoriesFlags.get(OTHERS), categoriesDirectoriesFlags.get(PIPES_VALVES), categoriesDirectoriesFlags.get(TANKS));
+        Properties newProperties = new Properties();
+        newProperties = DBConnection.prepareCategoriesProperties(categoriesDirectoriesFlags.get(BOILER_FURNACE), categoriesDirectoriesFlags.get(CONVEYOR_BELTS), categoriesDirectoriesFlags.get(MOTOR_PUMPS), categoriesDirectoriesFlags.get(OTHERS), categoriesDirectoriesFlags.get(PIPES_VALVES), categoriesDirectoriesFlags.get(TANKS),newProperties);
+        DBConnection.writePropertiesFile(username, password, hostname, port, newProperties);
     }
 
     public void updateScrollPanesWidth(double width) {
@@ -358,11 +363,9 @@ public class SelectHMISymbolWindow extends Stage {
                 index = i;
             } else {
                 CanvasObject canvasImage = currentImages.get(i);
-                if (canvasImage.getLastTimeSelected() != null && max != null) {
-                    if (max.isBefore(canvasImage.getLastTimeSelected())) {
-                        max = currentImages.get(i).getLastTimeSelected();
-                        index = i;
-                    }
+                if (canvasImage.getLastTimeSelected() != null && max != null && max.isBefore(canvasImage.getLastTimeSelected())) {
+                    max = currentImages.get(i).getLastTimeSelected();
+                    index = i;
                 }
             }
         }

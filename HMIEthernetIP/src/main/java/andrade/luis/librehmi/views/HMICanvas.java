@@ -322,7 +322,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             hue = Double.parseDouble(imageOptionsWindow.getHueTextField().getText());
             color = new CanvasColor(imageOptionsWindow.getColorPicker().getValue());
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
         CanvasImage canvasImage = new CanvasImage(selectedImage, current, true, selectedImagePath, false);
         canvasImage.setImageViewProperties(isMirroringHorizontal, isMirroringVertical, rotation);
@@ -459,8 +459,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         CanvasSlider canvasSlider;
         try {
             if(setSliderPropertiesWindow.getLocalExpression()!=null){
-                canvasSlider = new CanvasSlider(current, width, height, setSliderPropertiesWindow.getLocalExpression().getParameters().get(0), minValue, maxValue, minorTickValue, majorTickValue, snapHandleToTick, showTicks, showLabelsTicks, rotation, orientation);
-
+                canvasSlider = new CanvasSlider(current, width, height, setSliderPropertiesWindow.getLocalExpression().getParameters().get(0), rotation, orientation);
+                canvasSlider.setSliderProperties(minValue, maxValue, minorTickValue, majorTickValue, snapHandleToTick, showTicks, showLabelsTicks);
                 canvasSlider.setCanvas(this);
                 canvasSlider.setHmiApp(hmiApp);
                 canvasSlider.setUser(hmiApp.getUser());
@@ -475,7 +475,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                 this.setAddOnClickEnabled(false);
             }
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
     }
 
@@ -657,7 +657,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                 }
             }
         } catch (ClassNotFoundException | IOException | UnsupportedFlavorException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
     }
 
@@ -745,23 +745,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasPushbutton.getHmiApp().setWasModified(true);
     }
 
-    private void addPastedSymbolViewOnCanvasClicked(CanvasObjectData canvasObjectData) {
-        try {
-            CanvasImage canvasImage = new CanvasImage(canvasObjectData);
-            canvasImage.setCanvas(this);
-            canvasImage.setHmiApp(hmiApp);
-            canvasImage.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));
-            canvasImage.setObjectId(generateIdForPasteOperation(canvasObjectData));
-            this.addNewShape(canvasImage);
-            this.getChildren().add(canvasImage);
-            canvasImage.getHmiApp().setWasModified(true);
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error al agregar imagen", "Error:'" + e.getMessage() + "'");
-        }
-        Logger logger = Logger.getLogger(this.getClass().getName());
-        logger.log(Level.INFO,this.getClass().getResource(canvasObjectData.getData()).toExternalForm());
-    }
-
     private void addPastedTextFieldOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasTextField canvasTextField = new CanvasTextField(canvasObjectData);
         canvasTextField.setCanvas(this);
@@ -787,7 +770,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             this.getChildren().add(canvasSlider);
             canvasSlider.getHmiApp().setWasModified(true);
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
     }
 

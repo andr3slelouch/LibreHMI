@@ -6,20 +6,23 @@ import javafx.beans.property.SimpleStringProperty;
 
 import java.io.Serializable;
 
-public class AlarmRow implements Serializable {
-    public AlarmRow(String rowNumber, String name ,String expression ,String datetime, String type, String maxValue, String hiHiValue , String minValue, String loLoValue , String value, String status, String acknowledgement) {
+public class AlarmRow {
+    public AlarmRow(String rowNumber, String name ,String expression ,String datetime, String type, String status, String acknowledgement) {
         this.rowNumber = new SimpleStringProperty(rowNumber);
         this.name = new SimpleStringProperty(name);
         this.expression = new SimpleStringProperty(expression);
         this.datetime = new SimpleStringProperty(datetime);
         this.type = new SimpleStringProperty(type);
+        this.status = new SimpleStringProperty(status);
+        this.acknowledgement = new SimpleStringProperty(acknowledgement);
+    }
+
+    public void setValues(String maxValue, String hiHiValue, String minValue, String loLoValue, String value) {
         this.maxValue = new SimpleStringProperty(maxValue);
         this.hiHiValue = new SimpleStringProperty(hiHiValue);
         this.minValue = new SimpleStringProperty(minValue);
         this.loLoValue = new SimpleStringProperty(loLoValue);
         this.value = new SimpleStringProperty(value);
-        this.status = new SimpleStringProperty(status);
-        this.acknowledgement = new SimpleStringProperty(acknowledgement);
     }
 
     @SerializedName("rowNumber")
@@ -33,19 +36,19 @@ public class AlarmRow implements Serializable {
     private final SimpleStringProperty type;
     @SerializedName("maxValue")
     @Expose
-    private final SimpleStringProperty maxValue;
+    private SimpleStringProperty maxValue;
     @SerializedName("hiHiValue")
     @Expose
-    private final SimpleStringProperty hiHiValue;
+    private SimpleStringProperty hiHiValue;
     @SerializedName("minValue")
     @Expose
-    private final SimpleStringProperty minValue;
+    private SimpleStringProperty minValue;
     @SerializedName("loLoValue")
     @Expose
-    private final SimpleStringProperty loLoValue;
+    private SimpleStringProperty loLoValue;
     @SerializedName("value")
     @Expose
-    private final SimpleStringProperty value;
+    private SimpleStringProperty value;
     @SerializedName("status")
     @Expose
     private final SimpleStringProperty status;

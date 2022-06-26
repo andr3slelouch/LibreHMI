@@ -17,6 +17,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
@@ -106,11 +108,11 @@ public class ManageUsersWindow extends Stage {
         deleteItem.setText("Eliminar");
         deleteItem.setOnAction(event -> {
             try {
-                if (showAlert(CONFIRMATION, "Confirmar eliminación de Usuario", "Esta seguro de eliminar el usuario '" + row.getUsername() + "'?")) {
-                    if (row.getHmiUser().deleteFromDatabase()) table.setItems(getUsers());
-                }
+                if (showAlert(CONFIRMATION, "Confirmar eliminación de Usuario", "Esta seguro de eliminar el usuario '" + row.getUsername() + "'?") && row.getHmiUser().deleteFromDatabase())
+                    table.setItems(getUsers());
             } catch (SQLException | IOException e) {
-                e.printStackTrace();
+                Logger logger = Logger.getLogger(this.getClass().getName());
+                logger.log(Level.INFO,e.getMessage());
             }
         });
         return deleteItem;
@@ -123,9 +125,14 @@ public class ManageUsersWindow extends Stage {
             users=readUsers(con,users,query);
         } catch (SQLException | IOException e) {
             showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",e.getMessage());
-            e.printStackTrace();
+            log(e);
         }
         return users;
+    }
+
+    private void log(Exception e) {
+        Logger logger = Logger.getLogger(this.getClass().getName());
+        logger.log(Level.INFO, e.getMessage());
     }
 
     public ObservableList<HMIUserRow> readUsers(Connection con,ObservableList<HMIUserRow> users,String query){
@@ -145,7 +152,7 @@ public class ManageUsersWindow extends Stage {
             }
         }catch(Exception e){
             showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",e.getMessage());
-            e.printStackTrace();
+            log(e);
         }
         return users;
     }

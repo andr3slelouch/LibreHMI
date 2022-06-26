@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
+import static andrade.luis.librehmi.controllers.TextFormatters.digitFilter;
+
 public class WriteExpressionWindow extends Stage {
 
     private final HBox floatPrecisionHBox;
@@ -46,9 +48,10 @@ public class WriteExpressionWindow extends Stage {
 
     private ArrayList<Tag> localTags;
 
-    public WriteExpressionWindow(){
-        this(750,250);
+    public WriteExpressionWindow() {
+        this(750, 250);
     }
+
     public WriteExpressionWindow(double width, double height) {
         root = new StackPane();
         addedTags = new ArrayList<>();
@@ -60,39 +63,31 @@ public class WriteExpressionWindow extends Stage {
 
         Label floatPrecision = new Label("Precisión de decimales:");
         floatPrecisionTextField = new TextField();
-        UnaryOperator<TextFormatter.Change> integerFilter = change -> {
-            String newText = change.getControlNewText();
-            if (!newText.matches("^\\d+$")) {
-                change.setText("");
-                change.setRange(change.getRangeStart(), change.getRangeStart());
-            }
-            return change;
-        };
-        floatPrecisionTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 3, integerFilter));
+        floatPrecisionTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 3, digitFilter));
         floatPrecisionTextField.setPromptText("# decimales");
         floatPrecisionHBox = new HBox();
-        floatPrecisionHBox.getChildren().addAll(floatPrecision,floatPrecisionTextField);
+        floatPrecisionHBox.getChildren().addAll(floatPrecision, floatPrecisionTextField);
 
-        textField.textProperty().addListener((observableValue,oldValue,newValue) ->{
-            if(prepareExpression(false)){
+        textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (prepareExpression(false)) {
                 floatPrecisionTextField.setDisable(!this.localExpression.getResultType().equals("Flotante"));
             }
         });
 
         Label samplingTime = new Label("Tiempo de muestreo:");
         samplingTimeTextField = new TextField();
-        samplingTimeTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 1, integerFilter));
+        samplingTimeTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 1, digitFilter));
         samplingTimeTextField.setPromptText("Segundos");
         samplingTimeTextField.setTooltip(new Tooltip("En Segundos"));
         samplingTimeHBox = new HBox();
-        samplingTimeHBox.getChildren().addAll(samplingTime,samplingTimeTextField);
+        samplingTimeHBox.getChildren().addAll(samplingTime, samplingTimeTextField);
         samplingTimeHBox.setVisible(false);
         samplingTimeHBox.setSpacing(12);
 
         vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, textField,floatPrecisionHBox,samplingTimeHBox);
+        vbox.getChildren().addAll(label, textField, floatPrecisionHBox, samplingTimeHBox);
 
         finishSelectionButton = new Button("OK");
         finishSelectionButton.setAlignment(Pos.CENTER);
@@ -106,90 +101,113 @@ public class WriteExpressionWindow extends Stage {
         buttonsHBox.setAlignment(Pos.BASELINE_RIGHT);
         Button clearAllButton = new Button("Limpiar Tags");
 
-        buttonsHBox.getChildren().add(0,clearAllButton);
+        buttonsHBox.getChildren().add(0, clearAllButton);
         clearAllButton.setOnAction(mouseEvent -> clearAll());
         vbox.getChildren().add(buttonsHBox);
-        vbox.setPadding(new Insets(5,5,10,5));
+        vbox.setPadding(new Insets(5, 5, 10, 5));
         root.getChildren().add(vbox);
         Scene mainScene = new Scene(root, width, height);
         this.setScene(mainScene);
 
     }
 
-    protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode,"",false,this.localTags);
+    protected void addTag() {
+        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode, "", false, this.localTags);
         selectTagWindow.showAndWait();
         Tag tag = selectTagWindow.getSelectedTag();
-        if(tag!=null){
+        if (tag != null) {
             addedTags.add(tag);
-            textField.setText(textField.getText()+tag.getName());
+            textField.setText(textField.getText() + tag.getName());
             addTagButton.setDisable(true);
         }
     }
 
-    protected void clearAll(){
+    public Tag addTag(boolean inputMode, String filter, boolean testMode) {
+        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(), "", false, this.getLocalTags());
+        selectTagWindow.showAndWait();
+        if (!selectTagWindow.isCancelled()) {
+            clearAll();
+            Tag tag = selectTagWindow.getSelectedTag();
+            if (tag != null) {
+                this.getAddedTags().add(tag);
+            }
+            return tag;
+        }else{
+            return null;
+        }
+    }
+
+    public String updateInputExpression(boolean inputMode, String filter, boolean testMode,String expression){
+        Tag tag = addTag(inputMode, filter, testMode);
+        if (tag != null) {
+            return expression + tag.getName();
+        }
+        return "";
+    }
+
+    public void clearAll() {
         this.getTextField().setText("");
         this.getAddedTags().clear();
         this.addTagButton.setDisable(false);
     }
 
-    protected void confirmExit(Alert.AlertType type,String title,String message){
+    protected void confirmExit(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(message);
 
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
 
         alert.getButtonTypes().setAll(okButton);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
+        if (result.isPresent() && result.get() == okButton) {
             alert.close();
         }
     }
-    
-    public void finishingAction(){
+
+    public void finishingAction() {
         deleteUnneededTags();
-        if(prepareExpression(true)){
+        if (prepareExpression(true)) {
             this.close();
-        }else{
-            confirmExit(Alert.AlertType.WARNING,"No existe expresión definida","Debe agregar una expresión o un Tag");
+        } else {
+            confirmExit(Alert.AlertType.WARNING, "No existe expresión definida", "Debe agregar una expresión o un Tag");
         }
         this.done = true;
     }
 
-    protected void deleteUnneededTags(){
+    protected void deleteUnneededTags() {
         ArrayList<Tag> toDelete = new ArrayList<>();
-        for(int i=0;i< getAddedTags().size();i++){
-            if(!textField.getText().contains(getAddedTags().get(i).getName())){
+        for (int i = 0; i < getAddedTags().size(); i++) {
+            if (!textField.getText().contains(getAddedTags().get(i).getName())) {
                 toDelete.add(getAddedTags().get(i));
             }
         }
         getAddedTags().removeAll(toDelete);
     }
 
-    protected boolean prepareExpression(boolean test){
+    protected boolean prepareExpression(boolean test) {
         for (Tag addedTag : addedTags) {
             addedTag.setFloatPrecision(Integer.parseInt(floatPrecisionTextField.getText()));
         }
-        if(addedTags.isEmpty() && !textField.getText().isEmpty()){
-            this.localExpression = new Expression(textField.getText(),addedTags,Integer.parseInt(floatPrecisionTextField.getText()));
-            if(test){
-                try{
+        if (addedTags.isEmpty() && !textField.getText().isEmpty()) {
+            this.localExpression = new Expression(textField.getText(), addedTags, Integer.parseInt(floatPrecisionTextField.getText()));
+            if (test) {
+                try {
                     this.localExpression.evaluate();
                 } catch (CompileException | InvocationTargetException | SQLException | IOException e) {
-                    confirmExit(Alert.AlertType.ERROR,"Error al agregar expresión","Error:"+e.getMessage());
+                    confirmExit(Alert.AlertType.ERROR, "Error al agregar expresión", "Error:" + e.getMessage());
                 }
             }
             return true;
-        } else if(!textField.getText().isEmpty()){
-            this.localExpression = new Expression(textField.getText(),addedTags,Integer.parseInt(floatPrecisionTextField.getText()));
+        } else if (!textField.getText().isEmpty()) {
+            this.localExpression = new Expression(textField.getText(), addedTags, Integer.parseInt(floatPrecisionTextField.getText()));
             return true;
         }
 
         return false;
     }
+
     public HBox getFloatPrecisionHBox() {
         return floatPrecisionHBox;
     }
@@ -208,7 +226,7 @@ public class WriteExpressionWindow extends Stage {
 
     public void setAddedTags(ArrayList<Tag> addedTags) {
         this.addedTags = addedTags;
-        if(!this.addedTags.isEmpty()){
+        if (!this.addedTags.isEmpty()) {
             addTagButton.setDisable(true);
         }
     }

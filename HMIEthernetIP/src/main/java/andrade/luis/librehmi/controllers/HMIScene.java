@@ -32,7 +32,6 @@ public class HMIScene extends Scene {
     /*
      * windowImage source <a href="https://www.flaticon.com/free-icons/window" title="window icons">Window icons created by Anas Mannaa - Flaticon</a>
      * */
-    private final String location = getClass().getResource("").toExternalForm();
     private final Image windowImage = new Image(getClass().getResource("window.png").toExternalForm());
     private ScrollPane backgroundScrollPane;
     private ListView<String> listViewReference;
@@ -241,11 +240,9 @@ public class HMIScene extends Scene {
                 index = i;
             } else {
                 CanvasObject canvasObject = canvasObjects.get(i);
-                if (canvasObject.getLastTimeSelected() != null && max != null) {
-                    if (max.isBefore(canvasObject.getLastTimeSelected())) {
-                        max = canvasObjects.get(i).getLastTimeSelected();
-                        index = i;
-                    }
+                if (canvasObject.getLastTimeSelected() != null && max != null && max.isBefore(canvasObject.getLastTimeSelected())) {
+                    max = canvasObjects.get(i).getLastTimeSelected();
+                    index = i;
                 }
             }
         }

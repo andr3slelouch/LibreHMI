@@ -13,14 +13,15 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
     private final TextField buttonLabelTextField;
     private CanvasColor primaryColor = new CanvasColor(Color.BLACK);
     private CanvasColor backgroundColor = new CanvasColor(Color.GREEN);
-    public SetColorCommandPushButtonWindow(){
-        super(750,300);
+
+    public SetColorCommandPushButtonWindow() {
+        super(750, 300);
         setTitle("Propiedades de valor de botón pulsador");
         textField.setEditable(false);
         HBox buttonLabelHBox = new HBox();
         Label buttonLabel = new Label("Etiqueta del Botón:");
         buttonLabelTextField = new TextField("Button");
-        buttonLabelHBox.getChildren().addAll(buttonLabel,buttonLabelTextField);
+        buttonLabelHBox.getChildren().addAll(buttonLabel, buttonLabelTextField);
         buttonLabelHBox.setSpacing(20);
 
         HBox primaryHBox = new HBox();
@@ -63,6 +64,7 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
 
         this.finishSelectionButton.setOnAction(actionEvent -> this.finishingAction());
     }
+
     //private init(Color trueColor, Color falseColor, )
     public ToggleGroup getRadioGroup() {
         return radioGroup;
@@ -81,16 +83,7 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
     }
 
     @Override
-    protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),"bool",false,this.getLocalTags());
-        selectTagWindow.showAndWait();
-        if(!selectTagWindow.isCancelled()){
-            clearAll();
-            Tag tag = selectTagWindow.getSelectedTag();
-            if(tag!=null){
-                this.getAddedTags().add(tag);
-                textField.setText(textField.getText()+tag.getName());
-            }
-        }
+    protected void addTag() {
+        textField.setText(super.updateInputExpression(this.isInputMode(), "bool", false,textField.getText()));
     }
 }

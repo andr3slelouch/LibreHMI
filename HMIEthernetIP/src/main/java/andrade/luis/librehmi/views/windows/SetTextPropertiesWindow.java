@@ -16,6 +16,8 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.function.UnaryOperator;
 
+import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+
 public class SetTextPropertiesWindow extends Stage {
     protected final VBox vbox;
     private final RotationHBox rotationHBox;
@@ -76,14 +78,6 @@ public class SetTextPropertiesWindow extends Stage {
         Label fontSizeLabel = new Label("Tamaño de Fuente:");
         fontSizeField = new TextField("12.0");
         fontSizeField.setPrefWidth(195);
-        UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-            String newText = change.getControlNewText();
-            if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-                change.setText("");
-                change.setRange(change.getRangeStart(), change.getRangeStart());
-            }
-            return change;
-        };
         fontSizeField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
         HBox fontSizeHBox = new HBox(fontSizeLabel, fontSizeField);
         fontSizeHBox.setSpacing(12);

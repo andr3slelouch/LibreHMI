@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static javafx.geometry.Pos.CENTER;
 
@@ -52,6 +54,7 @@ public class LogInWindow extends Stage {
         signInHBox.setAlignment(CENTER);
         Button signInButton = new Button("Iniciar Sesión");
         signInButton.setOnAction(mouseEvent -> {
+            Logger logger = Logger.getLogger(this.getClass().getName());
             try {
                 HMIUser user = new HMIUser(usernameEmailField.getText(),passwordField.getText());
                 if(user.isUserLoggedIn()){
@@ -62,9 +65,10 @@ public class LogInWindow extends Stage {
                 }
             } catch (SQLException e) {
                 databaseConnectionFailed(e.getMessage());
-                e.printStackTrace();
+
+                logger.log(Level.INFO,e.getMessage());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.INFO,e.getMessage());
             }
         });
         signInHBox.getChildren().add(signInButton);

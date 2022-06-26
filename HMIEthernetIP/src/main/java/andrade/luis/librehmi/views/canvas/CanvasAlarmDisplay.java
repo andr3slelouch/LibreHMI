@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class CanvasAlarmDisplay extends CanvasObject {
     private static final String DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
@@ -168,20 +169,21 @@ public class CanvasAlarmDisplay extends CanvasObject {
     }
 
     private void addAcknowledgedAlarm(AlarmRow item){
-        this.alarmsTable.getItems().add(new AlarmRow(
+        AlarmRow alarmRow = new AlarmRow(
                 String.valueOf(this.alarmsTable.getItems().size() + 1),
                 item.getName(),
                 item.getExpression(),
                 DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(LocalDateTime.now()),
                 item.getType(),
-                item.getMaxValue(),
+                item.getStatus(),
+                ACKNOWLEDGED_STATE
+        );
+        alarmRow.setValues(item.getMaxValue(),
                 item.getHiHiValue(),
                 item.getMinValue(),
                 item.getLoLoValue(),
-                item.getValue(),
-                item.getStatus(),
-                ACKNOWLEDGED_STATE
-        ));
+                item.getValue());
+        this.alarmsTable.getItems().add(alarmRow);
         for (int i = 0; i < CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().size(); i++) {
             if (item.getName().equals(CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().get(i).getName())) {
                 CanvasAlarmDisplay.this.getHmiApp().getProjectAlarms().get(i).setAcknowledgement(ACKNOWLEDGED_STATE);
@@ -219,7 +221,7 @@ public class CanvasAlarmDisplay extends CanvasObject {
                 addTableItem(alarm);
             }
         } catch (SQLException | CompileException | IOException | InvocationTargetException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
     }
 
@@ -267,14 +269,14 @@ public class CanvasAlarmDisplay extends CanvasObject {
                 tableItem.getExpression().getExpressionToEvaluate(),
                 tableItem.getAlarmExecutionDateTime() != null ? tableItem.getAlarmExecutionDateTime() : "-",
                 tableItem.getType(),
-                tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
-                tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",
-                tableItem.getLowLimit() != null ? String.valueOf(tableItem.getLowLimit()) : "-",
-                tableItem.getLoloLimit() != null ? String.valueOf(tableItem.getLoloLimit()) : "-",
-                tableItem.getValue(),
                 tableItem.getStatus(),
                 tableItem.getAcknowledgement()
         );
+        updatedAlarm.setValues(tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
+                tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",
+                tableItem.getLowLimit() != null ? String.valueOf(tableItem.getLowLimit()) : "-",
+                tableItem.getLoloLimit() != null ? String.valueOf(tableItem.getLoloLimit()) : "-",
+                tableItem.getValue());
         this.alarmsTable.getItems().set(index, updatedAlarm);
     }
 
@@ -286,21 +288,21 @@ public class CanvasAlarmDisplay extends CanvasObject {
     }
 
     public void addTableItem(Alarm tableItem) {
-        this.alarmsTable.getItems().add(
-                new AlarmRow(
-                        String.valueOf(this.alarmsTable.getItems().size() + 1),
-                        tableItem.getName(),
-                        tableItem.getExpression().getExpressionToEvaluate(),
-                        tableItem.getAlarmExecutionDateTime() != null ? tableItem.getAlarmExecutionDateTime() : "-",
-                        tableItem.getType(),
-                        tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
-                        tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",
-                        tableItem.getLowLimit() != null ? String.valueOf(tableItem.getLowLimit()) : "-",
-                        tableItem.getLoloLimit() != null ? String.valueOf(tableItem.getLoloLimit()) : "-",
-                        tableItem.getValue(),
-                        tableItem.getStatus(),
-                        tableItem.getAcknowledgement()
-                ));
+        AlarmRow alarmRow = new AlarmRow(
+                String.valueOf(this.alarmsTable.getItems().size() + 1),
+                tableItem.getName(),
+                tableItem.getExpression().getExpressionToEvaluate(),
+                tableItem.getAlarmExecutionDateTime() != null ? tableItem.getAlarmExecutionDateTime() : "-",
+                tableItem.getType(),
+                tableItem.getStatus(),
+                tableItem.getAcknowledgement()
+        );
+        alarmRow.setValues(tableItem.getHighLimit() != null ? String.valueOf(tableItem.getHighLimit()) : "-",
+                tableItem.getHiHiLimit() != null ? String.valueOf(tableItem.getHiHiLimit()) : "-",
+                tableItem.getLowLimit() != null ? String.valueOf(tableItem.getLowLimit()) : "-",
+                tableItem.getLoloLimit() != null ? String.valueOf(tableItem.getLoloLimit()) : "-",
+                tableItem.getValue());
+        this.alarmsTable.getItems().add(alarmRow);
     }
 
     public void setTableItems(ArrayList<Alarm> tableItems) {

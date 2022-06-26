@@ -39,19 +39,11 @@ public class DBConnection {
         return getWorkingDirectory() + File.separator + "LibreHMI.properties";
     }
 
-    public static void writePropertiesFile(String username, String password, String hostname, String port, boolean boilerFurnace, boolean conveyorBelts, boolean motorPumps, boolean others, boolean pipesValues, boolean tanks) throws IOException {
-        Properties properties = new Properties();
-
+    public static void writePropertiesFile(String username, String password, String hostname, String port, Properties properties) throws IOException {
         properties.setProperty("username", username);
         properties.setProperty("password", password);
         properties.setProperty("hostname", hostname);
         properties.setProperty("port", port);
-        properties.setProperty("BoilerFurnace", String.valueOf(boilerFurnace));
-        properties.setProperty("ConveyorBelts", String.valueOf(conveyorBelts));
-        properties.setProperty("MotorsPumps", String.valueOf(motorPumps));
-        properties.setProperty("Others", String.valueOf(others));
-        properties.setProperty("PipesValves", String.valueOf(pipesValues));
-        properties.setProperty("Tanks", String.valueOf(tanks));
 
         try (FileOutputStream out = new FileOutputStream(getPropertiesFileName())) {
             properties.store(out, "LibreHMI setProperties file");
@@ -59,6 +51,16 @@ public class DBConnection {
             throw new IOException(e);
         }
 
+    }
+
+    public static Properties prepareCategoriesProperties(boolean boilerFurnace, boolean conveyorBelts, boolean motorPumps, boolean others, boolean pipesValues, boolean tanks, Properties properties) {
+        properties.setProperty("BoilerFurnace", String.valueOf(boilerFurnace));
+        properties.setProperty("ConveyorBelts", String.valueOf(conveyorBelts));
+        properties.setProperty("MotorsPumps", String.valueOf(motorPumps));
+        properties.setProperty("Others", String.valueOf(others));
+        properties.setProperty("PipesValves", String.valueOf(pipesValues));
+        properties.setProperty("Tanks", String.valueOf(tanks));
+        return properties;
     }
 
     public static Properties readPropertiesFile() throws IOException {

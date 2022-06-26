@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class HMISymbolsTree {
 
+    public static final String NULL_STR = "<null>";
     @SerializedName("ConveyorBelts")
     @Expose
     private ArrayList<String> conveyorBelts = null;
@@ -99,27 +100,27 @@ public class HMISymbolsTree {
         sb.append(HMISymbolsTree.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("conveyorBelts");
         sb.append('=');
-        sb.append(((this.conveyorBelts == null)?"<null>":this.conveyorBelts));
+        sb.append(((this.conveyorBelts == null)? NULL_STR :this.conveyorBelts));
         sb.append(',');
         sb.append("tanks");
         sb.append('=');
-        sb.append(((this.tanks == null)?"<null>":this.tanks));
+        sb.append(((this.tanks == null)? NULL_STR :this.tanks));
         sb.append(',');
         sb.append("others");
         sb.append('=');
-        sb.append(((this.others == null)?"<null>":this.others));
+        sb.append(((this.others == null)? NULL_STR :this.others));
         sb.append(',');
         sb.append("motorsPumps");
         sb.append('=');
-        sb.append(((this.motorsPumps == null)?"<null>":this.motorsPumps));
+        sb.append(((this.motorsPumps == null)? NULL_STR :this.motorsPumps));
         sb.append(',');
         sb.append("boilerFurnace");
         sb.append('=');
-        sb.append(((this.boilerFurnace == null)?"<null>":this.boilerFurnace));
+        sb.append(((this.boilerFurnace == null)? NULL_STR :this.boilerFurnace));
         sb.append(',');
         sb.append("pipesValves");
         sb.append('=');
-        sb.append(((this.pipesValves == null)?"<null>":this.pipesValves));
+        sb.append(((this.pipesValves == null)? NULL_STR :this.pipesValves));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');

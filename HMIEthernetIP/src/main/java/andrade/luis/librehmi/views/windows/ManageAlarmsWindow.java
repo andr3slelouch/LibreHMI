@@ -120,17 +120,13 @@ public class ManageAlarmsWindow extends Stage {
         int index = hmiApp.getIndexForAlarm(alarm.getName());
         Alarm updatedAlarm = new Alarm(
                 setAlarmWindow.getLocalExpression(),
-                Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
-                Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
-                Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
-                Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
-                setAlarmWindow.getHighLimitCheckBox().isSelected(),
-                setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
-                setAlarmWindow.getLowLimitCheckBox().isSelected(),
-                setAlarmWindow.getLoloLimitCheckBox().isSelected(),
                 setAlarmWindow.getAlarmNameTF().getText(),
                 setAlarmWindow.getAlarmCommentTF().getText()
         );
+        updatedAlarm.setHighLimit(Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),setAlarmWindow.getHighLimitCheckBox().isSelected());
+        updatedAlarm.setHiHiLimit(Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),setAlarmWindow.getHiHiLimitCheckBox().isSelected());
+        updatedAlarm.setLowLimit(Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),setAlarmWindow.getLowLimitCheckBox().isSelected());
+        updatedAlarm.setLoloLimit(Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),setAlarmWindow.getLoloLimitCheckBox().isSelected());
         if(index >= 0){
             alarmsList.set(index,updatedAlarm);
             ManageAlarmsWindow.this.canvasAlarmDisplay.updateTableItem(alarm.getName(),updatedAlarm);
@@ -144,17 +140,13 @@ public class ManageAlarmsWindow extends Stage {
             if(setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")){
                 Alarm alarm = new Alarm(
                         setAlarmWindow.getLocalExpression(),
-                        Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),
-                        Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),
-                        Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),
-                        Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),
-                        setAlarmWindow.getHighLimitCheckBox().isSelected(),
-                        setAlarmWindow.getHiHiLimitCheckBox().isSelected(),
-                        setAlarmWindow.getLowLimitCheckBox().isSelected(),
-                        setAlarmWindow.getLoloLimitCheckBox().isSelected(),
                         setAlarmWindow.getAlarmNameTF().getText(),
                         setAlarmWindow.getAlarmCommentTF().getText()
                 );
+                alarm.setHighLimit(Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),setAlarmWindow.getHighLimitCheckBox().isSelected());
+                alarm.setHiHiLimit(Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),setAlarmWindow.getHiHiLimitCheckBox().isSelected());
+                alarm.setLowLimit(Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),setAlarmWindow.getLowLimitCheckBox().isSelected());
+                alarm.setLoloLimit(Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),setAlarmWindow.getLoloLimitCheckBox().isSelected());
                 ManageAlarmsWindow.this.alarmsList.add(alarm);
                 this.canvasAlarmDisplay.addTableItem(alarm);
                 this.hmiApp.setWasModified(true);

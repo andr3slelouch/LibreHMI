@@ -91,7 +91,7 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
         horizontalRadioButton.setToggleGroup(radioGroup);
         verticalRadioButton.setToggleGroup(radioGroup);
         HBox radioButtons = new HBox();
-        radioButtons.getChildren().addAll(horizontalRadioButton,verticalRadioButton);
+        radioButtons.getChildren().addAll(horizontalRadioButton, verticalRadioButton);
         radioButtons.setSpacing(5);
 
         this.getFloatPrecisionHBox().setSpacing(91);
@@ -115,16 +115,8 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
 
     @Override
     protected void addTag() {
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(), "numbers", false,this.getLocalTags());
-        selectTagWindow.showAndWait();
-        if (!selectTagWindow.isCancelled()) {
-            clearAll();
-            Tag tag = selectTagWindow.getSelectedTag();
-            if (tag != null) {
-                this.getAddedTags().add(tag);
-                textField.setText(textField.getText() + tag.getName());
-            }
-        }
+        textField.setText(super.updateInputExpression(this.isInputMode(), "numbers", false,textField.getText()));
+
     }
 
     public CanvasOrientation getSelectedOrientation() {

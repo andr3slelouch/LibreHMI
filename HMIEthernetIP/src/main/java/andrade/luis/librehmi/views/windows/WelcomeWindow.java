@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WelcomeWindow extends Stage {
     HMIApp hmiApp;
@@ -71,7 +73,8 @@ public class WelcomeWindow extends Stage {
             recentUsedFilesData = gson.fromJson(bufferedReader, RecentUsedFilesData.class);
             stringList.addAll(recentUsedFilesData.getRecentlyUsedFilePaths());
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(this.getClass().getName());
+            logger.log(Level.INFO,e.getMessage());
         }
 
         observableList.setAll(stringList);
@@ -98,7 +101,8 @@ public class WelcomeWindow extends Stage {
                 try {
                     this.hmiApp.setHMIStage(null,"Editar");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Logger logger = Logger.getLogger(this.getClass().getName());
+                    logger.log(Level.INFO,e.getMessage());
                 }
             }
         });
@@ -107,7 +111,8 @@ public class WelcomeWindow extends Stage {
                 try {
                     this.hmiApp.setHMIStage("","Default");
                 }  catch (IOException e) {
-                    e.printStackTrace();
+                    Logger logger = Logger.getLogger(this.getClass().getName());
+                    logger.log(Level.INFO,e.getMessage());
                 }
             }
         });

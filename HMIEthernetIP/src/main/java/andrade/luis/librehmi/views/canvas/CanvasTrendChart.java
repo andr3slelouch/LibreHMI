@@ -88,15 +88,15 @@ public class CanvasTrendChart extends CanvasObject {
 
     public CanvasTrendChart(CanvasPoint positionCanvasPoint, ArrayList<TrendChartSerieData> trendChartSerieDataArrayList, double width, double height,double rotation) {
         super(positionCanvasPoint);
-        setData(trendChartSerieDataArrayList,this.getCanvasObjectData().getPosition().getX(),this.getCanvasObjectData().getPosition().getY(),width,height,rotation);
+        setData(trendChartSerieDataArrayList,width,height,rotation);
     }
     public CanvasTrendChart(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
         ArrayList<TrendChartSerieData> trendChartSerieDataArrayListLocal = new ArrayList<>(Arrays.asList(this.getCanvasObjectData().getTrendChartSerieDataArr()));
-        setData(trendChartSerieDataArrayListLocal,getCanvasObjectData().getPosition().getX(),getCanvasObjectData().getPosition().getY(), getCanvasObjectData().getWidth(),getCanvasObjectData().getHeight(),getCanvasObjectData().getRotation());
+        setData(trendChartSerieDataArrayListLocal, getCanvasObjectData().getWidth(),getCanvasObjectData().getHeight(),getCanvasObjectData().getRotation());
     }
 
-    public void setData(ArrayList<TrendChartSerieData> trendChartSerieDataArrayList,double x, double y, double width, double height, double rotation){
+    public void setData(ArrayList<TrendChartSerieData> trendChartSerieDataArrayList, double width, double height, double rotation){
 
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Tiempo");
@@ -305,7 +305,7 @@ public class CanvasTrendChart extends CanvasObject {
             try (CSVWriter writer = new CSVWriter(new FileWriter(file.getAbsolutePath()))) {
                 writer.writeAll(dataToExport);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.INFO,e.getMessage());
             }
         }
 
@@ -331,8 +331,6 @@ public class CanvasTrendChart extends CanvasObject {
         if(!setTrendChartPropertiesWindow.isCanceled()){
             this.setData(
                     setTrendChartPropertiesWindow.getTrendChartSerieDataArrayList(),
-                    this.getCanvasObjectData().getPosition().getX(),
-                    this.getCanvasObjectData().getPosition().getY(),
                     Double.parseDouble(setTrendChartPropertiesWindow.getSizeVBox().getWidthField().getText()),
                     Double.parseDouble(setTrendChartPropertiesWindow.getSizeVBox().getHeightField().getText()),
                     Double.parseDouble(setTrendChartPropertiesWindow.getRotationHBox().getRotationTextField().getText())
@@ -364,10 +362,8 @@ public class CanvasTrendChart extends CanvasObject {
             XYChart.Series<String, Number> serie = lineChart.getData().get(i);
             String colorString = "";
             for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
-                if(trendChartSerieData!=null){
-                    if (serie.getName().equals(trendChartSerieData.getSerieDataName())) {
-                        colorString = trendChartSerieData.getColor().toHexString();
-                    }
+                if (trendChartSerieData != null && serie.getName().equals(trendChartSerieData.getSerieDataName())) {
+                    colorString = trendChartSerieData.getColor().toHexString();
                 }
             }
             serie.getNode().setStyle("-fx-stroke: " + colorString + ";");
@@ -466,7 +462,7 @@ public class CanvasTrendChart extends CanvasObject {
         try {
             startD = dateFormat.parse(dateFormatString);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
         if (startD == null) {
             return null;
@@ -503,21 +499,19 @@ public class CanvasTrendChart extends CanvasObject {
     }
 
     private void updateTrendChartSerieData(TrendChartSerieData trendChartSerieData, int index, LocalDateTime now){
-        if(trendChartSerieData!=null){
-            if (lineChartSeries.get(index).getName().equals(trendChartSerieData.getSerieDataName())) {
-                try {
-                    lineChartSeries.get(index).getData().add(new LineChart.Data<>(dtf.format(now), (double) trendChartSerieData.getExpression().evaluate()));
-                    lineChartSeriesToExport.get(index).getData().add(new LineChart.Data<>(now, (double) trendChartSerieData.getExpression().evaluate()));
-                } catch (CompileException | InvocationTargetException | SQLException |
-                         IOException e) {
-                    e.printStackTrace();
-                }
+        if (trendChartSerieData != null && lineChartSeries.get(index).getName().equals(trendChartSerieData.getSerieDataName())) {
+            try {
+                lineChartSeries.get(index).getData().add(new LineChart.Data<>(dtf.format(now), (double) trendChartSerieData.getExpression().evaluate()));
+                lineChartSeriesToExport.get(index).getData().add(new LineChart.Data<>(now, (double) trendChartSerieData.getExpression().evaluate()));
+            } catch (CompileException | InvocationTargetException | SQLException |
+                     IOException e) {
+                logger.log(Level.INFO, e.getMessage());
             }
         }
     }
     @Override
-    public void updateTag(Tag tag,boolean forceUpdate){
-        super.updateTag(tag,forceUpdate);
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
         if(trendTimeline != null){
             for (TrendChartSerieData trendChartSerieData : trendChartSerieDataArrayList) {
                 ArrayList<Tag> parameters = trendChartSerieData.getExpression().getParameters();

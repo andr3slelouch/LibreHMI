@@ -16,9 +16,11 @@ import javafx.util.converter.IntegerStringConverter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static andrade.luis.librehmi.controllers.TextFormatters.integerFilter;
+import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
 
 public class ManageLocalTagWindow extends Stage {
 
@@ -54,25 +56,8 @@ public class ManageLocalTagWindow extends Stage {
     private final HBox booleanConditionsHBox;
     private final HBox doubleLimitHBox;
     Logger logger = Logger.getLogger(this.getClass().getName());
-    private final UnaryOperator<TextFormatter.Change> integerFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+$")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        return change;
-    };
 
-    private final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        return change;
-    };
-
-    public ManageLocalTagWindow(Tag localTag) {
+    public ManageLocalTagWindow(Tag localTag) throws SQLException, IOException {
         StackPane root = new StackPane();
 
         Label firstNameLabel = new Label("Nombre:");
@@ -156,12 +141,16 @@ public class ManageLocalTagWindow extends Stage {
 
         root.getChildren().add(vbox);
         
-        initUI(localTag);
+        try{
+            initUI(localTag);
+        }catch (Exception e){
+            logger.log(Level.INFO,e.getMessage());
+        }
 
         this.setScene(new Scene(root, 250, 200));
     }
     
-    private void initUI(Tag localTag){
+    private void initUI(Tag localTag) throws IOException, SQLException {
         if (localTag != null) {
             this.tag = localTag;
             this.setTitle("Actualizar Tag");
@@ -198,8 +187,10 @@ public class ManageLocalTagWindow extends Stage {
                         break;
 
                 }
-            } catch (SQLException | IOException e) {
-                throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new SQLException(e);
+            } catch (IOException e){
+                throw new IOException(e);
             }
         } else {
             this.setTitle("Creación de Tag");

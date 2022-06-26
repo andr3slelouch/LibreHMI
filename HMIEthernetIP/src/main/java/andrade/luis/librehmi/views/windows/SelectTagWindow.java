@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
@@ -82,16 +84,17 @@ public class SelectTagWindow extends Stage {
 
         if (localTags != null) {
             for (Tag localTag : localTags) {
-                existingTagsObsList.add(new TagRow(
+                TagRow row = new TagRow(
                         localTag.getPlcName(),
                         localTag.getPlcAddress(),
                         localTag.getPlcDeviceGroup(),
                         localTag.getName(),
                         localTag.getType(),
                         localTag.getAddress(),
-                        localTag.getAction(),
-                        localTag.getValue()
-                ));
+                        localTag.getAction()
+                );
+                row.setTagValue(localTag.getValue());
+                existingTagsObsList.add(row);
             }
         }
         if (existingTagsObsList.isEmpty() || testMode) {
@@ -161,7 +164,12 @@ public class SelectTagWindow extends Stage {
         MenuItem newItem = new MenuItem();
         newItem.setText("Nuevo");
         newItem.setOnAction(event -> {
-            ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(null);
+            ManageLocalTagWindow manageLocalTagWindow = null;
+            try {
+                manageLocalTagWindow = new ManageLocalTagWindow(null);
+            } catch (SQLException | IOException e) {
+                log(e);
+            }
             manageLocalTagWindow.showAndWait();
             if (manageLocalTagWindow.getTag() != null) {
                 localTags.add(manageLocalTagWindow.getTag());
@@ -174,7 +182,12 @@ public class SelectTagWindow extends Stage {
         MenuItem saveItem = new MenuItem();
         saveItem.setText("Editar");
         saveItem.setOnAction(event -> {
-            ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(row.generateTag());
+            ManageLocalTagWindow manageLocalTagWindow = null;
+            try {
+                manageLocalTagWindow = new ManageLocalTagWindow(row.generateTag());
+            } catch (SQLException | IOException e) {
+                log(e);
+            }
             manageLocalTagWindow.showAndWait();
             if (manageLocalTagWindow.getTag() != null) {
                 localTags.set(index, manageLocalTagWindow.getTag());
@@ -214,7 +227,7 @@ public class SelectTagWindow extends Stage {
         try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
             readTags(con, data, query);
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            log(e);
         }
         return data;
     }
@@ -223,19 +236,25 @@ public class SelectTagWindow extends Stage {
         try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
-                data.add(new TagRow(
+                TagRow row = new TagRow(
                         resultSet.getString("plcNombre"),
                         resultSet.getString("direccionIP"),
                         resultSet.getString("deviceGroup"),
                         resultSet.getString("nombreTag"),
                         resultSet.getString("tipoTag"),
                         resultSet.getString("tag"),
-                        resultSet.getString("accion"),
-                        ""));
+                        resultSet.getString("accion"));
+                row.setTagValue("");
+                data.add(row);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log(e);
         }
+    }
+
+    private void log(Exception e) {
+        Logger logger = Logger.getLogger(this.getClass().getName());
+        logger.log(Level.INFO, e.getMessage());
     }
 
     public void setSelectedTag() {

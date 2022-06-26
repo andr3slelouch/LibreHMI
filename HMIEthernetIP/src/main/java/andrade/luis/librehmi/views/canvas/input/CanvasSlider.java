@@ -20,8 +20,18 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CanvasSlider extends CanvasObject {
+    public Slider getSlider() {
+        return slider;
+    }
+
+    public void setSlider(Slider slider) {
+        this.slider = slider;
+    }
+
     private Slider slider;
     private Timeline timeline;
 
@@ -39,36 +49,23 @@ public class CanvasSlider extends CanvasObject {
 
     public CanvasSlider(CanvasObjectData canvasObjectData) throws SQLException, IOException {
         super(canvasObjectData);
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue(), this.getCanvasObjectData().getMinorTickValue(), this.getCanvasObjectData().getMajorTickValue(), this.getCanvasObjectData().isSnapHandleToTick(), this.getCanvasObjectData().isShowingTicks(), this.getCanvasObjectData().isShowingLabelsTicks(),this.getCanvasObjectData().getRotation(),this.getCanvasObjectData().getOrientation());
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getRotation(),this.getCanvasObjectData().getOrientation());
+        setSliderProperties(this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue(), this.getCanvasObjectData().getMinorTickValue(), this.getCanvasObjectData().getMajorTickValue(), this.getCanvasObjectData().isSnapHandleToTick(), this.getCanvasObjectData().isShowingTicks(), this.getCanvasObjectData().isShowingLabelsTicks());
     }
 
-    public CanvasSlider(CanvasPoint center, double width, double height,Tag linkedTag, double minValue, double maxValue, double minorTickValue, double majorTickValue, boolean snapHandleToTick, boolean showTicks, boolean showLabelsTicks,double rotation, CanvasOrientation orientation) throws SQLException, IOException {
+    public CanvasSlider(CanvasPoint center, double width, double height,Tag linkedTag,double rotation, CanvasOrientation orientation) throws SQLException, IOException {
         super(center);
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), width,height, linkedTag, minValue, maxValue, minorTickValue, majorTickValue, snapHandleToTick, showTicks, showLabelsTicks,rotation,orientation);
+        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), width,height, linkedTag,rotation,orientation);
     }
 
-    public void setData(double x, double y, double width, double height, Tag linkedTag, double minValue, double maxValue, double minorTickValue, double majorTickValue, boolean snapHandleToTick, boolean showTicks, boolean showLabelsTicks, double rotation, CanvasOrientation orientation) throws SQLException, IOException {
+    public void setData(double x, double y, double width, double height, Tag linkedTag, double rotation, CanvasOrientation orientation) throws SQLException, IOException {
         this.slider = new Slider();
         this.getCanvasObjectData().setPosition(new CanvasPoint(x,y));
-        slider.setMin(minValue);
-        slider.setMax(maxValue);
-        slider.setShowTickLabels(showLabelsTicks);
-        slider.setShowTickMarks(showTicks);
-        slider.setMajorTickUnit(majorTickValue);
-        slider.setMinorTickCount((int) minorTickValue);
-        slider.setSnapToTicks(snapHandleToTick);
         this.slider.setDisable(true);
         this.slider.setPrefWidth(width);
         this.slider.setPrefHeight(height);
         this.getCanvasObjectData().setWidth(width);
         this.getCanvasObjectData().setHeight(height);
-        this.getCanvasObjectData().setMaxValue(maxValue);
-        this.getCanvasObjectData().setMinValue(minValue);
-        this.getCanvasObjectData().setMinorTickValue(minorTickValue);
-        this.getCanvasObjectData().setMajorTickValue(majorTickValue);
-        this.getCanvasObjectData().setSnapHandleToTick(snapHandleToTick);
-        this.getCanvasObjectData().setShowingTicks(showTicks);
-        this.getCanvasObjectData().setShowingLabelsTicks(showLabelsTicks);
         this.getCanvasObjectData().setTag(linkedTag);
         this.getCanvasObjectData().setType("Slider");
         this.getCanvasObjectData().setDataType("Slider");
@@ -83,24 +80,7 @@ public class CanvasSlider extends CanvasObject {
             } else {
                 this.getCanvasObjectData().setData(String.valueOf(newValue));
             }
-            if (linkedTag != null && timeline != null) {
-                linkedTag.setValue(this.getCanvasObjectData().getData());
-                try {
-                    timeline.pause();
-                    this.setLastTimeSelected();
-                    if (!linkedTag.update()) {
-                        this.errorLabel = new Label("Error en Tag de Escritura");
-                        this.setTop(errorLabel);
-                    } else {
-                        this.setTop(null);
-                    }
-                    timeline.play();
-                } catch (SQLException | IOException e) {
-                    e.printStackTrace();
-                    this.errorLabel = new Label("Error en Tag de Escritura");
-                    this.setTop(errorLabel);
-                }
-            }
+            updateTimeline(linkedTag,timeline);
         });
         if (linkedTag != null) {
             linkedTag.read();
@@ -109,6 +89,23 @@ public class CanvasSlider extends CanvasObject {
         }
         this.setRotate(rotation);
         this.slider.setOrientation(getOrientation(orientation));
+    }
+
+    public void setSliderProperties(double minValue, double maxValue, double minorTickValue, double majorTickValue, boolean snapHandleToTick, boolean showTicks, boolean showLabelsTicks){
+        slider.setMin(minValue);
+        slider.setMax(maxValue);
+        slider.setShowTickLabels(showLabelsTicks);
+        slider.setShowTickMarks(showTicks);
+        slider.setMajorTickUnit(majorTickValue);
+        slider.setMinorTickCount((int) minorTickValue);
+        slider.setSnapToTicks(snapHandleToTick);
+        this.getCanvasObjectData().setMaxValue(maxValue);
+        this.getCanvasObjectData().setMinValue(minValue);
+        this.getCanvasObjectData().setMinorTickValue(minorTickValue);
+        this.getCanvasObjectData().setMajorTickValue(majorTickValue);
+        this.getCanvasObjectData().setSnapHandleToTick(snapHandleToTick);
+        this.getCanvasObjectData().setShowingTicks(showTicks);
+        this.getCanvasObjectData().setShowingLabelsTicks(showLabelsTicks);
     }
 
     private Orientation getOrientation(CanvasOrientation orientation) {
@@ -155,9 +152,11 @@ public class CanvasSlider extends CanvasObject {
         this.getCanvasObjectData().setRotation(rotation);
         this.getCanvasObjectData().setOrientation(setSliderPropertiesWindow.getSelectedOrientation());
         try {
-            setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(),this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), setSliderPropertiesWindow.getLocalExpression().getParameters().get(0),minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks,this.getCanvasObjectData().getRotation(),this.getCanvasObjectData().getOrientation());
+            setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(),this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), setSliderPropertiesWindow.getLocalExpression().getParameters().get(0),this.getCanvasObjectData().getRotation(),this.getCanvasObjectData().getOrientation());
+            this.setSliderProperties(minValue,maxValue,minorTickValue,majorTickValue,snapHandleToTick,showTicks,showLabelsTicks);
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(this.getClass().getName());
+            logger.log(Level.INFO,e.getMessage());
         }
         this.getHmiApp().setWasModified(true);
     }
@@ -199,7 +198,8 @@ public class CanvasSlider extends CanvasObject {
                                     evaluatedValue = Double.parseDouble(value);
                                 }
                             } catch (IOException | SQLException e) {
-                                e.printStackTrace();
+                                Logger logger = Logger.getLogger(this.getClass().getName());
+                                logger.log(Level.INFO,e.getMessage());
                             }
                             this.slider.setValue(evaluatedValue);
                         }), new KeyFrame(Duration.seconds(5)));
@@ -207,10 +207,9 @@ public class CanvasSlider extends CanvasObject {
         timeline.play();
     }
 
-    @Override
-    public void updateTag(Tag tag,boolean forceUpdate){
+    public void updateInputTag(Tag tag, boolean forceUpdate){
         int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
-        super.updateTag(tag,forceUpdate);
+        super.updateTag(tag);
         if(this.getCanvasObjectData().getTag().compareToTag(tag)){
             this.getCanvasObjectData().setTag(tag);
             this.getCanvasObjectData().getTag().setFloatPrecision(floatPrecision);

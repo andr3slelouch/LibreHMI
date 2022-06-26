@@ -1,5 +1,6 @@
 package andrade.luis.librehmi.views.canvas.input;
 
+import andrade.luis.librehmi.controllers.TextFormatters;
 import andrade.luis.librehmi.views.canvas.CanvasColor;
 import andrade.luis.librehmi.models.CanvasObjectData;
 import andrade.luis.librehmi.models.Tag;
@@ -28,6 +29,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CanvasTextField extends CanvasObject {
     private TextField textField;
@@ -51,51 +54,21 @@ public class CanvasTextField extends CanvasObject {
 
     private HMIUser user;
 
-    private final UnaryOperator<TextFormatter.Change> integerFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+$")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        return change;
-    };
-
-    private final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        return change;
-    };
-
-    private final UnaryOperator<TextFormatter.Change> booleanFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("(\\b0\\b)|(\\b1\\b)|(\\b00\\b)|(\\b01\\b)|")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        if (!change.getText().isEmpty()) {
-            change.setText(String.valueOf(Integer.valueOf(change.getText())));
-        }
-        return change;
-    };
-
     public CanvasTextField(CanvasPoint center, Tag linkedTag, double minValue, double maxValue, String type) {
         super(center);
         this.getCanvasObjectData().setType("TextField");
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 50, linkedTag, minValue, maxValue,type);
+        setData( 150, 50, linkedTag, minValue, maxValue,type);
         setNewMenuItem();
     }
 
     public CanvasTextField(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("TextField");
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue(),this.getCanvasObjectData().getType());
+        setData(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue(),this.getCanvasObjectData().getType());
         setNewMenuItem();
     }
 
-    private void setData(double x, double y, double width, double height, Tag linkedTag, double minValue, double maxValue, String type) {
+    private void setData(double width, double height, Tag linkedTag, double minValue, double maxValue, String type) {
         this.linkedTag = linkedTag;
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -109,13 +82,13 @@ public class CanvasTextField extends CanvasObject {
         initTextField(width,height);
         switch (type) {
             case ENTERO_STR:
-                this.textField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), (int) (minValue + 1), integerFilter));
+                this.textField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), (int) (minValue + 1), TextFormatters.integerFilter));
                 break;
             case FLOTANTE_STR:
-                this.textField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
+                this.textField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, TextFormatters.numberFilter));
                 break;
             case "Bool":
-                this.textField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, booleanFilter));
+                this.textField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, TextFormatters.booleanFilter));
                 break;
             default:
                 this.textField.setTextFormatter(null);
@@ -157,7 +130,7 @@ public class CanvasTextField extends CanvasObject {
             }else{
                 this.getCanvasObjectData().setData(newValue);
             }
-            setTextFieldUpdater();
+            updateTimeline(linkedTag,timeline);
 
         });
         this.textField.setDisable(true);
@@ -165,26 +138,6 @@ public class CanvasTextField extends CanvasObject {
         this.textField.setPrefHeight(height);
     }
 
-    private void setTextFieldUpdater(){
-        if (linkedTag != null && timeline!=null) {
-            linkedTag.setValue(this.getCanvasObjectData().getData());
-            try {
-                timeline.pause();
-                this.setLastTimeSelected();
-                if (!linkedTag.update()) {
-                    this.errorLabel = new Label("Error en Tag de Escritura");
-                    this.setTop(errorLabel);
-                } else {
-                    this.setTop(null);
-                }
-                timeline.play();
-            } catch (SQLException | IOException e) {
-                e.printStackTrace();
-                this.errorLabel = new Label("Error en Tag de Escritura");
-                this.setTop(errorLabel);
-            }
-        }
-    }
     public void setNewMenuItem() {
         MenuItem editMI = new MenuItem("Editar");
         editMI.setId("#editMI");
@@ -204,7 +157,7 @@ public class CanvasTextField extends CanvasObject {
         setTagInputPropertiesWindow.getTextField().setText(this.getCanvasObjectData().getTag().getName());
         setTagInputPropertiesWindow.getFloatPrecisionTextField().setText(String.valueOf(this.getCanvasObjectData().getTag().getFloatPrecision()));
         setTagInputPropertiesWindow.showAndWait();
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), setTagInputPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTagInputPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTagInputPropertiesWindow.getMaxValueField().getText()), setTagInputPropertiesWindow.getType());
+        setData(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), setTagInputPropertiesWindow.getLocalExpression().getParameters().get(0), Double.parseDouble(setTagInputPropertiesWindow.getMinValueField().getText()), Double.parseDouble(setTagInputPropertiesWindow.getMaxValueField().getText()), setTagInputPropertiesWindow.getType());
         this.getHmiApp().setWasModified(true);
     }
 
@@ -293,7 +246,8 @@ public class CanvasTextField extends CanvasObject {
                                         break;
                                 }
                             } catch (IOException | SQLException e) {
-                                e.printStackTrace();
+                                Logger logger = Logger.getLogger(this.getClass().getName());
+                                logger.log(Level.INFO,e.getMessage());
                             }
                             this.textField.setText(evaluatedValue);
                         }), new KeyFrame(Duration.seconds(5)));
@@ -301,10 +255,9 @@ public class CanvasTextField extends CanvasObject {
         timeline.play();
     }
 
-    @Override
-    public void updateTag(Tag tag,boolean forceUpdate){
+    public void updateInputTag(Tag tag,boolean forceUpdate){
         int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
-        super.updateTag(tag,forceUpdate);
+        super.updateTag(tag);
         if(this.getCanvasObjectData().getTag().compareToTag(tag)){
             this.getCanvasObjectData().setTag(tag);
             this.getCanvasObjectData().getTag().setFloatPrecision(floatPrecision);

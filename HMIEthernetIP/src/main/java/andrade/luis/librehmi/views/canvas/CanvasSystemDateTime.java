@@ -51,23 +51,10 @@ public class CanvasSystemDateTime extends CanvasLabel {
         propertiesWindow.getColorPicker().setValue((Color) this.getLabel().getTextFill());
         propertiesWindow.getDateTimeField().setText(this.getCanvasObjectData().getData());
         propertiesWindow.showAndWait();
-        this.getLabel().setFont(
-                Font.font(
-                        propertiesWindow.getFontFamilyComboBox().getValue(),
-                        propertiesWindow.getFontStyle(),
-                        Double.parseDouble(propertiesWindow.getFontSizeField().getText()
-                        )
-                )
-        );
-        this.getLabel().setTextFill(propertiesWindow.getColorPicker().getValue());
         double rotation = Double.parseDouble(propertiesWindow.getRotationTextField().getText());
-        this.setRotate(rotation);
-        this.getCanvasObjectData().setRotation(rotation);
-        this.getCanvasObjectData().setFontColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
-        this.getCanvasObjectData().setFontStyle(propertiesWindow.getFontStyle().name());
-        this.getCanvasObjectData().setFontFamily(propertiesWindow.getFontFamilyComboBox().getValue());
-        this.getCanvasObjectData().setFontSize(Double.parseDouble(propertiesWindow.getFontSizeField().getText()));
+        double fontSize = Double.parseDouble(propertiesWindow.getFontSizeField().getText());
         this.getCanvasObjectData().setData(propertiesWindow.getDateTimeField().getText());
+        this.setProperties(rotation,new CanvasColor(propertiesWindow.getColorPicker().getValue()),propertiesWindow.getFontStyle(),propertiesWindow.getFontFamilyComboBox().getValue(),fontSize);
         this.getHmiApp().setWasModified(true);
     }
 

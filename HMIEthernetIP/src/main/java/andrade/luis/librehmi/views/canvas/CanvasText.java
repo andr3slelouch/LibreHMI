@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class CanvasText extends CanvasLabel {
     private String text;
@@ -92,22 +93,9 @@ public class CanvasText extends CanvasLabel {
         propertiesWindow.getRotationTextField().setText(String.valueOf(this.getCanvasObjectData().getRotation()));
         propertiesWindow.getColorPicker().setValue((Color) this.getLabel().getTextFill());
         propertiesWindow.showAndWait();
-        this.getLabel().setFont(
-                Font.font(
-                        propertiesWindow.getFontFamilyComboBox().getValue(),
-                        propertiesWindow.getFontStyle(),
-                        Double.parseDouble(propertiesWindow.getFontSizeField().getText()
-                        )
-                )
-        );
-        this.getLabel().setTextFill(propertiesWindow.getColorPicker().getValue());
         double rotation = Double.parseDouble(propertiesWindow.getRotationTextField().getText());
-        this.setRotate(rotation);
-        this.getCanvasObjectData().setRotation(rotation);
-        this.getCanvasObjectData().setFontColor(new CanvasColor(propertiesWindow.getColorPicker().getValue()));
-        this.getCanvasObjectData().setFontStyle(propertiesWindow.getFontStyle().name());
-        this.getCanvasObjectData().setFontFamily(propertiesWindow.getFontFamilyComboBox().getValue());
-        this.getCanvasObjectData().setFontSize(Double.parseDouble(propertiesWindow.getFontSizeField().getText()));
+        double fontSize = Double.parseDouble(propertiesWindow.getFontSizeField().getText());
+        this.setProperties(rotation,new CanvasColor(propertiesWindow.getColorPicker().getValue()),propertiesWindow.getFontStyle(),propertiesWindow.getFontFamilyComboBox().getValue(),fontSize);
         this.getHmiApp().setWasModified(true);
     }
 
@@ -141,7 +129,7 @@ public class CanvasText extends CanvasLabel {
                 errorAlert.setContentText("Error al agregar la expresión, reintente");
                 errorAlert.showAndWait();
                 setExpression();
-                e.printStackTrace();
+                logger.log(Level.INFO,e.getMessage());
             }
         }
     }
@@ -182,7 +170,7 @@ public class CanvasText extends CanvasLabel {
                             } catch (CompileException | InvocationTargetException | NullPointerException | SQLException | IOException e) {
                                 this.errorLabel = new Label("Error en Tag de Lectura");
                                 this.setTop(this.errorLabel);
-                                e.printStackTrace();
+                                logger.log(Level.INFO,e.getMessage());
                             }
                             this.text = evaluatedValue;
                             this.getLabel().setText(this.text);
@@ -194,8 +182,8 @@ public class CanvasText extends CanvasLabel {
     }
 
     @Override
-    public void updateTag(Tag tag,boolean forceUpdate){
-        super.updateTag(tag,forceUpdate);
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
         if(timeline != null){
             ArrayList<Tag> parameters = this.getCanvasObjectData().getExpression().getParameters();
             for(int i=0;i<parameters.size();i++){

@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 
 import static javafx.geometry.Pos.CENTER;
@@ -164,7 +165,7 @@ public class CanvasRectangle extends CanvasObject {
             errorAlert.setContentText("Error al agregar la expresión, reintente");
             errorAlert.showAndWait();
             setPercentFill();
-            e.printStackTrace();
+            logger.log(Level.INFO,e.getMessage());
         }
     }
 
@@ -292,7 +293,7 @@ public class CanvasRectangle extends CanvasObject {
                             } catch (CompileException | InvocationTargetException | SQLException | IOException | NullPointerException e) {
                                 this.errorLabel = new Label("Error en Tag de Relleno");
                                 this.setTop(this.errorLabel);
-                                e.printStackTrace();
+                                logger.log(Level.INFO,e.getMessage());
                             }
                         }), new KeyFrame(Duration.seconds(this.getCanvasObjectData().getSamplingTime())));
         this.refillRectangleTimeline.setCycleCount(Animation.INDEFINITE);
@@ -333,8 +334,8 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
     @Override
-    public void updateTag(Tag tag,boolean forceUpdate){
-        super.updateTag(tag,forceUpdate);
+    public void updateTag(Tag tag){
+        super.updateTag(tag);
         if(refillRectangleTimeline != null){
             ArrayList<Tag> parameters = this.getCanvasObjectData().getExpression().getParameters();
             for(int i=0;i<parameters.size();i++){

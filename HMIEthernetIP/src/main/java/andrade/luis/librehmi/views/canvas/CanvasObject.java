@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasObject extends BorderPane {
@@ -97,7 +98,7 @@ public class CanvasObject extends BorderPane {
         }
     }
 
-    public void updateTag(Tag tag, boolean forceUpdate){
+    public void updateTag(Tag tag){
         if(visibilityTimeline!=null){
             ArrayList<Tag> parameters = this.getCanvasObjectData().getVisibilityExpression().getParameters();
             for(int i=0;i<parameters.size();i++){
@@ -147,22 +148,16 @@ public class CanvasObject extends BorderPane {
         }
     };
 
-    private final EventHandler<MouseEvent> onMyMousePressed = new EventHandler<>() {
-        @Override
-        public void handle(MouseEvent t) {
-
+    private final EventHandler<MouseEvent> onMyMousePressed = t->{
             start = new CanvasPoint(t.getSceneX(), t.getSceneY());
             end = new CanvasPoint(((BorderPane) (t.getSource())).getTranslateX(), ((BorderPane) (t.getSource())).getTranslateY());
             CanvasObject.this.setSelected(true);
             if (t.getButton() == MouseButton.SECONDARY) {
                 showContextMenu(t.getScreenX(), t.getScreenY());
             }
-        }
     };
 
-    private final EventHandler<MouseEvent> onMyMouseDragged = new EventHandler<>() {
-        @Override
-        public void handle(MouseEvent t) {
+    private final EventHandler<MouseEvent> onMyMouseDragged = t -> {
             double offsetX = t.getSceneX() - start.getX();
             double offsetY = t.getSceneY() - start.getY();
             double newTranslateX = end.getX() + offsetX;
@@ -176,7 +171,6 @@ public class CanvasObject extends BorderPane {
             if(CanvasObject.this.hmiApp != null){
                 CanvasObject.this.hmiApp.setWasModified(true);
             }
-        }
     };
 
     private final EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> {
@@ -373,7 +367,7 @@ public class CanvasObject extends BorderPane {
                                 } catch (CompileException | InvocationTargetException | SQLException | IOException | NullPointerException e) {
                                     this.errorLabel = new Label("Error de Tag de Animación");
                                     this.setTop(errorLabel);
-                                    e.printStackTrace();
+                                    logger.log(Level.INFO,e.getMessage());
                                 }
                             }), new KeyFrame(Duration.seconds(1)));
             this.visibilityTimeline.setCycleCount(Animation.INDEFINITE);
@@ -437,6 +431,28 @@ public class CanvasObject extends BorderPane {
 
     public ContextMenu getRightClickMenu() {
         return rightClickMenu;
+    }
+
+    public void updateTimeline(Tag linkedTag, Timeline timeline){
+        if (linkedTag != null && timeline!=null) {
+            linkedTag.setValue(this.getCanvasObjectData().getData());
+            try {
+                timeline.pause();
+                this.setLastTimeSelected();
+                if (!linkedTag.update()) {
+                    this.errorLabel = new Label("Error en Tag de Escritura");
+                    this.setTop(errorLabel);
+                } else {
+                    this.setTop(null);
+                }
+                timeline.play();
+            } catch (SQLException | IOException e) {
+                Logger logger = Logger.getLogger(this.getClass().getName());
+                logger.log(Level.INFO,e.getMessage());
+                this.errorLabel = new Label("Error en Tag de Escritura");
+                this.setTop(errorLabel);
+            }
+        }
     }
 
 }

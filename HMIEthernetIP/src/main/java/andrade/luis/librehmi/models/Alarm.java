@@ -14,6 +14,27 @@ public class Alarm implements Serializable {
     private static final String DEACTIVATED_STR = "Desactivada";
     private static final String UNACKNOWLEDGED_STATUS_STR = "No Reconocida";
     private Expression expression;
+
+    public void setHighLimit(Double highLimit,boolean enabled) {
+        this.highLimit = highLimit;
+        this.highAlarmEnabled = enabled;
+    }
+
+    public void setHiHiLimit(Double hiHiLimit,boolean enabled) {
+        this.hiHiLimit = hiHiLimit;
+        this.hiHiAlarmEnabled = enabled;
+    }
+
+    public void setLowLimit(Double lowLimit,boolean enabled) {
+        this.lowLimit = lowLimit;
+        this.lowAlarmEnabled = enabled;
+    }
+
+    public void setLoloLimit(Double loloLimit,boolean enabled) {
+        this.loloLimit = loloLimit;
+        this.loloAlarmEnabled = enabled;
+    }
+
     private Double highLimit=null;
     private Double hiHiLimit=null;
     private Double lowLimit=null;
@@ -34,25 +55,9 @@ public class Alarm implements Serializable {
 
     public Alarm(
             Expression expression,
-            double highLimit,
-            double hiHiLimit,
-            double lowLimit,
-            double loloLimit,
-            boolean highAlarmEnabled,
-            boolean hiHiAlarmEnabled,
-            boolean lowAlarmEnabled,
-            boolean loloAlarmEnabled,
             String name,
             String comment) {
         this.expression = expression;
-        this.highLimit = highLimit;
-        this.hiHiLimit = hiHiLimit;
-        this.lowLimit = lowLimit;
-        this.loloLimit = loloLimit;
-        this.loloAlarmEnabled = loloAlarmEnabled;
-        this.lowAlarmEnabled = lowAlarmEnabled;
-        this.hiHiAlarmEnabled = hiHiAlarmEnabled;
-        this.highAlarmEnabled = highAlarmEnabled;
         this.name = name;
         this.comment = comment;
     }

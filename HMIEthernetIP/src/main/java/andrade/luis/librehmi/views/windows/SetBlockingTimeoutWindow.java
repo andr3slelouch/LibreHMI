@@ -1,5 +1,6 @@
 package andrade.luis.librehmi.views.windows;
 
+import andrade.luis.librehmi.controllers.TextFormatters;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -33,15 +34,7 @@ public class SetBlockingTimeoutWindow extends Stage {
         this.setTitle("Propiedades de bloqueo");
         Label label = new Label("Defina el tiempo de bloqueo (Segundos):");
         timeoutTextField = new TextField("");
-        UnaryOperator<TextFormatter.Change> integerFilter = change -> {
-            String newText = change.getControlNewText();
-            if (!newText.matches("^(\\+|-)?\\d+$")) {
-                change.setText("");
-                change.setRange(change.getRangeStart(), change.getRangeStart());
-            }
-            return change;
-        };
-        timeoutTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), timeout, integerFilter));
+        timeoutTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), timeout, TextFormatters.digitFilter));
         HBox dataHBox = new HBox();
         dataHBox.getChildren().addAll(label,timeoutTextField);
 

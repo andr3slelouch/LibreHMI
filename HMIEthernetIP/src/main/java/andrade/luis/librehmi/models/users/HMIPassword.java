@@ -20,6 +20,10 @@ public class HMIPassword {
     private static final int ITERATIONS = 10000;
     private static final int KEY_LENGTH = 512;
 
+    private HMIPassword(){
+        throw new IllegalStateException("Password class");
+    }
+
     public static byte[] createRandomSalt() {
         byte[] saltBytes = new byte[16];
         RANDOM_GENERATOR.nextBytes(saltBytes);
@@ -37,7 +41,7 @@ public class HMIPassword {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             return secretKeyFactory.generateSecret(spec).getEncoded();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException | IllegalArgumentException e) {
-            return null;
+            return new byte[0];
         }
     }
 
@@ -48,7 +52,7 @@ public class HMIPassword {
     public static boolean verifyPassword(String password, String salt, String expectedHash) {
         char[] passwordCharArr = password.toCharArray();
         byte[] saltedHash = computeSaltedHash(passwordCharArr, Base64.getDecoder().decode(salt));
-        if(saltedHash!=null){
+        if(saltedHash.length<1){
             Arrays.fill(passwordCharArr, Character.MIN_VALUE);
             String saltedHashStr = Base64.getEncoder().encodeToString(saltedHash);
             return saltedHashStr.equals(expectedHash);

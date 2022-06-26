@@ -42,7 +42,9 @@ public class SaveDatabaseCredentialsWindow extends Stage {
             properties = DBConnection.readPropertiesFile();
         }catch (IOException e) {
             try {
-                DBConnection.writePropertiesFile("","","","",false,false,false,false,false,false);
+                Properties newProperties = new Properties();
+                newProperties = DBConnection.prepareCategoriesProperties(false,false,false,false,false,false,newProperties);
+                DBConnection.writePropertiesFile("","","","",newProperties);
             } catch (IOException ex) {
                 showAlert(Alert.AlertType.ERROR,"Error al leer el archivo de configuración","No se pudo leer el archivo de configuración",e.getMessage());
             }
@@ -102,7 +104,9 @@ public class SaveDatabaseCredentialsWindow extends Stage {
         saveButton.setOnAction(mouseEvent -> {
             try {
                 if(showAlert(Alert.AlertType.CONFIRMATION,"Precaución","Precaución el archivo de configuración se guarda en texto plano, presione OK para terminar el proceso","")){
-                    DBConnection.writePropertiesFile(usernameField.getText(),passwordField.getText(),hostnameField.getText(),portField.getText(), finalBoilerFurnace, finalConveyorBelts, finalMotorPumps, finalOthers, finalPipesValues, finalTanks);
+                    Properties newProperties = new Properties();
+                    newProperties = DBConnection.prepareCategoriesProperties(finalBoilerFurnace, finalConveyorBelts, finalMotorPumps, finalOthers, finalPipesValues, finalTanks,newProperties);
+                    DBConnection.writePropertiesFile(usernameField.getText(),passwordField.getText(),hostnameField.getText(),portField.getText(), newProperties);
                     this.close();
                     cancelled=false;
                 }

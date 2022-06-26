@@ -1,5 +1,6 @@
 package andrade.luis.librehmi.views;
 
+import andrade.luis.librehmi.controllers.TextFormatters;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -16,7 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
-import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DateHBox extends HBox {
 
@@ -34,14 +36,7 @@ public class DateHBox extends HBox {
         this.sliderDateTime = sliderDateTime;
     }
 
-    private final UnaryOperator<TextFormatter.Change> integerFilter = change -> {
-        String newText = change.getControlNewText();
-        if (!newText.matches("^\\d+$")) {
-            change.setText("");
-            change.setRange(change.getRangeStart(), change.getRangeStart());
-        }
-        return change;
-    };
+
 
     private TextField hoursTextField;
     private TextField minutesTextField;
@@ -81,7 +76,7 @@ public class DateHBox extends HBox {
         hoursTextField = new TextField("");
         hoursTextField.setPrefWidth(50);
         hoursTextField.setPromptText("HH");
-        hoursTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, integerFilter));
+        hoursTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, TextFormatters.digitFilter));
         hoursTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             double value = Double.parseDouble(newValue);
             if (value > 23) {
@@ -105,7 +100,7 @@ public class DateHBox extends HBox {
         minutesTextField = new TextField("");
         minutesTextField.setPrefWidth(50);
         minutesTextField.setPromptText("mm");
-        minutesTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, integerFilter));
+        minutesTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, TextFormatters.digitFilter));
         minutesTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             double value = Double.parseDouble(newValue);
             if (value > 59) {
@@ -129,7 +124,7 @@ public class DateHBox extends HBox {
         secondsTextField = new TextField("");
         secondsTextField.setPrefWidth(50);
         secondsTextField.setPromptText("ss");
-        secondsTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, integerFilter));
+        secondsTextField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 0, TextFormatters.digitFilter));
         secondsTextField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             double value = Double.parseDouble(newValue);
             if (value > 59) {
@@ -166,7 +161,8 @@ public class DateHBox extends HBox {
                 int sliderValue = convertDateFormatStringToSliderValue(this.sliderDateTime, this.localDateTime);
                 this.dateSlider.setValue(sliderValue);
             } catch (ParseException e) {
-                e.printStackTrace();
+                Logger logger = Logger.getLogger(this.getClass().getName());
+                logger.log(Level.INFO,e.getMessage());
             }
         }
     }

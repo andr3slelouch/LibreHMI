@@ -6,7 +6,7 @@ import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 
-public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
+public class SetTagInputPropertiesWindow extends WriteExpressionWindow {
     public TextField getMinValueField() {
         return minValueField;
     }
@@ -33,11 +33,12 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
     private String type = "String";
     private ArrayList<RadioButton> radioButtons;
 
-    public SetTagInputPropertiesWindow(){
+    public SetTagInputPropertiesWindow() {
         super(750, 320);
         this.init();
     }
-    private void init(){
+
+    private void init() {
         textField.setEditable(false);
         Label minValueLabel = new Label("Defina el valor mínimo:");
         minValueField = new TextField("0");
@@ -73,18 +74,18 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
         radioButtons.add(rb4);
 
         HBox defineTypeVBox = new HBox();
-        defineTypeVBox.getChildren().addAll(typeLabel,rb1,rb2,rb4,rb3);
+        defineTypeVBox.getChildren().addAll(typeLabel, rb1, rb2, rb4, rb3);
         defineTypeVBox.setSpacing(10);
 
         getFloatPrecisionHBox().setSpacing(17);
 
-        this.getVbox().getChildren().add(2,minValueHBox);
-        this.getVbox().getChildren().add(3,maxValueHBox);
-        this.getVbox().getChildren().add(5,defineTypeVBox);
+        this.getVbox().getChildren().add(2, minValueHBox);
+        this.getVbox().getChildren().add(3, maxValueHBox);
+        this.getVbox().getChildren().add(5, defineTypeVBox);
         this.getVbox().setSpacing(5);
         this.setInputMode(true);
-        textField.textProperty().addListener((observableValue,oldValue,newValue) ->{
-            if(prepareExpression(false)){
+        textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (prepareExpression(false)) {
                 getFloatPrecisionTextField().setDisable(!this.getLocalExpression().getResultType().equals("Flotante"));
                 maxValueField.setDisable(this.getLocalExpression().getResultType().equals("Bool"));
                 minValueField.setDisable(this.getLocalExpression().getResultType().equals("Bool"));
@@ -108,21 +109,17 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow{
     }
 
     @Override
-    protected void addTag(){
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(),"",false,this.getLocalTags());
-        selectTagWindow.showAndWait();
-        if(!selectTagWindow.isCancelled()){
-            clearAll();
-            Tag tag = selectTagWindow.getSelectedTag();
-            if(tag!=null){
-                this.getAddedTags().add(tag);
-                textField.setText(textField.getText()+tag.getName());
-                for (RadioButton radioButton : radioButtons) {
-                    if (radioButton.getText().equals(tag.getType())) {
-                        radioButton.setSelected(true);
-                    }
+    protected void addTag() {
+        Tag tag = super.addTag(this.isInputMode(), "", false);
+        if (tag != null) {
+            this.getAddedTags().add(tag);
+            textField.setText(textField.getText() + tag.getName());
+            for (RadioButton radioButton : radioButtons) {
+                if (radioButton.getText().equals(tag.getType())) {
+                    radioButton.setSelected(true);
                 }
             }
         }
+
     }
 }

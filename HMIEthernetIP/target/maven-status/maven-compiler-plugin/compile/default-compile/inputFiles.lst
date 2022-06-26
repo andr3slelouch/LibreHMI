@@ -27,6 +27,7 @@
 /home/andres/Downloads/GitClones/Thesis/HMIEthernetIP/src/main/java/andrade/luis/librehmi/models/MouseOverMode.java
 /home/andres/Downloads/GitClones/Thesis/HMIEthernetIP/src/main/java/andrade/luis/librehmi/views/SetDateTimeProperties.java
 /home/andres/Downloads/GitClones/Thesis/HMIEthernetIP/src/main/java/andrade/luis/librehmi/models/Alarm.java
+/home/andres/Downloads/GitClones/Thesis/HMIEthernetIP/src/main/java/andrade/luis/librehmi/controllers/TextFormatters.java
 /home/andres/Downloads/GitClones/Thesis/HMIEthernetIP/src/main/java/andrade/luis/librehmi/views/windows/WelcomeWindow.java
 /home/andres/Downloads/GitClones/Thesis/HMIEthernetIP/src/main/java/andrade/luis/librehmi/views/canvas/input/CanvasSlider.java
 /home/andres/Downloads/GitClones/Thesis/HMIEthernetIP/src/main/java/andrade/luis/librehmi/views/windows/SetPercentFillPropertiesWindow.java
