@@ -78,6 +78,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                     addPastedTextOnCanvasClicked(canvasObjectData);
                     continue;
                 case IMAGE_STR:
+                case SYMBOL_STR:
                     addPastedImageViewOnCanvasClicked(canvasObjectData);
                     continue;
                 case BUTTON_STR:
@@ -91,9 +92,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                     continue;
                 case TEXTFIELD_STR:
                     addPastedTextFieldOnCanvasClicked(canvasObjectData);
-                    continue;
-                case SYMBOL_STR:
-                    addPastedSymbolViewOnCanvasClicked(canvasObjectData);
                     continue;
                 case ALARM_DISPLAY_STR:
                     addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
@@ -327,7 +325,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             e.printStackTrace();
         }
         CanvasImage canvasImage = new CanvasImage(selectedImage, current, true, selectedImagePath, false);
-        canvasImage.modifyImageViewSizeRotation(isMirroringHorizontal, isMirroringVertical, rotation);
+        canvasImage.setImageViewProperties(isMirroringHorizontal, isMirroringVertical, rotation);
         if (isModifyingColor) {
             canvasImage.modifyImageViewColors(color, contrast, brightness, saturation, hue);
         }
@@ -398,7 +396,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         if (selectedSymbolPath != null) {
             CanvasImage canvasImage = new CanvasImage(selectedSymbol, current, true, selectedSymbolPath, true);
             canvasImage.getCanvasObjectData().setSymbolCategory(selectedSymbolCategory);
-            canvasImage.modifyImageViewSizeRotation(isMirroringHorizontal, isMirroringVertical, rotation);
+            canvasImage.setImageViewProperties(isMirroringHorizontal, isMirroringVertical, rotation);
             if (isModifyingColor) {
                 canvasImage.modifyImageViewColors(color, contrast, brightness, saturation, hue);
             }
@@ -644,10 +642,8 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                     case TEXTFIELD_STR:
                         addPastedTextFieldOnCanvasClicked(canvasObjectData);
                         break;
-                    case SYMBOL_STR:
-                        addPastedSymbolViewOnCanvasClicked(canvasObjectData);
-                        break;
                     case IMAGE_STR:
+                    case SYMBOL_STR:
                         addPastedImageViewOnCanvasClicked(canvasObjectData);
                         break;
                     case ALARM_DISPLAY_STR:
@@ -720,6 +716,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
                 canvasImage.setImage(new Image(getClass().getResourceAsStream("windows"+ File.separator+canvasObjectData.getData())));
                 canvasImage.setImageView(new ImageView(canvasImage.getImage()));
                 canvasImage.setCenter(canvasImage.getImageView());
+                canvasImage.setSize(canvasImage.getCanvasObjectData().getWidth(),canvasImage.getCanvasObjectData().getHeight());
+                canvasImage.setImageViewProperties(canvasImage.getCanvasObjectData().isMirroringHorizontal(), canvasImage.getCanvasObjectData().isMirroringVertical(), canvasImage.getCanvasObjectData().getRotation());
+                if (canvasImage.getCanvasObjectData().isModifyingColors()) {
+                    canvasImage.modifyImageViewColors(canvasImage.getCanvasObjectData().getPrimaryColor(), canvasImage.getCanvasObjectData().getContrast(), canvasImage.getCanvasObjectData().getBrightness(), canvasImage.getCanvasObjectData().getSaturation(), canvasImage.getCanvasObjectData().getHue());
+                }
             }
             canvasImage.setCanvas(this);
             canvasImage.setHmiApp(this.hmiApp);
@@ -731,7 +732,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error al agregar imagen", "Error:'" + e.getMessage() + "'");
         }
-
     }
 
     private void addPastedPushbuttonOnCanvasClicked(CanvasObjectData canvasObjectData) {

@@ -39,21 +39,21 @@ public class CanvasImage extends CanvasObject {
         this.setData(image, imagePath, isOnCanvas, 100, 100, isImageSymbol);
     }
 
-    public CanvasImage(CanvasObjectData canvasObjectData){
+    public CanvasImage(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         try {
             if (!this.getCanvasObjectData().isImageSymbol()) {
                 this.image = new Image(new FileInputStream(canvasObjectData.getData()));
-            }else{
+            } else {
                 this.image = imageNotFound;
             }
         } catch (FileNotFoundException e) {
             this.image = imageNotFound;
         }
         this.setData(this.image, this.getCanvasObjectData().getData(), true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().isImageSymbol());
-        this.modifyImageViewSizeRotation(this.getCanvasObjectData().isMirroringHorizontal(),this.getCanvasObjectData().isMirroringVertical(),this.getCanvasObjectData().getRotation());
-        if(this.getCanvasObjectData().isModifyingColors()){
-            this.modifyImageViewColors(this.getCanvasObjectData().getPrimaryColor(),this.getCanvasObjectData().getContrast(),this.getCanvasObjectData().getBrightness(),this.getCanvasObjectData().getSaturation(),this.getCanvasObjectData().getHue());
+        this.setImageViewProperties(this.getCanvasObjectData().isMirroringHorizontal(), this.getCanvasObjectData().isMirroringVertical(), this.getCanvasObjectData().getRotation());
+        if (this.getCanvasObjectData().isModifyingColors()) {
+            this.modifyImageViewColors(this.getCanvasObjectData().getPrimaryColor(), this.getCanvasObjectData().getContrast(), this.getCanvasObjectData().getBrightness(), this.getCanvasObjectData().getSaturation(), this.getCanvasObjectData().getHue());
         }
     }
 
@@ -77,7 +77,7 @@ public class CanvasImage extends CanvasObject {
         }
     }
 
-    public void modifyImageViewSizeRotation(boolean isMirroringHorizontal, boolean isMirroringVertical, double rotation){
+    public void setImageViewProperties(boolean isMirroringHorizontal, boolean isMirroringVertical, double rotation) {
         if (this.imageView != null) {
             this.setRotate(rotation);
             this.getCanvasObjectData().setRotation(rotation);
@@ -93,18 +93,18 @@ public class CanvasImage extends CanvasObject {
     }
 
     private void setData(Image image, String imagePath, boolean isOnCanvas, double width, double height, boolean isImageSymbol) {
-        if(imagePath != null) {
+        if (imagePath != null) {
             this.image = image;
-        }else{
+        } else {
             this.image = imageNotFound;
         }
         this.imageView = new ImageView(this.image);
         this.getCanvasObjectData().setImageSymbol(isImageSymbol);
         this.setCenter(this.imageView);
         this.getCanvasObjectData().setType("Image");
-        if(isImageSymbol){
+        if (isImageSymbol) {
             this.getCanvasObjectData().setDataType("Símbolo HMI");
-        }else{
+        } else {
             this.getCanvasObjectData().setDataType("Imagen");
         }
         this.getCanvasObjectData().setSuperType("Figure");
@@ -121,7 +121,7 @@ public class CanvasImage extends CanvasObject {
     }
 
     @Override
-    public void setSize(double width,double height){
+    public void setSize(double width, double height) {
         super.setSize(width, height);
         this.imageView.setFitWidth(width);
         this.imageView.setFitHeight(height);
@@ -137,8 +137,8 @@ public class CanvasImage extends CanvasObject {
         this.getHmiApp().setWasModified(true);
     }
 
-    private void setSymbolImageProcess() throws FileNotFoundException {
-        SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow(this.imageView.getFitWidth(),this.imageView.getFitHeight());
+    private void setSymbolImageProcess() {
+        SelectHMISymbolWindow selectHMISymbolWindow = new SelectHMISymbolWindow(this.imageView.getFitWidth(), this.imageView.getFitHeight());
         if (this.getCanvasObjectData() != null) {
             selectHMISymbolWindow.setPreservingRatio(this.getCanvasObjectData().isPreservingRatio());
             selectHMISymbolWindow.setMirroringHorizontal(this.getCanvasObjectData().isMirroringHorizontal());
@@ -146,7 +146,7 @@ public class CanvasImage extends CanvasObject {
             selectHMISymbolWindow.setRotation(this.getCanvasObjectData().getRotation());
             selectHMISymbolWindow.setSymbolCategory(this.getCanvasObjectData().getSymbolCategory());
             selectHMISymbolWindow.setSelectedImagePath(this.getCanvasObjectData().getData());
-            if(this.getCanvasObjectData().isModifyingColors()){
+            if (this.getCanvasObjectData().isModifyingColors()) {
                 selectHMISymbolWindow.setColor(this.getCanvasObjectData().getPrimaryColor());
                 selectHMISymbolWindow.setContrast(this.getCanvasObjectData().getContrast());
                 selectHMISymbolWindow.setBrightness(this.getCanvasObjectData().getBrightness());
@@ -158,8 +158,10 @@ public class CanvasImage extends CanvasObject {
         selectHMISymbolWindow.showAndWait();
         this.getCanvasObjectData().setWidth(selectHMISymbolWindow.getImageViewWidth());
         this.getCanvasObjectData().setHeight(selectHMISymbolWindow.getImageViewHeight());
-
-        Image selectedSymbol = selectHMISymbolWindow.getSelectedImage();
+        Image selectedSymbol = this.image;
+        if(selectHMISymbolWindow.getSelectedImage() != null){
+            selectedSymbol = selectHMISymbolWindow.getSelectedImage();
+        }
         boolean isMirroringVertical = selectHMISymbolWindow.isMirroringVertical();
         boolean isMirroringHorizontal = selectHMISymbolWindow.isMirroringHorizontal();
         boolean isPreservingRatio = selectHMISymbolWindow.isPreservingRatio();
@@ -169,18 +171,22 @@ public class CanvasImage extends CanvasObject {
         double brightness = selectHMISymbolWindow.getBrightness();
         double saturation = selectHMISymbolWindow.getSaturation();
         double hue = selectHMISymbolWindow.getHue();
+        String imagePath = this.getCanvasObjectData().getData();
+        if(selectHMISymbolWindow.getSelectedImagePath()!=null){
+            imagePath = selectHMISymbolWindow.getSelectedImagePath();
+        }
         CanvasColor color = selectHMISymbolWindow.getColor();
         this.getCanvasObjectData().setPreservingRatio(isPreservingRatio);
-        setData(selectedSymbol, selectHMISymbolWindow.getSelectedImagePath(), true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), true);
-        modifyImageViewSizeRotation(isMirroringHorizontal,isMirroringVertical,rotation);
-        if(isModifyingColor){
-            modifyImageViewColors(color,contrast,brightness,saturation,hue);
+        setData(selectedSymbol, imagePath, true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), true);
+        setImageViewProperties(isMirroringHorizontal, isMirroringVertical, rotation);
+        if (isModifyingColor) {
+            modifyImageViewColors(color, contrast, brightness, saturation, hue);
         }
     }
 
     private void setImageViewProcess() throws FileNotFoundException {
-        SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow(this.imageView.getFitWidth(),this.imageView.getFitHeight());
-        if(this.getCanvasObjectData().isModifyingColors()){
+        SetImageOptionsWindow imageOptionsWindow = new SetImageOptionsWindow(this.imageView.getFitWidth(), this.imageView.getFitHeight());
+        if (this.getCanvasObjectData().isModifyingColors()) {
             imageOptionsWindow.setModifyingColor(true);
             imageOptionsWindow.getModColorRB().setSelected(true);
             imageOptionsWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
@@ -188,7 +194,7 @@ public class CanvasImage extends CanvasObject {
             imageOptionsWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
             imageOptionsWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
             imageOptionsWindow.getColorPicker().setValue(this.getCanvasObjectData().getPrimaryColor().getColor());
-        }else{
+        } else {
             imageOptionsWindow.getOriginalColorRB().setSelected(true);
         }
         imageOptionsWindow.getImagePathTextField().setText(this.getCanvasObjectData().getData());
@@ -213,10 +219,10 @@ public class CanvasImage extends CanvasObject {
         double hue = Double.parseDouble(imageOptionsWindow.getHueTextField().getText());
         CanvasColor color = new CanvasColor(imageOptionsWindow.getColorPicker().getValue());
         this.getCanvasObjectData().setPreservingRatio(isPreservingRatio);
-        setData(selectedImage, selectedImagePath , true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), false);
-        modifyImageViewSizeRotation(isMirroringHorizontal,isMirroringVertical,rotation);
-        if(isModifyingColor){
-            modifyImageViewColors(color,contrast,brightness,saturation,hue);
+        setData(selectedImage, selectedImagePath, true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), false);
+        setImageViewProperties(isMirroringHorizontal, isMirroringVertical, rotation);
+        if (isModifyingColor) {
+            modifyImageViewColors(color, contrast, brightness, saturation, hue);
         }
     }
 
