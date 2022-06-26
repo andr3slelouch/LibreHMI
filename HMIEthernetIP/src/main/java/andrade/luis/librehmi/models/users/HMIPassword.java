@@ -37,7 +37,6 @@ public class HMIPassword {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             return secretKeyFactory.generateSecret(spec).getEncoded();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException | IllegalArgumentException e) {
-            e.printStackTrace();
             return null;
         }
     }

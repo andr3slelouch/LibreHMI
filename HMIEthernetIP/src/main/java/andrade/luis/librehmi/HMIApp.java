@@ -21,6 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -60,6 +61,9 @@ public class HMIApp extends Application {
     public static final String EDITAR_STR = "Editar";
     public static final String EJECUTAR_STR = "Ejecutar";
     public static final String USER_HOME = "user.home";
+    public static final String OPERATOR_STR = "Operador";
+    public static final String CIPHER_ALGORITHM = "PBEWithMD5AndTripleDES";
+    public static final String WINDOW_STR = "WINDOW";
     private Stage mainStage;
     Logger logger
             = Logger.getLogger(
@@ -69,17 +73,17 @@ public class HMIApp extends Application {
     private static final String FILE_ERROR_TITLE = "El archivo de proyecto no es válido";
     private final ArrayList<HMIScene> pages = new ArrayList<>();
     private final ArrayList<Stage> createdWindows = new ArrayList<>();
-    private ArrayList<String> pagesTitles = new ArrayList<>();
-    private ArrayList<Alarm> projectAlarms = new ArrayList<>();
-    private ArrayList<Alarm> manageableAlarms = new ArrayList<>();
+    private final ArrayList<String> pagesTitles = new ArrayList<>();
+    private final ArrayList<Alarm> projectAlarms = new ArrayList<>();
+    private final ArrayList<Alarm> manageableAlarms = new ArrayList<>();
     private ArrayList<Tag> localTags = new ArrayList<>();
     private final ArrayList<MenuItem> editExecuteMenuItems = new ArrayList<>();
     private final ArrayList<Menu> fileMenus = new ArrayList<>();
     private final ArrayList<Menu> editMenus = new ArrayList<>();
     private final ArrayList<Menu> alarmsMenus = new ArrayList<>();
     private final ArrayList<Menu> configMenus = new ArrayList<>();
-    private final ArrayList<Menu> windowsMenus = new ArrayList<>();
-    private final ArrayList<Menu> helpMenus = new ArrayList<>();
+    private final ArrayList<Menu> windowMenus = new ArrayList<>();
+    private final ArrayList<HBox> expandBoxes = new ArrayList<>();
     private String currentProjectFilePath = null;
     private String currentFilename = null;
     private boolean wasModified = false;
@@ -150,20 +154,7 @@ public class HMIApp extends Application {
     private String mode = "";
     private Timeline autoBlockTimeline;
     private String selectedPage;
-    private Timeline refreshLocalTagsTimeline;
     private HMICanvas root;
-
-    public String getCurrentProjectFilePath() {
-        return currentProjectFilePath;
-    }
-
-    public void setCurrentProjectFilePath(String currentProjectFilePath) {
-        this.currentProjectFilePath = currentProjectFilePath;
-    }
-
-    public boolean isWasModified() {
-        return wasModified;
-    }
 
     public void setWasModified(boolean wasModified) {
         this.wasModified = wasModified;
@@ -172,10 +163,6 @@ public class HMIApp extends Application {
 
     public HMIAppData getHmiAppData() {
         return hmiAppData;
-    }
-
-    public ArrayList<HMIScene> getPages() {
-        return pages;
     }
 
     public void setHmiAppData(HMIAppData hmiAppData) {
@@ -193,7 +180,7 @@ public class HMIApp extends Application {
                 addAlarm(this.hmiAppData.getHmiAlarms().get(i));
             }
         }
-        if(this.hmiAppData.getHmiLocalTags() != null){
+        if (this.hmiAppData.getHmiLocalTags() != null) {
             localTags.addAll(this.hmiAppData.getHmiLocalTags());
         }
     }
@@ -206,7 +193,6 @@ public class HMIApp extends Application {
     }
 
     public void createNewProject() {
-        logger.log(Level.INFO, "Closing Project...");
         if (wasModified) {
             if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
                 this.clearProject();
@@ -224,11 +210,6 @@ public class HMIApp extends Application {
     public ArrayList<String> getPagesTitles() {
         return pagesTitles;
     }
-
-    public void setPagesTitles(ArrayList<String> pagesTitles) {
-        this.pagesTitles = pagesTitles;
-    }
-
     @Override
     public void start(Stage stage) {
 
@@ -268,15 +249,12 @@ public class HMIApp extends Application {
     }
 
     private void closeProcess(WindowEvent windowEvent) {
-        logger.log(Level.INFO, "Closing...");
         if (wasModified) {
             if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
                 logger.log(Level.INFO, "CANCELED");
             } else {
                 windowEvent.consume();
             }
-        } else {
-            logger.log(Level.INFO, "CLOSED...");
         }
     }
 
@@ -288,7 +266,7 @@ public class HMIApp extends Application {
         } else {
             this.modeLabel = EDITAR_STR;
             this.mode = EJECUTAR_STR;
-            user = new HMIUser("", "", "", "", "Operador", "");
+            user = new HMIUser("", "", "", "", OPERATOR_STR, "");
         }
         if (user != null) {
             if (filenamePath == null) {
@@ -324,7 +302,6 @@ public class HMIApp extends Application {
         designElementsLabel.setFont(new Font("Arial", 15));
         VBox designToolsVBox = generateDesignVBox(scene, root);
 
-
         ArrayList<String> itemsForComboBox = new ArrayList<>(List.of(scene.getTitle()));
         ListView<String> listViewReference = new ListView<>();
         scene.setListViewReference(listViewReference);
@@ -333,21 +310,22 @@ public class HMIApp extends Application {
         Label pagesLabel = new Label("Páginas");
         pagesLabel.setFont(new Font("Arial", 15));
 
-        VBox vbox = new VBox(designElementsLabel, designToolsVBox, pagesLabel, scene.getListViewReference());
-        vbox.setPadding(new Insets(50, 0, 0, 0));
-        vbox.setSpacing(10);
-        vbox.setPrefWidth(150);
+        VBox lateralMenuVBox = new VBox(designElementsLabel, designToolsVBox, pagesLabel, scene.getListViewReference());
+        lateralMenuVBox.setPadding(new Insets(50, 0, 0, 0));
+        lateralMenuVBox.setSpacing(10);
+        lateralMenuVBox.setPrefWidth(150);
         Button expandButton = new Button(">");
-        HBox expandHBox = new HBox(vbox, expandButton);
+        expandButton.setId("#expandButton");
+        HBox expandHBox = new HBox(lateralMenuVBox, expandButton);
         expandHBox.setAlignment(CENTER);
         expandHBox.setPrefWidth(Region.USE_COMPUTED_SIZE);
         expandHBox.setMaxWidth(Region.USE_PREF_SIZE);
 
-        expandHBox.setTranslateX(-vbox.getPrefWidth());
+        expandHBox.setTranslateX(-lateralMenuVBox.getPrefWidth());
         StackPane.setAlignment(expandHBox, Pos.CENTER_LEFT);
         // animation for moving the slider
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(expandHBox.translateXProperty(), -vbox.getPrefWidth())),
+                new KeyFrame(Duration.ZERO, new KeyValue(expandHBox.translateXProperty(), -lateralMenuVBox.getPrefWidth())),
                 new KeyFrame(Duration.millis(500), new KeyValue(expandHBox.translateXProperty(), 0d))
         );
 
@@ -369,10 +347,10 @@ public class HMIApp extends Application {
                 expandButton.setText(">");
             }
         });
+        expandBoxes.add(expandHBox);
 
         MenuBar menuBar = generateMenuBar(scene, root);
         menuBar.setId("#menuBar");
-        //menuBars.add(menuBar);
 
         root.getChildren().add(menuBar);
         root.getChildren().add(expandHBox);
@@ -422,11 +400,11 @@ public class HMIApp extends Application {
         MenuItem manageUsersMI = new MenuItem("Administrar Usuarios");
         manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
         manageUsersMI.setOnAction(mouseEvent -> {
-            if(user.getRole().equals("Administrador")){
+            if (user.getRole().equals("Administrador")) {
                 ManageUsersWindow manageUsersWindow = new ManageUsersWindow();
                 manageUsersWindow.showAndWait();
-            }else{
-                showAlert(Alert.AlertType.ERROR,"Error de privilegios","Para administrar los usuarios, ud debe tener un rol de \"Administrador\"",false,false);
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error de privilegios", "Para administrar los usuarios, ud debe tener un rol de \"Administrador\"", false, false);
             }
 
         });
@@ -434,7 +412,6 @@ public class HMIApp extends Application {
         Menu tagsMI = new Menu("Tags Locales");
         tagsMI.setId("#tagsMI");
         MenuItem createLocalTagMI = new MenuItem("Crear Tag Local");
-        //createLocalTagMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+U"));
         createLocalTagMI.setOnAction(mouseEvent -> {
             ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(null);
             manageLocalTagWindow.showAndWait();
@@ -444,7 +421,6 @@ public class HMIApp extends Application {
 
         });
         MenuItem manageLocalTagsMI = new MenuItem("Administrar Tag Locales");
-        //manageUsersMI.setAccelerator(KeyCombination.keyCombination("Ctrl+Alt+U"));
         manageLocalTagsMI.setOnAction(mouseEvent -> {
             SelectTagWindow tagWindow = new SelectTagWindow(false, "LocalTags", false, localTags);
             tagWindow.showAndWait();
@@ -483,24 +459,24 @@ public class HMIApp extends Application {
         importWindowsMI.setOnAction(mouseEvent -> {
             try {
                 loadSceneData();
-            } catch (Exception e) {
-                if(e.getMessage()!=null) showAlert(Alert.AlertType.ERROR, "Error al cargar el archivo", "Existió un error al cargar el archivo: " + e.getMessage(), false, false);
+            } catch (IOException e) {
+                if (e.getMessage() != null)
+                    showAlert(Alert.AlertType.ERROR, "Error al cargar el archivo", "Existió un error al cargar el archivo: " + e.getMessage(), false, false);
             }
         });
+        importWindowsMI.setId("#import");
         menuWindows.getItems().add(selectWindowsMI);
         menuWindows.getItems().add(importWindowsMI);
-
-        windowsMenus.add(menuWindows);
+        windowMenus.add(menuWindows);
 
         Menu menuHelp = new Menu("Ayuda");
 
         MenuItem userManualMI = new MenuItem("Manual de Usuario");
         userManualMI.setAccelerator(KeyCombination.keyCombination("Ctrl+M"));
-        userManualMI.setOnAction(mouseEvent -> {});
+        userManualMI.setOnAction(mouseEvent -> {
+        });
 
         menuHelp.getItems().add(userManualMI);
-
-        helpMenus.add(menuHelp);
 
         menuBar.getMenus().addAll(menuFile, menuEdit, menuAlarm, menuConfiguration, menuWindows, menuHelp);
 
@@ -534,7 +510,7 @@ public class HMIApp extends Application {
         openProjectMI.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         openProjectMI.setOnAction(mouseEvent -> openProcess());
         Menu openRecentProjectsMI = new Menu("Recientes");
-
+        openRecentProjectsMI.setId("#recents");
         ArrayList<String> menuItems = getRecentItems();
         if (!menuItems.isEmpty()) {
             for (int i = 0; i < menuItems.size(); i++) {
@@ -592,18 +568,7 @@ public class HMIApp extends Application {
         MenuItem runEditMI = new MenuItem(modeLabel);
 
         editExecuteMenuItems.add(runEditMI);
-        runEditMI.setOnAction(actionEvent -> {
-            if (modeLabel.equals(EDITAR_STR)) {
-                loginUser(modeLabel);
-                this.modeLabel = EJECUTAR_STR;
-                this.mode = EDITAR_STR;
-            } else {
-                this.modeLabel = EDITAR_STR;
-                this.mode = EJECUTAR_STR;
-                enableInputRepresentations(this.mode);
-            }
-            updateMenuBarsMode(this.modeLabel);
-        });
+        runEditMI.setOnAction(actionEvent -> changeMode());
 
 
         MenuItem exitMI = new MenuItem("Salir");
@@ -620,6 +585,36 @@ public class HMIApp extends Application {
         return menuFile;
     }
 
+    private void changeMode(){
+        if (modeLabel.equals(EDITAR_STR)) {
+            loginUser(modeLabel);
+            if(!this.user.getRole().equals(OPERATOR_STR)){
+                this.modeLabel = EJECUTAR_STR;
+                this.mode = EDITAR_STR;
+            }
+        } else {
+            this.modeLabel = EDITAR_STR;
+            this.mode = EJECUTAR_STR;
+            enableInputRepresentations(this.mode);
+        }
+        updateMenuBarsMode(this.modeLabel);
+        updateLateralMenuMode();
+    }
+
+    private void updateLateralMenuMode(){
+        for(HBox hBox : expandBoxes){
+            for (Node content:hBox.getChildren()) {
+                if(content.getId()!=null && content.getId().equals("#expandButton")){
+                    Button tmpButton = (Button) content;
+                    if(tmpButton.getText().equals("<")){
+                        tmpButton.fire();
+                    }
+                }
+            }
+            hBox.setDisable(this.mode.equals(EJECUTAR_STR));
+        }
+    }
+
     private void updateMenuBarsMode(String mode) {
         for (MenuItem menuItem : editExecuteMenuItems) {
             menuItem.setText(mode);
@@ -628,7 +623,7 @@ public class HMIApp extends Application {
         for (Menu menu : fileMenus) {
             for (MenuItem subMenu : menu.getItems()) {
                 if (subMenu.getId() != null) {
-                    if (subMenu.getId().equals("#saveMI") || subMenu.getId().equals("#saveAsMI")) {
+                    if (subMenu.getId().equals("#saveMI") || subMenu.getId().equals("#saveAsMI") || subMenu.getId().equals("#saveAsEncryptedMI") || subMenu.getId().equals("#recents")) {
                         subMenu.setDisable(this.mode.equals(EJECUTAR_STR));
                     }
                 }
@@ -646,6 +641,15 @@ public class HMIApp extends Application {
         for (Menu menu : configMenus) {
             menu.setDisable(this.mode.equals(EJECUTAR_STR));
         }
+
+        for (Menu menu : windowMenus) {
+            for (MenuItem item: menu.getItems()) {
+                if(item.getId()!=null && item.getId().equals("#import")){
+                    item.setDisable(this.mode.equals(EJECUTAR_STR));
+                }
+            }
+        }
+
 
     }
 
@@ -817,7 +821,7 @@ public class HMIApp extends Application {
         logInWindow.showAndWait();
         if (logInWindow.getLoggedUser() != null) {
             this.user = logInWindow.getLoggedUser();
-            if (this.user.getRole().equals("Operador") && this.mode.equals(EDITAR_STR)) {
+            if (this.user.getRole().equals(OPERATOR_STR) && mode.equals(EDITAR_STR)) {
                 showAlert(Alert.AlertType.ERROR, "Error de Privilegios", "Error un usuario con el Rol \"Operador\" no puede editar el proyecto", false, false);
             } else {
                 enableInputRepresentations(mode);
@@ -831,19 +835,19 @@ public class HMIApp extends Application {
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> {
                             logger.log(Level.INFO, "Executing autoBlockTimeline");
-                            user = new HMIUser("", "", "", "", "Operador", "");
+                            user = new HMIUser("", "", "", "", OPERATOR_STR, "");
                             enableInputRepresentations(mode);
                         }), new KeyFrame(Duration.seconds(1)));
         this.autoBlockTimeline.setDelay(Duration.seconds(60));
     }
 
     public void setRefreshLocalTagsTimeline() {
-        this.refreshLocalTagsTimeline = new Timeline(
+        Timeline refreshLocalTagsTimeline = new Timeline(
                 new KeyFrame(
                         Duration.seconds(0),
                         (ActionEvent actionEvent) -> refreshLocalTags()), new KeyFrame(Duration.seconds(1)));
-        this.refreshLocalTagsTimeline.setCycleCount(Animation.INDEFINITE);
-        this.refreshLocalTagsTimeline.play();
+        refreshLocalTagsTimeline.setCycleCount(Animation.INDEFINITE);
+        refreshLocalTagsTimeline.play();
     }
 
     public void refreshLocalTags() {
@@ -852,11 +856,7 @@ public class HMIApp extends Application {
     }
 
     public void updateLocalTags(boolean forceUpdate) {
-        for (int i = 0; i < root.getShapeArrayList().size(); i++) {
-            for (Tag localTag : localTags) {
-                root.getShapeArrayList().get(i).updateTag(localTag,forceUpdate);
-            }
-        }
+        updateTagsInObjects(forceUpdate);
         for (int i = 0; i < projectAlarms.size(); i++) {
             for (Tag localTag : localTags) {
                 for (Alarm alarm : projectAlarms) {
@@ -868,6 +868,13 @@ public class HMIApp extends Application {
                     }
                     alarm.getExpression().setParameters(parameters);
                 }
+            }
+        }
+    }
+    public void updateTagsInObjects(boolean forceUpdate){
+        for (int i = 0; i < root.getShapeArrayList().size(); i++) {
+            for (Tag localTag : localTags) {
+                root.getShapeArrayList().get(i).updateTag(localTag, forceUpdate);
             }
         }
     }
@@ -911,7 +918,7 @@ public class HMIApp extends Application {
 
     private ArrayList<String> getRecentItems() {
         String recentFilesFilePath = DBConnection.getWorkingDirectory() + File.separator + "recentFiles.json";
-        RecentUsedFilesData recentUsedFilesData = null;
+        RecentUsedFilesData recentUsedFilesData;
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(recentFilesFilePath))) {
@@ -1032,8 +1039,10 @@ public class HMIApp extends Application {
                 localHmiAppData = getEncryptedHmiAppData(gson, filenamePath);
             } while (!wasEncryptedFileInputPasswordCanceled && localHmiAppData == null);
         }
+        loadHMIDataProcess(localHmiAppData,filenamePath);
+    }
 
-
+    private void loadHMIDataProcess(HMIAppData localHmiAppData, String filenamePath){
         if (localHmiAppData != null) {
             if (localHmiAppData.getType() == null) {
                 if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?", false, false)) {
@@ -1064,7 +1073,7 @@ public class HMIApp extends Application {
                 }
                 StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
                 encryptor.setPassword(setFilePasswordWindow.getPassword());
-                encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
+                encryptor.setAlgorithm(CIPHER_ALGORITHM);
                 try {
                     String rawJson = encryptor.decrypt(rawEncryptedDataSB.toString());
                     localHmiAppData = gson.fromJson(rawJson, HMIAppData.class);
@@ -1102,7 +1111,7 @@ public class HMIApp extends Application {
             e.printStackTrace();
         }
 
-        RecentUsedFilesCache recentUsedFilesCache = null;
+        RecentUsedFilesCache recentUsedFilesCache;
         if (recentUsedFilesData == null) {
             recentUsedFilesData = new RecentUsedFilesData();
             recentUsedFilesData.setCapacity(CAPACITY);
@@ -1199,18 +1208,18 @@ public class HMIApp extends Application {
             if (filenamePath != null) {
                 String[] filenameArr = filenamePath.split(File.separator);
                 this.currentFilename = filenameArr[filenameArr.length - 1];
-                Writer writer = Files.newBufferedWriter(Path.of(filenamePath));
-                String rawJson = gson.toJson(this.hmiAppData);
-                StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
-                encryptor.setPassword(setFilePasswordWindow.getPassword());
-                encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
-                String encryptedJSON = encryptor.encrypt(rawJson);
-                writer.write(encryptedJSON);
-                writer.close();
-                this.currentProjectFilePath = filenamePath;
-                this.setWasModified(false);
-                addRecentUsedFilePath(filenamePath);
-                updateTitleWithFilename();
+                try(Writer writer = Files.newBufferedWriter(Path.of(filenamePath))){
+                    String rawJson = gson.toJson(this.hmiAppData);
+                    StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+                    encryptor.setPassword(setFilePasswordWindow.getPassword());
+                    encryptor.setAlgorithm(CIPHER_ALGORITHM);
+                    String encryptedJSON = encryptor.encrypt(rawJson);
+                    writer.write(encryptedJSON);
+                    this.currentProjectFilePath = filenamePath;
+                    this.setWasModified(false);
+                    addRecentUsedFilePath(filenamePath);
+                    updateTitleWithFilename();
+                }
             }
         }
     }
@@ -1229,6 +1238,7 @@ public class HMIApp extends Application {
             }
         }
         updateMenuBarsMode(this.modeLabel);
+        updateLateralMenuMode();
         if (mode.equals(EJECUTAR_STR) && this.user.getRole().equals("Administrador")) {
             setAutoBlockObjectsTimeline();
             this.autoBlockTimeline.play();
@@ -1287,10 +1297,7 @@ public class HMIApp extends Application {
      */
     private int getIndexForStageWithScene(String title) {
         int index = -1;
-        logger.log(Level.INFO, "Title" + title);
         for (int i = 0; i < createdWindows.size(); i++) {
-            logger.log(Level.INFO, "Current" + ((HMIScene) createdWindows.get(i).getScene()).getId());
-            logger.log(Level.INFO, "Current" + ((HMIScene) createdWindows.get(i).getScene()).getTitle());
             if (((HMIScene) createdWindows.get(i).getScene()).getId().equals(title)) {
                 index = i;
             }
@@ -1410,7 +1417,7 @@ public class HMIApp extends Application {
             );
         } else {
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("WINDOW", "*.window", "*.WINDOW")
+                    new FileChooser.ExtensionFilter(WINDOW_STR, "*.window", "*.WINDOW")
             );
         }
         fileChooser.setTitle("Exportar Ventana");
@@ -1453,7 +1460,7 @@ public class HMIApp extends Application {
                 new File(System.getProperty(USER_HOME))
         );
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("WINDOW", "*.window", "*.WINDOW"),
+                new FileChooser.ExtensionFilter(WINDOW_STR, "*.window", "*.WINDOW"),
                 new FileChooser.ExtensionFilter("SECURE WINDOW", "*.swindow", "*.SWINDOW"),
                 new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
         );
@@ -1468,7 +1475,7 @@ public class HMIApp extends Application {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         HMISceneData localHmiAppData = null;
-        if (type.equals("window") || type.equals("WINDOW")) {
+        if (type.equals("window") || type.equals(WINDOW_STR)) {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath));
             localHmiAppData = gson.fromJson(bufferedReader, HMISceneData.class);
         } else if (type.equals("swindow") || type.equals("SWINDOW")) {
@@ -1498,7 +1505,7 @@ public class HMIApp extends Application {
                 }
                 StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
                 encryptor.setPassword(setFilePasswordWindow.getPassword());
-                encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
+                encryptor.setAlgorithm(CIPHER_ALGORITHM);
                 try {
                     String rawJson = encryptor.decrypt(rawEncryptedDataSB.toString());
                     localHmiSceneData = gson.fromJson(rawJson, HMISceneData.class);
@@ -1521,14 +1528,14 @@ public class HMIApp extends Application {
         if (!setFilePasswordWindow.isCanceled()) {
             Gson gson = new Gson();
             if (filePathName != null) {
-                Writer writer = Files.newBufferedWriter(Path.of(filePathName));
-                String rawJson = gson.toJson(hmiSceneData);
-                StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
-                encryptor.setPassword(setFilePasswordWindow.getPassword());
-                encryptor.setAlgorithm("PBEWithMD5AndTripleDES");
-                String encryptedJSON = encryptor.encrypt(rawJson);
-                writer.write(encryptedJSON);
-                writer.close();
+                try(Writer writer = Files.newBufferedWriter(Path.of(filePathName))){
+                    String rawJson = gson.toJson(hmiSceneData);
+                    StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+                    encryptor.setPassword(setFilePasswordWindow.getPassword());
+                    encryptor.setAlgorithm(CIPHER_ALGORITHM);
+                    String encryptedJSON = encryptor.encrypt(rawJson);
+                    writer.write(encryptedJSON);
+                }
             }
         }
 
@@ -1603,10 +1610,10 @@ public class HMIApp extends Application {
             }
             if (!DBConnection.tableExistsInSchema("Users", "HMIUsers")) {
                 DBConnection.generateSchemaHMIUsers();
-                showAlert(Alert.AlertType.INFORMATION,"Se ha creado la base de datos de usuarios","Se creo la base de datos de usuarios con el usuario \"admin\" con contraseña \"12345\",\npor su seguridad actualice la contraseña desde la ventana de administración de usuarios",false,false);
+                showAlert(Alert.AlertType.INFORMATION, "Se ha creado la base de datos de usuarios", "Se creo la base de datos de usuarios con el usuario \"admin\" con contraseña \"12345\",\npor su seguridad actualice la contraseña desde la ventana de administración de usuarios", false, false);
             }
         } catch (SQLException sqlException) {
-            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", "Verifique que tiene acceso a MySQL a través de la ventana de credenciales que se mostrará a continuación\nError:"+sqlException.getMessage(), false, false);
+            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", "Verifique que tiene acceso a MySQL a través de la ventana de credenciales que se mostrará a continuación\nError:" + sqlException.getMessage(), false, false);
             sqlException.printStackTrace();
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.showAndWait();
@@ -1673,18 +1680,6 @@ public class HMIApp extends Application {
 
     public ArrayList<Alarm> getProjectAlarms() {
         return projectAlarms;
-    }
-
-    public void setProjectAlarms(ArrayList<Alarm> projectAlarms) {
-        this.projectAlarms = projectAlarms;
-    }
-
-    public ArrayList<Alarm> getManageableAlarms() {
-        return manageableAlarms;
-    }
-
-    public void setManageableAlarms(ArrayList<Alarm> manageableAlarms) {
-        this.manageableAlarms = manageableAlarms;
     }
 
     public ArrayList<Tag> getLocalTags() {
