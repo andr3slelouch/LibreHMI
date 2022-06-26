@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -21,6 +22,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,6 +55,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private final ContextMenu rightClickMenu;
     private CanvasPoint lastClickPoint;
     private final ArrayList<CanvasPoint> canvasObjectPoints = new ArrayList<>();
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
 
     public void setShapeArrayList(ArrayList<CanvasObjectData> shapeArrayList) {
@@ -713,6 +716,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private void addPastedImageViewOnCanvasClicked(CanvasObjectData canvasObjectData) {
         try {
             CanvasImage canvasImage = new CanvasImage(canvasObjectData);
+            if(canvasImage.getCanvasObjectData().isImageSymbol()){
+                canvasImage.setImage(new Image(getClass().getResourceAsStream("windows"+ File.separator+canvasObjectData.getData())));
+                canvasImage.setImageView(new ImageView(canvasImage.getImage()));
+                canvasImage.setCenter(canvasImage.getImageView());
+            }
             canvasImage.setCanvas(this);
             canvasImage.setHmiApp(this.hmiApp);
             canvasImage.setPosition(Objects.requireNonNullElseGet(currentMousePosition, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + pasteOffset, canvasObjectData.getPosition().getY() + pasteOffset)));

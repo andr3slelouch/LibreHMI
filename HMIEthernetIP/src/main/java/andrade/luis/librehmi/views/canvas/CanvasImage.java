@@ -17,12 +17,21 @@ public class CanvasImage extends CanvasObject {
         return imageView;
     }
 
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
+    }
+
     private ImageView imageView;
     /**
      * Image Not found attribution:
      * <a href="https://www.flaticon.com/free-icons/page-not-found" title="page-not-found icons">Page-not-found icons created by Pixel perfect - Flaticon</a>
      */
     private final Image imageNotFound = new Image(getClass().getResource("not-found.png").toExternalForm());
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
     private Image image;
 
     public CanvasImage(Image image, CanvasPoint center, boolean isOnCanvas, String imagePath, boolean isImageSymbol) {
@@ -35,6 +44,8 @@ public class CanvasImage extends CanvasObject {
         try {
             if (!this.getCanvasObjectData().isImageSymbol()) {
                 this.image = new Image(new FileInputStream(canvasObjectData.getData()));
+            }else{
+                this.image = imageNotFound;
             }
         } catch (FileNotFoundException e) {
             this.image = imageNotFound;
@@ -147,8 +158,8 @@ public class CanvasImage extends CanvasObject {
         selectHMISymbolWindow.showAndWait();
         this.getCanvasObjectData().setWidth(selectHMISymbolWindow.getImageViewWidth());
         this.getCanvasObjectData().setHeight(selectHMISymbolWindow.getImageViewHeight());
-        String selectedSymbolPath = selectHMISymbolWindow.getSelectedImagePath();
-        Image selectedSymbol = new Image(new FileInputStream(selectedSymbolPath));
+
+        Image selectedSymbol = selectHMISymbolWindow.getSelectedImage();
         boolean isMirroringVertical = selectHMISymbolWindow.isMirroringVertical();
         boolean isMirroringHorizontal = selectHMISymbolWindow.isMirroringHorizontal();
         boolean isPreservingRatio = selectHMISymbolWindow.isPreservingRatio();
@@ -160,7 +171,7 @@ public class CanvasImage extends CanvasObject {
         double hue = selectHMISymbolWindow.getHue();
         CanvasColor color = selectHMISymbolWindow.getColor();
         this.getCanvasObjectData().setPreservingRatio(isPreservingRatio);
-        setData(selectedSymbol, selectedSymbolPath, true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), true);
+        setData(selectedSymbol, selectHMISymbolWindow.getSelectedImagePath(), true, this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), true);
         modifyImageViewSizeRotation(isMirroringHorizontal,isMirroringVertical,rotation);
         if(isModifyingColor){
             modifyImageViewColors(color,contrast,brightness,saturation,hue);
