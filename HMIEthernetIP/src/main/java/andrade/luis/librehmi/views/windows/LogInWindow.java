@@ -65,7 +65,6 @@ public class LogInWindow extends Stage {
                 }
             } catch (SQLException e) {
                 databaseConnectionFailed(e.getMessage());
-
                 logger.log(Level.INFO,e.getMessage());
             } catch (IOException e) {
                 logger.log(Level.INFO,e.getMessage());

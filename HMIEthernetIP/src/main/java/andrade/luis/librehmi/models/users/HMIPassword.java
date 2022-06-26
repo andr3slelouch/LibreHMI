@@ -8,6 +8,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
     This Class was based on http://www.aspheute.com/english/20040105.asp special thanks to Christoph Wille
@@ -52,13 +54,12 @@ public class HMIPassword {
     public static boolean verifyPassword(String password, String salt, String expectedHash) {
         char[] passwordCharArr = password.toCharArray();
         byte[] saltedHash = computeSaltedHash(passwordCharArr, Base64.getDecoder().decode(salt));
-        if(saltedHash.length<1){
+        if(saltedHash.length>0){
             Arrays.fill(passwordCharArr, Character.MIN_VALUE);
             String saltedHashStr = Base64.getEncoder().encodeToString(saltedHash);
             return saltedHashStr.equals(expectedHash);
         }else{
             return false;
         }
-
     }
 }
