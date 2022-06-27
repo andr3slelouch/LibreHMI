@@ -1,5 +1,6 @@
 package andrade.luis.librehmi.views.windows;
 
+import andrade.luis.librehmi.models.CanvasObjectData;
 import andrade.luis.librehmi.models.HMISymbolsTree;
 import andrade.luis.librehmi.views.canvas.CanvasColor;
 import andrade.luis.librehmi.views.canvas.CanvasImage;
@@ -50,15 +51,6 @@ public class SelectHMISymbolWindow extends Stage {
     private double imageViewHeight;
     Logger logger = Logger.getLogger(this.getClass().getName());
 
-    public double getHue() {
-        return hue;
-    }
-
-    public void setHue(double hue) {
-        this.hue = hue;
-    }
-
-    private double hue;
     private Image selectedImage;
     private String selectedImagePath;
     private boolean mirroringVertical = false;
@@ -66,13 +58,11 @@ public class SelectHMISymbolWindow extends Stage {
     private boolean modifyingColor = false;
     private boolean preservingRatio = false;
     private double rotation = 0;
-    private double contrast = 0;
-    private double brightness = 0;
-    private double saturation = 0;
+
     private String symbolCategory = "";
     private CanvasColor color;
     private final ArrayList<CanvasImage> currentImages = new ArrayList<>();
-    private ArrayList<ScrollPane> categoriesPanes = new ArrayList<>();
+    private final ArrayList<ScrollPane> categoriesPanes = new ArrayList<>();
 
     private final ArrayList<TitledPane> categoriesTitlePanes = new ArrayList<>();
     private static final String PIPES_VALVES = "PipesValves";
@@ -92,6 +82,17 @@ public class SelectHMISymbolWindow extends Stage {
     );
     HashMap<String, Boolean> categoriesDirectoriesFlags = new HashMap<>();
     ArrayList<String> categories = new ArrayList<>(categoriesDirectory.keySet());
+
+    public CanvasObjectData getCanvasObjectData() {
+        return canvasObjectData;
+    }
+
+    public void setCanvasObjectData(CanvasObjectData canvasObjectData) {
+        this.canvasObjectData = canvasObjectData;
+    }
+
+    private CanvasObjectData canvasObjectData = new CanvasObjectData();
+
 
     public SelectHMISymbolWindow(double imageViewWidth, double imageViewHeight) {
         this.imageViewWidth = imageViewWidth;
@@ -140,10 +141,10 @@ public class SelectHMISymbolWindow extends Stage {
             if (modifyingColor) {
                 setImageOptionsWindow.setModifyingColor(true);
                 setImageOptionsWindow.getModColorRB().setSelected(true);
-                setImageOptionsWindow.getBrightnessTextField().setText(String.valueOf(brightness));
-                setImageOptionsWindow.getContrastTextField().setText(String.valueOf(contrast));
-                setImageOptionsWindow.getHueTextField().setText(String.valueOf(hue));
-                setImageOptionsWindow.getSaturationTextField().setText(String.valueOf(saturation));
+                setImageOptionsWindow.getBrightnessTextField().setText(String.valueOf(this.getCanvasObjectData().getBrightness()));
+                setImageOptionsWindow.getContrastTextField().setText(String.valueOf(this.getCanvasObjectData().getContrast()));
+                setImageOptionsWindow.getHueTextField().setText(String.valueOf(this.getCanvasObjectData().getHue()));
+                setImageOptionsWindow.getSaturationTextField().setText(String.valueOf(this.getCanvasObjectData().getSaturation()));
                 setImageOptionsWindow.getColorPicker().setValue(color.getColor());
             } else {
                 setImageOptionsWindow.getOriginalColorRB().setSelected(true);
@@ -162,10 +163,10 @@ public class SelectHMISymbolWindow extends Stage {
             if (setImageOptionsWindow.isModifyingColor()) {
                 modifyingColor = setImageOptionsWindow.isModifyingColor();
                 color = new CanvasColor(setImageOptionsWindow.getColorPicker().getValue());
-                contrast = Double.parseDouble(setImageOptionsWindow.getContrastTextField().getText());
-                brightness = Double.parseDouble(setImageOptionsWindow.getBrightnessTextField().getText());
-                saturation = Double.parseDouble(setImageOptionsWindow.getSaturationTextField().getText());
-                hue = Double.parseDouble(setImageOptionsWindow.getHueTextField().getText());
+                this.getCanvasObjectData().setContrast(Double.parseDouble(setImageOptionsWindow.getContrastTextField().getText()));
+                this.getCanvasObjectData().setBrightness(Double.parseDouble(setImageOptionsWindow.getBrightnessTextField().getText()));
+                this.getCanvasObjectData().setSaturation(Double.parseDouble(setImageOptionsWindow.getSaturationTextField().getText()));
+                this.getCanvasObjectData().setHue(Double.parseDouble(setImageOptionsWindow.getHueTextField().getText()));
             }
         });
         Button okButton = new Button("OK");
@@ -422,29 +423,7 @@ public class SelectHMISymbolWindow extends Stage {
         this.modifyingColor = modifyingColor;
     }
 
-    public double getContrast() {
-        return contrast;
-    }
 
-    public void setContrast(double contrast) {
-        this.contrast = contrast;
-    }
-
-    public double getBrightness() {
-        return brightness;
-    }
-
-    public void setBrightness(double brightness) {
-        this.brightness = brightness;
-    }
-
-    public double getSaturation() {
-        return saturation;
-    }
-
-    public void setSaturation(double saturation) {
-        this.saturation = saturation;
-    }
 
     public CanvasColor getColor() {
         return color;

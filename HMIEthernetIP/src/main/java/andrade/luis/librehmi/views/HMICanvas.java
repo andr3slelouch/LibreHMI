@@ -56,54 +56,59 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private final ContextMenu rightClickMenu;
     private CanvasPoint lastClickPoint;
     private final ArrayList<CanvasPoint> canvasObjectPoints = new ArrayList<>();
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 
     public void setShapeArrayList(ArrayList<CanvasObjectData> shapeArrayList) {
         pasteOffset = 0;
         for (CanvasObjectData canvasObjectData : shapeArrayList) {
-            switch (canvasObjectData.getType()) {
-                case LINE_STR:
-                    addPastedLine(canvasObjectData);
-                    continue;
-                case RECTANGLE_STR:
-                    addPastedRectangle(canvasObjectData);
-                    continue;
-                case ELLIPSE_STR:
-                    addPastedEllipse(canvasObjectData);
-                    continue;
-                case SYS_DATE_TIME_STR:
-                    addPastedSystemDateTimeLabel(canvasObjectData);
-                    continue;
-                case TEXT_STR:
-                    addPastedTextOnCanvasClicked(canvasObjectData);
-                    continue;
-                case IMAGE_STR:
-                case SYMBOL_STR:
-                    addPastedImageViewOnCanvasClicked(canvasObjectData);
-                    continue;
-                case BUTTON_STR:
-                    addPastedButtonOnCanvasClicked(canvasObjectData);
-                    continue;
-                case PUSHBUTTON_STR:
-                    addPastedPushbuttonOnCanvasClicked(canvasObjectData);
-                    continue;
-                case SLIDER_STR:
-                    addPastedSliderOnCanvasClicked(canvasObjectData);
-                    continue;
-                case TEXTFIELD_STR:
-                    addPastedTextFieldOnCanvasClicked(canvasObjectData);
-                    continue;
-                case ALARM_DISPLAY_STR:
-                    addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
-                    continue;
-                case TREND_STR:
-                    addPastedTrendChartOnCanvasClicked(canvasObjectData);
-                    continue;
-                default:
-            }
+            addPastedObject(canvasObjectData);
         }
         pasteOffset = 10;
+    }
+
+    private void addPastedObject(CanvasObjectData canvasObjectData){
+        switch (canvasObjectData.getType()) {
+            case LINE_STR:
+                addPastedLine(canvasObjectData);
+                break;
+            case RECTANGLE_STR:
+                addPastedRectangle(canvasObjectData);
+                break;
+            case ELLIPSE_STR:
+                addPastedEllipse(canvasObjectData);
+                break;
+            case SYS_DATE_TIME_STR:
+                addPastedSystemDateTimeLabel(canvasObjectData);
+                break;
+            case TEXT_STR:
+                addPastedTextOnCanvasClicked(canvasObjectData);
+                break;
+            case IMAGE_STR:
+            case SYMBOL_STR:
+                addPastedImageViewOnCanvasClicked(canvasObjectData);
+                break;
+            case BUTTON_STR:
+                addPastedButtonOnCanvasClicked(canvasObjectData);
+                break;
+            case PUSHBUTTON_STR:
+                addPastedPushbuttonOnCanvasClicked(canvasObjectData);
+                break;
+            case SLIDER_STR:
+                addPastedSliderOnCanvasClicked(canvasObjectData);
+                break;
+            case TEXTFIELD_STR:
+                addPastedTextFieldOnCanvasClicked(canvasObjectData);
+                break;
+            case ALARM_DISPLAY_STR:
+                addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
+                break;
+            case TREND_STR:
+                addPastedTrendChartOnCanvasClicked(canvasObjectData);
+                break;
+            default:
+                break;
+        }
     }
 
     private final ArrayList<CanvasObject> shapeArrayList = new ArrayList<>();
@@ -393,10 +398,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         isMirroringHorizontal = selectHMISymbolWindow.isMirroringHorizontal();
         rotation = selectHMISymbolWindow.getRotation();
         isModifyingColor = selectHMISymbolWindow.isModifyingColor();
-        contrast = selectHMISymbolWindow.getContrast();
-        brightness = selectHMISymbolWindow.getBrightness();
-        saturation = selectHMISymbolWindow.getSaturation();
-        hue = selectHMISymbolWindow.getHue();
+        contrast = selectHMISymbolWindow.getCanvasObjectData().getContrast();
+        brightness = selectHMISymbolWindow.getCanvasObjectData().getBrightness();
+        saturation = selectHMISymbolWindow.getCanvasObjectData().getSaturation();
+        hue = selectHMISymbolWindow.getCanvasObjectData().getHue();
         color = selectHMISymbolWindow.getColor();
         if (selectedSymbolPath != null) {
             CanvasImage canvasImage = new CanvasImage(selectedSymbol, current, true, selectedSymbolPath, true);
@@ -606,47 +611,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             if (clipboard.isDataFlavorAvailable(flavor)) {
                 CanvasObjectData canvasObjectData = (CanvasObjectData) clipboard.getData(flavor);
                 canvasObjectData.setPosition(Objects.requireNonNullElseGet(lastClickPoint, () -> new CanvasPoint(canvasObjectData.getPosition().getX() + 10, canvasObjectData.getPosition().getY() + 10)));
-                switch (canvasObjectData.getType()) {
-                    case LINE_STR:
-                        addPastedLine(canvasObjectData);
-                        break;
-                    case RECTANGLE_STR:
-                        addPastedRectangle(canvasObjectData);
-                        break;
-                    case ELLIPSE_STR:
-                        addPastedEllipse(canvasObjectData);
-                        break;
-                    case SYS_DATE_TIME_STR:
-                        addPastedSystemDateTimeLabel(canvasObjectData);
-                        break;
-                    case TEXT_STR:
-                        addPastedTextOnCanvasClicked(canvasObjectData);
-                        break;
-                    case BUTTON_STR:
-                        addPastedButtonOnCanvasClicked(canvasObjectData);
-                        break;
-                    case PUSHBUTTON_STR:
-                        addPastedPushbuttonOnCanvasClicked(canvasObjectData);
-                        break;
-                    case SLIDER_STR:
-                        addPastedSliderOnCanvasClicked(canvasObjectData);
-                        break;
-                    case TEXTFIELD_STR:
-                        addPastedTextFieldOnCanvasClicked(canvasObjectData);
-                        break;
-                    case IMAGE_STR:
-                    case SYMBOL_STR:
-                        addPastedImageViewOnCanvasClicked(canvasObjectData);
-                        break;
-                    case ALARM_DISPLAY_STR:
-                        addPastedAlarmDisplayOnCanvasClicked(canvasObjectData);
-                        break;
-                    case TREND_STR:
-                        addPastedTrendChartOnCanvasClicked(canvasObjectData);
-                        break;
-                    default:
-                        break;
-                }
+                addPastedObject(canvasObjectData);
             }
         } catch (ClassNotFoundException | IOException | UnsupportedFlavorException e) {
             logger.log(Level.INFO,e.getMessage());

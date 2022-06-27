@@ -149,10 +149,10 @@ public class CanvasImage extends CanvasObject {
             selectHMISymbolWindow.setSelectedImagePath(this.getCanvasObjectData().getData());
             if (this.getCanvasObjectData().isModifyingColors()) {
                 selectHMISymbolWindow.setColor(this.getCanvasObjectData().getPrimaryColor());
-                selectHMISymbolWindow.setContrast(this.getCanvasObjectData().getContrast());
-                selectHMISymbolWindow.setBrightness(this.getCanvasObjectData().getBrightness());
-                selectHMISymbolWindow.setSaturation(this.getCanvasObjectData().getSaturation());
-                selectHMISymbolWindow.setHue(this.getCanvasObjectData().getHue());
+                selectHMISymbolWindow.getCanvasObjectData().setContrast(this.getCanvasObjectData().getContrast());
+                selectHMISymbolWindow.getCanvasObjectData().setBrightness(this.getCanvasObjectData().getBrightness());
+                selectHMISymbolWindow.getCanvasObjectData().setSaturation(this.getCanvasObjectData().getSaturation());
+                selectHMISymbolWindow.getCanvasObjectData().setHue(this.getCanvasObjectData().getHue());
                 selectHMISymbolWindow.setModifyingColor(this.getCanvasObjectData().isModifyingColors());
             }
         }
@@ -168,10 +168,10 @@ public class CanvasImage extends CanvasObject {
         boolean isPreservingRatio = selectHMISymbolWindow.isPreservingRatio();
         double rotation = selectHMISymbolWindow.getRotation();
         boolean isModifyingColor = selectHMISymbolWindow.isModifyingColor();
-        double contrast = selectHMISymbolWindow.getContrast();
-        double brightness = selectHMISymbolWindow.getBrightness();
-        double saturation = selectHMISymbolWindow.getSaturation();
-        double hue = selectHMISymbolWindow.getHue();
+        double contrast = selectHMISymbolWindow.getCanvasObjectData().getContrast();
+        double brightness = selectHMISymbolWindow.getCanvasObjectData().getBrightness();
+        double saturation = selectHMISymbolWindow.getCanvasObjectData().getSaturation();
+        double hue = selectHMISymbolWindow.getCanvasObjectData().getHue();
         String imagePath = this.getCanvasObjectData().getData();
         if(selectHMISymbolWindow.getSelectedImagePath()!=null){
             imagePath = selectHMISymbolWindow.getSelectedImagePath();

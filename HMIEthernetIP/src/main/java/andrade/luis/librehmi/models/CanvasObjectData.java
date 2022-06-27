@@ -292,6 +292,10 @@ public class CanvasObjectData implements Serializable, Transferable {
         return saturation;
     }
 
+    public void setSaturation(double saturation){
+        this.saturation = saturation;
+    }
+
     public boolean isMirroringHorizontal() {
         return mirroringHorizontal;
     }

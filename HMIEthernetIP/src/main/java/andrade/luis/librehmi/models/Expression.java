@@ -89,7 +89,7 @@ public class Expression implements Serializable {
             for(String parameterType : parameterTypes){
                 if(parameterType.equals(STRING_STR)) break;
             }
-            if (expressionToEvaluate.contains(arithmeticOperator) && expressionToEvaluate.matches(".*\\d+.*")) {
+            if (expressionToEvaluate.contains(arithmeticOperator) && expressionToEvaluate.matches("\\d")) {
                 return FLOAT_STR;
             }
         }
