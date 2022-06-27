@@ -4,6 +4,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * Clase que contendrá los datos de un usuario que se mostrarán en cada fila de la tabla de administración de usuarios
+ */
 public class HMIUserRow {
     public String getFirst() {
         return first.get();

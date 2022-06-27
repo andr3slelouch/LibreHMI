@@ -9,6 +9,9 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Clase alarma que contendrá las condiciones necesarias para su activación
+ */
 public class Alarm implements Serializable {
     private static final String ACTIVATED_STR = "Activada";
     private static final String DEACTIVATED_STR = "Desactivada";
@@ -70,6 +73,14 @@ public class Alarm implements Serializable {
         this.comment = comment;
     }
 
+    /**
+     * Permite verificar las condiciones de la alarma
+     * @return true si una alarma cumple sus condiciones
+     * @throws SQLException Se activa esta excepción si no se puede realizar la comunicación con la base de datos
+     * @throws CompileException Se activa si la expresión de condición definida tiene un problema para su compilación
+     * @throws IOException Se activa si no se pueden leer las credenciales de conexión a la base de datos
+     * @throws InvocationTargetException
+     */
     public boolean checkAlarm() throws SQLException, CompileException, IOException, InvocationTargetException {
         if(conditionEnabled){
             boolean localValue = (boolean) this.expression.evaluate();
@@ -83,6 +94,14 @@ public class Alarm implements Serializable {
         }
     }
 
+    /**
+     * Permite verificar las condiciones de alto y alto-alto
+     * @return true si las condiciones de activación se cumplen
+     * @throws SQLException Se activa esta excepción si no se puede realizar la comunicación con la base de datos
+     * @throws CompileException Se activa si la expresión de condición definida tiene un problema para su compilación
+     * @throws IOException Se activa si no se pueden leer las credenciales de conexión a la base de datos
+     * @throws InvocationTargetException
+     */
     private boolean checkHighConditions() throws SQLException, CompileException, IOException, InvocationTargetException {
         if(hiHiAlarmEnabled){
             double localValue = (double) this.expression.evaluate();
@@ -97,6 +116,14 @@ public class Alarm implements Serializable {
         return false;
     }
 
+    /**
+     * Permite verificar las condiciones de bajo y bajo-bajo
+     * @return true si las condiciones de activación se cumplen
+     * @throws SQLException Se activa esta excepción si no se puede realizar la comunicación con la base de datos
+     * @throws CompileException Se activa si la expresión de condición definida tiene un problema para su compilación
+     * @throws IOException Se activa si no se pueden leer las credenciales de conexión a la base de datos
+     * @throws InvocationTargetException
+     */
     private boolean checkLowConditions() throws SQLException, CompileException, IOException, InvocationTargetException {
         if(loloAlarmEnabled){
             double localValue = (double) this.expression.evaluate();
@@ -111,6 +138,11 @@ public class Alarm implements Serializable {
         return false;
     }
 
+    /**
+     * Permite verificar las condiciones de boolean
+     * @param localValue Valor a ser verificado
+     * @return true si las condiciones de activación se cumplen
+     */
     private boolean checkBooleanCondition(boolean localValue){
         if(localValue == condition){
             if(this.status.equals(DEACTIVATED_STR)){
@@ -127,6 +159,11 @@ public class Alarm implements Serializable {
         }
     }
 
+    /**
+     * Permite verificar las condiciones de alto-alto
+     * @param localValue Valor a ser verificado
+     * @return true si las condiciones de activación se cumplen
+     */
     private boolean checkHiHiAlarmCondition(double localValue){
         if(localValue > hiHiLimit){
             if(this.status.equals(DEACTIVATED_STR)){
@@ -141,6 +178,11 @@ public class Alarm implements Serializable {
         return false;
     }
 
+    /**
+     * Permite verificar las condiciones de alto
+     * @param localValue Valor a ser verificado
+     * @return true si las condiciones de activación se cumplen
+     */
     private boolean checkHighAlarmCondition(double localValue){
         if(localValue> highLimit){
             if(this.status.equals(DEACTIVATED_STR)){
@@ -155,6 +197,11 @@ public class Alarm implements Serializable {
         return false;
     }
 
+    /**
+     * Permite verificar las condiciones de bajo-bajo
+     * @param localValue Valor a ser verificado
+     * @return true si las condiciones de activación se cumplen
+     */
     private boolean checkLoLoCondition(double localValue){
         if(localValue < loloLimit){
             if(this.status.equals(DEACTIVATED_STR)){
@@ -169,6 +216,11 @@ public class Alarm implements Serializable {
         return false;
     }
 
+    /**
+     * Permite verificar las condiciones de bajo
+     * @param localValue Valor a ser verificado
+     * @return true si las condiciones de activación se cumplen
+     */
     private boolean checkLowCondition(double localValue){
         if(localValue < lowLimit){
             if(this.status.equals(DEACTIVATED_STR)){
@@ -227,6 +279,9 @@ public class Alarm implements Serializable {
         return alarmExecutionDateTime;
     }
 
+    /**
+     * Define el tiempo de ejecución de alarma consultando el tiempo actual del sistema
+     */
     public void setAlarmExecutionDateTime() {
         this.alarmExecutionDateTime = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now());
     }

@@ -2,6 +2,9 @@ package andrade.luis.librehmi.models;
 
 import javafx.scene.control.CheckBox;
 
+/**
+ * Clase que contiene los datos de una página de la ventana de selección de páginas
+ */
 public class SceneItem {
     private final CheckBox checkBox;
     private String scene;

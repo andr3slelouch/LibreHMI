@@ -4,6 +4,9 @@ import andrade.luis.librehmi.HMIApp;
 import andrade.luis.librehmi.views.RecentUsedFilesItem;
 import javafx.scene.control.ListCell;
 
+/**
+ * Clase que contendrá las celdas de la lista de archivos recientes
+ */
 public class RecentUsedFilesCell extends ListCell<String> {
     HMIApp hmiApp;
     @Override

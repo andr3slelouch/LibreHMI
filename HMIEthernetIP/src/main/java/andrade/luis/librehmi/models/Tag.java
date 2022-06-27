@@ -10,6 +10,9 @@ import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.Map;
 
+/**
+ * Clase que contiene los datos de un tag
+ */
 public class Tag implements Serializable {
     private static final String NULL_STR = "<null>";
     public static final String ENTERO_STR = "Entero";
@@ -133,6 +136,12 @@ public class Tag implements Serializable {
         this.floatPrecision = floatPrecision;
     }
 
+    /**
+     * Permite leer los datos de un tag desde la base de datos, si es un tag local solamente retornará su valor
+     * @return Valor del tag leído desde la base de datos
+     * @throws SQLException
+     * @throws IOException
+     */
     public String read() throws SQLException, IOException {
         if (!localTag) {
             try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
@@ -155,6 +164,12 @@ public class Tag implements Serializable {
         }
     }
 
+    /**
+     * Permite extraer el resultado desde el resultSet
+     * @param resultSet ResultSet obtenido luego de consultar en la base de datos
+     * @return String con el valor de la columna valor de la base de datos
+     * @throws SQLException
+     */
     private String getResultFromResultSet(ResultSet resultSet) throws SQLException {
         while (resultSet.next()) {
             if (!resultSet.getString("valor").isEmpty()) {
@@ -166,6 +181,11 @@ public class Tag implements Serializable {
         return null;
     }
 
+    /**
+     * Permite comparar si dos tags tienen los mismos atributos
+     * @param comparedTag Tag a comparar contra el tag actual
+     * @return true si los tags tienen los mismos valores en sus atributos
+     */
     public boolean compareToTag(Tag comparedTag) {
         if (comparedTag != null) {
             return
@@ -183,6 +203,12 @@ public class Tag implements Serializable {
         }
     }
 
+    /**
+     * Permite actualizar los valores de un tag en la base de datos
+     * @return false si la operación tiene éxito al realizarse
+     * @throws SQLException
+     * @throws IOException
+     */
     public boolean update() throws SQLException, IOException {
         if (!localTag) {
             try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
@@ -208,6 +234,10 @@ public class Tag implements Serializable {
 
     }
 
+    /**
+     * Permite preparar un valor para su actualización en la base de datos
+     * @return Valor preparado para ser almacenado en la base de datos
+     */
     private String prepareValue() {
         String updateValue;
         switch (this.getType()) {
@@ -224,6 +254,7 @@ public class Tag implements Serializable {
         return updateValue;
     }
 
+
     public DecimalFormat generateDecimalFormat() {
         String precisionStr = "#.";
         for (int i = 0; i < floatPrecision; i++) {
@@ -232,6 +263,15 @@ public class Tag implements Serializable {
         return new DecimalFormat(precisionStr);
     }
 
+    /**
+     * Constructor de la clase que permite definir todos sus atributos requeridos
+     * @param name Nombre del tag
+     * @param type Tipo del tag
+     * @param address Dirección del tag
+     * @param action Tipo de acción disponible en cuestión de escritura o lectura
+     * @param value Valor del tag
+     * @param floatPrecision Precisión del tag
+     */
     public Tag(String name, String type, String address, String action, String value, int floatPrecision) {
         this.name = name;
         this.type = type;
@@ -242,12 +282,26 @@ public class Tag implements Serializable {
         this.localTag = false;
     }
 
+    /**
+     * Permite definir los valores de PLC del tag
+     * @param plcName Nombre del plc
+     * @param plcAddress Dirección del PLC
+     * @param plcDeviceGroup Device Group del PLC
+     */
     public void setPLCValues(String plcName, String plcAddress, String plcDeviceGroup){
         this.plcName = plcName;
         this.plcAddress = plcAddress;
         this.plcDeviceGroup = plcDeviceGroup;
     }
 
+    /**
+     * Constructor para definir un tag local
+     * @param name Nombre del tag local
+     * @param type Tipo del tag local
+     * @param action Tipo de acción disponible en cuestión de escritura o lectura
+     * @param value Valor del tag local
+     * @param floatPrecision Precisión de decimales del tag local
+     */
     public Tag(String name, String type, String action, String value, int floatPrecision) {
         this.plcName = "LibreHMI";
         this.plcAddress = "localhost";

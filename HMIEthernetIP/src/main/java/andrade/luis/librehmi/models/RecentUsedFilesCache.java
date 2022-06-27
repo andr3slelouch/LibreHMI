@@ -2,6 +2,9 @@ package andrade.luis.librehmi.models;
 
 import java.util.*;
 
+/**
+ * Clase que contendrá los últimos archivos de proyecto utilizados por la aplicación
+ */
 public class RecentUsedFilesCache {
     Set<String> cache;
 

@@ -7,11 +7,22 @@ import java.util.Properties;
 import andrade.luis.librehmi.models.users.HMIUser;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
+/**
+ * Clase que contiene los métodos estáticos requeridos para conectarse a la base de datos
+ * de forma general por la aplicación
+ */
 public class DBConnection {
     public static final String ADMIN = "admin";
     private final String bdDriverEIPScriptLocation = getClass().getResource("BD_DRIVER_LINUX.sql").toExternalForm().substring(5);
     private static final String BD_DRIVER_EIP_NAME = "bd_driver_eip";
 
+    /**
+     * Permite crear una conexión a un esquema de la base de datos
+     * @param schema Nombre del esquema
+     * @return Conexión al esquema de base de datos
+     * @throws SQLException
+     * @throws IOException
+     */
     public static Connection createConnection(String schema) throws SQLException, IOException {
         Properties properties = readPropertiesFile();
         Connection con;
@@ -25,6 +36,11 @@ public class DBConnection {
         return con;
     }
 
+    /**
+     * Permite obtener el directorio de trabajo donde la aplicación guardará y leerá los archivos necesarios
+     * para su funcionamiento
+     * @return El path del directorio de trabajo
+     */
     public static String getWorkingDirectory() {
         String homeDirectory = System.getProperty("user.home");
         String directoryName = homeDirectory.concat(File.separator + "LibreHMI");
@@ -35,10 +51,23 @@ public class DBConnection {
         return directoryName;
     }
 
+    /**
+     * Permite obtener el path con el nombre del archivo de propiedades de la aplicación
+     * @return El path del archivo de propiedades
+     */
     public static String getPropertiesFileName() {
         return getWorkingDirectory() + File.separator + "LibreHMI.properties";
     }
 
+    /**
+     * Permite escribir el archivo de propiedades
+     * @param username Nombre de usuario para la conexión a la base de datos
+     * @param password Contraseña del usuario para la conexión a la base de datos
+     * @param hostname Dirección IP de la base de datos
+     * @param port Puerto de la base de datos
+     * @param properties Objeto de propiedades
+     * @throws IOException
+     */
     public static void writePropertiesFile(String username, String password, String hostname, String port, Properties properties) throws IOException {
         properties.setProperty("username", username);
         properties.setProperty("password", password);
@@ -53,6 +82,17 @@ public class DBConnection {
 
     }
 
+    /**
+     * Permite añadir las propiedades que permiten verificar si las categorías se han habilitado
+     * @param boilerFurnace Categoría de Hornos, calderas, etc
+     * @param conveyorBelts Categoría de Cintas transportadoras
+     * @param motorPumps Categoría de Motores y bombas
+     * @param others Categoría de Otros
+     * @param pipesValues Categoría de Tuberías
+     * @param tanks Categoría de Tanques
+     * @param properties Objeto de propiedades
+     * @return Objeto de propiedades con las categorías agregadas
+     */
     public static Properties prepareCategoriesProperties(boolean boilerFurnace, boolean conveyorBelts, boolean motorPumps, boolean others, boolean pipesValues, boolean tanks, Properties properties) {
         properties.setProperty("BoilerFurnace", String.valueOf(boilerFurnace));
         properties.setProperty("ConveyorBelts", String.valueOf(conveyorBelts));
@@ -63,6 +103,11 @@ public class DBConnection {
         return properties;
     }
 
+    /**
+     * Permite leer el archivo de propiedades
+     * @return Objeto de propiedades de la aplicación
+     * @throws IOException
+     */
     public static Properties readPropertiesFile() throws IOException {
         Properties properties = new Properties();
         try (FileInputStream in = new FileInputStream(getPropertiesFileName())) {
@@ -71,14 +116,33 @@ public class DBConnection {
         }
     }
 
+    /**
+     * Permite crear una conexión hacia el esquema BD_DRIVER_EIP
+     * @return Conexión hacia el esquema requerido
+     * @throws SQLException
+     * @throws IOException
+     */
     public static Connection createConnectionToBDDriverEIP() throws SQLException, IOException {
         return createConnection(BD_DRIVER_EIP_NAME);
     }
 
+    /**
+     * Permite crear una conexión hacia el esquema de usuarios
+     * @return Conexión hacia el esquema requerido
+     * @throws SQLException
+     * @throws IOException
+     */
     public static Connection createConnectionToHMIUsers() throws SQLException, IOException {
         return createConnection("HMIUsers");
     }
 
+    /**
+     * Permite verificar si un esquema requerido existe en la base de datosw
+     * @param schemaName Nombre del esquema a verificarse
+     * @return true si el esquema requerido existe
+     * @throws SQLException
+     * @throws IOException
+     */
     public static boolean schemaExistsInDB(String schemaName) throws SQLException, IOException {
         try (Connection con = createConnection("")) {
             String query = "SELECT schema_name from information_schema.schemata where schema_name = ?";
@@ -99,10 +163,24 @@ public class DBConnection {
 
     }
 
+    /**
+     * Permite verificar si las tablas esperadas de los esquemas existen
+     * @return true si las tablas esperadas existen
+     * @throws SQLException
+     * @throws IOException
+     */
     public static boolean checkIfTablesFromSchemaBDDriverAreReady() throws SQLException, IOException {
         return !(!tableExistsInSchema("plcs", BD_DRIVER_EIP_NAME) || !tableExistsInSchema("tags", BD_DRIVER_EIP_NAME) || !tableExistsInSchema("intermedia", BD_DRIVER_EIP_NAME) || !tableExistsInSchema("boolean", BD_DRIVER_EIP_NAME) || !tableExistsInSchema("entero", BD_DRIVER_EIP_NAME) || !tableExistsInSchema("flotante", BD_DRIVER_EIP_NAME));
     }
 
+    /**
+     * Permite verificar si las tablas de un esquema existen
+     * @param tableName Nombre de la tabla a verificar
+     * @param schemaName Nombre del esquema a verificar
+     * @return true si existe la tabla dentro del esquema
+     * @throws SQLException
+     * @throws IOException
+     */
     public static boolean tableExistsInSchema(String tableName, String schemaName) throws SQLException, IOException {
         if (schemaExistsInDB(schemaName)) {
             Connection con = createConnection(schemaName);
@@ -125,6 +203,11 @@ public class DBConnection {
         }
     }
 
+    /**
+     * Permite crear la tabla de usuarios en el esquema HMIUsers
+     * @throws SQLException
+     * @throws IOException
+     */
     public static void createUsersTable() throws SQLException, IOException {
         // prepare query to create database
         String query = "CREATE TABLE Users " +
@@ -159,6 +242,12 @@ public class DBConnection {
         }
     }
 
+    /**
+     * Permite crear un esquema requerido si este no existe
+     * @param schemaName Esquema a crearse si no existe
+     * @throws SQLException
+     * @throws IOException
+     */
     public static void createSchemaIfNotExists(String schemaName) throws SQLException, IOException {
         if (!schemaExistsInDB(schemaName)) {
             try(Connection con = createConnection("")){
@@ -178,6 +267,11 @@ public class DBConnection {
         }
     }
 
+    /**
+     * Permite generar el esquema bd_driver_eip
+     * @throws SQLException
+     * @throws IOException
+     */
     public void generateSchemaBDDriverEIP() throws SQLException, IOException {
         createSchemaIfNotExists(BD_DRIVER_EIP_NAME);
         try(Connection con = createConnectionToBDDriverEIP()){
@@ -190,6 +284,11 @@ public class DBConnection {
 
     }
 
+    /**
+     * Permite ejecutar un script sql
+     * @param con Conexión hacia la base de datos
+     * @throws IOException
+     */
     public void runScript(Connection con) throws IOException {
         ScriptRunner scriptRunner = new ScriptRunner(con);
         try (Reader reader = new BufferedReader(new FileReader(bdDriverEIPScriptLocation))){
@@ -199,6 +298,11 @@ public class DBConnection {
         }
     }
 
+    /**
+     * Permite generar el esquema HMIUsers
+     * @throws SQLException
+     * @throws IOException
+     */
     public static void generateSchemaHMIUsers() throws SQLException, IOException {
         createSchemaIfNotExists("HMIUsers");
         createUsersTable();

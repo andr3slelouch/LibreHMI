@@ -9,6 +9,9 @@ import java.awt.datatransfer.Transferable;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Clase que contiene los datos de una página para su exportación e importación
+ */
 public class HMISceneData implements Serializable, Transferable {
 
     @SerializedName("title")

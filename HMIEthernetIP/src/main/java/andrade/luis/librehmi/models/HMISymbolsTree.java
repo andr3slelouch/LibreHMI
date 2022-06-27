@@ -6,6 +6,9 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Clase que contiene los datos del arbol de archivos de recursos de símbolos HMI
+ */
 public class HMISymbolsTree {
 
     public static final String NULL_STR = "<null>";

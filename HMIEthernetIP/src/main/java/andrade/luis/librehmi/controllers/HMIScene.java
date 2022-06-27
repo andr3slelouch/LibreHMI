@@ -1,12 +1,12 @@
 package andrade.luis.librehmi.controllers;
 
 import andrade.luis.librehmi.HMIApp;
+import andrade.luis.librehmi.models.CanvasObjectData;
 import andrade.luis.librehmi.models.HMISceneData;
+import andrade.luis.librehmi.views.HMICanvas;
 import andrade.luis.librehmi.views.canvas.CanvasColor;
 import andrade.luis.librehmi.views.canvas.CanvasObject;
-import andrade.luis.librehmi.models.CanvasObjectData;
 import andrade.luis.librehmi.views.canvas.CanvasPoint;
-import andrade.luis.librehmi.views.HMICanvas;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -14,28 +14,26 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
+/**
+ * Esta clase se encargará de contener el canvas, y de administrar ciertas propiedades
+ */
 public class HMIScene extends Scene {
-    Logger logger
-            = Logger.getLogger(
-            HMIScene.class.getName());
     /*
      * windowImage source <a href="https://www.flaticon.com/free-icons/window" title="window icons">Window icons created by Anas Mannaa - Flaticon</a>
      * */
     private final Image windowImage = new Image(getClass().getResource("window.png").toExternalForm());
-    private ScrollPane backgroundScrollPane;
+    private final ScrollPane backgroundScrollPane;
     private ListView<String> listViewReference;
-    private ArrayList<String> itemsForList;
     private String title;
     private String sceneCommentary;
     private Color background;
@@ -93,23 +91,23 @@ public class HMIScene extends Scene {
 
     private HMIApp hmiApp;
 
-    public ArrayList<String> getItemsForList() {
-        return itemsForList;
-    }
-
     public void updateItem(int index, String value){
         this.listViewReference.getItems().set(index, value);
     }
 
+    /**
+     * Este método sirve para crear los elementos de la lista de páginas del menú lateral
+     * @param itemsForComboBox Lista de páginas
+     */
     public void setItems(ArrayList<String> itemsForComboBox) {
-        this.itemsForList = itemsForComboBox;
         ObservableList<String> elements = FXCollections.observableArrayList(itemsForComboBox);
 
         listViewReference.setItems(elements);
         /*setting each image to corresponding array index*/
-        listViewReference.setCellFactory(param -> new ListCell<String>() {
+        listViewReference.setCellFactory(param -> new ListCell<>() {
             /*view the image class to display the image*/
             private final ImageView displayImage = new ImageView();
+
             @Override
             public void updateItem(String name, boolean empty) {
                 super.updateItem(name, empty);
@@ -129,10 +127,10 @@ public class HMIScene extends Scene {
                     newItem.setOnAction(event -> hmiApp.addNewScene());
                     MenuItem exportItem = new MenuItem();
                     exportItem.setText("Exportar");
-                    exportItem.setOnAction(event -> hmiApp.exportSceneData(name,false));
+                    exportItem.setOnAction(event -> hmiApp.exportSceneData(name, false));
                     MenuItem exportEncryptedItem = new MenuItem();
                     exportEncryptedItem.setText("Exportar con contraseña");
-                    exportEncryptedItem.setOnAction(event -> hmiApp.exportSceneData(name,true));
+                    exportEncryptedItem.setOnAction(event -> hmiApp.exportSceneData(name, true));
                     MenuItem deleteItem = new MenuItem();
                     deleteItem.setText("Eliminar");
                     deleteItem.setOnAction(event -> hmiApp.deleteScene(getItem()));
@@ -142,10 +140,10 @@ public class HMIScene extends Scene {
                         String item = getItem();
                         hmiApp.updateScene(item);
                     });
-                    contextMenu.getItems().addAll(newItem,exportItem,exportEncryptedItem,deleteItem,propertiesItem);
+                    contextMenu.getItems().addAll(newItem, exportItem, exportEncryptedItem, deleteItem, propertiesItem);
                     setContextMenu(contextMenu);
                     setOnMouseClicked(event -> {
-                        if(event.getClickCount()==2){
+                        if (event.getClickCount() == 2) {
                             hmiApp.changeSelectedScene(getItem());
                         }
                     });
@@ -162,14 +160,6 @@ public class HMIScene extends Scene {
         this.listViewReference = listViewReference;
     }
 
-    public ScrollPane getBackgroundScrollPane() {
-        return backgroundScrollPane;
-    }
-
-    public void setBackgroundScrollPane(ScrollPane backgroundScrollPane) {
-        this.backgroundScrollPane = backgroundScrollPane;
-    }
-
     public HMICanvas getCanvas() {
         return hmiCanvas;
     }
@@ -178,8 +168,19 @@ public class HMIScene extends Scene {
         this.hmiCanvas = hmiCanvas;
     }
 
-    public HMIScene(ScrollPane scrollPane, HMICanvas hmiCanvas, String title, String sceneCommentary, double v, double v1, Paint paint) {
-        super(scrollPane, v, v1, paint);
+    /**
+     * Constructor de la clase, aquí se definirán el color de fondo de la página, su título, además que se habilita la
+     * lógica para agregar y pegar figuras
+     * @param scrollPane Panel de scroll que permitirá que la página tenga esta propiedad
+     * @param hmiCanvas Canvas donde se pueden agregar las representaciones gráficas
+     * @param title Título de la página
+     * @param sceneCommentary Comentario o descripción de la página
+     * @param width Ancho de la página
+     * @param height Alto de la página
+     * @param paint Color de fondo de la página
+     */
+    public HMIScene(ScrollPane scrollPane, HMICanvas hmiCanvas, String title, String sceneCommentary, double width, double height, Paint paint) {
+        super(scrollPane, width, height, paint);
         this.backgroundScrollPane = scrollPane;
         scrollPane.setBackground(new Background(new BackgroundFill(paint, CornerRadii.EMPTY, Insets.EMPTY)));
         this.background = (Color) paint;
@@ -208,16 +209,25 @@ public class HMIScene extends Scene {
         });
     }
 
+    /**
+     * Permite llamar al método de copiar de la figura seleccionada
+     */
     public void copy(){
         CanvasObject selected = getCanvas().getSelectedFigure();
         selected.copy("Copy");
     }
 
+    /**
+     * Permite llamar al método de cortar de la figura seleccionada
+     */
     public void cut(){
         CanvasObject selected = getCanvas().getSelectedFigure();
         selected.cut();
     }
 
+    /**
+     * Permite actualizar la figura que se encuentra seleccionada
+     */
     public void updateSelected(){
         canvasObjects = getCanvas().getShapeArrayList();
         max = null;
@@ -232,6 +242,10 @@ public class HMIScene extends Scene {
 
     }
 
+    /**
+     * Permite obtener el índice de la figura seleccionada dentro del arraylist de figuras
+     * @return Valor del índice de la última figura seleccionada
+     */
     private int getLastSelectedCanvasObjectIndex(){
         int index = -1;
         for (int i = 0; i < canvasObjects.size(); i++) {
@@ -249,6 +263,12 @@ public class HMIScene extends Scene {
         return index;
     }
 
+    /**
+     * Permite actualizar los parámetros de la página
+     * @param sceneTitle Título de la página
+     * @param sceneCommentary Comentario de la página
+     * @param background Color de fondo de la página
+     */
     public void update(String sceneTitle, String sceneCommentary, Color background) {
         setTitle(sceneTitle);
         setSceneCommentary(sceneCommentary);

@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+/**
+ * Enum con los datos básicos para definir las orientaciones disponibles para una animación de relleno porcentual
+ */
 public enum CanvasOrientation implements Serializable {
     @SerializedName("HORIZONTAL")
     @Expose

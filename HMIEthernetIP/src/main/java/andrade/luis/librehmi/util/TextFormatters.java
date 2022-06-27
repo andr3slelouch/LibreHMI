@@ -4,10 +4,17 @@ import javafx.scene.control.TextFormatter;
 
 import java.util.function.UnaryOperator;
 
+/**
+ * Clase que contiene los verificadores de texto
+ */
 public class TextFormatters {
     private TextFormatters(){
         throw new IllegalStateException("TextFormatters");
     }
+
+    /**
+     * Verificador de enteros a través del operador unario
+     */
     public static final UnaryOperator<TextFormatter.Change> integerFilter = change -> {
         String newText = change.getControlNewText();
         if (!newText.matches("^([+-])?\\d+$")) {
@@ -17,6 +24,9 @@ public class TextFormatters {
         return change;
     };
 
+    /**
+     * Verificador de dígitos a través del operador unario
+     */
     public static final UnaryOperator<TextFormatter.Change> digitFilter = change -> {
         String newText = change.getControlNewText();
         if (!newText.matches("^\\d+$")) {
@@ -26,6 +36,9 @@ public class TextFormatters {
         return change;
     };
 
+    /**
+     * Verificador de flotantes a través del operador unario
+     */
     public static final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
         String newText = change.getControlNewText();
         if (!newText.matches("^([+-])?\\d+\\.\\d+$")) {
@@ -35,6 +48,9 @@ public class TextFormatters {
         return change;
     };
 
+    /**
+     * Verificador de boolean a través del operador unario
+     */
     public static final UnaryOperator<TextFormatter.Change> booleanFilter = change -> {
         String newText = change.getControlNewText();
         if (!newText.matches("(\\b0\\b)|(\\b1\\b)|(\\b00\\b)|(\\b01\\b)|")) {

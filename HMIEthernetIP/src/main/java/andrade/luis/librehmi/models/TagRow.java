@@ -4,6 +4,10 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * Clase que contendrá los datos de un tag en cada fila de una tabla de selección de tags
+ * o de administración de tag locales
+ */
 public class TagRow {
 
     public static final String NULL_STR = "<null>";

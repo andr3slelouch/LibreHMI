@@ -4,6 +4,9 @@ import andrade.luis.librehmi.views.canvas.CanvasColor;
 
 import java.io.Serializable;
 
+/**
+ * Contiene los datos requeridos para el funcionamiento de una serie de un gráfico de tendencias
+ */
 public class TrendChartSerieData implements Serializable {
     public Expression getExpression() {
         return expression;

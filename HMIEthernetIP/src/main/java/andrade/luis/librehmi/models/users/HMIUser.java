@@ -7,6 +7,9 @@ import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
 import java.sql.*;
 
+/**
+ * Esta clase contendrá los datos del usuario
+ */
 public class HMIUser {
     @SerializedName("firstName")
     @Expose
@@ -19,7 +22,7 @@ public class HMIUser {
     private String email;
     @SerializedName("username")
     @Expose
-    private String username="";
+    private String username = "";
     @SerializedName("role")
     @Expose
     private String role;
@@ -87,12 +90,13 @@ public class HMIUser {
 
     /**
      * Constructor de usuario HMI
+     *
      * @param firstName Nombre del usuario
-     * @param lastName Apellido del usuario
-     * @param email Correo del usuario
-     * @param username Nombre de usuario
-     * @param role Rol del usuario
-     * @param password Contraseña de la cuenta
+     * @param lastName  Apellido del usuario
+     * @param email     Correo del usuario
+     * @param username  Nombre de usuario
+     * @param role      Rol del usuario
+     * @param password  Contraseña de la cuenta
      */
     public HMIUser(String firstName, String lastName, String email, String username, String role, String password) {
         this.firstName = firstName;
@@ -103,6 +107,14 @@ public class HMIUser {
         setPassword(password);
     }
 
+    /**
+     * Permite obtener los datos del usuario si la contraseña ingresada coincide
+     *
+     * @param usernameOrEmail Nombre de usuario o email del usuario
+     * @param password        Contraseña del Usuario
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public HMIUser(String usernameOrEmail, String password) throws SQLException, IOException {
         this.userLoggedIn = verifyUserAndPassword(usernameOrEmail, password);
         if (this.username != null) {
@@ -110,25 +122,43 @@ public class HMIUser {
         }
     }
 
+    /**
+     * Permite generar el salt y su hash computado basado en una contraseña ingresada por el usuario
+     *
+     * @param password Contraseña ingresada por el usuario
+     */
     public void setPassword(String password) {
         this.salt = HMIPassword.createRandomSaltString();
         this.saltedHashPassword = HMIPassword.computeSaltedHashString(password, this.salt);
     }
 
+    /**
+     * Permite conectarse a la base de datos y crear el usuario
+     *
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public void createInDatabase() throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+        try (Connection con = DBConnection.createConnectionToHMIUsers()) {
             String query = "INSERT INTO Users(first,last,email,username,role,salt,saltedHashPassword) values (?,?,?,?,?,?,?)";
             prepareAndExecuteQuery(con, query);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e);
         }
 
     }
 
+    /**
+     * Método para preparar un statement de mysql de actualización
+     *
+     * @param con   Conexión hacia la base de datos mysql
+     * @param query Comando SQL a ser ejecutado
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     */
     private void prepareAndExecuteQuery(Connection con, String query) throws SQLException {
-        try(PreparedStatement prepareStatement = con.prepareStatement(query)){
+        try (PreparedStatement prepareStatement = con.prepareStatement(query)) {
             prepareStatement.setString(1, this.firstName);
             prepareStatement.setString(2, this.lastName);
             prepareStatement.setString(3, this.email);
@@ -140,17 +170,26 @@ public class HMIUser {
         }
     }
 
+    /**
+     * Permite verificar si un email existe y se encuentra asociado a un usuario en la base de datos
+     *
+     * @param email    Correo electrónico a verificarse
+     * @param username Nombre de usuario a verificarse
+     * @return true si el correo se encuentra asociado a un usuario
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public static boolean existsEmail(String email, String username) throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+        try (Connection con = DBConnection.createConnectionToHMIUsers()) {
             String query = "SELECT email from Users WHERE email=?";
             boolean usernameExists = false;
-            if(!username.isEmpty()){
+            if (!username.isEmpty()) {
                 query = query.concat(" AND username!=?");
                 usernameExists = true;
             }
-            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
-                preparedStatement.setString(1,email);
-                if(usernameExists) preparedStatement.setString(2,username);
+            try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+                preparedStatement.setString(1, email);
+                if (usernameExists) preparedStatement.setString(2, username);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 boolean res = false;
                 while (resultSet.next()) {
@@ -158,18 +197,26 @@ public class HMIUser {
                 }
                 return res;
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e);
         }
     }
 
+    /**
+     * Permite verificar si un nombre de usuario existe y se encuentra asociado a un usuario en la base de datos
+     *
+     * @param username Nombre de usuario a verificarse
+     * @return true si el nombre de usuario se encuentra en uso
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public static boolean existsUsername(String username) throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+        try (Connection con = DBConnection.createConnectionToHMIUsers()) {
             String query = "SELECT username from Users WHERE username=?";
-            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
-                preparedStatement.setString(1,username);
+            try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+                preparedStatement.setString(1, username);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 boolean res = false;
                 while (resultSet.next()) {
@@ -177,19 +224,28 @@ public class HMIUser {
                 }
                 return res;
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e);
         }
     }
 
+    /**
+     * Permite verificar el usuario y contraseña para realizar un logueo
+     *
+     * @param usernameOrEmail Nombre de usuario o email del usuario
+     * @param password        Contraseña a verificarse
+     * @return true si el usuario y la contraseña coinciden
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public boolean verifyUserAndPassword(String usernameOrEmail, String password) throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+        try (Connection con = DBConnection.createConnectionToHMIUsers()) {
             String query = "SELECT username, salt, saltedHashPassword FROM Users WHERE username=? or email=?";
-            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
-                preparedStatement.setString(1,usernameOrEmail);
-                preparedStatement.setString(2,usernameOrEmail);
+            try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+                preparedStatement.setString(1, usernameOrEmail);
+                preparedStatement.setString(2, usernameOrEmail);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 String localSalt = "";
                 String localExpectedHash = "";
@@ -200,20 +256,27 @@ public class HMIUser {
                 }
                 return HMIPassword.verifyPassword(password, localSalt, localExpectedHash);
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e);
         }
 
 
     }
 
+    /**
+     * Permite leer los datos del usuario desde la base de datos
+     *
+     * @param username Nombre de usuario a consultarse
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public void readFromDatabase(String username) throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+        try (Connection con = DBConnection.createConnectionToHMIUsers()) {
             String query = "SELECT * FROM Users WHERE username=?";
-            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
-                preparedStatement.setString(1,username);
+            try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+                preparedStatement.setString(1, username);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     this.firstName = resultSet.getString(2);
@@ -225,38 +288,49 @@ public class HMIUser {
                     this.saltedHashPassword = resultSet.getString(8);
                 }
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e);
         }
 
     }
-    
-    
 
+    /**
+     * Permite actualizar los datos del usuario en la base de datos
+     *
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public void updateInDatabase() throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToHMIUsers()){
-            String query = "UPDATE Users SET first=?, last=?,email=?,username=?,role=?,salt=?,saltedHashPassword=? WHERE username='"+oldUsername+"'";
+        try (Connection con = DBConnection.createConnectionToHMIUsers()) {
+            String query = "UPDATE Users SET first=?, last=?,email=?,username=?,role=?,salt=?,saltedHashPassword=? WHERE username='" + oldUsername + "'";
             prepareAndExecuteQuery(con, query);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e);
         }
     }
 
+    /**
+     * Permite eliminar un usuario de la base de datos
+     *
+     * @return true si el usuario se eliminó con éxito
+     * @throws SQLException Si la clase no puede conectarse con la base de datos
+     * @throws IOException  Si no se puede realizar el proceso de lectura de credenciales
+     */
     public boolean deleteFromDatabase() throws SQLException, IOException {
-        try(Connection con = DBConnection.createConnectionToHMIUsers()){
+        try (Connection con = DBConnection.createConnectionToHMIUsers()) {
             String sql = "DELETE FROM Users WHERE username=?";
-            try(PreparedStatement statement = con.prepareStatement(sql)){
+            try (PreparedStatement statement = con.prepareStatement(sql)) {
                 statement.setString(1, this.username);
                 int rowsDeleted = statement.executeUpdate();
                 return rowsDeleted > 0;
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e);
         }
     }

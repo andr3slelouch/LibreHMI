@@ -13,6 +13,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Clase que se encarga de permitir el dinamismo de las los tags al permitir su manipulación en tiempo real
+ */
 public class Expression implements Serializable {
     private static final ArrayList<String> arithmeticOperators = new ArrayList<>(Arrays.asList("+", "-", "*", "/", "%", "++", "--"));
     private static final ArrayList<String> comparisonOperators = new ArrayList<>(Arrays.asList("==", "!=", ">", "<", ">=", "<="));
@@ -66,6 +69,12 @@ public class Expression implements Serializable {
         return floatPrecision;
     }
 
+    /**
+     * Constructor de la clase permite definir los parámetros requeridos para utilizar una expresión de la librería
+     * @param expressionToEvaluate Expresión a ser evaluada
+     * @param tags Tags de la base de datos o locales que pertenecen a la expresión
+     * @param floatPrecision Precisión de decimales de los tags
+     */
     public Expression(String expressionToEvaluate, ArrayList<Tag> tags, int floatPrecision) {
         this.expressionToEvaluate = expressionToEvaluate;
         this.parameters = tags;
@@ -79,6 +88,10 @@ public class Expression implements Serializable {
         this.resultType = determineResultType();
     }
 
+    /**
+     * Permite definir el tipo de resultado con base en la expresión definida y sus tags asociados
+     * @return String del tipo de dato determinado puede ser:FLOTANTE,STRING,BOOL
+     */
     public String determineResultType() {
         StringBuilder sb = new StringBuilder(this.expressionToEvaluate);
 
@@ -103,6 +116,10 @@ public class Expression implements Serializable {
 
     }
 
+    /**
+     * Permite determinar si el tipo de resultado es bool
+     * @return Bool si es de dicho tipo y un string vacío si no es así
+     */
     private String determineBoolean(){
         for (String comparisonOperator : comparisonOperators) {
             if (expressionToEvaluate.contains(comparisonOperator)) {
@@ -118,6 +135,11 @@ public class Expression implements Serializable {
         return "";
     }
 
+    /**
+     * Permite determinar el tipo de resultado si la expresión contiene solamente un parámetro
+     * @param sb String builder que permite verificar o corregir la expresión a una admitida por la librería
+     * @return String del tipo de dato determinado puede ser:FLOTANTE,STRING,BOOL
+     */
     private String determineResultTypeIfOnlyOneParameter(StringBuilder sb){
         if(parameters.size()==1){
             switch (parameters.get(0).getType()) {
@@ -140,6 +162,11 @@ public class Expression implements Serializable {
         return "";
     }
 
+    /**
+     * Permite determinar si el tipo de resultado de la expresión es String
+     * @param expressionToEvaluate Expresión a ser evaluada
+     * @return "String" si es de dicho tipo caso contrario un string vacío
+     */
     private String determineString(String expressionToEvaluate){
         for (String stringOperator : stringOperators) {
             if (expressionToEvaluate.contains(stringOperator)) {
@@ -155,6 +182,9 @@ public class Expression implements Serializable {
         return "";
     }
 
+    /**
+     * Permite actualizar una expresión para ser compatible con las propiedades de operaciones entre String
+     */
     private void concatenateStringExpression(){
         for(int i = 0; i < parameters.size(); i++) {
             if(!this.expressionToEvaluate.contains("String.valueOf("+parameterNames[i]+")")){
@@ -195,6 +225,10 @@ public class Expression implements Serializable {
         return sb.toString();
     }
 
+    /**
+     * Permite retornar la clase del parámetro correspondiente
+     * @return Array de String del tipo de dato determinado puede ser:double.class, boolean.class,void.class
+     */
     public Class[] getParameterTypesClasses() {
         Class[] parameterTypesClasses = new Class[this.parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
@@ -214,6 +248,11 @@ public class Expression implements Serializable {
         return parameterTypesClasses;
     }
 
+    /**
+     * Permite generar un objeto ExpressionEvaluator tomando de base los atributos de la clase
+     * @return ExpressionEvaluator con sus parámetros definidos para su evaluación
+     * @throws CompileException Si la librería tiene problemas para compilar la expresión
+     */
     public ExpressionEvaluator prepareExpression() throws CompileException {
         ExpressionEvaluator ee = new ExpressionEvaluator();
         this.determineResultType();
@@ -242,6 +281,10 @@ public class Expression implements Serializable {
 
     }
 
+    /**
+     * Permite generar el objeto DecimalFormat correspondiente para la expresión basado en su atributo de floatPrecision
+     * @return DecimalFormar basado en el número de decimales definido en floatPrecision
+     */
     public DecimalFormat generateDecimalFormat(){
         String precisionStr = "#.";
         for(int i=0;i<floatPrecision;i++){
@@ -250,6 +293,15 @@ public class Expression implements Serializable {
         return new DecimalFormat(precisionStr);
     }
 
+    /**
+     * Permite evaluar el ExpressionEvaluator generado de la clase y obtener su resultado
+     * @return Objeto genérico conteniendo los datos calculados de la expresión
+     * @throws CompileException
+     * @throws InvocationTargetException
+     * @throws SQLException
+     * @throws IOException
+     * @throws NullPointerException
+     */
     public Object evaluate() throws CompileException, InvocationTargetException, SQLException, IOException, NullPointerException{
         ExpressionEvaluator ee = prepareExpression();
         Object[] valuesToEvaluate = new Object[parameterNames.length];

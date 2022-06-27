@@ -6,6 +6,9 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Clase que contendrá los datos de una celda de la lista de archivos recientes
+ */
 public class RecentUsedFilesData implements Serializable {
     public int getCapacity() {
         return capacity;

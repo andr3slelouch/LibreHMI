@@ -11,6 +11,10 @@ import andrade.luis.librehmi.views.canvas.CanvasPoint;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Clase que contendrá todos los atributos de una figura del canvas, esta clase permite el copiado, cortado y pegado,
+ * así como las opciones de exportación e importación
+ */
 public class CanvasObjectData implements Serializable, Transferable {
     private static final String NULL_STR = "<null>";
     @SerializedName("selected")
