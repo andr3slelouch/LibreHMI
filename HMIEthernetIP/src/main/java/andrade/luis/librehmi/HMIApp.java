@@ -55,6 +55,7 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 
 
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.geometry.Pos.CENTER;
 
 public class HMIApp extends Application {
@@ -64,6 +65,8 @@ public class HMIApp extends Application {
     public static final String OPERATOR_STR = "Operador";
     public static final String CIPHER_ALGORITHM = "PBEWithMD5AndTripleDES";
     public static final String WINDOW_STR = "WINDOW";
+    public static final String ERROR_WHILE_SAVING_STR = "Existió un error al guardar el proyecto";
+    public static final String CANCEL_STR = "Cancelar";
     private Stage mainStage;
     Logger logger
             = Logger.getLogger(
@@ -194,7 +197,7 @@ public class HMIApp extends Application {
 
     public void createNewProject() {
         if (wasModified) {
-            if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
+            if (showSaveDialog(false, "")) {
                 this.clearProject();
                 HMIScene scene = generatePage(DEFAULT_PAGE_NAME, "", Color.WHITESMOKE);
                 addScene(scene);
@@ -210,6 +213,7 @@ public class HMIApp extends Application {
     public ArrayList<String> getPagesTitles() {
         return pagesTitles;
     }
+
     @Override
     public void start(Stage stage) {
 
@@ -250,7 +254,7 @@ public class HMIApp extends Application {
 
     private void closeProcess(WindowEvent windowEvent) {
         if (wasModified) {
-            if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
+            if (showSaveDialog(false, "")) {
                 log("CANCELED");
             } else {
                 windowEvent.consume();
@@ -404,7 +408,7 @@ public class HMIApp extends Application {
                 ManageUsersWindow manageUsersWindow = new ManageUsersWindow();
                 manageUsersWindow.showAndWait();
             } else {
-                showAlert(Alert.AlertType.ERROR, "Error de privilegios", "Para administrar los usuarios, ud debe tener un rol de \"Administrador\"", false, false);
+                showAlert(Alert.AlertType.ERROR, "Error de privilegios", "Para administrar los usuarios, ud debe tener un rol de \"Administrador\"","");
             }
 
         });
@@ -413,15 +417,14 @@ public class HMIApp extends Application {
         tagsMI.setId("#tagsMI");
         MenuItem createLocalTagMI = new MenuItem("Crear Tag Local");
         createLocalTagMI.setOnAction(mouseEvent -> {
-            ManageLocalTagWindow manageLocalTagWindow = null;
             try {
-                manageLocalTagWindow = new ManageLocalTagWindow(null);
+                ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(null);
+                manageLocalTagWindow.showAndWait();
+                if (manageLocalTagWindow.getTag() != null) {
+                    localTags.add(manageLocalTagWindow.getTag());
+                }
             } catch (SQLException | IOException e) {
                 log(e.getMessage());
-            }
-            manageLocalTagWindow.showAndWait();
-            if (manageLocalTagWindow.getTag() != null) {
-                localTags.add(manageLocalTagWindow.getTag());
             }
 
         });
@@ -466,7 +469,7 @@ public class HMIApp extends Application {
                 loadSceneData();
             } catch (IOException e) {
                 if (e.getMessage() != null)
-                    showAlert(Alert.AlertType.ERROR, "Error al cargar el archivo", "Existió un error al cargar el archivo: " + e.getMessage(), false, false);
+                    showAlert(Alert.AlertType.ERROR, "Error al cargar el archivo", "Existió un error al cargar el archivo",e.getMessage());
             }
         });
         importWindowsMI.setId("#import");
@@ -490,16 +493,15 @@ public class HMIApp extends Application {
 
     private void openProcess() {
         try {
-            log("Closing Project...");
             if (wasModified) {
-                if (showAlert(Alert.AlertType.CONFIRMATION, ALERT_SAVE_TITLE, ALERT_SAVE_DESCRIPTION, false, true)) {
+                if (showSaveDialog(false, "")) {
                     loadHMIData();
                 }
             } else {
                 loadHMIData();
             }
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Error al Cargar Proyecto", ERROR_STR + e.getMessage(), false, false);
+            showAlert(Alert.AlertType.ERROR, "Error al Cargar Proyecto", "Existió un error al cargar el proyecto" ,e.getMessage());
 
         }
     }
@@ -525,7 +527,7 @@ public class HMIApp extends Application {
                     try {
                         this.loadHMIData(menuItems.get(finalI));
                     } catch (IOException e) {
-                        showAlert(Alert.AlertType.ERROR,"Error al cargar archivo reciente",e.getMessage(),false,false);
+                        showAlert(Alert.AlertType.ERROR, "Error al cargar archivo reciente","Existió un error al cargar un archivo reciente" ,e.getMessage());
                     }
                 });
                 openRecentProjectsMI.getItems().add(recentMenuItem);
@@ -541,7 +543,7 @@ public class HMIApp extends Application {
             try {
                 this.saveHMIDataProcess();
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_WHILE_SAVING_STR,e.getMessage());
                 log(e.getMessage());
             }
         });
@@ -552,7 +554,7 @@ public class HMIApp extends Application {
             try {
                 this.saveAsHMIData(false);
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_WHILE_SAVING_STR,e.getMessage());
                 log(e.getMessage());
             }
         });
@@ -563,7 +565,7 @@ public class HMIApp extends Application {
             try {
                 this.saveAsHMIData(true);
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_STR + e.getMessage(), false, false);
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar Como", ERROR_WHILE_SAVING_STR,e.getMessage());
                 log(e.getMessage());
             }
         });
@@ -594,10 +596,10 @@ public class HMIApp extends Application {
         logger.log(Level.INFO, e);
     }
 
-    private void changeMode(){
+    private void changeMode() {
         if (modeLabel.equals(EDITAR_STR)) {
             loginUser(modeLabel);
-            if(!this.user.getRole().equals(OPERATOR_STR)){
+            if (!this.user.getRole().equals(OPERATOR_STR)) {
                 this.modeLabel = EJECUTAR_STR;
                 this.mode = EDITAR_STR;
             }
@@ -610,12 +612,12 @@ public class HMIApp extends Application {
         updateLateralMenuMode();
     }
 
-    private void updateLateralMenuMode(){
-        for(HBox hBox : expandBoxes){
-            for (Node content:hBox.getChildren()) {
-                if(content.getId()!=null && content.getId().equals("#expandButton")){
+    private void updateLateralMenuMode() {
+        for (HBox hBox : expandBoxes) {
+            for (Node content : hBox.getChildren()) {
+                if (content.getId() != null && content.getId().equals("#expandButton")) {
                     Button tmpButton = (Button) content;
-                    if(tmpButton.getText().equals("<")){
+                    if (tmpButton.getText().equals("<")) {
                         tmpButton.fire();
                     }
                 }
@@ -648,8 +650,8 @@ public class HMIApp extends Application {
 
     private void updateMenuWindowsMode() {
         for (Menu menu : windowMenus) {
-            for (MenuItem item: menu.getItems()) {
-                if(item.getId()!=null && item.getId().equals("#import")){
+            for (MenuItem item : menu.getItems()) {
+                if (item.getId() != null && item.getId().equals("#import")) {
                     item.setDisable(this.mode.equals(EJECUTAR_STR));
                 }
             }
@@ -683,10 +685,10 @@ public class HMIApp extends Application {
                             setAlarmWindow.getAlarmNameTF().getText(),
                             setAlarmWindow.getAlarmCommentTF().getText()
                     );
-                    alarm.setHighLimit(Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),setAlarmWindow.getHighLimitCheckBox().isSelected());
-                    alarm.setHiHiLimit(Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),setAlarmWindow.getHiHiLimitCheckBox().isSelected());
-                    alarm.setLowLimit(Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),setAlarmWindow.getLowLimitCheckBox().isSelected());
-                    alarm.setLoloLimit(Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),setAlarmWindow.getLoloLimitCheckBox().isSelected());
+                    alarm.setHighLimit(Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()), setAlarmWindow.getHighLimitCheckBox().isSelected());
+                    alarm.setHiHiLimit(Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()), setAlarmWindow.getHiHiLimitCheckBox().isSelected());
+                    alarm.setLowLimit(Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()), setAlarmWindow.getLowLimitCheckBox().isSelected());
+                    alarm.setLoloLimit(Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()), setAlarmWindow.getLoloLimitCheckBox().isSelected());
                     addAlarm(alarm);
                 } else if (setAlarmWindow.getLocalExpression().determineResultType().equals("Bool")) {
                     Alarm alarm = new Alarm(
@@ -832,7 +834,7 @@ public class HMIApp extends Application {
         if (logInWindow.getLoggedUser() != null) {
             this.user = logInWindow.getLoggedUser();
             if (this.user.getRole().equals(OPERATOR_STR) && mode.equals(EDITAR_STR)) {
-                showAlert(Alert.AlertType.ERROR, "Error de Privilegios", "Error un usuario con el Rol \"Operador\" no puede editar el proyecto", false, false);
+                showAlert(Alert.AlertType.ERROR, "Error de Privilegios", "Error un usuario con el Rol \"Operador\" no puede editar el proyecto","");
             } else {
                 enableInputRepresentations(mode);
             }
@@ -881,7 +883,8 @@ public class HMIApp extends Application {
             }
         }
     }
-    public void updateTagsInObjects(){
+
+    public void updateTagsInObjects() {
         for (int i = 0; i < root.getShapeArrayList().size(); i++) {
             for (Tag localTag : localTags) {
                 root.getShapeArrayList().get(i).updateTag(localTag);
@@ -945,10 +948,10 @@ public class HMIApp extends Application {
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
             );
-            alarm.setHighLimit(manageableAlarm.getHighLimit(),manageableAlarm.isHighAlarmEnabled());
-            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),false);
-            alarm.setLowLimit(manageableAlarm.getLowLimit(),false);
-            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),false);
+            alarm.setHighLimit(manageableAlarm.getHighLimit(), manageableAlarm.isHighAlarmEnabled());
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(), false);
+            alarm.setLowLimit(manageableAlarm.getLowLimit(), false);
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(), false);
             projectAlarms.add(alarm);
         }
         if (manageableAlarm.isHiHiAlarmEnabled()) {
@@ -957,10 +960,10 @@ public class HMIApp extends Application {
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
             );
-            alarm.setHighLimit(manageableAlarm.getHighLimit(),false);
-            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),manageableAlarm.isHiHiAlarmEnabled());
-            alarm.setLowLimit(manageableAlarm.getLowLimit(),false);
-            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),false);
+            alarm.setHighLimit(manageableAlarm.getHighLimit(), false);
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(), manageableAlarm.isHiHiAlarmEnabled());
+            alarm.setLowLimit(manageableAlarm.getLowLimit(), false);
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(), false);
             projectAlarms.add(alarm);
         }
         if (manageableAlarm.isLoloAlarmEnabled()) {
@@ -969,10 +972,10 @@ public class HMIApp extends Application {
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
             );
-            alarm.setHighLimit(manageableAlarm.getHighLimit(),false);
-            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),false);
-            alarm.setLowLimit(manageableAlarm.getLowLimit(),false);
-            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),manageableAlarm.isLoloAlarmEnabled());
+            alarm.setHighLimit(manageableAlarm.getHighLimit(), false);
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(), false);
+            alarm.setLowLimit(manageableAlarm.getLowLimit(), false);
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(), manageableAlarm.isLoloAlarmEnabled());
             projectAlarms.add(alarm);
         }
         if (manageableAlarm.isLowAlarmEnabled()) {
@@ -981,10 +984,10 @@ public class HMIApp extends Application {
                     manageableAlarm.getName(),
                     manageableAlarm.getComment()
             );
-            alarm.setHighLimit(manageableAlarm.getHighLimit(),false);
-            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(),false);
-            alarm.setLowLimit(manageableAlarm.getLowLimit(),manageableAlarm.isLowAlarmEnabled());
-            alarm.setLoloLimit(manageableAlarm.getLoloLimit(),false);
+            alarm.setHighLimit(manageableAlarm.getHighLimit(), false);
+            alarm.setHiHiLimit(manageableAlarm.getHiHiLimit(), false);
+            alarm.setLowLimit(manageableAlarm.getLowLimit(), manageableAlarm.isLowAlarmEnabled());
+            alarm.setLoloLimit(manageableAlarm.getLoloLimit(), false);
             projectAlarms.add(alarm);
         }
     }
@@ -1030,29 +1033,35 @@ public class HMIApp extends Application {
                 localHmiAppData = getEncryptedHmiAppData(gson, filenamePath);
             } while (!wasEncryptedFileInputPasswordCanceled && localHmiAppData == null);
         }
-        loadHMIDataProcess(localHmiAppData,filenamePath);
+        loadHMIDataProcess(localHmiAppData, filenamePath);
     }
 
-    private void loadHMIDataProcess(HMIAppData localHmiAppData, String filenamePath){
+    private void loadHMIDataProcess(HMIAppData localHmiAppData, String filenamePath) {
         if (localHmiAppData != null) {
             if (localHmiAppData.getType() == null) {
-                if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?", false, false)) {
+                if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?","")) {
                     loadHMIData(localHmiAppData, filenamePath);
                 }
             } else if (localHmiAppData.getType().equals(HMI_PROJECT)) {
                 loadHMIData(localHmiAppData, filenamePath);
             } else {
-                if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?", false, false)) {
+                if (showAlert(Alert.AlertType.WARNING, FILE_ERROR_TITLE, "¿Intentar cargarlo de todas formas?","")) {
                     loadHMIData(localHmiAppData, filenamePath);
                 }
             }
         } else {
-            showAlert(Alert.AlertType.ERROR, FILE_ERROR_TITLE, "No se pudo obtener ningún dato de proyecto desde el archivo", false, false);
+            showAlert(Alert.AlertType.ERROR, FILE_ERROR_TITLE, "No se pudo obtener ningún dato de proyecto desde el archivo","");
         }
     }
 
     private HMIAppData getEncryptedHmiAppData(Gson gson, String filenamePath) throws IOException {
-        HMIAppData localHmiAppData = null;
+        HMIAppData localHmiAppData;
+        String rawJson = decipherRawJson(filenamePath);
+        localHmiAppData = gson.fromJson(rawJson, HMIAppData.class);
+        return localHmiAppData;
+    }
+
+    private String decipherRawJson(String filenamePath) throws IOException {
         SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(false);
         setFilePasswordWindow.showAndWait();
         if (!setFilePasswordWindow.isCanceled()) {
@@ -1066,11 +1075,9 @@ public class HMIApp extends Application {
                 encryptor.setPassword(setFilePasswordWindow.getPassword());
                 encryptor.setAlgorithm(CIPHER_ALGORITHM);
                 try {
-                    String rawJson = encryptor.decrypt(rawEncryptedDataSB.toString());
-                    localHmiAppData = gson.fromJson(rawJson, HMIAppData.class);
-                    wasEncryptedFileInputPasswordCanceled = false;
+                    return encryptor.decrypt(rawEncryptedDataSB.toString());
                 } catch (EncryptionOperationNotPossibleException e) {
-                    wasEncryptedFileInputPasswordCanceled = !showAlert(Alert.AlertType.ERROR, "Contraseña incorrecta", "La contraseña ingresada no es correcta, reintente", false, false);
+                    wasEncryptedFileInputPasswordCanceled = !showAlert(Alert.AlertType.ERROR, "Contraseña incorrecta", "La contraseña ingresada no es correcta, reintente","");
                 }
             } finally {
                 wasEncryptedFileInputPasswordCanceled = false;
@@ -1078,7 +1085,7 @@ public class HMIApp extends Application {
         } else {
             wasEncryptedFileInputPasswordCanceled = true;
         }
-        return localHmiAppData;
+        return "";
     }
 
     private void loadHMIData(HMIAppData localHmiAppData, String filenamePath) {
@@ -1199,7 +1206,7 @@ public class HMIApp extends Application {
             if (filenamePath != null) {
                 String[] filenameArr = filenamePath.split(File.separator);
                 this.currentFilename = filenameArr[filenameArr.length - 1];
-                try(Writer writer = Files.newBufferedWriter(Path.of(filenamePath))){
+                try (Writer writer = Files.newBufferedWriter(Path.of(filenamePath))) {
                     String rawJson = gson.toJson(this.hmiAppData);
                     StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
                     encryptor.setPassword(setFilePasswordWindow.getPassword());
@@ -1297,7 +1304,7 @@ public class HMIApp extends Application {
     }
 
     /**
-     * Si se solicita el cambio de una sola página esta no generará una ventana nueva sino que cambiará la escena actual
+     * Si se solicita el cambio de una sola página esta no generará una ventana nueva sino, que cambiará la escena actual
      * de la aplicación a la seleccionada basada en su título
      *
      * @param sceneTitle Título de la página a seleccionarse
@@ -1422,13 +1429,13 @@ public class HMIApp extends Application {
                 try {
                     exportSceneEncryptedData(scene.getHmiSceneData(), file.getAbsolutePath());
                 } catch (IOException e) {
-                    showAlert(Alert.AlertType.ERROR, "Error al guardar el archivo: " + e.getMessage(), "Error al escribir el archivo", false, true);
+                    showSaveDialog(true, e.getMessage());
                 }
             } else {
                 try {
                     exportSceneData(scene.getHmiSceneData(), file.getAbsolutePath());
                 } catch (IOException e) {
-                    showAlert(Alert.AlertType.ERROR, "Error al guardar el archivo: " + e.getMessage(), "Error al escribir el archivo", false, true);
+                    showSaveDialog(true, e.getMessage());
                 }
             }
         }
@@ -1479,37 +1486,14 @@ public class HMIApp extends Application {
         if (localHmiAppData != null) {
             addScene(localHmiAppData);
         } else {
-            showAlert(Alert.AlertType.ERROR, FILE_ERROR_TITLE, "No se pudo obtener ningún dato de proyecto desde el archivo", false, false);
+            showAlert(Alert.AlertType.ERROR, FILE_ERROR_TITLE, "No se pudo obtener ningún dato de proyecto desde el archivo","");
         }
     }
 
     private HMISceneData getEncryptedHmiSceneData(Gson gson, String filenamePath) throws IOException {
-        HMISceneData localHmiSceneData = null;
-        SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(false);
-        setFilePasswordWindow.showAndWait();
-        if (!setFilePasswordWindow.isCanceled()) {
-            StringBuilder rawEncryptedDataSB = new StringBuilder();
-            String line;
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filenamePath))) {
-                while ((line = bufferedReader.readLine()) != null) {
-                    rawEncryptedDataSB.append(line);
-                }
-                StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
-                encryptor.setPassword(setFilePasswordWindow.getPassword());
-                encryptor.setAlgorithm(CIPHER_ALGORITHM);
-                try {
-                    String rawJson = encryptor.decrypt(rawEncryptedDataSB.toString());
-                    localHmiSceneData = gson.fromJson(rawJson, HMISceneData.class);
-                    wasEncryptedFileInputPasswordCanceled = false;
-                } catch (EncryptionOperationNotPossibleException e) {
-                    wasEncryptedFileInputPasswordCanceled = !showAlert(Alert.AlertType.ERROR, "Contraseña incorrecta", "La contraseña ingresada no es correcta, reintente", false, false);
-                }
-            } finally {
-                wasEncryptedFileInputPasswordCanceled = false;
-            }
-        } else {
-            wasEncryptedFileInputPasswordCanceled = true;
-        }
+        HMISceneData localHmiSceneData;
+        String rawJson = decipherRawJson(filenamePath);
+        localHmiSceneData = gson.fromJson(rawJson, HMISceneData.class);
         return localHmiSceneData;
     }
 
@@ -1519,7 +1503,7 @@ public class HMIApp extends Application {
         if (!setFilePasswordWindow.isCanceled()) {
             Gson gson = new Gson();
             if (filePathName != null) {
-                try(Writer writer = Files.newBufferedWriter(Path.of(filePathName))){
+                try (Writer writer = Files.newBufferedWriter(Path.of(filePathName))) {
                     String rawJson = gson.toJson(hmiSceneData);
                     StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
                     encryptor.setPassword(setFilePasswordWindow.getPassword());
@@ -1571,24 +1555,7 @@ public class HMIApp extends Application {
      * - False si se cancela
      */
     private boolean confirmDelete(String sceneTitle) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar eliminación");
-        alert.setHeaderText("Desea eliminar la página seleccionada \"" + sceneTitle + "\"?");
-
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(cancelButton, okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            alert.close();
-            return true;
-        } else if (result.isPresent() && result.get() == cancelButton) {
-            alert.close();
-            return false;
-        }
-        return false;
+        return showAlert(Alert.AlertType.CONFIRMATION,"Confirmar eliminación","Desea eliminar la página seleccionada \"" + sceneTitle + "\"?","");
     }
 
     private void generateDatabase() {
@@ -1599,65 +1566,84 @@ public class HMIApp extends Application {
             }
             if (!DBConnection.tableExistsInSchema("Users", "HMIUsers")) {
                 DBConnection.generateSchemaHMIUsers();
-                showAlert(Alert.AlertType.INFORMATION, "Se ha creado la base de datos de usuarios", "Se creo la base de datos de usuarios con el usuario \"admin\" con contraseña \"12345\",\npor su seguridad actualice la contraseña desde la ventana de administración de usuarios", false, false);
+                showAlert(Alert.AlertType.INFORMATION, "Se ha creado la base de datos de usuarios", "Se creo la base de datos de usuarios con el usuario \"admin\" con contraseña \"12345\",\npor su seguridad actualice la contraseña desde la ventana de administración de usuarios","");
             }
         } catch (SQLException sqlException) {
-            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", "Verifique que tiene acceso a MySQL a través de la ventana de credenciales que se mostrará a continuación\nError:" + sqlException.getMessage(), false, false);
+            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", "Verifique que tiene acceso a MySQL a través de la ventana de credenciales que se mostrará a continuación",ERROR_STR + sqlException.getMessage());
             log(sqlException.getMessage());
             SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
             saveDatabaseCredentialsWindow.showAndWait();
             generateDatabase();
         } catch (IOException e) {
-            if (!showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", "El archivo de propiedades no se encontró pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos", true, false)) {
+            if (!showAlertWithCredentials()) {
                 generateDatabase();
             }
             log(e.getMessage());
         }
     }
 
-    public boolean showAlert(Alert.AlertType type, String title, String message, boolean showCredentialsWindow, boolean isSaveDialog) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
+    public boolean showSaveDialog(boolean errorMode, String message) {
+        Alert alert;
+        if (errorMode) {
+            alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error al guardar el archivo");
+            alert.setHeaderText("Existió un error al tratar de guardar el archivo");
+            alert.setContentText(message);
+        } else {
+            alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(ALERT_SAVE_TITLE);
+            alert.setHeaderText(ALERT_SAVE_DESCRIPTION);
+        }
 
         ButtonType saveButton = new ButtonType("Guardar", ButtonBar.ButtonData.YES);
         ButtonType dontSaveButton = new ButtonType("No Guardar", ButtonBar.ButtonData.NO);
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButton = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType cancelButton = new ButtonType(CANCEL_STR, ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        if (isSaveDialog) {
-            alert.getButtonTypes().setAll(dontSaveButton, cancelButton, saveButton);
-        } else {
-            alert.getButtonTypes().setAll(cancelButton, okButton);
-        }
+        alert.getButtonTypes().setAll(dontSaveButton, cancelButton, saveButton);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            alert.close();
-            if (showCredentialsWindow) {
-                SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
-                saveDatabaseCredentialsWindow.showAndWait();
-                return saveDatabaseCredentialsWindow.isCancelled();
-            }
-            return true;
-        } else if (result.isPresent() && result.get() == cancelButton) {
-            alert.close();
-            return false;
-        } else if (result.isPresent() && result.get() == saveButton) {
+
+        if (result.isPresent() && result.get() == saveButton) {
             alert.close();
             try {
                 saveHMIDataProcess();
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_STR + e.getMessage(), false, false);
+                showAlert(Alert.AlertType.ERROR, "Error al Guardar", ERROR_WHILE_SAVING_STR, e.getMessage());
                 log(e.getMessage());
             }
             return true;
         } else if (result.isPresent() && result.get() == dontSaveButton) {
             alert.close();
             return true;
+        } else if (result.isPresent() && result.get() == cancelButton) {
+            alert.close();
+            return false;
         }
         return true;
     }
+
+    public boolean showAlertWithCredentials() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error al conectarse a la base de datos");
+        alert.setHeaderText("El archivo de propiedades no se encontró pulse OK para mostrar la ventana de ingreso de credenciales para conectarse a la base de datos");
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType(CANCEL_STR, ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(cancelButton, okButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == okButton) {
+            SaveDatabaseCredentialsWindow saveDatabaseCredentialsWindow = new SaveDatabaseCredentialsWindow();
+            saveDatabaseCredentialsWindow.showAndWait();
+            return saveDatabaseCredentialsWindow.isCancelled();
+        } else if (result.isPresent() && result.get() == cancelButton) {
+            alert.close();
+            return false;
+        }
+        return true;
+    }
+
+
 
     public HMIUser getUser() {
         return user;

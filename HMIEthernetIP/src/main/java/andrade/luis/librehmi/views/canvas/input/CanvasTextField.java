@@ -1,6 +1,6 @@
 package andrade.luis.librehmi.views.canvas.input;
 
-import andrade.luis.librehmi.controllers.TextFormatters;
+import andrade.luis.librehmi.util.TextFormatters;
 import andrade.luis.librehmi.views.canvas.CanvasColor;
 import andrade.luis.librehmi.models.CanvasObjectData;
 import andrade.luis.librehmi.models.Tag;
@@ -13,7 +13,6 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
@@ -28,7 +27,6 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -255,15 +253,11 @@ public class CanvasTextField extends CanvasObject {
         timeline.play();
     }
 
-    public void updateInputTag(Tag tag,boolean forceUpdate){
-        int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
-        super.updateTag(tag);
-        if(this.getCanvasObjectData().getTag().compareToTag(tag)){
-            this.getCanvasObjectData().setTag(tag);
-            this.getCanvasObjectData().getTag().setFloatPrecision(floatPrecision);
-        }
+    public String updateInputTag(Tag tag,boolean forceUpdate){
+        String value = super.updateInputTag(tag);
         if(forceUpdate){
-            this.textField.setText(tag.getValue());
+            this.textField.setText(value);
         }
+        return value;
     }
 }

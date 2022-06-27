@@ -13,11 +13,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 
 public class SignUpWindow extends Stage {
 
@@ -137,23 +138,7 @@ public class SignUpWindow extends Stage {
     }
 
     private void databaseConnectionFailed(String message) {
-        showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",message);
-    }
-
-    public void showAlert(Alert.AlertType type, String title,String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
-
-        alert.getButtonTypes().setAll(okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
-            alert.close();
-        }
+        showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",message,"");
     }
 
     public boolean verifyFields(TextField firstName, TextField lastName, TextField email, TextField username, PasswordField passwordField, PasswordField repeatPasswordField) throws SQLException, IOException {
@@ -178,7 +163,7 @@ public class SignUpWindow extends Stage {
         if(message.isEmpty()){
             return true;
         }else{
-            showAlert(Alert.AlertType.WARNING,"Error en los campos ingresados",message);
+            showAlert(Alert.AlertType.WARNING,"Error en los campos ingresados",message,"");
             return false;
         }
     }

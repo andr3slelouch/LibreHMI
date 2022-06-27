@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class SelectTagWindow extends Stage {
@@ -164,16 +165,17 @@ public class SelectTagWindow extends Stage {
         MenuItem newItem = new MenuItem();
         newItem.setText("Nuevo");
         newItem.setOnAction(event -> {
-            ManageLocalTagWindow manageLocalTagWindow = null;
+
             try {
-                manageLocalTagWindow = new ManageLocalTagWindow(null);
+                ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(null);
+                manageLocalTagWindow.showAndWait();
+                if (manageLocalTagWindow.getTag() != null) {
+                    localTags.add(manageLocalTagWindow.getTag());
+                }
             } catch (SQLException | IOException e) {
                 log(e);
             }
-            manageLocalTagWindow.showAndWait();
-            if (manageLocalTagWindow.getTag() != null) {
-                localTags.add(manageLocalTagWindow.getTag());
-            }
+
         });
         return newItem;
     }
@@ -182,16 +184,17 @@ public class SelectTagWindow extends Stage {
         MenuItem saveItem = new MenuItem();
         saveItem.setText("Editar");
         saveItem.setOnAction(event -> {
-            ManageLocalTagWindow manageLocalTagWindow = null;
+
             try {
-                manageLocalTagWindow = new ManageLocalTagWindow(row.generateTag());
+                ManageLocalTagWindow manageLocalTagWindow = new ManageLocalTagWindow(row.generateTag());
+                manageLocalTagWindow.showAndWait();
+                if (manageLocalTagWindow.getTag() != null) {
+                    localTags.set(index, manageLocalTagWindow.getTag());
+                }
             } catch (SQLException | IOException e) {
                 log(e);
             }
-            manageLocalTagWindow.showAndWait();
-            if (manageLocalTagWindow.getTag() != null) {
-                localTags.set(index, manageLocalTagWindow.getTag());
-            }
+
         });
         return saveItem;
     }
@@ -308,25 +311,6 @@ public class SelectTagWindow extends Stage {
         this.alert = alert;
     }
 
-    private boolean showAlert(Alert.AlertType type, String title, String message) {
-        alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
 
-        ButtonType okButton = new ButtonType("Sí", ButtonBar.ButtonData.YES);
-        ButtonType cancelButton = new ButtonType("No", ButtonBar.ButtonData.NO);
-
-        alert.getButtonTypes().setAll(cancelButton, okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            alert.close();
-            return true;
-        } else if (result.isPresent() && result.get() == cancelButton) {
-            alert.close();
-            return false;
-        }
-        return false;
-    }
 }
 

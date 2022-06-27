@@ -8,8 +8,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /*
     This Class was based on http://www.aspheute.com/english/20040105.asp special thanks to Christoph Wille

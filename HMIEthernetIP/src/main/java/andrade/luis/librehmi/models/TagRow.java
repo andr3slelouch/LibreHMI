@@ -4,8 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.SimpleStringProperty;
 
-import java.io.Serializable;
-
 public class TagRow {
 
     public static final String NULL_STR = "<null>";
@@ -141,55 +139,12 @@ public class TagRow {
         this.tagAction = new SimpleStringProperty(tagAction);
     }
 
-    public Tag generateTag(){
-        Tag tag = new Tag(getPlcName(),getPlcAddress(),getPlcDeviceGroup(),getTagName(),getTagType(),getTagAddress(),getTagAction(),getTagValue(),0);
-        if(tag.getPlcName().equals("LibreHMI") && tag.getPlcAddress().equals("localhost")&& tag.getPlcDeviceGroup().equals("Local") && tag.getAddress().equals("Local")){
+    public Tag generateTag() {
+        Tag tag = new Tag(getTagName(), getTagType(), getTagAddress(), getTagAction(), getTagValue(), 0);
+        tag.setPLCValues(getPlcName(), getPlcAddress(), getPlcDeviceGroup());
+        if (tag.getPlcName().equals("LibreHMI") && tag.getPlcAddress().equals("localhost") && tag.getPlcDeviceGroup().equals("Local") && tag.getAddress().equals("Local")) {
             tag.setLocalTag(true);
         }
         return tag;
-    }
-
-    @Override
-    public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append(CanvasObjectData.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
-        sb.append("plcName");
-        sb.append('=');
-        sb.append(((this.plcName == null)? NULL_STR :this.plcName));
-        sb.append(',');
-        sb.append("plcAddress");
-        sb.append('=');
-        sb.append(((this.plcAddress == null)? NULL_STR :this.plcAddress));
-        sb.append(',');
-        sb.append("plcDeviceGroup");
-        sb.append('=');
-        sb.append(((this.plcDeviceGroup == null)? NULL_STR :this.plcDeviceGroup));
-        sb.append(',');
-        sb.append("tagName");
-        sb.append('=');
-        sb.append(((this.tagName == null)? NULL_STR :this.tagName));
-        sb.append(',');
-        sb.append("tagType");
-        sb.append('=');
-        sb.append(((this.tagType == null)? NULL_STR :this.tagType));
-        sb.append(',');
-        sb.append("tagAddress");
-        sb.append('=');
-        sb.append(((this.tagAddress == null)? NULL_STR :this.tagAddress));
-        sb.append(',');
-        sb.append("tagAction");
-        sb.append('=');
-        sb.append(((this.tagAction == null)? NULL_STR :this.tagAction));
-        sb.append(',');
-        sb.append("tagValue");
-        sb.append('=');
-        sb.append(((this.tagValue == null)? NULL_STR :this.tagValue));
-        sb.append(',');
-        if (sb.charAt((sb.length()- 1)) == ',') {
-            sb.setCharAt((sb.length()- 1), ']');
-        } else {
-            sb.append(']');
-        }
-        return sb.toString();
     }
 }

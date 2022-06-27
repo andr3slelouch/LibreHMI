@@ -4,10 +4,8 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.SimpleStringProperty;
 
-import java.io.Serializable;
-
 public class AlarmRow {
-    public AlarmRow(String rowNumber, String name ,String expression ,String datetime, String type, String status, String acknowledgement) {
+    public AlarmRow(String rowNumber, String name, String expression, String datetime, String type, String status, String acknowledgement) {
         this.rowNumber = new SimpleStringProperty(rowNumber);
         this.name = new SimpleStringProperty(name);
         this.expression = new SimpleStringProperty(expression);

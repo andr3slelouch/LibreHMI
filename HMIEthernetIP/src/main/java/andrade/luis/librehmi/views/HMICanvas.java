@@ -29,9 +29,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 
 public class HMICanvas extends Pane implements CanvasObjectInterface {
 
@@ -326,6 +327,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
         CanvasImage canvasImage = new CanvasImage(selectedImage, current, true, selectedImagePath, false);
         canvasImage.setImageViewProperties(isMirroringHorizontal, isMirroringVertical, rotation);
+        addCanvasImageToCanvas(isModifyingColor, contrast, brightness, saturation, hue, color, canvasImage);
+
+    }
+
+    private void addCanvasImageToCanvas(boolean isModifyingColor, double contrast, double brightness, double saturation, double hue, CanvasColor color, CanvasImage canvasImage) {
         if (isModifyingColor) {
             canvasImage.modifyImageViewColors(color, contrast, brightness, saturation, hue);
         }
@@ -340,7 +346,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         this.getChildren().add(canvasImage);
         canvasImage.getHmiApp().setWasModified(true);
         this.setAddOnClickEnabled(false);
-
     }
 
     private void addPushbuttonOnCanvasClicked(CanvasPoint current) {
@@ -397,20 +402,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             CanvasImage canvasImage = new CanvasImage(selectedSymbol, current, true, selectedSymbolPath, true);
             canvasImage.getCanvasObjectData().setSymbolCategory(selectedSymbolCategory);
             canvasImage.setImageViewProperties(isMirroringHorizontal, isMirroringVertical, rotation);
-            if (isModifyingColor) {
-                canvasImage.modifyImageViewColors(color, contrast, brightness, saturation, hue);
-            }
-            canvasImage.setCanvas(this);
-            canvasImage.setHmiApp(hmiApp);
-            if (this.getShapeArrayList().isEmpty()) {
-                canvasImage.setObjectId(FIGURE_ID + "0");
-            } else {
-                canvasImage.setObjectId(FIGURE_ID + this.getShapeArrayList().size());
-            }
-            this.addNewShape(canvasImage);
-            this.getChildren().add(canvasImage);
-            canvasImage.getHmiApp().setWasModified(true);
-            this.setAddOnClickEnabled(false);
+            addCanvasImageToCanvas(isModifyingColor, contrast, brightness, saturation, hue, color, canvasImage);
 
         }
     }
@@ -730,7 +722,7 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
             this.getChildren().add(canvasImage);
             canvasImage.getHmiApp().setWasModified(true);
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error al agregar imagen", "Error:'" + e.getMessage() + "'");
+            showAlert(Alert.AlertType.ERROR, "Error al agregar imagen", "Existió un arror al tratar de agregar la imagen", e.getMessage());
         }
     }
 
@@ -855,21 +847,6 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-
-        alert.getButtonTypes().setAll(okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            alert.close();
-        }
     }
 
 }

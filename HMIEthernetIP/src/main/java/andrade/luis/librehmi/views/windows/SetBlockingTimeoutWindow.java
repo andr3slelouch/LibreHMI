@@ -1,6 +1,6 @@
 package andrade.luis.librehmi.views.windows;
 
-import andrade.luis.librehmi.controllers.TextFormatters;
+import andrade.luis.librehmi.util.TextFormatters;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,8 +10,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
-import java.util.Optional;
-import java.util.function.UnaryOperator;
+
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 
 public class SetBlockingTimeoutWindow extends Stage {
     private final TextField timeoutTextField;
@@ -65,33 +65,12 @@ public class SetBlockingTimeoutWindow extends Stage {
         timeout = Integer.parseInt(timeoutTextField.getText());
         boolean isValid = false;
         if(timeout<minValue){
-            isValid = showAlert("Advertencia: El tiempo de bloqueo es muy bajo","Definir un tiempo de bloqueo tan bajo puede ser perjudicial para la experiencia de usuario, ¿Continuar?");
+            isValid = showAlert(Alert.AlertType.WARNING,"Advertencia: El tiempo de bloqueo es muy bajo","Definir un tiempo de bloqueo tan bajo puede ser perjudicial para la experiencia de usuario, ¿Continuar?");
         }else if(timeout>maxValue){
-            isValid = showAlert("Advertencia: El tiempo de bloqueo es muy alto","Definir un tiempo de bloqueo tan alto podría vulnerar la seguridad del sistema, ¿Continuar?");
+            isValid = showAlert(Alert.AlertType.WARNING,"Advertencia: El tiempo de bloqueo es muy alto","Definir un tiempo de bloqueo tan alto podría vulnerar la seguridad del sistema, ¿Continuar?");
         }
         if(isValid){
             this.close();
         }
-    }
-
-    private boolean showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-
-        ButtonType yesButton = new ButtonType("Sí", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
-
-        alert.getButtonTypes().setAll(noButton,yesButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == yesButton) {
-            alert.close();
-            return true;
-        } else if (result.isPresent() && result.get() == noButton) {
-            alert.close();
-            return false;
-        }
-        return true;
     }
 }

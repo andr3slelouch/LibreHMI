@@ -1,6 +1,6 @@
 package andrade.luis.librehmi.views;
 
-import andrade.luis.librehmi.controllers.TextFormatters;
+import andrade.luis.librehmi.util.TextFormatters;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;

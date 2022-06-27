@@ -18,9 +18,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
 
-import static andrade.luis.librehmi.controllers.TextFormatters.digitFilter;
+import static andrade.luis.librehmi.util.TextFormatters.digitFilter;
 
 public class WriteExpressionWindow extends Stage {
 
@@ -123,7 +122,7 @@ public class WriteExpressionWindow extends Stage {
     }
 
     public Tag addTag(boolean inputMode, String filter, boolean testMode) {
-        SelectTagWindow selectTagWindow = new SelectTagWindow(this.isInputMode(), "", false, this.getLocalTags());
+        SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode, filter, testMode, this.getLocalTags());
         selectTagWindow.showAndWait();
         if (!selectTagWindow.isCancelled()) {
             clearAll();

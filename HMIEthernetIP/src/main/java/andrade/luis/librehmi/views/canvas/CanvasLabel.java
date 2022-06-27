@@ -2,7 +2,6 @@ package andrade.luis.librehmi.views.canvas;
 
 import andrade.luis.librehmi.models.CanvasObjectData;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 

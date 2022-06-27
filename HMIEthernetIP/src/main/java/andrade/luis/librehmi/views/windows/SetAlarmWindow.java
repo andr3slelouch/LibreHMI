@@ -6,11 +6,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DoubleStringConverter;
 
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
 public class SetAlarmWindow extends WriteExpressionWindow {
     private final HBox doubleLimitHBox;

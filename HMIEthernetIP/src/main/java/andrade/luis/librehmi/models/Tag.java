@@ -15,8 +15,8 @@ public class Tag implements Serializable {
     public static final String ENTERO_STR = "Entero";
     public static final String FLOTANTE_STR = "Flotante";
     public static final String BOOL_STR = "Bool";
-    private static final Map<String, String> selectQueries = Map.of(ENTERO_STR, "select valor from entero where nombreTag=", FLOTANTE_STR, "select valor from flotante where nombreTag=", BOOL_STR, "select valor from boolean where nombreTag=");
-    private static final Map<String, String> updateQueries = Map.of(ENTERO_STR, "update entero SET valor=? where nombreTag=", FLOTANTE_STR, "update flotante SET valor=? where nombreTag=", BOOL_STR, "update boolean SET valor=? where nombreTag=");
+    private static final Map<String, String> selectQueries = Map.of(ENTERO_STR, "select valor from entero where nombreTag=?", FLOTANTE_STR, "select valor from flotante where nombreTag=?", BOOL_STR, "select valor from boolean where nombreTag=?");
+    private static final Map<String, String> updateQueries = Map.of(ENTERO_STR, "update entero SET valor=? where nombreTag=?", FLOTANTE_STR, "update flotante SET valor=? where nombreTag=?", BOOL_STR, "update boolean SET valor=? where nombreTag=?");
 
     public boolean isLocalTag() {
         return localTag;
@@ -136,28 +136,34 @@ public class Tag implements Serializable {
     public String read() throws SQLException, IOException {
         if (!localTag) {
             try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
-                try (Statement statement = con.createStatement()) {
-                    if (this.getType() != null && this.getName() != null) {
-                        String query = selectQueries.get(this.getType()) + "'" + this.getName() + "'";
-                        ResultSet resultSet = statement.executeQuery(query);
-                        while (resultSet.next()) {
-                            if (!resultSet.getString("valor").isEmpty()) {
-                                String result = resultSet.getString("valor");
-                                this.value = result;
-                                return result;
-                            }
-                        }
+                if (this.getType() != null && this.getName() != null) {
+                    String query = selectQueries.get(this.getType());
+                    try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+                        preparedStatement.setString(1, this.getName());
+                        ResultSet resultSet = preparedStatement.executeQuery();
+                        return getResultFromResultSet(resultSet);
                     }
                 }
             } catch (SQLException e) {
                 throw new SQLException(e);
-            } catch (IOException e){
+            } catch (IOException e) {
                 throw new IOException(e);
             }
             return null;
         } else {
             return this.value;
         }
+    }
+
+    private String getResultFromResultSet(ResultSet resultSet) throws SQLException {
+        while (resultSet.next()) {
+            if (!resultSet.getString("valor").isEmpty()) {
+                String result = resultSet.getString("valor");
+                this.value = result;
+                return result;
+            }
+        }
+        return null;
     }
 
     public boolean compareToTag(Tag comparedTag) {
@@ -181,13 +187,13 @@ public class Tag implements Serializable {
         if (!localTag) {
             try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
                 if (this.getType() != null && this.getName() != null) {
-                    String query = updateQueries.get(this.getType()) + "'" + this.getName() + "'";
+                    String query = updateQueries.get(this.getType());
                     try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
                         preparedStatement.setString(1, prepareValue());
+                        preparedStatement.setString(2, this.getName());
                         int insertRowResult = preparedStatement.executeUpdate();
                         return insertRowResult > 0;
                     }
-
                 } else {
                     return false;
                 }
@@ -226,10 +232,7 @@ public class Tag implements Serializable {
         return new DecimalFormat(precisionStr);
     }
 
-    public Tag(String plcName, String plcAddress, String plcDeviceGroup, String name, String type, String address, String action, String value, int floatPrecision) {
-        this.plcName = plcName;
-        this.plcAddress = plcAddress;
-        this.plcDeviceGroup = plcDeviceGroup;
+    public Tag(String name, String type, String address, String action, String value, int floatPrecision) {
         this.name = name;
         this.type = type;
         this.address = address;
@@ -237,6 +240,12 @@ public class Tag implements Serializable {
         this.value = value;
         this.floatPrecision = floatPrecision;
         this.localTag = false;
+    }
+
+    public void setPLCValues(String plcName, String plcAddress, String plcDeviceGroup){
+        this.plcName = plcName;
+        this.plcAddress = plcAddress;
+        this.plcDeviceGroup = plcDeviceGroup;
     }
 
     public Tag(String name, String type, String action, String value, int floatPrecision) {

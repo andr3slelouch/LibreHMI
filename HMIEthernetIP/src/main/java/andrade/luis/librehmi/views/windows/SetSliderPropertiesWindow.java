@@ -1,7 +1,6 @@
 package andrade.luis.librehmi.views.windows;
 
 import andrade.luis.librehmi.models.CanvasOrientation;
-import andrade.luis.librehmi.models.Tag;
 import andrade.luis.librehmi.views.RotationHBox;
 import andrade.luis.librehmi.views.SizeVBox;
 import javafx.scene.control.*;

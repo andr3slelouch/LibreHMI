@@ -16,10 +16,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class ManageUsersWindow extends Stage {
@@ -135,8 +135,8 @@ public class ManageUsersWindow extends Stage {
         logger.log(Level.INFO, e.getMessage());
     }
 
-    public ObservableList<HMIUserRow> readUsers(Connection con,ObservableList<HMIUserRow> users,String query){
-        try(Statement statement = con.createStatement()){
+    public ObservableList<HMIUserRow> readUsers(Connection con,ObservableList<HMIUserRow> users,String query) {
+        try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 users.add(new HMIUserRow(
@@ -150,32 +150,10 @@ public class ManageUsersWindow extends Stage {
                         )
                 ));
             }
-        }catch(Exception e){
-            showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",e.getMessage());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error al conectarse a la base de datos", e.getMessage());
             log(e);
         }
         return users;
-    }
-
-    private boolean showAlert(Alert.AlertType type,String title,String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-
-        ButtonType okButton = new ButtonType("Sí",ButtonBar.ButtonData.YES);
-        ButtonType cancelButton = new ButtonType("No",ButtonBar.ButtonData.NO);
-
-        alert.getButtonTypes().setAll(cancelButton,okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
-            alert.close();
-            return true;
-        }else if(result.isPresent() && result.get() == cancelButton){
-            alert.close();
-            return false;
-        }
-        return false;
     }
 }

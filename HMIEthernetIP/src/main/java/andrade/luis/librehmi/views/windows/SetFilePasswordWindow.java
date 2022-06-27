@@ -8,8 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.Optional;
-
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.geometry.Pos.BASELINE_RIGHT;
 import static javafx.geometry.Pos.CENTER;
 
@@ -68,7 +67,7 @@ public class SetFilePasswordWindow extends Stage {
                     canceled = false;
                     this.close();
                 }else{
-                    showAlert();
+                    showAlert(Alert.AlertType.ERROR,"Las contraseñas no coinciden","Verifique que las contraseñas ingresadas sean las mismas","");
                 }
             }else{
                 canceled=false;
@@ -94,20 +93,5 @@ public class SetFilePasswordWindow extends Stage {
         double height = registration ? 150 : 125;
         this.setScene(new Scene(root,400,height));
 
-    }
-
-    private void showAlert(){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Las contraseñas no coinciden");
-        alert.setHeaderText("Verifique que las contraseñas ingresadas sean las mismas");
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
-
-        alert.getButtonTypes().setAll(okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
-            alert.close();
-        }
     }
 }

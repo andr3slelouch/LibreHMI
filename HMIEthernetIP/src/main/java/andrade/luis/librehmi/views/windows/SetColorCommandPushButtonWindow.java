@@ -1,6 +1,5 @@
 package andrade.luis.librehmi.views.windows;
 
-import andrade.luis.librehmi.models.Tag;
 import andrade.luis.librehmi.views.canvas.CanvasColor;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;

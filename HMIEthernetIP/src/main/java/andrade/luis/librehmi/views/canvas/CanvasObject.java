@@ -447,12 +447,21 @@ public class CanvasObject extends BorderPane {
                 }
                 timeline.play();
             } catch (SQLException | IOException e) {
-                Logger logger = Logger.getLogger(this.getClass().getName());
                 logger.log(Level.INFO,e.getMessage());
                 this.errorLabel = new Label("Error en Tag de Escritura");
                 this.setTop(errorLabel);
             }
         }
+    }
+
+    public String updateInputTag(Tag tag){
+        int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
+        updateTag(tag);
+        if(this.getCanvasObjectData().getTag().compareToTag(tag)){
+            this.getCanvasObjectData().setTag(tag);
+            this.getCanvasObjectData().getTag().setFloatPrecision(floatPrecision);
+        }
+        return this.getCanvasObjectData().getTag().getValue();
     }
 
 }

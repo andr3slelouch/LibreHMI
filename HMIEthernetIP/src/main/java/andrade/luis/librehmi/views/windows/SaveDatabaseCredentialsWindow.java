@@ -8,22 +8,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.Properties;
+
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 
 public class SaveDatabaseCredentialsWindow extends Stage {
 
     public boolean isCancelled() {
         return cancelled;
-    }
-
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
 
     private boolean cancelled =true;
@@ -135,30 +131,5 @@ public class SaveDatabaseCredentialsWindow extends Stage {
         String url = "jdbc:mysql://"+hostname+":"+port;
         con = DriverManager.getConnection(url, username, password); //attempting to connect to MySQL database
         con.close();
-    }
-
-    public boolean showAlert(Alert.AlertType type, String title, String message, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-        if(!content.isEmpty()){
-            alert.setContentText(content);
-        }
-
-        ButtonType cancelButton = new ButtonType("Cancelar",ButtonBar.ButtonData.CANCEL_CLOSE);
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
-
-        alert.getButtonTypes().setAll(cancelButton,okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
-            alert.close();
-            return true;
-        }else if(result.isPresent() && result.get() == cancelButton){
-            alert.close();
-            return false;
-        }
-        return false;
     }
 }

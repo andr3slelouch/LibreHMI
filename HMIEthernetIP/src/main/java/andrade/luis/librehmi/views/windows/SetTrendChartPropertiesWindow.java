@@ -14,11 +14,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
-
 import java.util.ArrayList;
-import java.util.Optional;
-
-import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+import static andrade.luis.librehmi.util.Alerts.showAlert;
+import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
 public class SetTrendChartPropertiesWindow extends Stage {
 
@@ -108,12 +106,12 @@ public class SetTrendChartPropertiesWindow extends Stage {
         finishSelectionButton.setOnAction(actionEvent -> {
             this.canceled = false;
             if(Double.parseDouble(samplingTimeTF.getText())<0.5){
-                showAlert("Valor de muestreo muy bajo","El valor de muestreo debe ser mayor o igual a 0.5 segundos");
+                showAlert(Alert.AlertType.ERROR,"Valor de muestreo muy bajo","El valor de muestreo debe ser mayor o igual a 0.5 segundos","");
             }else{
                 if(updateTrendChartSerieDataArrayList()){
                     this.close();
                 }else{
-                    showAlert("Existen valores vacíos","Verifique que todos los valores de las Expresiones habilitadas no estén vacíos");
+                    showAlert(Alert.AlertType.ERROR,"Existen valores vacíos","Verifique que todos los valores de las Expresiones habilitadas no estén vacíos","");
                 }
             }
         });
@@ -144,21 +142,5 @@ public class SetTrendChartPropertiesWindow extends Stage {
             }
         }
         return true;
-    }
-
-    private void showAlert(String title, String message){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-
-        alert.getButtonTypes().setAll(okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
-            alert.close();
-        }
     }
 }

@@ -12,10 +12,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.geometry.Pos.CENTER;
 
 public class LogInWindow extends Stage {
@@ -61,7 +61,7 @@ public class LogInWindow extends Stage {
                     loggedUser = user;
                     this.close();
                 }else{
-                    showAlert(Alert.AlertType.ERROR,"Error al Iniciar Sesión","Usuario o contraseña incorrectos");
+                    showAlert(Alert.AlertType.ERROR,"Error al Iniciar Sesión","Usuario o contraseña incorrectos","");
                 }
             } catch (SQLException e) {
                 databaseConnectionFailed(e.getMessage());
@@ -85,22 +85,6 @@ public class LogInWindow extends Stage {
     }
 
     private void databaseConnectionFailed(String message) {
-        showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",message);
-    }
-
-    public void showAlert(Alert.AlertType type, String title,String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-
-        ButtonType okButton = new ButtonType("OK",ButtonBar.ButtonData.OK_DONE);
-
-        alert.getButtonTypes().setAll(okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == okButton)
-        {
-            alert.close();
-        }
+        showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",message,"");
     }
 }

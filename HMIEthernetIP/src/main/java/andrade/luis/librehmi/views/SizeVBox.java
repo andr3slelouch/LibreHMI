@@ -7,9 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DoubleStringConverter;
 
-import java.util.function.UnaryOperator;
-
-import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
 public class SizeVBox extends VBox {
     private final HBox heightValueHBox;

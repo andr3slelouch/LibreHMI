@@ -142,12 +142,16 @@ public class HMIUser {
 
     public static boolean existsEmail(String email, String username) throws SQLException, IOException {
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
-            String query = "SELECT email from Users WHERE email='" + email + "'";
+            String query = "SELECT email from Users WHERE email=?";
+            boolean usernameExists = false;
             if(!username.isEmpty()){
-                query = query.concat(" AND username!='"+username+"'");
+                query = query.concat(" AND username!=?");
+                usernameExists = true;
             }
-            try(Statement statement = con.createStatement()){
-                ResultSet resultSet = statement.executeQuery(query);
+            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                preparedStatement.setString(1,email);
+                if(usernameExists) preparedStatement.setString(2,username);
+                ResultSet resultSet = preparedStatement.executeQuery();
                 boolean res = false;
                 while (resultSet.next()) {
                     res = (email.equals(resultSet.getString(1)));
@@ -159,14 +163,14 @@ public class HMIUser {
         }catch (IOException e){
             throw new IOException(e);
         }
-
     }
 
     public static boolean existsUsername(String username) throws SQLException, IOException {
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
-            String query = "SELECT username from Users WHERE username='" + username + "'";
-            try(Statement statement = con.createStatement()){
-                ResultSet resultSet = statement.executeQuery(query);
+            String query = "SELECT username from Users WHERE username=?";
+            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                preparedStatement.setString(1,username);
+                ResultSet resultSet = preparedStatement.executeQuery();
                 boolean res = false;
                 while (resultSet.next()) {
                     res = (username.equals(resultSet.getString(1)));
@@ -182,9 +186,11 @@ public class HMIUser {
 
     public boolean verifyUserAndPassword(String usernameOrEmail, String password) throws SQLException, IOException {
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
-            String query = "SELECT username, salt, saltedHashPassword FROM Users WHERE username='" + usernameOrEmail + "' or email='" + usernameOrEmail + "'";
-            try(Statement statement = con.createStatement()){
-                ResultSet resultSet = statement.executeQuery(query);
+            String query = "SELECT username, salt, saltedHashPassword FROM Users WHERE username=? or email=?";
+            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                preparedStatement.setString(1,usernameOrEmail);
+                preparedStatement.setString(2,usernameOrEmail);
+                ResultSet resultSet = preparedStatement.executeQuery();
                 String localSalt = "";
                 String localExpectedHash = "";
                 while (resultSet.next()) {
@@ -205,9 +211,10 @@ public class HMIUser {
 
     public void readFromDatabase(String username) throws SQLException, IOException {
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
-            String query = "SELECT * FROM Users WHERE username='" + username + "'";
-            try(Statement statement = con.createStatement()){
-                ResultSet resultSet = statement.executeQuery(query);
+            String query = "SELECT * FROM Users WHERE username=?";
+            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                preparedStatement.setString(1,username);
+                ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     this.firstName = resultSet.getString(2);
                     this.lastName = resultSet.getString(3);
@@ -242,7 +249,6 @@ public class HMIUser {
     public boolean deleteFromDatabase() throws SQLException, IOException {
         try(Connection con = DBConnection.createConnectionToHMIUsers()){
             String sql = "DELETE FROM Users WHERE username=?";
-
             try(PreparedStatement statement = con.prepareStatement(sql)){
                 statement.setString(1, this.username);
                 int rowsDeleted = statement.executeUpdate();

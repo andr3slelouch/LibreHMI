@@ -34,4 +34,5 @@ module andrade.luis.hmiethernetip {
     opens andrade.luis.librehmi.views to com.google.gson, javafx.base, javafx.fxml;
     exports andrade.luis.librehmi.views.windows;
     opens andrade.luis.librehmi.views.windows to com.google.gson, javafx.base, javafx.fxml;
+    exports andrade.luis.librehmi.util;
 }

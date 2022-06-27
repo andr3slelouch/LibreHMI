@@ -3,7 +3,6 @@ andrade/luis/librehmi/views/windows/ManageAlarmsWindow$1.class
 andrade/luis/librehmi/views/windows/SetTextPropertiesWindow.class
 andrade/luis/librehmi/models/HMIAppData.class
 andrade/luis/librehmi/models/Expression.class
-andrade/luis/librehmi/controllers/TextFormatters.class
 andrade/luis/librehmi/models/SceneItem.class
 andrade/luis/librehmi/views/windows/SetPercentFillPropertiesWindow.class
 andrade/luis/librehmi/views/windows/LogInWindow.class
@@ -22,6 +21,7 @@ andrade/luis/librehmi/models/users/HMIUserRow.class
 andrade/luis/librehmi/models/TagRow.class
 andrade/luis/librehmi/views/canvas/CanvasObject.class
 andrade/luis/librehmi/views/canvas/CanvasImage.class
+andrade/luis/librehmi/util/TextFormatters.class
 andrade/luis/librehmi/views/canvas/CanvasTrendChart.class
 andrade/luis/librehmi/views/canvas/CanvasLabel.class
 andrade/luis/librehmi/views/RotationHBox.class
@@ -67,6 +67,7 @@ andrade/luis/librehmi/views/windows/ManageUsersWindow.class
 andrade/luis/librehmi/views/windows/SetButtonPropertiesWindow.class
 andrade/luis/librehmi/views/windows/SelectHMISymbolWindow.class
 andrade/luis/librehmi/views/windows/SetFilePasswordWindow.class
+andrade/luis/librehmi/util/Alerts.class
 andrade/luis/librehmi/views/windows/SelectTagWindow.class
 andrade/luis/librehmi/views/canvas/CanvasObjectInterface.class
 andrade/luis/librehmi/models/RecentUsedFilesData.class

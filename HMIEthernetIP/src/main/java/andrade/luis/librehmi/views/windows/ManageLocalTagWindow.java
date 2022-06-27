@@ -15,12 +15,12 @@ import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static andrade.luis.librehmi.controllers.TextFormatters.integerFilter;
-import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+import static andrade.luis.librehmi.util.Alerts.showAlert;
+import static andrade.luis.librehmi.util.TextFormatters.integerFilter;
+import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
 public class ManageLocalTagWindow extends Stage {
 
@@ -49,10 +49,9 @@ public class ManageLocalTagWindow extends Stage {
 
     private Tag tag;
     private VBox vbox;
-    private TextField valueField;
-    private RadioButton falseRadioButton;
-    private RadioButton trueRadioButton;
-    private ToggleGroup toggleGroup;
+    private final TextField valueField;
+    private final RadioButton falseRadioButton;
+    private final RadioButton trueRadioButton;
     private final HBox booleanConditionsHBox;
     private final HBox doubleLimitHBox;
     Logger logger = Logger.getLogger(this.getClass().getName());
@@ -94,7 +93,7 @@ public class ManageLocalTagWindow extends Stage {
         doubleLimitHBox.setSpacing(34);
 
         Label boolValueLabel = new Label("Valor:");
-        toggleGroup = new ToggleGroup();
+        ToggleGroup toggleGroup = new ToggleGroup();
         trueRadioButton = new RadioButton("Verdadero");
         trueRadioButton.setToggleGroup(toggleGroup);
         trueRadioButton.setSelected(true);
@@ -114,19 +113,7 @@ public class ManageLocalTagWindow extends Stage {
         Button registerButton = new Button("Guardar Tag");
         registerButton.setOnAction(actionEvent -> {
             if(verifyFields(firstNameField, typesComboBox, actionsComboBox)){
-                String value = "";
-                if(typesComboBox.getSelectionModel().getSelectedItem().equals(FLOTANTE_STR)||typesComboBox.getSelectionModel().getSelectedItem().equals(ENTERO_STR)){
-                    value = valueField.getText();
-                }else{
-                    value = trueRadioButton.isSelected() ? "1" : "0";
-                }
-                if(ManageLocalTagWindow.this.tag == null){
-                    this.tag = new Tag(firstNameField.getText(),typesComboBox.getSelectionModel().getSelectedItem(),actionsComboBox.getSelectionModel().getSelectedItem(),value,3);
-                }else{
-                    this.tag.setValue(value);
-                    logger.log(Level.INFO,this.tag.getValue());
-                }
-                this.close();
+                registerProcess();
             }
         });
         HBox buttonsHBox = new HBox();
@@ -149,7 +136,23 @@ public class ManageLocalTagWindow extends Stage {
 
         this.setScene(new Scene(root, 250, 200));
     }
-    
+
+    private void registerProcess() {
+        String value;
+        if(typesComboBox.getSelectionModel().getSelectedItem().equals(FLOTANTE_STR)||typesComboBox.getSelectionModel().getSelectedItem().equals(ENTERO_STR)){
+            value = valueField.getText();
+        }else{
+            value = trueRadioButton.isSelected() ? "1" : "0";
+        }
+        if(ManageLocalTagWindow.this.tag == null){
+            this.tag = new Tag(firstNameField.getText(),typesComboBox.getSelectionModel().getSelectedItem(),actionsComboBox.getSelectionModel().getSelectedItem(),value,3);
+        }else{
+            this.tag.setValue(value);
+            logger.log(Level.INFO,this.tag.getValue());
+        }
+        this.close();
+    }
+
     private void initUI(Tag localTag) throws IOException, SQLException {
         if (localTag != null) {
             this.tag = localTag;
@@ -235,23 +238,8 @@ public class ManageLocalTagWindow extends Stage {
         if (message.isEmpty()) {
             return true;
         } else {
-            showAlert(Alert.AlertType.WARNING, "Error en los campos ingresados", message);
+            showAlert(Alert.AlertType.WARNING, "Error en los campos ingresados", message,"");
             return false;
-        }
-    }
-
-    public void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(message);
-
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-
-        alert.getButtonTypes().setAll(okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            alert.close();
         }
     }
 }

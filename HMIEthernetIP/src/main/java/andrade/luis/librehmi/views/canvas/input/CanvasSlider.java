@@ -12,7 +12,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.util.Duration;
 
@@ -207,20 +206,13 @@ public class CanvasSlider extends CanvasObject {
         timeline.play();
     }
 
-    public void updateInputTag(Tag tag, boolean forceUpdate){
-        int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
-        super.updateTag(tag);
-        if(this.getCanvasObjectData().getTag().compareToTag(tag)){
-            this.getCanvasObjectData().setTag(tag);
-            this.getCanvasObjectData().getTag().setFloatPrecision(floatPrecision);
+    public String updateInputTag(Tag tag, boolean forceUpdate){
+        String value = super.updateInputTag(tag);
+        if (forceUpdate && value != null) {
+            double evaluatedValue = Double.parseDouble(value);
+            this.slider.setValue(evaluatedValue);
         }
-        if(forceUpdate){
-            String value = this.getCanvasObjectData().getTag().getValue();
-            if (value != null) {
-                double evaluatedValue = Double.parseDouble(value);
-                this.slider.setValue(evaluatedValue);
-            }
-        }
+        return value;
     }
 }
 

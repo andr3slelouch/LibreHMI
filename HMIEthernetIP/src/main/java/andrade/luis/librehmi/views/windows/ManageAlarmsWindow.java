@@ -10,8 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.util.ArrayList;
-import java.util.Optional;
 
+import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
 public class ManageAlarmsWindow extends Stage {
@@ -85,7 +85,7 @@ public class ManageAlarmsWindow extends Stage {
         MenuItem deleteItem = new MenuItem();
         deleteItem.setText("Eliminar");
         deleteItem.setOnAction(event -> {
-            if(showAlert(CONFIRMATION,"Confirmar eliminación","Desea eliminar la alarma seleccionada \"" + item.getName() + "\"?")){
+            if(showAlert(CONFIRMATION,"Confirmar eliminación","Desea eliminar la alarma seleccionada \"" + item.getName() + "\"?","")){
                 deleteAlarm(item.getName());
             }
         });
@@ -163,29 +163,8 @@ public class ManageAlarmsWindow extends Stage {
                 this.hmiApp.setWasModified(true);
             }
         }else{
-            showAlert(Alert.AlertType.ERROR,"El nombre de la nueva alarma ya existe","Ya existe una alarma con el nombre \"" +setAlarmWindow.getAlarmNameTF().getText()+ "\", cambia el nombre de la alarma");
+            showAlert(Alert.AlertType.ERROR,"El nombre de la nueva alarma ya existe","Ya existe una alarma con el nombre \"" +setAlarmWindow.getAlarmNameTF().getText()+ "\", cambia el nombre de la alarma","");
             createNewAlarm(setAlarmWindow);
         }
-    }
-
-    private boolean showAlert(Alert.AlertType alertType, String title, String description) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(description);
-
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButton = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(cancelButton,okButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            alert.close();
-            return true;
-        } else if (result.isPresent() && result.get() == cancelButton) {
-            alert.close();
-            return false;
-        }
-        return false;
     }
 }

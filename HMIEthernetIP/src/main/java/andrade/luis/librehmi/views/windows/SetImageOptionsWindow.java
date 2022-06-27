@@ -14,9 +14,8 @@ import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
 import java.io.File;
-import java.util.function.UnaryOperator;
 
-import static andrade.luis.librehmi.controllers.TextFormatters.numberFilter;
+import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
 public class SetImageOptionsWindow extends Stage {
     protected final VBox vbox;

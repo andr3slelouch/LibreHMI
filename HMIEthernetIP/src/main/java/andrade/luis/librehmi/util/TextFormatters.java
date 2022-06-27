@@ -1,4 +1,4 @@
-package andrade.luis.librehmi.controllers;
+package andrade.luis.librehmi.util;
 
 import javafx.scene.control.TextFormatter;
 
@@ -10,7 +10,7 @@ public class TextFormatters {
     }
     public static final UnaryOperator<TextFormatter.Change> integerFilter = change -> {
         String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+$")) {
+        if (!newText.matches("^([+-])?\\d+$")) {
             change.setText("");
             change.setRange(change.getRangeStart(), change.getRangeStart());
         }
@@ -28,7 +28,7 @@ public class TextFormatters {
 
     public static final UnaryOperator<TextFormatter.Change> numberFilter = change -> {
         String newText = change.getControlNewText();
-        if (!newText.matches("^(\\+|-)?\\d+\\.\\d+$")) {
+        if (!newText.matches("^([+-])?\\d+\\.\\d+$")) {
             change.setText("");
             change.setRange(change.getRangeStart(), change.getRangeStart());
         }

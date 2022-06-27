@@ -81,9 +81,10 @@ public class DBConnection {
 
     public static boolean schemaExistsInDB(String schemaName) throws SQLException, IOException {
         try (Connection con = createConnection("")) {
-            String query = "SELECT schema_name from information_schema.schemata where schema_name = '" + schemaName + "';";
-            try (Statement statement = con.createStatement()) {
-                ResultSet resultSet = statement.executeQuery(query);
+            String query = "SELECT schema_name from information_schema.schemata where schema_name = ?";
+            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                preparedStatement.setString(1,schemaName);
+                ResultSet resultSet = preparedStatement.executeQuery();
                 boolean res = false;
                 if (resultSet.next()) {
                     res = (schemaName.equals(resultSet.getString(1)));
@@ -105,9 +106,11 @@ public class DBConnection {
     public static boolean tableExistsInSchema(String tableName, String schemaName) throws SQLException, IOException {
         if (schemaExistsInDB(schemaName)) {
             Connection con = createConnection(schemaName);
-            String query = "select table_name from information_schema.tables where table_name='" + tableName + "' and table_schema='" + schemaName + "';";
-            try (Statement statement = con.createStatement()) {
-                ResultSet resultSet = statement.executeQuery(query);
+            String query = "select table_name from information_schema.tables where table_name=? and table_schema=?";
+            try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                preparedStatement.setString(1,tableName);
+                preparedStatement.setString(2,schemaName);
+                ResultSet resultSet = preparedStatement.executeQuery();
                 boolean res = false;
                 if (resultSet.next()) {
                     res = (tableName.equals(resultSet.getString(1)));
@@ -159,7 +162,11 @@ public class DBConnection {
     public static void createSchemaIfNotExists(String schemaName) throws SQLException, IOException {
         if (!schemaExistsInDB(schemaName)) {
             try(Connection con = createConnection("")){
-                String query = "CREATE database " + schemaName;
+                String query = "CREATE database ?";
+                try(PreparedStatement preparedStatement = con.prepareStatement(query)){
+                    preparedStatement.setString(1,schemaName);
+                    preparedStatement.executeQuery();
+                }
                 try(Statement statement = con.createStatement()){
                     statement.execute(query);
                 }
