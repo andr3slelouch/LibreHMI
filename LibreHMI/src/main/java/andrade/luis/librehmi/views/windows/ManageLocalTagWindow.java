@@ -22,6 +22,9 @@ import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static andrade.luis.librehmi.util.TextFormatters.integerFilter;
 import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
+/**
+ * Ventana de administración de tag locales
+ */
 public class ManageLocalTagWindow extends Stage {
 
     public static final String FLOTANTE_STR = "Flotante";
@@ -56,6 +59,12 @@ public class ManageLocalTagWindow extends Stage {
     private final HBox doubleLimitHBox;
     Logger logger = Logger.getLogger(this.getClass().getName());
 
+    /**
+     * Constructor de ventana de administración de Tag locales
+     * @param localTag Tag local a ser administrado
+     * @throws SQLException
+     * @throws IOException
+     */
     public ManageLocalTagWindow(Tag localTag) throws SQLException, IOException {
         StackPane root = new StackPane();
 
@@ -137,6 +146,9 @@ public class ManageLocalTagWindow extends Stage {
         this.setScene(new Scene(root, 250, 200));
     }
 
+    /**
+     * Permite registrar el valor del tag
+     */
     private void registerProcess() {
         String value;
         if(typesComboBox.getSelectionModel().getSelectedItem().equals(FLOTANTE_STR)||typesComboBox.getSelectionModel().getSelectedItem().equals(ENTERO_STR)){
@@ -153,6 +165,12 @@ public class ManageLocalTagWindow extends Stage {
         this.close();
     }
 
+    /**
+     * Permite inicializar la interfaz con los valores del tag
+     * @param localTag Tag local que se administrará
+     * @throws IOException
+     * @throws SQLException
+     */
     private void initUI(Tag localTag) throws IOException, SQLException {
         if (localTag != null) {
             this.tag = localTag;
@@ -200,6 +218,10 @@ public class ManageLocalTagWindow extends Stage {
         }
     }
 
+    /**
+     * Permite habilitar las entradas dependiendo del tipo
+     * @param type Tipo de tag
+     */
     private void enableInputs(String type) {
         if (type.equals(FLOTANTE_STR) || type.equals(ENTERO_STR)) {
             this.getVbox().getChildren().remove(doubleLimitHBox);
@@ -226,6 +248,13 @@ public class ManageLocalTagWindow extends Stage {
         }
     }
 
+    /**
+     * Permite verificar que no existen campos vacíos
+     * @param nameField Nombre del tag local
+     * @param typesComboBox ComboBox de Tipo del tag local
+     * @param actionsComboBox ComboBox de acciones del tag local
+     * @return true si todos los campos son correctos
+     */
     public boolean verifyFields(TextField nameField, ComboBox<String> typesComboBox, ComboBox<String> actionsComboBox) {
         String message = "";
         if (nameField.getText().isEmpty()) {

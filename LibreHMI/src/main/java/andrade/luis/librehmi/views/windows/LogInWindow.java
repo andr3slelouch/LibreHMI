@@ -18,6 +18,9 @@ import java.util.logging.Logger;
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.geometry.Pos.CENTER;
 
+/**
+ * Ventana de inicio de sesión
+ */
 public class LogInWindow extends Stage {
     private final StackPane root;
 
@@ -31,6 +34,9 @@ public class LogInWindow extends Stage {
 
     private HMIUser loggedUser;
 
+    /**
+     * Constructor de la ventana
+     */
     public LogInWindow(){
         root = new StackPane();
         final Label label = new Label("Inicio de Sesión");
@@ -84,6 +90,10 @@ public class LogInWindow extends Stage {
         
     }
 
+    /**
+     * Permite mostrar la ventana de error al conectarse a la base de datos
+     * @param message
+     */
     private void databaseConnectionFailed(String message) {
         showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",message,"");
     }

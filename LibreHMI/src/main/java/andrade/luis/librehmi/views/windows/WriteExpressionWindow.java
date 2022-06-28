@@ -21,6 +21,9 @@ import java.util.Optional;
 
 import static andrade.luis.librehmi.util.TextFormatters.digitFilter;
 
+/**
+ * Ventana de definición de expresiones para asociar a las representaciones gráficas y alarmas
+ */
 public class WriteExpressionWindow extends Stage {
 
     private final HBox floatPrecisionHBox;
@@ -47,10 +50,18 @@ public class WriteExpressionWindow extends Stage {
 
     private ArrayList<Tag> localTags;
 
+    /**
+     * Constructor de la ventana
+     */
     public WriteExpressionWindow() {
         this(750, 250);
     }
 
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Altura de la ventana
+     */
     public WriteExpressionWindow(double width, double height) {
         root = new StackPane();
         addedTags = new ArrayList<>();
@@ -110,6 +121,9 @@ public class WriteExpressionWindow extends Stage {
 
     }
 
+    /**
+     * Permite añadir un tag a la expresión
+     */
     protected void addTag() {
         SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode, "", false, this.localTags);
         selectTagWindow.showAndWait();
@@ -121,6 +135,13 @@ public class WriteExpressionWindow extends Stage {
         }
     }
 
+    /**
+     * Permite añadir un tag y retornarlo
+     * @param inputMode Bandera de modo de entrada
+     * @param filter Filtro del tipo de tag
+     * @param testMode Bandera para activar el modo de pruebas
+     * @return Tag añadido
+     */
     public Tag addTag(boolean inputMode, String filter, boolean testMode) {
         SelectTagWindow selectTagWindow = new SelectTagWindow(inputMode, filter, testMode, this.getLocalTags());
         selectTagWindow.showAndWait();
@@ -136,6 +157,14 @@ public class WriteExpressionWindow extends Stage {
         }
     }
 
+    /**
+     * Permite retornar la nueva expresión a evaluar con el tag añadido
+     * @param inputMode Bandera de modo de entrada
+     * @param filter Filtro del tipo de tag
+     * @param testMode Bandera para activar el modo de pruebas
+     * @param expression Expresión a actualizarse
+     * @return Expresión actualizada
+     */
     public String updateInputExpression(boolean inputMode, String filter, boolean testMode,String expression){
         Tag tag = addTag(inputMode, filter, testMode);
         if (tag != null) {
@@ -144,12 +173,21 @@ public class WriteExpressionWindow extends Stage {
         return "";
     }
 
+    /**
+     * Permite eliminar la expresión escrita junto con los tags definidos
+     */
     public void clearAll() {
         this.getTextField().setText("");
         this.getAddedTags().clear();
         this.addTagButton.setDisable(false);
     }
 
+    /**
+     * Permite mostrar una ventana de confirmación de salida
+     * @param type Tipo de alerta a mostrarse
+     * @param title Título
+     * @param message Mensaje a mostrarse en la ventana
+     */
     protected void confirmExit(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -165,6 +203,9 @@ public class WriteExpressionWindow extends Stage {
         }
     }
 
+    /**
+     * Permite verificar los campos antes de cerrar la ventana
+     */
     public void finishingAction() {
         deleteUnneededTags();
         if (prepareExpression(true)) {
@@ -175,6 +216,9 @@ public class WriteExpressionWindow extends Stage {
         this.done = true;
     }
 
+    /**
+     * Permite eliminar los tags agregados pero no seleccionados
+     */
     protected void deleteUnneededTags() {
         ArrayList<Tag> toDelete = new ArrayList<>();
         for (int i = 0; i < getAddedTags().size(); i++) {
@@ -185,6 +229,11 @@ public class WriteExpressionWindow extends Stage {
         getAddedTags().removeAll(toDelete);
     }
 
+    /**
+     * Permite preparar la expresión antes de retornarla
+     * @param test Bandera de modo de pruebas
+     * @return true si la operación se realizó exitosamente
+     */
     protected boolean prepareExpression(boolean test) {
         for (Tag addedTag : addedTags) {
             addedTag.setFloatPrecision(Integer.parseInt(floatPrecisionTextField.getText()));
@@ -223,6 +272,10 @@ public class WriteExpressionWindow extends Stage {
         return addedTags;
     }
 
+    /**
+     * Permite definir los tags añadidos
+     * @param addedTags ArrayList de tags añadidos
+     */
     public void setAddedTags(ArrayList<Tag> addedTags) {
         this.addedTags = addedTags;
         if (!this.addedTags.isEmpty()) {

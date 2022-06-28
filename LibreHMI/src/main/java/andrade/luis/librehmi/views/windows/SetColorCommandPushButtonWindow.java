@@ -5,6 +5,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
+/**
+ * Ventana de definición de colores de comando para el pulsador
+ */
 public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
     private final ToggleGroup radioGroup;
     private final ColorPicker primaryColorPicker;
@@ -13,6 +16,9 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
     private CanvasColor primaryColor = new CanvasColor(Color.BLACK);
     private CanvasColor backgroundColor = new CanvasColor(Color.GREEN);
 
+    /**
+     * constructor de ventana
+     */
     public SetColorCommandPushButtonWindow() {
         super(750, 300);
         setTitle("Propiedades de valor de botón pulsador");
@@ -81,6 +87,9 @@ public class SetColorCommandPushButtonWindow extends WriteExpressionWindow {
         return buttonLabelTextField;
     }
 
+    /**
+     * Permite añadir un tag filtrando que sea del tipo de escritura
+     */
     @Override
     protected void addTag() {
         textField.setText(super.updateInputExpression(this.isInputMode(), "bool", false,textField.getText()));

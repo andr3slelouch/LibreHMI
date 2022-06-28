@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+/**
+ * Item para la lista de archivos de la ventana de bienvenida
+ */
 public class RecentUsedFilesItem {
     @FXML
     private HBox hBox;
@@ -28,6 +30,10 @@ public class RecentUsedFilesItem {
     private Button editButton;
     private final HMIApp hmiApp;
 
+    /**
+     * Constructor del item de la lista
+     * @param hmiApp Objeto de aplicación
+     */
     public RecentUsedFilesItem(HMIApp hmiApp){
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("welcomeStageLVItem.fxml"));
         fxmlLoader.setController(this);
@@ -40,6 +46,10 @@ public class RecentUsedFilesItem {
         this.hmiApp = hmiApp;
     }
 
+    /**
+     * Permite definir la información del item
+     * @param filepath Path del archivo reciente
+     */
     public void setInfo(String filepath){
         filepathLabel.setText(filepath);
         String[] filenameArr = filepath.split(File.separator);

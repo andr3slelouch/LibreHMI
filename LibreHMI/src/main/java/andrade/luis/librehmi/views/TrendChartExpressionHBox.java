@@ -8,6 +8,9 @@ import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 
+/**
+ * HBox para la definición de expresiones para el gráfico de tendencias
+ */
 public class TrendChartExpressionHBox extends HBox {
     public TextField getExpressionTF() {
         return expressionTF;
@@ -51,6 +54,11 @@ public class TrendChartExpressionHBox extends HBox {
     }
 
     private ArrayList<Tag> localTags;
+
+    /**
+     * Constructor del HBox
+     * @param localTags ArrayList Tags disponibles
+     */
     public TrendChartExpressionHBox(ArrayList<Tag> localTags){
         this.localTags = localTags;
         enableChartExpression = new CheckBox();

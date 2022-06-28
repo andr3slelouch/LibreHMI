@@ -39,7 +39,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,11 +49,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
-
-
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.geometry.Pos.CENTER;
 
@@ -159,6 +155,10 @@ public class HMIApp extends Application {
     private String selectedPage;
     private HMICanvas root;
 
+    /**
+     * Permite actualizar las banderas de modificación de proyecto
+     * @param wasModified Bandera sobre si la aplicación fue modificada
+     */
     public void setWasModified(boolean wasModified) {
         this.wasModified = wasModified;
         this.updateTitleFlag.setValue(this.wasModified);
@@ -168,6 +168,10 @@ public class HMIApp extends Application {
         return hmiAppData;
     }
 
+    /**
+     * Permite definir los datos de la aplicación
+     * @param hmiAppData Datos de la aplicación
+     */
     public void setHmiAppData(HMIAppData hmiAppData) {
         this.hmiAppData = hmiAppData;
         clearProject();
@@ -188,6 +192,9 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite limpiar los elementos del canvas
+     */
     public void clearProject() {
         this.pages.clear();
         this.pagesTitles.clear();
@@ -195,6 +202,9 @@ public class HMIApp extends Application {
         this.currentProjectFilePath = null;
     }
 
+    /**
+     * Permite crear un nuevo proyecto
+     */
     public void createNewProject() {
         if (wasModified) {
             if (showSaveDialog(false, "")) {
@@ -214,6 +224,10 @@ public class HMIApp extends Application {
         return pagesTitles;
     }
 
+    /**
+     * Método para inicializar la aplicación
+     * @param stage Stage donde se agregaran los elementos de la aplicación
+     */
     @Override
     public void start(Stage stage) {
 
@@ -252,6 +266,10 @@ public class HMIApp extends Application {
         launch(args);
     }
 
+    /**
+     * Permite cerrar la aplicación
+     * @param windowEvent Objeto de evento de ventana que permite cerrar la aplicación
+     */
     private void closeProcess(WindowEvent windowEvent) {
         if (wasModified) {
             if (showSaveDialog(false, "")) {
@@ -262,6 +280,12 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite definir el modo de la aplicación
+     * @param filenamePath Path del archivo del proyecto
+     * @param mode Modo de la aplicación
+     * @throws IOException
+     */
     public void setHMIStage(String filenamePath, String mode) throws IOException {
         if (mode.equals(EDITAR_STR)) {
             loginUser(mode);
@@ -363,6 +387,12 @@ public class HMIApp extends Application {
         return scene;
     }
 
+    /**
+     * Permite generar el menú superior de la aplicación
+     * @param scene Página donde se agregará el menú
+     * @param root Canvas donde se agregará el menú
+     * @return MenuBar con todos los elementos requeridos por el menú
+     */
     private MenuBar generateMenuBar(HMIScene scene, HMICanvas root) {
         MenuBar menuBar = new MenuBar();
         menuBar.setPrefWidth(mainStage.getWidth());
@@ -491,6 +521,9 @@ public class HMIApp extends Application {
         return menuBar;
     }
 
+    /**
+     * Permite iniciar el proceso de apertura de un archivo
+     */
     private void openProcess() {
         try {
             if (wasModified) {
@@ -506,6 +539,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite generar el menú de opciones de archivo para el menú superior
+     * @return Menú con las opciones de archivo
+     */
     private Menu generateMenuFile() {
         // --- Menu File
         Menu menuFile = new Menu("Archivo");
@@ -596,6 +633,9 @@ public class HMIApp extends Application {
         logger.log(Level.INFO, e);
     }
 
+    /**
+     * Permite cambiar el modo de la aplicación
+     */
     private void changeMode() {
         if (modeLabel.equals(EDITAR_STR)) {
             loginUser(modeLabel);
@@ -612,6 +652,9 @@ public class HMIApp extends Application {
         updateLateralMenuMode();
     }
 
+    /**
+     * Permite actualizar el modo del menú lateral
+     */
     private void updateLateralMenuMode() {
         for (HBox hBox : expandBoxes) {
             for (Node content : hBox.getChildren()) {
@@ -626,6 +669,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite actualizar el modo del menú superior
+     * @param mode Modo de aplicación
+     */
     private void updateMenuBarsMode(String mode) {
         for (MenuItem menuItem : editExecuteMenuItems) {
             menuItem.setText(mode);
@@ -648,6 +695,9 @@ public class HMIApp extends Application {
         updateMenuWindowsMode();
     }
 
+    /**
+     * Permite actualizar el menú de ventanas
+     */
     private void updateMenuWindowsMode() {
         for (Menu menu : windowMenus) {
             for (MenuItem item : menu.getItems()) {
@@ -658,6 +708,9 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite actualizar el menú de archivos
+     */
     private void updateMenuFileMode() {
         for (Menu menu : fileMenus) {
             for (MenuItem subMenu : menu.getItems()) {
@@ -668,7 +721,10 @@ public class HMIApp extends Application {
         }
     }
 
-
+    /**
+     * Permite generar el menú de alarmas
+     * @return Menú para agregarse al menú superior
+     */
     private Menu generateMenuAlarm() {
         // --- Menu View
         Menu menuAlarm = new Menu("Alarmas");
@@ -719,6 +775,12 @@ public class HMIApp extends Application {
         return menuAlarm;
     }
 
+    /**
+     * VBox con las opciones para agregar representaciones gráficas al canvas
+     * @param scene Página donde se agregará el VBox
+     * @param root Canvas donde se agregará el VBox
+     * @return VBox con las opciones requeridas
+     */
     private VBox generateDesignVBox(HMIScene scene, HMICanvas root) {
         Button rectangleBtn = new Button("");
         rectangleBtn.setTooltip(new Tooltip("Rectángulo"));
@@ -828,6 +890,10 @@ public class HMIApp extends Application {
         return designToolsVBox;
     }
 
+    /**
+     * Permite iniciar el proceso de inicio de sesión
+     * @param mode Modo de la aplicación
+     */
     public void loginUser(String mode) {
         LogInWindow logInWindow = new LogInWindow();
         logInWindow.showAndWait();
@@ -841,6 +907,9 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite iniciar el hilo de autobloqueo de representaciones gráficas
+     */
     public void setAutoBlockObjectsTimeline() {
         this.autoBlockTimeline = new Timeline(
                 new KeyFrame(
@@ -853,6 +922,9 @@ public class HMIApp extends Application {
         this.autoBlockTimeline.setDelay(Duration.seconds(60));
     }
 
+    /**
+     * Permite definir el hilo de actualización de tags locales
+     */
     public void setRefreshLocalTagsTimeline() {
         Timeline refreshLocalTagsTimeline = new Timeline(
                 new KeyFrame(
@@ -862,11 +934,17 @@ public class HMIApp extends Application {
         refreshLocalTagsTimeline.play();
     }
 
+    /**
+     * Permite actualizar los tags locales empezando por las entradas
+     */
     public void refreshLocalTags() {
         updateLocalTagsFromInputs();
         updateLocalTags();
     }
 
+    /**
+     * Permite actualizar los tags
+     */
     public void updateLocalTags() {
         updateTagsInObjects();
         for (int i = 0; i < projectAlarms.size(); i++) {
@@ -884,6 +962,9 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite actualizar los tags de los objetos
+     */
     public void updateTagsInObjects() {
         for (int i = 0; i < root.getShapeArrayList().size(); i++) {
             for (Tag localTag : localTags) {
@@ -892,6 +973,9 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite actualizar los tags de entradas
+     */
     public void updateLocalTagsFromInputs() {
         ArrayList<CanvasObject> canvasObjects = root.getShapeArrayList();
         LocalDateTime max = null;
@@ -915,6 +999,10 @@ public class HMIApp extends Application {
 
     }
 
+    /**
+     * Permite añadir una alarma a la aplicación
+     * @param alarm Alarma para añadir a la aplicación
+     */
     private void addAlarm(Alarm alarm) {
         if (alarm.getExpression().determineResultType().equals("Flotante") || alarm.getExpression().determineResultType().equals("Entero")) {
             manageableAlarms.add(alarm);
@@ -927,6 +1015,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite obtener los archivos de proyecto recientemente utilizados
+     * @return ArrayList de strings con los paths de archivos de proyecto recientes
+     */
     private ArrayList<String> getRecentItems() {
         String recentFilesFilePath = DBConnection.getWorkingDirectory() + File.separator + "recentFiles.json";
         RecentUsedFilesData recentUsedFilesData;
@@ -941,6 +1033,10 @@ public class HMIApp extends Application {
         return new ArrayList<>();
     }
 
+    /**
+     * Permite generar las alarmas de tipo double del proyecto
+     * @param manageableAlarm Alarma administrable del proyecto
+     */
     private void generateDoubleProjectAlarms(Alarm manageableAlarm) {
         if (manageableAlarm.isHighAlarmEnabled()) {
             Alarm alarm = new Alarm(
@@ -992,6 +1088,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite iniciar el proceso de guardar de la aplicación
+     * @throws IOException
+     */
     private void saveHMIDataProcess() throws IOException {
         if (currentProjectFilePath != null) {
             this.saveHMIData(currentProjectFilePath);
@@ -1000,6 +1100,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite iniciar el proceso de carga del proyecto
+     * @throws IOException
+     */
     private void loadHMIData() throws IOException {
 
         FileChooser fileChooser = new FileChooser();
@@ -1019,6 +1123,11 @@ public class HMIApp extends Application {
 
     }
 
+    /**
+     * Permite iniciar el proceso carga de proyecto desde un path de archivo de proyecto
+     * @param filenamePath Path del archivo de proyecto
+     * @throws IOException
+     */
     public void loadHMIData(String filenamePath) throws IOException {
         String[] filenamePathArr = filenamePath.split("\\.");
         String type = filenamePathArr[filenamePathArr.length - 1];
@@ -1036,6 +1145,11 @@ public class HMIApp extends Application {
         loadHMIDataProcess(localHmiAppData, filenamePath);
     }
 
+    /**
+     * Permite iniciar el proceso de carga de proyecto
+     * @param localHmiAppData Datos de aplicación a cargarse
+     * @param filenamePath Path del archivo a cargarse
+     */
     private void loadHMIDataProcess(HMIAppData localHmiAppData, String filenamePath) {
         if (localHmiAppData != null) {
             if (localHmiAppData.getType() == null) {
@@ -1054,6 +1168,13 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite obtener los datos de aplicación encriptados en un archivo
+     * @param gson Objeto para leer JSON
+     * @param filenamePath Path del archivo de proyecto encriptado
+     * @return Datos de aplicación para cargarse
+     * @throws IOException
+     */
     private HMIAppData getEncryptedHmiAppData(Gson gson, String filenamePath) throws IOException {
         HMIAppData localHmiAppData;
         String rawJson = decipherRawJson(filenamePath);
@@ -1061,6 +1182,12 @@ public class HMIApp extends Application {
         return localHmiAppData;
     }
 
+    /**
+     * Permite decifrar un JSON cifrado a partir de mostrar la ventana de ingreso de contraseña
+     * @param filenamePath Path del archivo de proyecto a cargarse
+     * @return JSON dentro de un string
+     * @throws IOException
+     */
     private String decipherRawJson(String filenamePath) throws IOException {
         SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(false);
         setFilePasswordWindow.showAndWait();
@@ -1088,6 +1215,11 @@ public class HMIApp extends Application {
         return "";
     }
 
+    /**
+     * Permite cargar un archivo de proyecto
+     * @param localHmiAppData Objeto de datos de aplicación
+     * @param filenamePath Path del archivo a cargarse
+     */
     private void loadHMIData(HMIAppData localHmiAppData, String filenamePath) {
         this.setHmiAppData(localHmiAppData);
         this.currentProjectFilePath = filenamePath;
@@ -1098,6 +1230,10 @@ public class HMIApp extends Application {
         addRecentUsedFilePath(filenamePath);
     }
 
+    /**
+     * Permite añadir un archivo de proyecto al registro de archivos recientes
+     * @param filenamePath Path del archivo de proyecto
+     */
     private void addRecentUsedFilePath(String filenamePath) {
         String recentFilesFilePath = DBConnection.getWorkingDirectory() + File.separator + "recentFiles.json";
         RecentUsedFilesData recentUsedFilesData = null;
@@ -1129,6 +1265,11 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite guardar un archivo de proyecto nuevo
+     * @param encrypted Bandera que define si se exportará un archivo de proyecto encriptado
+     * @throws IOException
+     */
     private void saveAsHMIData(boolean encrypted) throws IOException {
         FileChooser fileChooser = new FileChooser();
         if (encrypted) {
@@ -1155,6 +1296,9 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite preparar los datos de la aplicación
+     */
     private void prepareHMIData() {
         ArrayList<HMISceneData> hmiSceneDataArrayList = new ArrayList<>();
         for (HMIScene hmiScene : pages) {
@@ -1399,12 +1543,21 @@ public class HMIApp extends Application {
         updateTitleWithFilename();
     }
 
+    /**
+     * Permite añadir una página al proyecto
+     * @param hmiSceneData Datos de la página
+     */
     private void addScene(HMISceneData hmiSceneData) {
         HMIScene hmiScene = generatePage(hmiSceneData.getTitle(), hmiSceneData.getSceneCommentary(), hmiSceneData.getBackground().getColor());
         addScene(hmiScene);
         hmiScene.setHmiSceneData(hmiSceneData);
     }
 
+    /**
+     * Permite exportar los datos de la página seleccionada a un archivo
+     * @param sceneName Nombre de la página a exportar
+     * @param encrypted Bandera para definir si se exportará el archivo de forma encriptada
+     */
     public void exportSceneData(String sceneName, boolean encrypted) {
         int index = getIndexForScene(sceneName);
         HMIScene scene = (index != -1 && index < pages.size()) ? pages.get(index) : null;
@@ -1441,6 +1594,12 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite exportar los datos de una página
+     * @param hmiSceneData Datos de la página
+     * @param filePathName Path del archivo dodne se exportará
+     * @throws IOException
+     */
     public void exportSceneData(HMISceneData hmiSceneData, String filePathName) throws IOException {
         Gson gson = new Gson();
         if (filePathName != null) {
@@ -1450,6 +1609,10 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite cargar los datos de una escena a una página
+     * @throws IOException
+     */
     private void loadSceneData() throws IOException {
         FileChooser fileChooser = new FileChooser();
 
@@ -1467,6 +1630,11 @@ public class HMIApp extends Application {
         loadSceneData(file.getAbsolutePath());
     }
 
+    /**
+     * Permite cargar los datos de una escena de una página
+     * @param filenamePath Path del archivo de página
+     * @throws IOException
+     */
     private void loadSceneData(String filenamePath) throws IOException {
         String[] filenamePathArr = filenamePath.split("\\.");
         String type = filenamePathArr[filenamePathArr.length - 1];
@@ -1490,6 +1658,13 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite obtener los datos de una página cifrada
+     * @param gson Objeto de lectura de JSON
+     * @param filenamePath Path de archivo de página
+     * @return Datos de página
+     * @throws IOException
+     */
     private HMISceneData getEncryptedHmiSceneData(Gson gson, String filenamePath) throws IOException {
         HMISceneData localHmiSceneData;
         String rawJson = decipherRawJson(filenamePath);
@@ -1497,6 +1672,12 @@ public class HMIApp extends Application {
         return localHmiSceneData;
     }
 
+    /**
+     * Permite exportar los datos de una página de forma encriptada
+     * @param hmiSceneData Datos de página a exportarse
+     * @param filePathName Path del archivo a exportarse
+     * @throws IOException
+     */
     public void exportSceneEncryptedData(HMISceneData hmiSceneData, String filePathName) throws IOException {
         SetFilePasswordWindow setFilePasswordWindow = new SetFilePasswordWindow(true);
         setFilePasswordWindow.showAndWait();
@@ -1516,12 +1697,20 @@ public class HMIApp extends Application {
 
     }
 
+    /**
+     * Permite actualizar el título de la aplicación con el nombre de archivo de proyecto
+     */
     public void updateTitleWithFilename() {
         if (this.currentFilename != null && !mainStage.getTitle().contains(this.currentFilename)) {
             mainStage.setTitle(this.currentFilename + " - " + mainStage.getTitle());
         }
     }
 
+    /**
+     * Permite obtener el índice de una alarma requerida
+     * @param name Nombre de la alarma
+     * @return Índice de la alarma
+     */
     public int getIndexForAlarm(String name) {
         int res = -1;
         for (int i = 0; i < manageableAlarms.size(); i++) {
@@ -1558,6 +1747,9 @@ public class HMIApp extends Application {
         return showAlert(Alert.AlertType.CONFIRMATION,"Confirmar eliminación","Desea eliminar la página seleccionada \"" + sceneTitle + "\"?","");
     }
 
+    /**
+     * Permite generar los esquemas de base de datos si estas no existen
+     */
     private void generateDatabase() {
         try {
             if (!DBConnection.checkIfTablesFromSchemaBDDriverAreReady()) {
@@ -1582,6 +1774,12 @@ public class HMIApp extends Application {
         }
     }
 
+    /**
+     * Permite mostrar el diálogo de guardar cambios
+     * @param errorMode Bandera para indicar que se trata de un error
+     * @param message Mensaje a mostrarse en la ventana
+     * @return true si el usuario da clic en Guardar
+     */
     public boolean showSaveDialog(boolean errorMode, String message) {
         Alert alert;
         if (errorMode) {
@@ -1622,6 +1820,11 @@ public class HMIApp extends Application {
         return true;
     }
 
+    /**
+     * Permite mostrar una ventana de diálogo para mostrar la ventana de definición de propiedades luego de dar clic en
+     * OK
+     * @return true si el usuario da clic en OK
+     */
     public boolean showAlertWithCredentials() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error al conectarse a la base de datos");

@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Esta es la clase que contiene define a un CanvasPushbutton, se utiliza para cambiar el valor de un Tag del tipo
+ * Esta es la clase que define a un CanvasPushbutton, se utiliza para cambiar el valor de un Tag del tipo
  * Booleano asociado al hacer clic en él cambia el valor del Tag Booleano asociado
  */
 public class CanvasPushbutton extends CanvasButton {
@@ -31,12 +31,20 @@ public class CanvasPushbutton extends CanvasButton {
     private static final String REVERSE_STR = "Reversa";
     private static final String TOGGLE_STR = "Toggle";
 
+    /**
+     * Constructor para agregar un nuevo botón al canvas
+     * @param center CanvasPoint que indica la posición del objeto
+     */
     public CanvasPushbutton(CanvasPoint center) {
         super(center);
         this.getCanvasObjectData().setType("Pushbutton");
         this.getCanvasObjectData().setDataType("Pulsador");
     }
 
+    /**
+     * Constructor para pegar un botón copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasPushbutton(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
         if(this.getCanvasObjectData().getPrimaryColor()!=null && this.getCanvasObjectData().getBackgroundColor()!=null && this.getCanvasObjectData().getMode()!=null){
@@ -46,6 +54,9 @@ public class CanvasPushbutton extends CanvasButton {
         this.getCanvasObjectData().setSuperType("TagInputObject");
     }
 
+    /**
+     * Perite agregar la opción de Cambio de color al dar clic derecho en la figura
+     */
     @Override
     public void setNewMenuItem() {
         MenuItem colorCommandPushActionMI = new MenuItem("Cambio de Color");
@@ -54,6 +65,10 @@ public class CanvasPushbutton extends CanvasButton {
         this.getRightClickMenu().getItems().add(colorCommandPushActionMI);
     }
 
+    /**
+     * Permite definir la acción del botón al dar clic
+     * En este caso se encargará de enviar una variable booleana al tag definido
+     */
     @Override
     public void buttonAction() {
         SetColorCommandPushButtonWindow setColorCommandPushButtonWindow = new SetColorCommandPushButtonWindow();
@@ -75,6 +90,15 @@ public class CanvasPushbutton extends CanvasButton {
         this.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite definir el cambio de colores de la aplicación con base en su acción
+     * @param buttonText Texto del botón
+     * @param mode Modo de acción, disponibles entre Directa(Siempre Verdadero), Reversa(Siempre Falso),
+     *             Toggle(Luego de dar clic cambia, por ejemplo de verdadero a falso y viceversa)
+     * @param linkedTag Tag asociado al botón
+     * @param primaryColor Color cuando el botón estará en verdadero
+     * @param backgroundColor Color cuando el botón estará en falso
+     */
     public void setDynamicColors(String buttonText, String mode, Tag linkedTag, CanvasColor primaryColor, CanvasColor backgroundColor) {
         this.button.setText(buttonText);
         if(mode.equals(REVERSE_STR)){
@@ -91,6 +115,12 @@ public class CanvasPushbutton extends CanvasButton {
         this.getCanvasObjectData().setData(buttonText);
     }
 
+    /**
+     * Permite enviar el valor hacia la base de datos del tag
+     * @param clicked true si se ha dado clic al botón en verdadero, y falso para lo contrario
+     * @throws SQLException
+     * @throws IOException
+     */
     private void changeValues(boolean clicked) throws SQLException, IOException {
         if (clicked) {
             this.getCanvasObjectData().setStatus("clicked");
@@ -121,6 +151,9 @@ public class CanvasPushbutton extends CanvasButton {
         }
     }
 
+    /**
+     * Permite definir la acción después de dar clic
+     */
     private final EventHandler<MouseEvent> onPushbuttonOnMyMouseReleased = mouseEvent -> {
         try {
             switch (this.getCanvasObjectData().getMode()) {
@@ -139,6 +172,9 @@ public class CanvasPushbutton extends CanvasButton {
         }
     };
 
+    /**
+     * Permite definir la acción al dar clic
+     */
     private final EventHandler<MouseEvent> onPushbuttonOnMyMousePressed = mouseEvent -> {
         try {
             switch (this.getCanvasObjectData().getMode()) {
@@ -159,6 +195,7 @@ public class CanvasPushbutton extends CanvasButton {
             logger.log(Level.INFO,e.getMessage());
         }
     };
+
 
     @Override
     public void setEnable(String mode) {
@@ -183,6 +220,11 @@ public class CanvasPushbutton extends CanvasButton {
                 break;
         }
     }
+
+    /**
+     * Permite actualizar el tag asociado
+     * @param tag Tag a ser asociado
+     */
     @Override
     public void updateTag(Tag tag){
         super.updateTag(tag);

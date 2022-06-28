@@ -10,6 +10,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.util.Optional;
 
+/**
+ * Ventana para la definición de propiedades de tamaño
+ */
 public class SetSizeWindow extends Stage {
     protected final StackPane root;
 
@@ -29,6 +32,11 @@ public class SetSizeWindow extends Stage {
     protected SizeVBox vbox;
 
 
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     */
     public SetSizeWindow(double width, double height) {
         root = new StackPane();
         setTitle("Propiedades de tamaño");
@@ -58,6 +66,9 @@ public class SetSizeWindow extends Stage {
 
     }
 
+    /**
+     * Permite verificar los campos de la ventana
+     */
     protected void finishingAction() {
         if(!vbox.getWidthField().getText().isEmpty() && !vbox.getHeightField().getText().isEmpty()){
             this.close();
@@ -70,6 +81,10 @@ public class SetSizeWindow extends Stage {
         }
     }
 
+    /**
+     * Permite mostrar la ventana de confirmación
+     * @param message Mensaje a ser mostrado en la ventana
+     */
     private void confirmExit(String message){
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia");

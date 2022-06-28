@@ -14,8 +14,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javafx.animation.Animation;
 
+/**
+ * Clase que define el objeto CanvasSystemDateTime, que permitirá mostrar la fecha y hora del sistema en tiempo real
+ */
 public class CanvasSystemDateTime extends CanvasLabel {
 
+    /**
+     * Constructor para pegar un CanvasSystemDateTime copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasSystemDateTime(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("SystemDateTime");
@@ -36,11 +43,19 @@ public class CanvasSystemDateTime extends CanvasLabel {
         this.setRotate(this.getCanvasObjectData().getRotation());
     }
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasSystemDateTime al canvas
+     * @param content Texto del label
+     * @param center Posición del objeto
+     */
     public CanvasSystemDateTime(String content, CanvasPoint center) {
         super(content, center);
         this.getCanvasObjectData().setType("SystemDateTime");
     }
 
+    /**
+     * Permite mostrar la ventana de definición de propiedades del objeto
+     */
     @Override
     public void setProperties(){
         SetDateTimeProperties propertiesWindow = new SetDateTimeProperties();
@@ -58,6 +73,9 @@ public class CanvasSystemDateTime extends CanvasLabel {
         this.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite definir el hilo de actualización de fecha y hora
+     */
     public void setTimeline() {
         Timeline timeline = new Timeline(
                 new KeyFrame(

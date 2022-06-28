@@ -12,19 +12,26 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
+/**
+ * Ventana de selección de ventanas
+ */
 public class SelectPagesWindow extends Stage {
-    private final StackPane root;
-    private ArrayList<SceneItem> items = new ArrayList<>();
-    private ArrayList<String> selectedItems = new ArrayList<>();
-    private int height = 50;
+    private final ArrayList<SceneItem> items = new ArrayList<>();
+    private final ArrayList<String> selectedItems = new ArrayList<>();
 
+    /**
+     * Constructor de la ventana
+     * @param itemsForList ArrayList de páginas disponibles en el proyecto
+     * @param selectedItems ArrayList de páginas seleccionadas
+     */
     public SelectPagesWindow(ArrayList<String> itemsForList, ArrayList<String> selectedItems) {
-        root = new StackPane();
+        StackPane root = new StackPane();
         setTitle("Seleccione una Ventana");
 
         VBox checkBoxesVBox = new VBox();
         checkBoxesVBox.setSpacing(15);
 
+        int height = 50;
         for (String hmiScene : itemsForList) {
             CheckBox box = new CheckBox();
             Label sceneName = new Label(hmiScene);
@@ -33,7 +40,7 @@ public class SelectPagesWindow extends Stage {
             checkBoxHBox.getChildren().addAll(box, sceneName);
             checkBoxesVBox.getChildren().addAll(checkBoxHBox);
             items.add(new SceneItem(hmiScene,box));
-            height= height + 32;
+            height = height + 32;
         }
 
         if(selectedItems!=null){
@@ -70,16 +77,23 @@ public class SelectPagesWindow extends Stage {
         vbox.setPadding(new Insets(5,5,10,5));
         root.getChildren().add(vbox);
 
-        this.setScene(new Scene(root,400,height));
+        this.setScene(new Scene(root,400, height));
 
     }
 
+    /**
+     * Permite seleccionar o no seleccionar todas las páginas
+     * @param selected Bandera para indicar todas las páginas
+     */
     private void selectAllPages(boolean selected) {
         for(SceneItem sceneItem : items){
             sceneItem.setSelected(selected);
         }
     }
 
+    /**
+     * Permite definir los items seleccionados
+     */
     private void setSelectedItems() {
         selectedItems.clear();
         for(SceneItem sceneItem : items){

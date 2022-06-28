@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Clase que define el objeto CanvasTextField, que permitirá variar el valor del tag de escritura asociado
+ */
 public class CanvasTextField extends CanvasObject {
     private TextField textField;
     private String type;
@@ -52,6 +55,14 @@ public class CanvasTextField extends CanvasObject {
 
     private HMIUser user;
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasTextField al canvas
+     * @param center CanvasPoint para definir la posición del objeto
+     * @param linkedTag Tag enlazado al objeto
+     * @param minValue Valor Mínimo posible del objeto
+     * @param maxValue Valor máximo posible del objeto
+     * @param type Tipo de dato de entrada del campo de texto
+     */
     public CanvasTextField(CanvasPoint center, Tag linkedTag, double minValue, double maxValue, String type) {
         super(center);
         this.getCanvasObjectData().setType("TextField");
@@ -59,6 +70,10 @@ public class CanvasTextField extends CanvasObject {
         setNewMenuItem();
     }
 
+    /**
+     * Constructor para pegar un CanvasTextField copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasTextField(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("TextField");
@@ -66,6 +81,15 @@ public class CanvasTextField extends CanvasObject {
         setNewMenuItem();
     }
 
+    /**
+     * Método para definir las propiedades del objeto
+     * @param width Ancho del objeto
+     * @param height Alto del objeto
+     * @param linkedTag Tag enlazado al objeto
+     * @param minValue Valor mínimo del objeto
+     * @param maxValue Valor máximo del objeto
+     * @param type Tipo de entrada del objeto
+     */
     private void setData(double width, double height, Tag linkedTag, double minValue, double maxValue, String type) {
         this.linkedTag = linkedTag;
         this.minValue = minValue;
@@ -115,6 +139,11 @@ public class CanvasTextField extends CanvasObject {
         this.setRotate(this.getCanvasObjectData().getRotation());
     }
 
+    /**
+     * Permite inicializar el campo de texto
+     * @param width Ancho del objeto
+     * @param height Alto del objeto
+     */
     private void initTextField(double width, double height){
         this.textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.isEmpty() && (this.type.equals(ENTERO_STR) || this.type.equals(FLOTANTE_STR))) {
@@ -136,6 +165,9 @@ public class CanvasTextField extends CanvasObject {
         this.textField.setPrefHeight(height);
     }
 
+    /**
+     * Permite añadir la opción de Editar al menú de clic derecho
+     */
     public void setNewMenuItem() {
         MenuItem editMI = new MenuItem("Editar");
         editMI.setId("#editMI");
@@ -143,6 +175,9 @@ public class CanvasTextField extends CanvasObject {
         this.getRightClickMenu().getItems().add(2,editMI);
     }
 
+    /**
+     * Permite definir el comportamiento luego de dar clic en el botón Editar
+     */
     private void buttonAction() {
         SetTagInputPropertiesWindow setTagInputPropertiesWindow = new SetTagInputPropertiesWindow();
         setTagInputPropertiesWindow.setTitle("Propiedades de valor de campo de entrada de texto");
@@ -159,6 +194,9 @@ public class CanvasTextField extends CanvasObject {
         this.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Método para definir las propiedades básicas del objeto en cuanto al tag de entrada
+     */
     @Override
     public void setProperties() {
         SetInputTextPropertiesWindow propertiesWindow = new SetInputTextPropertiesWindow(this.textField.getWidth(),this.textField.getHeight());
@@ -217,6 +255,9 @@ public class CanvasTextField extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir el hilo de actualización de tag del objeto
+     */
     public void setTimeline() {
         timeline = new Timeline(
                 new KeyFrame(

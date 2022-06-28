@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Clase que define el objeto CanvasSlider, que permitirá variar el valor del tag de escritura asociado
+ */
 public class CanvasSlider extends CanvasObject {
     public Slider getSlider() {
         return slider;
@@ -46,17 +49,46 @@ public class CanvasSlider extends CanvasObject {
 
     private HMIUser user;
 
+    /**
+     * Constructor para pegar un CanvasSlider copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     * @throws SQLException
+     * @throws IOException
+     */
     public CanvasSlider(CanvasObjectData canvasObjectData) throws SQLException, IOException {
         super(canvasObjectData);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight(), this.getCanvasObjectData().getTag(), this.getCanvasObjectData().getRotation(),this.getCanvasObjectData().getOrientation());
         setSliderProperties(this.getCanvasObjectData().getMinValue(), this.getCanvasObjectData().getMaxValue(), this.getCanvasObjectData().getMinorTickValue(), this.getCanvasObjectData().getMajorTickValue(), this.getCanvasObjectData().isSnapHandleToTick(), this.getCanvasObjectData().isShowingTicks(), this.getCanvasObjectData().isShowingLabelsTicks());
     }
 
+    /**
+     * Constructor para agregar un nuevo CanvasSlider al canvas
+     * @param center Posición del objeto
+     * @param width Ancho del objeto
+     * @param height Altura del objeto
+     * @param linkedTag Tag enlazado al objeto
+     * @param rotation Ángulo de rotación
+     * @param orientation Orientación del CanvasSlider posible entre vertical u horizontal
+     * @throws SQLException
+     * @throws IOException
+     */
     public CanvasSlider(CanvasPoint center, double width, double height,Tag linkedTag,double rotation, CanvasOrientation orientation) throws SQLException, IOException {
         super(center);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), width,height, linkedTag,rotation,orientation);
     }
 
+    /**
+     * Permite definir las propiedades básicas del objeto
+     * @param x Posición del objeto en X
+     * @param y Posición del objeto en Y
+     * @param width Ancho del objeto
+     * @param height Ancho del objeto
+     * @param linkedTag Tag enlazado al objeto
+     * @param rotation Ángulo de rotación
+     * @param orientation Orientación del CanvasSlider posible entre vertical u horizontal
+     * @throws SQLException
+     * @throws IOException
+     */
     public void setData(double x, double y, double width, double height, Tag linkedTag, double rotation, CanvasOrientation orientation) throws SQLException, IOException {
         this.slider = new Slider();
         this.getCanvasObjectData().setPosition(new CanvasPoint(x,y));
@@ -90,6 +122,16 @@ public class CanvasSlider extends CanvasObject {
         this.slider.setOrientation(getOrientation(orientation));
     }
 
+    /**
+     * Método que permite definir las propiedades del Slider de JavaFX
+     * @param minValue Valor mínimo del Slider
+     * @param maxValue Valor máximo del Slider
+     * @param minorTickValue Valor del tick mínimo
+     * @param majorTickValue Valor del tick máximo
+     * @param snapHandleToTick Bandera para forzar a que el indicador este siempre sobre un tick
+     * @param showTicks Bandera para mostrar ticks
+     * @param showLabelsTicks Bandera para mostrar las etiquetas de los ticks
+     */
     public void setSliderProperties(double minValue, double maxValue, double minorTickValue, double majorTickValue, boolean snapHandleToTick, boolean showTicks, boolean showLabelsTicks){
         slider.setMin(minValue);
         slider.setMax(maxValue);
@@ -107,6 +149,11 @@ public class CanvasSlider extends CanvasObject {
         this.getCanvasObjectData().setShowingLabelsTicks(showLabelsTicks);
     }
 
+    /**
+     * Permite retornar un enum de orientación disponible para el Slider
+     * @param orientation Objeto CanvasOrientation para definir la orientación del canvas
+     * @return Objeto Orientation compatible con el Slider de JavaFX
+     */
     private Orientation getOrientation(CanvasOrientation orientation) {
         if(orientation == CanvasOrientation.VERTICAL){
             return Orientation.VERTICAL;
@@ -115,6 +162,9 @@ public class CanvasSlider extends CanvasObject {
         }
     }
 
+    /**
+     * Permite mostrar una ventana de definición de propiedades y definir las propiedades del CanvasSlider
+     */
     @Override
     public void setProperties() {
         SetSliderPropertiesWindow setSliderPropertiesWindow = new SetSliderPropertiesWindow(this.slider.getPrefWidth(),this.slider.getPrefHeight());
@@ -185,6 +235,9 @@ public class CanvasSlider extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir el hilo para actualizar los valores del Slider
+     */
     public void setTimeline() {
         timeline = new Timeline(
                 new KeyFrame(

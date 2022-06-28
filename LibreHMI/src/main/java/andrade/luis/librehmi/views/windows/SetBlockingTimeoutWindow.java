@@ -13,6 +13,9 @@ import javafx.util.converter.IntegerStringConverter;
 
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 
+/**
+ * Ventana de definición de tiempo de bloqueo
+ */
 public class SetBlockingTimeoutWindow extends Stage {
     private final TextField timeoutTextField;
 
@@ -28,6 +31,10 @@ public class SetBlockingTimeoutWindow extends Stage {
     int minValue=30;
     int maxValue=60*5;
 
+    /**
+     * Constructor de ventana
+     * @param timeout Tiempo por defecto
+     */
     public SetBlockingTimeoutWindow(int timeout) {
         this.timeout = timeout;
         StackPane root = new StackPane();
@@ -61,6 +68,9 @@ public class SetBlockingTimeoutWindow extends Stage {
         this.setScene(new Scene(root,422,75));
     }
 
+    /**
+     * Permite validar los campos de la ventana antes de cerrar la ventana
+     */
     private void finishingAction() {
         timeout = Integer.parseInt(timeoutTextField.getText());
         boolean isValid = false;

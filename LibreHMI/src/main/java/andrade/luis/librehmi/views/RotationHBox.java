@@ -9,6 +9,9 @@ import javafx.util.converter.DoubleStringConverter;
 
 import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
+/**
+ * HBox con el campo de rotación utilizado en distintas ventanas
+ */
 public class RotationHBox extends HBox {
     public TextField getRotationTextField() {
         return rotationTextField;
@@ -18,6 +21,10 @@ public class RotationHBox extends HBox {
 
     private String rotationValue;
 
+    /**
+     * Constructor de HBox
+     * @param rotationValue Valor de inicialización de rotación
+     */
     public RotationHBox(String rotationValue){
         this.rotationValue = rotationValue;
         Label rotationLabel = new Label("Rotar:");

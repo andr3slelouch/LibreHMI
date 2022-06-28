@@ -20,6 +20,9 @@ import java.util.regex.Pattern;
 
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 
+/**
+ * Ventana de registro de usuario
+ */
 public class SignUpWindow extends Stage {
 
     private final ComboBox<String> rolesComboBox;
@@ -39,6 +42,10 @@ public class SignUpWindow extends Stage {
     }
     Logger logger = Logger.getLogger(this.getClass().getName());
 
+    /**
+     * Constructor de la ventana
+     * @param hmiUser Usuario del sistema a ser editado en caso de requerirse
+     */
     public SignUpWindow(HMIUser hmiUser){
         StackPane root = new StackPane();
         setTitle("Registro de usuario");
@@ -137,10 +144,26 @@ public class SignUpWindow extends Stage {
         this.setScene(new Scene(root,333,275));
     }
 
+    /**
+     * Permite mostrar la ventana de error al conectarse a la base de datos
+     * @param message
+     */
     private void databaseConnectionFailed(String message) {
         showAlert(Alert.AlertType.ERROR,"Error al conectarse a la base de datos",message,"");
     }
 
+    /**
+     * Permite verificar los campos de la ventana
+     * @param firstName Nombre del usuario
+     * @param lastName Apellido del usuario
+     * @param email Correo electrónico del usuario
+     * @param username Nombre de usuario
+     * @param passwordField Contraseña del usuario
+     * @param repeatPasswordField Repetición Contraseña del usuario
+     * @return true si todos los campos son correctos
+     * @throws SQLException
+     * @throws IOException
+     */
     public boolean verifyFields(TextField firstName, TextField lastName, TextField email, TextField username, PasswordField passwordField, PasswordField repeatPasswordField) throws SQLException, IOException {
         String message = "";
         if(firstName.getText().isEmpty() || lastName.getText().isEmpty() || email.getText().isEmpty() || username.getText().isEmpty()){
@@ -168,6 +191,14 @@ public class SignUpWindow extends Stage {
         }
     }
 
+    /**
+     * Permite verificar las credenciales del usuario
+     * @param email Correo electrónico del usuario
+     * @param username Nombre de usuario
+     * @return String conteniendo el mensaje de verificación
+     * @throws SQLException
+     * @throws IOException
+     */
     private String checkUserCredentials(TextField email, TextField username) throws SQLException, IOException {
         String message = "";
         if(HMIUser.existsEmail(email.getText(), this.hmiUser.getUsername())){

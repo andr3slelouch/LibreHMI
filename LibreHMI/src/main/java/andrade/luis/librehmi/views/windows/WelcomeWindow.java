@@ -25,6 +25,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Ventana de bienvenida al usuario, donde se mostrarán las opciones de nuevo, abrir,
+ * y una sección donde se muestran los archivos recientes
+ */
 public class WelcomeWindow extends Stage {
     HMIApp hmiApp;
     @FXML
@@ -43,25 +47,36 @@ public class WelcomeWindow extends Stage {
     private VBox beginVBox;
     @FXML
     private VBox recentVBox;
-    private Scene scene;
     private final ArrayList<String> stringList = new ArrayList<>();
     ObservableList<String> observableList = FXCollections.observableArrayList();
 
-
+    /**
+     * Constructor de la ventana
+     * @param hmiApp Objeto de la aplicación
+     * @throws IOException
+     */
     public WelcomeWindow(HMIApp hmiApp) throws IOException {
         this();
         this.hmiApp = hmiApp;
     }
 
+    /**
+     * Constructor de la ventana
+     * @throws IOException
+     */
     public WelcomeWindow() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("welcomeStage.fxml"));
         fxmlLoader.setController(this);
         StackPane root = fxmlLoader.load();
 
-        this.scene = new Scene(root);
-        this.setScene(this.scene);
+        Scene scene = new Scene(root);
+        this.setScene(scene);
         this.setMaximized(true);
     }
+
+    /**
+     * Permite definir la lista de archivos recientes
+     */
     public void setListView()
     {
 
@@ -82,6 +97,10 @@ public class WelcomeWindow extends Stage {
         recentUsedFilesListView.setItems(observableList);
         recentUsedFilesListView.setPrefHeight(400);
     }
+
+    /**
+     * Permite inicializar los elementos de la ventana
+     */
     @FXML
     void initialize() {
         assert recentUsedFilesListView != null : "fx:id=\"recentUsedFilesListView\" was not injected: check your FXML file 'CustomList.fxml'.";

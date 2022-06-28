@@ -4,6 +4,9 @@ import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Clase que define el objeto CanvasPoint que contendrá coordenadas en X e Y
+ */
 public class CanvasPoint implements Serializable
 {
 

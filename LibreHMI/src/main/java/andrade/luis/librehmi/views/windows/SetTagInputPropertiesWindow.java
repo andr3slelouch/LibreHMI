@@ -6,6 +6,9 @@ import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 
+/**
+ * Ventana de definición de propiedades de tag de entrada
+ */
 public class SetTagInputPropertiesWindow extends WriteExpressionWindow {
     public TextField getMinValueField() {
         return minValueField;
@@ -15,6 +18,10 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow {
         return maxValueField;
     }
 
+    /**
+     * Permite obtener el tipo seleccionado
+     * @return String del tipo seleccionado
+     */
     public String getType() {
         for (RadioButton radioButton : radioButtons) {
             if (radioButton.isSelected()) {
@@ -33,11 +40,17 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow {
     private String type = "String";
     private ArrayList<RadioButton> radioButtons;
 
+    /**
+     * Constructor de la ventana
+     */
     public SetTagInputPropertiesWindow() {
         super(750, 320);
         this.init();
     }
 
+    /**
+     * Permite inicializar los campos de la ventana
+     */
     private void init() {
         textField.setEditable(false);
         Label minValueLabel = new Label("Defina el valor mínimo:");
@@ -95,11 +108,19 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow {
 
     }
 
+    /**
+     * Permite habilitar o deshabilitar las entradas de máximo y mínimo
+     * @param disable Bandera para habilitar o deshabilitar los campos
+     */
     private void disableMaxMinInputs(boolean disable) {
         minValueField.setDisable(disable);
         maxValueField.setDisable(disable);
     }
 
+    /**
+     * Permite seleccionar el radioButton seleccionado
+     * @param buttonName Nombre del radioButton seleccionado
+     */
     public void setSelectedRadioButton(String buttonName) {
         for (RadioButton radioButton : radioButtons) {
             if (radioButton.getText().equals(buttonName)) {
@@ -108,6 +129,9 @@ public class SetTagInputPropertiesWindow extends WriteExpressionWindow {
         }
     }
 
+    /**
+     * Permite agregar un tag
+     */
     @Override
     protected void addTag() {
         Tag tag = super.addTag(this.isInputMode(), "", false);

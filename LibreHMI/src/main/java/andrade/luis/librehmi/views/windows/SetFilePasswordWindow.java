@@ -12,6 +12,9 @@ import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.geometry.Pos.BASELINE_RIGHT;
 import static javafx.geometry.Pos.CENTER;
 
+/**
+ * Ventana de definición de contraseña para un archivo
+ */
 public class SetFilePasswordWindow extends Stage {
     private final StackPane root;
 
@@ -35,7 +38,10 @@ public class SetFilePasswordWindow extends Stage {
 
     private String password;
 
-
+    /**
+     * Constructor de la ventana
+     * @param registration Bandera de definición para mostrar si es de registro o de verificación
+     */
     public SetFilePasswordWindow(boolean registration){
         root = new StackPane();
         this.setTitle("Definir Contraseña Para Proyecto");

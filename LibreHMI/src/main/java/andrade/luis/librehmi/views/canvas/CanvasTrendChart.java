@@ -46,6 +46,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.opencsv.CSVWriter;
 import java.util.logging.Level;
 
+/**
+ * Clase que define el objeto CanvasTrendChart, que permitirá mostrar un gráfico de tendencias con base en los tags que
+ * se asocien a la representación
+ */
 public class CanvasTrendChart extends CanvasObject {
     private DateTimeFormatter dtf;
     private Slider startRangeSlider;
@@ -86,16 +90,36 @@ public class CanvasTrendChart extends CanvasObject {
     private final ArrayList<CheckBox> enabledExpressionCheckBoxes = new ArrayList<>();
     private final ArrayList<String> showingExpressions = new ArrayList<>();
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasTrendChart al canvas
+     * @param positionCanvasPoint Posición del objeto en el canvas
+     * @param trendChartSerieDataArrayList ArrayList de series de datos a ser graficados
+     * @param width Ancho de la representación
+     * @param height Alto de la representación
+     * @param rotation Valor para rotar la representación
+     */
     public CanvasTrendChart(CanvasPoint positionCanvasPoint, ArrayList<TrendChartSerieData> trendChartSerieDataArrayList, double width, double height,double rotation) {
         super(positionCanvasPoint);
         setData(trendChartSerieDataArrayList,width,height,rotation);
     }
+
+    /**
+     * Constructor para pegar un CanvasTrendChart copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasTrendChart(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
         ArrayList<TrendChartSerieData> trendChartSerieDataArrayListLocal = new ArrayList<>(Arrays.asList(this.getCanvasObjectData().getTrendChartSerieDataArr()));
         setData(trendChartSerieDataArrayListLocal, getCanvasObjectData().getWidth(),getCanvasObjectData().getHeight(),getCanvasObjectData().getRotation());
     }
 
+    /**
+     * Permite definir los datos de la representación
+     * @param trendChartSerieDataArrayList ArrayList de series de datos a ser graficados
+     * @param width Ancho de la representación
+     * @param height Alto de la representación
+     * @param rotation Valor para rotar la representación
+     */
     public void setData(ArrayList<TrendChartSerieData> trendChartSerieDataArrayList, double width, double height, double rotation){
 
         CategoryAxis xAxis = new CategoryAxis();
@@ -246,6 +270,9 @@ public class CanvasTrendChart extends CanvasObject {
         this.setBottom(downContent);
     }
 
+    /**
+     * Permite inicializar las series del gráfico de tendencias
+     */
     private void initTrendChartSeries(){
         for (TrendChartSerieData data : trendChartSerieDataArrayList) {
             if(data!=null){
@@ -267,6 +294,9 @@ public class CanvasTrendChart extends CanvasObject {
         }
     }
 
+    /**
+     * Permite exportar los datos recopilados dentro de las series haca un CSV
+     */
     private void exportDataToCSV() {
         List<String[]> dataToExport = new ArrayList<>();
         String[] header = new String[lineChartSeriesToExport.size()+1];
@@ -311,6 +341,9 @@ public class CanvasTrendChart extends CanvasObject {
 
     }
 
+    /**
+     * Permite mostrar la ventana de propiedades del objeto
+     */
     @Override
     public void setProperties(){
         SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750,475,getHmiApp().getLocalTags());
@@ -344,12 +377,18 @@ public class CanvasTrendChart extends CanvasObject {
         }
     }
 
+    /**
+     * Permite realizar la operación de acercamiento
+     */
     public void zoomInOperation() {
         this.zoomedIn = true;
         double sliderRange = getSliderRangeValue(startRangeHBox.getLocalDateTime(), endRangeHBox.getLocalDateTime(), this.getCanvasObjectData().getSamplingTime());
         updateSliders(startRangeHBox.getLocalDateTime(), sliderRange, true);
     }
 
+    /**
+     * Permite realizar la operación de alejamiento
+     */
     public void zoomOutOperation() {
         if (this.zoomedIn) {
             this.zoomedIn = false;
@@ -357,6 +396,9 @@ public class CanvasTrendChart extends CanvasObject {
         }
     }
 
+    /**
+     * Permite actualizar los colores de las líneas de tendencias del gráfico
+     */
     public void updateLineChartColors() {
         for (int i = 0; i < lineChart.getData().size(); i++) {
             XYChart.Series<String, Number> serie = lineChart.getData().get(i);
@@ -370,6 +412,9 @@ public class CanvasTrendChart extends CanvasObject {
         }
     }
 
+    /**
+     * Permite actualizar las series asociadas al gráfico
+     */
     public void updateSeries() {
         ArrayList<XYChart.Series<String, Number>> seriesToDelete = new ArrayList<>();
         ArrayList<XYChart.Series<String, Number>> seriesToAdd = new ArrayList<>();
@@ -397,6 +442,12 @@ public class CanvasTrendChart extends CanvasObject {
         }
     }
 
+    /**
+     * Permite obtener el índice de una serie dentro del arrayList a partir de su nombre
+     * @param arrayList ArrayList de series de datos mostrados en el gráfico
+     * @param name Nombre de la serie de datos a buscarse
+     * @return Índice retornado de la serie especificada
+     */
     public int getIndexForSerieInArrayList(ArrayList<XYChart.Series<String, Number>> arrayList, String name) {
         for (int i = 0; i < arrayList.size(); i++) {
             if (arrayList.get(i).getName().equals(name)) {
@@ -406,6 +457,12 @@ public class CanvasTrendChart extends CanvasObject {
         return -1;
     }
 
+    /**
+     * Permite actualizar los valores dentro de los sliders en las operaciones de Zoom In y Zoom Out
+     * @param sliderDateTime LocalDateTime del nuevo tiempo a ser definido
+     * @param sliderRange Cantidad para ser mostrada dentro del slider
+     * @param isFilterEnabled Bandera definiendo si se ha aplicado el filtro de zoom
+     */
     public void updateSliders(LocalDateTime sliderDateTime, double sliderRange, boolean isFilterEnabled) {
         this.sliderLocalDateTime = sliderDateTime;
         this.startRangeSlider.setMin(0.0);
@@ -443,6 +500,13 @@ public class CanvasTrendChart extends CanvasObject {
         updateLineChartColors();
     }
 
+    /**
+     * Permite filtrar una serie del gráfico de tendencias
+     * @param start LocalDateTime de inicio del filtro
+     * @param end LocalDateTime de fin de filtro
+     * @param serie Serie a la cual se aplicará el filtro
+     * @return Serie filtrada
+     */
     public XYChart.Series<String, Number> filterSerie(LocalDateTime start, LocalDateTime end, XYChart.Series<String, Number> serie) {
         XYChart.Series<String, Number> filteredSerie = new XYChart.Series<>();
         for (int i = 0; i < serie.getData().size(); i++) {
@@ -455,6 +519,11 @@ public class CanvasTrendChart extends CanvasObject {
         return filteredSerie;
     }
 
+    /**
+     * Permite convertir una fecha y hora de String a LocalDateTime
+     * @param dateFormatString Fecha y hora en string
+     * @return LocalDateTime obtenido a partir de la fecha y hora
+     */
     public LocalDateTime convertStringToLocalDateTime(String dateFormatString) {
         Locale spanishLocale = new Locale("es", "ES");
         DateFormat dateFormat = new SimpleDateFormat(DISPLAY_FORMAT, spanishLocale);
@@ -471,16 +540,32 @@ public class CanvasTrendChart extends CanvasObject {
         }
     }
 
-    public String convertSliderValueToString(LocalDateTime currentLocalDateTime, Double object) {
-        LocalDateTime sliderDateTime = currentLocalDateTime.plusSeconds(object.longValue());
+    /**
+     * Permite convertir un valor de fecha y hora desde el valor del slider a un String de fecha y hora
+     * @param currentLocalDateTime LocalDateTime actual del gráfico de tendencias
+     * @param value Valor desde el Slider
+     * @return Valor de fecha y hora en string
+     */
+    public String convertSliderValueToString(LocalDateTime currentLocalDateTime, Double value) {
+        LocalDateTime sliderDateTime = currentLocalDateTime.plusSeconds(value.longValue());
         return dtf.format(sliderDateTime);
     }
 
+    /**
+     * Permite obtener el rango para el slider con base a un LocalDateTime de inicio y de fin
+     * @param start LocalDateTime de inicio
+     * @param end LocalDateTime de fin
+     * @param samplingTime Tiempo de sampleo
+     * @return Rango para el slider
+     */
     public double getSliderRangeValue(LocalDateTime start, LocalDateTime end, double samplingTime) {
         double rangeSeconds = (int) ChronoUnit.SECONDS.between(start, end);
         return rangeSeconds / samplingTime;
     }
 
+    /**
+     * Permite definir el hilo para graficar las series en el gráfico de tendencias
+     */
     public void setTrendTimeline() {
         this.trendTimeline = new Timeline(
                 new KeyFrame(
@@ -498,6 +583,12 @@ public class CanvasTrendChart extends CanvasObject {
         this.trendTimeline.play();
     }
 
+    /**
+     * Permite actualizar una serie del gráfico de tendencias
+     * @param trendChartSerieData Serie para actualizar sus valores
+     * @param index Índice de la serie a actualizarse
+     * @param now LocalDateTime del momento de la actualización
+     */
     private void updateTrendChartSerieData(TrendChartSerieData trendChartSerieData, int index, LocalDateTime now){
         if (trendChartSerieData != null && lineChartSeries.get(index).getName().equals(trendChartSerieData.getSerieDataName())) {
             try {

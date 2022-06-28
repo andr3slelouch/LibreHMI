@@ -9,6 +9,9 @@ import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 
+/**
+ * Ventana de definición de propiedades de la animación de visibilidad
+ */
 public class SetVisibilityAnimationWindow extends WriteExpressionWindow{
     private final RadioButton falseRadioButton;
     private final RadioButton trueRadioButton;
@@ -25,6 +28,9 @@ public class SetVisibilityAnimationWindow extends WriteExpressionWindow{
 
     private ArrayList<Tag> localTags;
 
+    /**
+     * Constructor de la ventana
+     */
     public SetVisibilityAnimationWindow(){
         setTitle("Propiedades de Animación de Visibilidad");
         Label visibilityLabel = new Label("Visible si:");
@@ -41,6 +47,9 @@ public class SetVisibilityAnimationWindow extends WriteExpressionWindow{
         this.finishSelectionButton.setOnAction(mouseEvent -> finishingAction());
     }
 
+    /**
+     * Permite verificar los campos definidos antes de cerrar la ventana
+     */
     @Override
     public void finishingAction(){
         if (!this.textField.getText().isEmpty() && this.getLocalExpression() != null && this.getLocalExpression().getResultType().equals("Bool")) {

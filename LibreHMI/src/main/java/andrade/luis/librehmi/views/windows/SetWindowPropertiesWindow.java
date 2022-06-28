@@ -13,6 +13,9 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Optional;
 
+/**
+ * Ventana de definición de propiedades de ventanas
+ */
 public class SetWindowPropertiesWindow extends Stage {
 
     public TextField getNameField() {
@@ -36,13 +39,30 @@ public class SetWindowPropertiesWindow extends Stage {
     private TextField commentField;
     private ColorPicker windowColorPicker;
     private ArrayList<String> windowsTitles = new ArrayList<>();
+
+    /**
+     * Constructor de la ventana
+     */
     public SetWindowPropertiesWindow(){
         init("","",Color.WHITESMOKE);
     }
+
+    /**
+     * Constructor de la ventana
+     * @param title Título de la ventana
+     * @param commentary Comentario de la ventana
+     * @param color Color definido para la ventana
+     */
     public SetWindowPropertiesWindow(String title, String commentary, Color color){
         init(title,commentary,color);
     }
 
+    /**
+     * Permite inicializar los campos de la ventana
+     * @param title Título de la ventana
+     * @param commentary Comentario de la ventana
+     * @param color Color definido para la ventana
+     */
     private void init(String title, String commentary, Color color){
         StackPane root = new StackPane();
         this.setTitle("Propiedades de Ventana");
@@ -95,6 +115,12 @@ public class SetWindowPropertiesWindow extends Stage {
         this.setScene(mainScene);
     }
 
+    /**
+     * Permite mostrar la ventana de confirmación
+     * @param type Tipo de alerta
+     * @param title Título de la alerta
+     * @param message Mensaje de la alerta
+     */
     private void confirmExit(Alert.AlertType type,String title ,String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -111,6 +137,10 @@ public class SetWindowPropertiesWindow extends Stage {
         }
     }
 
+    /**
+     * Permite definir los títulos de las páginas
+     * @param windowsTitles ArrayList de las páginas disponibles
+     */
     public void setPagesTitles(ArrayList<String> windowsTitles) {
         this.windowsTitles = windowsTitles;
     }

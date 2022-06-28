@@ -17,6 +17,9 @@ import java.io.File;
 
 import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
+/**
+ * Ventana de definición de opciones de imagen
+ */
 public class SetImageOptionsWindow extends Stage {
     protected final VBox vbox;
     private final RotationHBox rotationHBox;
@@ -124,7 +127,11 @@ public class SetImageOptionsWindow extends Stage {
     private boolean mirroringVertical = false;
     final FileChooser fileChooser = new FileChooser();
 
-
+    /**
+     * Constructor de ventana
+     * @param imageViewWidth Ancho de la imagen
+     * @param imageViewHeight Alto de la imagen
+     */
     public SetImageOptionsWindow(double imageViewWidth, double imageViewHeight) {
         StackPane root = new StackPane();
        this.setTitle("Propiedades de Imagen");

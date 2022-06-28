@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
+/**
+ * Ventana de administración de alarmas
+ */
 public class ManageAlarmsWindow extends Stage {
     private final CanvasAlarmDisplay canvasAlarmDisplay;
 
@@ -28,6 +31,11 @@ public class ManageAlarmsWindow extends Stage {
     private final HMIApp hmiApp;
     private final ArrayList<Alarm> alarmsList;
 
+    /**
+     * Constructor de la ventana de administración de alarmas
+     * @param alarmsList Lista de alarmas a administrarse
+     * @param hmiApp Clase principal de la aplicación
+     */
     public ManageAlarmsWindow(ArrayList<Alarm> alarmsList, HMIApp hmiApp) {
         this.alarmsList = alarmsList;
         this.hmiApp = hmiApp;
@@ -59,6 +67,10 @@ public class ManageAlarmsWindow extends Stage {
         this.setScene(scene);
     }
 
+    /**
+     * Permite crear el menu de crear nueva alarma
+     * @return MenuItem con el comportamiento de creación de una nueva alarma
+     */
     private MenuItem createNewMenuIteM(){
         MenuItem newItem = new MenuItem();
         newItem.setText("Nueva");
@@ -69,6 +81,11 @@ public class ManageAlarmsWindow extends Stage {
         return newItem;
     }
 
+    /**
+     * Permite crear el menu de editar una alarma
+     * @param item Fila de alarma de la tabla a ser editada
+     * @return MenuItem con el comportamiento de edición
+     */
     private MenuItem createEditMenuItem(AlarmRow item){
         MenuItem editItem = new MenuItem();
         editItem.setText("Editar");
@@ -81,6 +98,11 @@ public class ManageAlarmsWindow extends Stage {
         return editItem;
     }
 
+    /**
+     * Permite crear el menú de eliminación de alarma
+     * @param item Fila de alarma de la tabla a ser eliminada
+     * @return MenuItem con el comportamiento de eliminación
+     */
     private MenuItem createDeleteMenuItem(AlarmRow item){
         MenuItem deleteItem = new MenuItem();
         deleteItem.setText("Eliminar");
@@ -92,12 +114,20 @@ public class ManageAlarmsWindow extends Stage {
         return deleteItem;
     }
 
+    /**
+     * Permite eliminar una alarma del proyecto
+     * @param name Nombre de la alarma a ser eliminada
+     */
     private void deleteAlarm(String name){
         ManageAlarmsWindow.this.canvasAlarmDisplay.removeTableItem(name);
         int index = hmiApp.getIndexForAlarm(name);
         alarmsList.remove(index);
     }
 
+    /**
+     * Permite editar una alarma del proyecto
+     * @param alarm Alarma a ser editada
+     */
     private void editAlarm(Alarm alarm){
         SetAlarmWindow setAlarmWindow = new SetAlarmWindow(hmiApp);
         setAlarmWindow.setTitle("Editar Alarma");
@@ -134,6 +164,10 @@ public class ManageAlarmsWindow extends Stage {
         }
     }
 
+    /**
+     * Permite crear una nueva alarma
+     * @param setAlarmWindow Ventana de definición de alarmas
+     */
     private void createNewAlarm(SetAlarmWindow setAlarmWindow){
         setAlarmWindow.showAndWait();
         if(hmiApp.getIndexForAlarm(setAlarmWindow.getAlarmNameTF().getText())==-1){

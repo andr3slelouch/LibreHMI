@@ -6,6 +6,9 @@ import javafx.scene.paint.Color;
 
 import java.io.Serializable;
 
+/**
+ * Clase que define el objeto CanvasColor que permitirá exportar los valores de color
+ */
 public class CanvasColor implements Serializable {
     @SerializedName("red")
     @Expose
@@ -37,6 +40,10 @@ public class CanvasColor implements Serializable {
 
     }
 
+    /**
+     * Permite generar el valor hexadecimal del color definido
+     * @return String de valor hexadecimal del color
+     */
     public String toHexString() {
         int r = ((int) Math.round(red     * 255)) << 24;
         int g = ((int) Math.round(green   * 255)) << 16;
@@ -45,6 +52,10 @@ public class CanvasColor implements Serializable {
         return String.format("#%08X", (r + g + b + a));
     }
 
+    /**
+     * Permite retornar un objeto Color compatible con los objetos JavaFX
+     * @return Objeto Color de JavaFX
+     */
     public Color getColor() {
         return new Color(red, green, blue, opacity);
     }

@@ -4,6 +4,9 @@ import andrade.luis.librehmi.views.RotationHBox;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
+/**
+ * Ventana de definición de propiedades de figuras geométricas
+ */
 public class SetGeometricFigurePropertiesWindow extends SetSizeWindow {
     private final RotationHBox rotationHBox;
 
@@ -16,6 +19,11 @@ public class SetGeometricFigurePropertiesWindow extends SetSizeWindow {
     private final ColorPicker colorPicker;
     private String rotationValue;
 
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     */
     public SetGeometricFigurePropertiesWindow(double width, double height) {
         super(width, height);
         this.getVbox().getWidthValueHBox().setSpacing(16);

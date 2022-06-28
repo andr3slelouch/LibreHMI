@@ -45,7 +45,7 @@ public class CanvasButton extends CanvasObject {
      */
     public CanvasButton(CanvasPoint position) {
         super(position);
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 50);
+        setData(150, 50);
     }
 
     /**
@@ -55,17 +55,15 @@ public class CanvasButton extends CanvasObject {
      */
     public CanvasButton(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
-        setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
+        setData(this.getCanvasObjectData().getWidth(), this.getCanvasObjectData().getHeight());
     }
 
     /**
      * Este método permite definir los atributos que constituyen el objeto
-     * @param x Posición en X
-     * @param y Posición en Y
      * @param width Ancho del botón
      * @param height Altura del botón
      */
-    public void setData(double x, double y, double width, double height) {
+    public void setData(double width, double height) {
         this.getCanvasObjectData().setType("Button");
         this.getCanvasObjectData().setDataType("Botón");
         this.button = new Button(this.getCanvasObjectData().getData());
@@ -127,6 +125,10 @@ public class CanvasButton extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir la acción del clic en el botón, buscando realizar el cambio de página
+     * a la seleccionada por el usuario
+     */
     public void onAction(){
         boolean pagesReadyState = true;
         for (String selectedPage : this.getCanvasObjectData().getSelectedPages()) {
@@ -141,6 +143,9 @@ public class CanvasButton extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir las propiedades del botón, su tamaño, contenido, color
+     */
     @Override
     public void setProperties(){
         SetButtonPropertiesWindow propertiesWindow = new SetButtonPropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
@@ -197,6 +202,7 @@ public class CanvasButton extends CanvasObject {
         this.button.setTextFill(propertiesWindow.getColorPickerLabel().getValue());
         this.getHmiApp().setWasModified(true);
     }
+
 
     @Override
     public void setEnable(String mode) {

@@ -34,6 +34,9 @@ import java.util.logging.Logger;
 
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 
+/**
+ * Canvas de la aplicación donde se pondrán agregar las representaciones gráficas
+ */
 public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     private String type;
@@ -58,7 +61,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
     private final ArrayList<CanvasPoint> canvasObjectPoints = new ArrayList<>();
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-
+    /**
+     * Permite agregar las representaciones gráficas a partir de un arraylist de datos de representaciones gráficas
+     * Se ejecuta cuando se realiza la carga desde el archivo
+     * @param shapeArrayList ArrayList de CanvasObjectData
+     */
     public void setShapeArrayList(ArrayList<CanvasObjectData> shapeArrayList) {
         pasteOffset = 0;
         for (CanvasObjectData canvasObjectData : shapeArrayList) {
@@ -67,6 +74,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         pasteOffset = 10;
     }
 
+    /**
+     * Permite añadir una representación gráfica desde el portapapeles o desde el proceso de regeneración
+     * de representaciones gráficas
+     * @param canvasObjectData CanvasObjectData del objeto a regenerarse
+     */
     private void addPastedObject(CanvasObjectData canvasObjectData){
         switch (canvasObjectData.getType()) {
             case LINE_STR:
@@ -139,6 +151,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         this.shapeArrayList.add(shape);
     }
 
+    /**
+     * Constructor del lienzo
+     */
     public HMICanvas() {
         this.setId("MainCanvas");
         rightClickMenu = new ContextMenu();
@@ -154,6 +169,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         rightClickMenu.getItems().addAll(pasteMenuItem);
     }
 
+    /**
+     * Permite añadir una figura nueva al canvas
+     * @param current Posición donde se agregará la figura
+     */
     public void addFigureOnCanvasClicked(CanvasPoint current) {
         switch (type) {
             case LINE_STR:
@@ -200,6 +219,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite añadir un gráfico de tendencias al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addTrendChartOnCanvasClicked(CanvasPoint current) {
         SetTrendChartPropertiesWindow setTrendChartPropertiesWindow = new SetTrendChartPropertiesWindow(750, 475, hmiApp.getLocalTags());
         setTrendChartPropertiesWindow.showAndWait();
@@ -229,6 +252,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite añadir una figura de Elipse al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addEllipseOnCanvasClicked(CanvasPoint current) {
         CanvasEllipse canvasEllipse = new CanvasEllipse(current);
         canvasEllipse.setCanvas(this);
@@ -244,6 +271,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         this.setAddOnClickEnabled(false);
     }
 
+    /**
+     * Permite añadir una figura de Línea al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addLineOnCanvasClicked(CanvasPoint current) {
         int expectedPoints = 2;
         if (canvasObjectPoints.size() != expectedPoints - 1) {
@@ -281,6 +312,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite añadir una representación gráfica de resumen de alarma
+     * @param current Posición donde se agregará la figura
+     */
     private void addAlarmDisplayOnCanvasClicked(CanvasPoint current) {
         CanvasAlarmDisplay canvasAlarmDisplay = new CanvasAlarmDisplay(current, true);
         canvasAlarmDisplay.setCanvas(this);
@@ -301,6 +336,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     }
 
+    /**
+     * Permite añadir una representación gráfica de imagen al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addImageViewOnCanvasClicked(CanvasPoint current) {
         Image selectedImage = null;
         String selectedImagePath = null;
@@ -336,6 +375,16 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     }
 
+    /**
+     * Permite añadir una imagen o símbolo HMI al canvas
+     * @param isModifyingColor Bandera para verificar si se esta modificando el color de la imagen
+     * @param contrast Valor de contraste
+     * @param brightness Valor de brillo
+     * @param saturation Valor de saturación
+     * @param hue Valor de tinte
+     * @param color Color de la imagen para modificarse
+     * @param canvasImage CanvasImage para añadirse al canvas
+     */
     private void addCanvasImageToCanvas(boolean isModifyingColor, double contrast, double brightness, double saturation, double hue, CanvasColor color, CanvasImage canvasImage) {
         if (isModifyingColor) {
             canvasImage.modifyImageViewColors(color, contrast, brightness, saturation, hue);
@@ -353,6 +402,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         this.setAddOnClickEnabled(false);
     }
 
+    /**
+     * Permite añadir una representación gráfica de Pulsador al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addPushbuttonOnCanvasClicked(CanvasPoint current) {
         SetColorCommandPushButtonWindow setColorCommandPushButtonWindow = new SetColorCommandPushButtonWindow();
         setColorCommandPushButtonWindow.setLocalTags(hmiApp.getLocalTags());
@@ -375,6 +428,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite añadir una representación gráfica de símbolo HMI al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addSymbolViewOnCanvasClicked(CanvasPoint current) {
         Image selectedSymbol;
         String selectedSymbolPath;
@@ -412,6 +469,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite añadir una representación gráfica de campo de entrada de texto al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addTextFieldOnCanvasClicked(CanvasPoint current) {
         SetTagInputPropertiesWindow setTagInputPropertiesWindow = new SetTagInputPropertiesWindow();
         setTagInputPropertiesWindow.setTitle("Propiedades de valor de campo de entrada de texto");
@@ -435,6 +496,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite añadir una representación gráfica de Slider al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addSliderOnCanvasClicked(CanvasPoint current) {
         SetSliderPropertiesWindow setSliderPropertiesWindow = new SetSliderPropertiesWindow(150, 150);
         setSliderPropertiesWindow.setLocalTags(hmiApp.getLocalTags());
@@ -476,6 +541,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite añadir una representación gráfica de botón al canvas
+     * @param current Posición donde se agregará la figura
+     */
     private void addButtonOnCanvasClicked(CanvasPoint current) {
         CanvasButton canvasButton = new CanvasButton(current);
         canvasButton.setHmiApp(hmiApp);
@@ -493,6 +562,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     }
 
+    /**
+     * Permite añadir una representación gráfica de Figura de rectángulo al canvas
+     * @param current Posición donde se agregará la figura
+     */
     public void addRectangleOnCanvasClicked(CanvasPoint current) {
         CanvasRectangle newCreatedRectangle = new CanvasRectangle(current);
         newCreatedRectangle.setCanvas(this);
@@ -508,6 +581,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         this.setAddOnClickEnabled(false);
     }
 
+    /**
+     * Permite añadir una representación gráfica de Fecha y Hora al canvas
+     * @param current Posición donde se agregará la figura
+     */
     public void addSystemDateTimeLabelOnCanvasClicked(CanvasPoint current) {
         CanvasSystemDateTime canvasSystemDateTime = new CanvasSystemDateTime("yyyy/MM/dd HH:mm:ss", current);
         canvasSystemDateTime.setCanvas(this);
@@ -525,6 +602,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
 
     }
 
+    /**
+     * Permite añadir una representación gráfica de Texto al canvas
+     * @param current Posición donde se agregará la figura
+     */
     public void addTextOnCanvasClicked(CanvasPoint current) {
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
         writeExpressionWindow.setTitle("Propiedades de valor del Texto");
@@ -552,6 +633,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite obtener la lista de CanvasObject del canvas
+     * @return ArrayList de CanvasObjects dentro del canvas
+     */
     public ArrayList<CanvasObject> getCurrentCanvasObjects() {
         ArrayList<CanvasObject> arrayList = new ArrayList<>();
         for (int i = 0; i < this.getChildren().size(); i++) {
@@ -565,6 +650,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         return arrayList;
     }
 
+    /**
+     * Permite determinar si un ID se encuentra asociado a otro objeto del canvas
+     * @param id Id a determinar
+     * @return true si el Id está asociado a un elemento del canvas
+     */
     public boolean existsId(String id) {
         for (CanvasObject canvasObject : getShapeArrayList()) {
             if (canvasObject.getId().equals(id)) {
@@ -574,6 +664,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         return false;
     }
 
+    /**
+     * Permite determinar si una representación gráfica del canvas se encuentra mostrando el menú contextual
+     * @return true si una representación gráfica está mostrando el menú contextual
+     */
     public boolean isFigureContextMenuShowing() {
         for (CanvasObject rect : getShapeArrayList()) {
             if (rect.getRightClickMenu().isShowing()) {
@@ -583,6 +677,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         return false;
     }
 
+    /**
+     * Permite obtener la figura seleccionada
+     * @return CanvasObject de la figura seleccionada
+     */
     public CanvasObject getSelectedFigure() {
         for (CanvasObject canvasObject : getShapeArrayList()) {
             if (canvasObject.isSelected()) {
@@ -592,11 +690,20 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         return null;
     }
 
+    /**
+     * Permite mostrar el menú contextual de la aplicación en la posición requerida
+     * @param screenX Posición en X para mostrar el menú
+     * @param screenY Posición en Y para mostrar el menú
+     */
     public void showContextMenu(double screenX, double screenY) {
         currentMousePosition = new CanvasPoint(screenX, screenY);
         rightClickMenu.show(HMICanvas.this, screenX, screenY);
     }
 
+    /**
+     * Permite actuar a la aplicación cuando se da clic en el canvas
+     * @param canvasPoint Posición del clic
+     */
     public void onCanvasClicked(CanvasPoint canvasPoint) {
         if (!isFigureContextMenuShowing()) {
             showContextMenu(canvasPoint.getX(), canvasPoint.getY());
@@ -604,6 +711,9 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Operación de pegado desde el portapapeles
+     */
     public void paste() {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         try {
@@ -618,6 +728,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite pegar un gráfico de tendencias desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información del gráfico de tendencias para agregar al canvas
+     */
     private void addPastedTrendChartOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasTrendChart canvasTrendChart = new CanvasTrendChart(canvasObjectData);
         canvasTrendChart.setCanvas(this);
@@ -631,6 +746,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasTrendChart.getTrendTimeline().play();
     }
 
+    /**
+     * Permite pegar una Figura de elipse desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura de elipse para agregar al canvas
+     */
     private void addPastedEllipse(CanvasObjectData canvasObjectData) {
         CanvasEllipse canvasEllipse = new CanvasEllipse(canvasObjectData);
         canvasEllipse.setCanvas(this);
@@ -642,6 +762,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasEllipse.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite pegar una Figura de Línea desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedLine(CanvasObjectData canvasObjectData) {
         CanvasLine canvasLine = new CanvasLine(canvasObjectData);
         canvasLine.setCanvas(this);
@@ -653,6 +778,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasLine.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite pegar una representación gráfica de resumen de alarmas desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedAlarmDisplayOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasAlarmDisplay canvasAlarmDisplay = new CanvasAlarmDisplay(canvasObjectData);
         canvasAlarmDisplay.setCanvas(this);
@@ -666,6 +796,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasAlarmDisplay.setUpdateTableTimeline();
     }
 
+    /**
+     * Permite pegar una representación gráfica de Imagen desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedImageViewOnCanvasClicked(CanvasObjectData canvasObjectData) {
         try {
             CanvasImage canvasImage = new CanvasImage(canvasObjectData);
@@ -691,6 +826,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite pegar una representación gráfica de pulsador desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedPushbuttonOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasPushbutton canvasPushbutton = new CanvasPushbutton(canvasObjectData);
         canvasPushbutton.setCanvas(this);
@@ -702,6 +842,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasPushbutton.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite pegar una representación gráfica campo de texto desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedTextFieldOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasTextField canvasTextField = new CanvasTextField(canvasObjectData);
         canvasTextField.setCanvas(this);
@@ -714,6 +859,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasTextField.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite pegar una representación gráfica de slider desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedSliderOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasSlider canvasSlider;
         try {
@@ -731,6 +881,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite pegar una representación gráfica de botón desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedButtonOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasButton canvasButton = new CanvasButton(canvasObjectData);
         canvasButton.setHmiApp(hmiApp);
@@ -744,6 +899,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasButton.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite pegar una representación gráfica de Texto desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     private void addPastedTextOnCanvasClicked(CanvasObjectData canvasObjectData) {
         CanvasText canvasText = new CanvasText(canvasObjectData);
         canvasText.setCanvas(this);
@@ -755,6 +915,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasText.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite pegar una Figura de Rectángulo desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     public void addPastedRectangle(CanvasObjectData canvasObjectData) {
         CanvasRectangle canvasRectangle = new CanvasRectangle(canvasObjectData);
         canvasRectangle.setCanvas(this);
@@ -767,6 +932,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasRectangle.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite pegar una representación gráfica de texto de fecha y hora desde el portapapeles o
+     * regenerado desde el proceso de carga desde el archivo
+     * @param canvasObjectData CanvasObjectData con la información de la figura para agregar al canvas
+     */
     public void addPastedSystemDateTimeLabel(CanvasObjectData canvasObjectData) {
         CanvasSystemDateTime canvasSystemDateTime = new CanvasSystemDateTime(canvasObjectData);
         canvasSystemDateTime.setCanvas(this);
@@ -779,6 +949,11 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         canvasSystemDateTime.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite generar un nuevo ID para la representación gráfica pegada
+     * @param canvasObjectData Datos de la representación gráfica pegada
+     * @return String ID del objeto generado para la nueva figura
+     */
     public String generateIdForPasteOperation(CanvasObjectData canvasObjectData) {
         if (canvasObjectData.getOperation().equals("Copy")) {
             int copyNumber = 0;
@@ -797,6 +972,10 @@ public class HMICanvas extends Pane implements CanvasObjectInterface {
         }
     }
 
+    /**
+     * Permite la eliminación de una representación gráfica seleccionada
+     * @param canvasObjectData Información de la representación a eliminarse
+     */
     @Override
     public void delete(CanvasObjectData canvasObjectData) {
         CanvasObject toDelete = new CanvasObject();

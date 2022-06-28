@@ -16,6 +16,9 @@ import java.util.Properties;
 
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 
+/**
+ * Ventana de definición de credenciales de la base de datos
+ */
 public class SaveDatabaseCredentialsWindow extends Stage {
 
     public boolean isCancelled() {
@@ -24,6 +27,9 @@ public class SaveDatabaseCredentialsWindow extends Stage {
 
     private boolean cancelled =true;
 
+    /**
+     * Constructor de la ventana
+     */
     public SaveDatabaseCredentialsWindow(){
         StackPane root = new StackPane();
         setTitle("Registro de credenciales");
@@ -39,7 +45,7 @@ public class SaveDatabaseCredentialsWindow extends Stage {
         }catch (IOException e) {
             try {
                 Properties newProperties = new Properties();
-                newProperties = DBConnection.prepareCategoriesProperties(false,false,false,false,false,false,newProperties);
+                DBConnection.prepareCategoriesProperties(false, false, false, false, false, false, newProperties);
                 DBConnection.writePropertiesFile("","","","",newProperties);
             } catch (IOException ex) {
                 showAlert(Alert.AlertType.ERROR,"Error al leer el archivo de configuración","No se pudo leer el archivo de configuración",e.getMessage());
@@ -126,6 +132,14 @@ public class SaveDatabaseCredentialsWindow extends Stage {
 
     }
 
+    /**
+     * Permite verificar la conexión a la base de datos con las credenciales definidas
+     * @param hostname Dirección IP de la base de datos
+     * @param port Puerto de la base de datos
+     * @param username Nombre de usuario de la base de datos
+     * @param password Contraseña del usuario de la base de datos
+     * @throws SQLException
+     */
     private void testConnection(String hostname, String port, String username, String password) throws SQLException {
         Connection con;
         String url = "jdbc:mysql://"+hostname+":"+port;

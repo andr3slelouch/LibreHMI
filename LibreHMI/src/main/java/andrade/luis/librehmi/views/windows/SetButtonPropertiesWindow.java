@@ -5,6 +5,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
+/**
+ * Ventana de definición de propiedades de botón
+ */
 public class SetButtonPropertiesWindow extends SetInputTextPropertiesWindow{
 
     public TextField getButtonLabelField() {
@@ -27,6 +30,11 @@ public class SetButtonPropertiesWindow extends SetInputTextPropertiesWindow{
 
     private ColorPicker colorPickerLabel;
 
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     */
     public SetButtonPropertiesWindow(double width, double height) {
         super(width, height);
 

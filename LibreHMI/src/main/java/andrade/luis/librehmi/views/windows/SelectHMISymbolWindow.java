@@ -26,7 +26,9 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+/**
+ * Ventana de selección de símbolos HMI
+ */
 public class SelectHMISymbolWindow extends Stage {
 
     private LocalDateTime max;
@@ -93,7 +95,11 @@ public class SelectHMISymbolWindow extends Stage {
 
     private CanvasObjectData canvasObjectData = new CanvasObjectData();
 
-
+    /**
+     * Constructor de la ventana
+     * @param imageViewWidth Ancho de la imagen
+     * @param imageViewHeight Alto de la imagen
+     */
     public SelectHMISymbolWindow(double imageViewWidth, double imageViewHeight) {
         this.imageViewWidth = imageViewWidth;
         this.imageViewHeight = imageViewHeight;
@@ -188,6 +194,11 @@ public class SelectHMISymbolWindow extends Stage {
         logger.log(Level.INFO, e);
     }
 
+    /**
+     * Permite obtener los paths de las figuras predeterminadas
+     * @param category Categoría de la cual se requieren las figuras predeterminadas
+     * @return ArrayList de Strings de paths de las figuras predeterminadas
+     */
     private ArrayList<String> getCategoryFilesPaths(String category){
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
@@ -197,6 +208,11 @@ public class SelectHMISymbolWindow extends Stage {
 
     }
 
+    /**
+     * Permite obtener los objetos InputStream de las imágenes del directorio especificado
+     * @param categoryFilesPaths Path del directorio
+     * @return ArrayList de InputStream de las figuras predeterminadas dentro del directorio
+     */
     private ArrayList<InputStream> getCategoryFilesArrayList(ArrayList<String> categoryFilesPaths) {
         ArrayList<InputStream> categoryFilesArrayList = new ArrayList<>();
         for (String path : categoryFilesPaths) {
@@ -205,6 +221,12 @@ public class SelectHMISymbolWindow extends Stage {
         return categoryFilesArrayList;
     }
 
+    /**
+     * Permite generar un ScrollPane que contiene las distintas imágenes predeterminadas
+     * @param category Categoría a ser especificada
+     * @return ScrollPane conteniendo las imágenes predeterminadas de la categoría
+     * @throws IOException
+     */
     private ScrollPane generateSymbolsScrollPaneByCategory(String category) throws IOException {
         File importedCategoryDirectoryPath = new File(DBConnection.getWorkingDirectory() + File.separator + categoriesDirectory.get(category));
         HBox imagesHBox = new HBox(4);
@@ -254,6 +276,12 @@ public class SelectHMISymbolWindow extends Stage {
         return scrollPane;
     }
 
+    /**
+     * Permite importar una imagen a un directorio específico de trabajo que la aplicación consultará para mostrar
+     * dentro de las imágenes predeterminadas
+     * @param category Categoría de la imagen importada
+     * @throws IOException
+     */
     public void importAction(String category) throws IOException {
         FileChooser fileChooser = new FileChooser();
 
@@ -289,6 +317,12 @@ public class SelectHMISymbolWindow extends Stage {
 
     }
 
+    /**
+     * Permite copiar un archivo desde el FileInputStream hacia un directorio especificado
+     * @param is Archivo que se copiará
+     * @param outputPath Directorio de destino
+     * @throws IOException
+     */
     private void copyFile(FileInputStream is, String outputPath) throws IOException {
         try (FileOutputStream out = new FileOutputStream(outputPath)) {
             int c;
@@ -301,6 +335,11 @@ public class SelectHMISymbolWindow extends Stage {
         }
     }
 
+    /**
+     * Permite actualizar las banderas del archivo de propiedades
+     * @param category Categoría a actualizar
+     * @throws IOException
+     */
     private void updateCategoryDirectoryInProperties(String category) throws IOException {
         Properties properties = DBConnection.readPropertiesFile();
         String hostname = "";
@@ -325,6 +364,10 @@ public class SelectHMISymbolWindow extends Stage {
         DBConnection.writePropertiesFile(username, password, hostname, port, newProperties);
     }
 
+    /**
+     * Permite actualizar el ancho de scrollPane
+     * @param width Ancho para actualizar
+     */
     public void updateScrollPanesWidth(double width) {
         for (ScrollPane scrollPane : categoriesPanes) {
             scrollPane.setMaxWidth(width);
@@ -334,6 +377,10 @@ public class SelectHMISymbolWindow extends Stage {
         }
     }
 
+    /**
+     * Permite actualizar una imagen seleccionada
+     * @param imagePath Path de la imagen a actualizar
+     */
     public void updateSelected(String imagePath) {
         for (CanvasImage canvasImage : currentImages) {
             if (canvasImage.getCanvasObjectData().getData().equals(imagePath)) {
@@ -343,6 +390,9 @@ public class SelectHMISymbolWindow extends Stage {
         }
     }
 
+    /**
+     * Permite actualizar la imagen seleccionada
+     */
     public void updateSelected() {
         max = null;
         int index = getLastSelectedImageIndex();
@@ -356,6 +406,10 @@ public class SelectHMISymbolWindow extends Stage {
         setResultValues(currentImages.get(index).getImage(), currentImages.get(index).getCanvasObjectData().getData());
     }
 
+    /**
+     * Permite obtener el índice de la última imagen seleccionada
+     * @return Índice de la imagen seleccionada
+     */
     private int getLastSelectedImageIndex() {
         int index = -1;
         for (int i = 0; i < currentImages.size(); i++) {
@@ -373,6 +427,11 @@ public class SelectHMISymbolWindow extends Stage {
         return index;
     }
 
+    /**
+     * Permite definir los atributos de retorno
+     * @param image Imagen a ser definida como retorno
+     * @param imagePath Path de la imagen a ser definida como retorno
+     */
     public void setResultValues(Image image, String imagePath) {
         this.selectedImage = image;
         this.selectedImagePath = imagePath;

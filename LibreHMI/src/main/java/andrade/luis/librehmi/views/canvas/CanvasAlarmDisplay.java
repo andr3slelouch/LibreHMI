@@ -23,6 +23,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+/**
+ * Clase que define el objeto CanvasAlarmDisplay, que permitirá mostrar alarmas dentro de una tabla
+ */
 public class CanvasAlarmDisplay extends CanvasObject {
     private static final String DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
     private static final String ACKNOWLEDGED_STATE = "Reconocida";
@@ -32,6 +35,10 @@ public class CanvasAlarmDisplay extends CanvasObject {
     private TableView<AlarmRow> alarmsTable;
     private final ArrayList<Alarm> activatedAlarms = new ArrayList<>();
 
+    /**
+     * Constructor para pegar un CanvasAlarmDisplay copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasAlarmDisplay(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         setData(canvasObjectData.getPosition().getX(), canvasObjectData.getPosition().getY(), canvasObjectData.getWidth(), canvasObjectData.getHeight(), true);
@@ -49,11 +56,24 @@ public class CanvasAlarmDisplay extends CanvasObject {
 
     private HMIUser user;
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasAlarmDisplay al canvas
+     * @param center CanvasPoint con la posición del objeto
+     * @param isOnCanvas Bandera para definir si el objeto está dentro del canvas
+     */
     public CanvasAlarmDisplay(CanvasPoint center, boolean isOnCanvas) {
         super(center);
         setData(center.getX(), center.getY(), 950, 400, isOnCanvas);
     }
 
+    /**
+     * Método que permite definir las propiedades del objeto
+     * @param x Posición del objeto en X
+     * @param y Posición dle objeto en Y
+     * @param width Ancho del objeto
+     * @param height Alto del objeto
+     * @param isOnCanvas Bandera que define si el objeto está en el canvas
+     */
     private void setData(double x, double y, double width, double height, boolean isOnCanvas) {
         this.getCanvasObjectData().setType("AlarmDisplay");
         this.getCanvasObjectData().setDataType("Resumen de Alarmas");
@@ -131,6 +151,9 @@ public class CanvasAlarmDisplay extends CanvasObject {
         this.setCenter(this.alarmsTable);
     }
 
+    /**
+     * Permite definir el constructor de filas de la tabla
+     */
     public void setRowFactory() {
         this.alarmsTable.setRowFactory(alarmsTableView -> new TableRow<>() {
             @Override
@@ -168,6 +191,10 @@ public class CanvasAlarmDisplay extends CanvasObject {
         });
     }
 
+    /**
+     * Permite cambiar el estado de una alarma de "No Reconocido" a "Reconocido"
+     * @param item Fila de alarma
+     */
     private void addAcknowledgedAlarm(AlarmRow item){
         AlarmRow alarmRow = new AlarmRow(
                 String.valueOf(this.alarmsTable.getItems().size() + 1),
@@ -191,6 +218,9 @@ public class CanvasAlarmDisplay extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir el hilo de verificación de alarmas
+     */
     public void setUpdateTableTimeline() {
         Timeline updateTableTimeline = new Timeline(
                 new KeyFrame(
@@ -204,6 +234,10 @@ public class CanvasAlarmDisplay extends CanvasObject {
         updateTableTimeline.play();
     }
 
+    /**
+     * Permite añadir una nueva alarma a la tabla
+     * @param alarm Objeto de alarma para agregarse a la tabla
+     */
     private void addAlarmFromTimeline(Alarm alarm) {
         try {
             boolean alarmStatus = alarm.checkAlarm();
@@ -225,6 +259,9 @@ public class CanvasAlarmDisplay extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir las propiedades del objeto en cuanto al ancho y alto
+     */
     @Override
     public void setProperties() {
         super.setProperties();
@@ -257,10 +294,16 @@ public class CanvasAlarmDisplay extends CanvasObject {
         }
     }
 
+
     public TableView<AlarmRow> getAlarmsTable() {
         return alarmsTable;
     }
 
+    /**
+     * Permite actualizar una fila de alarma de la tabla
+     * @param oldName Nombre de la alarma a ser modificada
+     * @param tableItem Objeto de alarma a modificarse
+     */
     public void updateTableItem(String oldName, Alarm tableItem) {
         int index = getAlarmIndex(oldName);
         AlarmRow updatedAlarm = new AlarmRow(
@@ -280,6 +323,10 @@ public class CanvasAlarmDisplay extends CanvasObject {
         this.alarmsTable.getItems().set(index, updatedAlarm);
     }
 
+    /**
+     * Permite eliminar una fila de alarma de la tabla
+     * @param name Nombre de la alarma a eliminarse
+     */
     public void removeTableItem(String name) {
         int index = getAlarmIndex(name);
         if (index >= 0) {
@@ -287,6 +334,10 @@ public class CanvasAlarmDisplay extends CanvasObject {
         }
     }
 
+    /**
+     * Permite añadir una nueva fila basada en un objeto de alarma
+     * @param tableItem Objeto de alarma agregarse a la tabla
+     */
     public void addTableItem(Alarm tableItem) {
         AlarmRow alarmRow = new AlarmRow(
                 String.valueOf(this.alarmsTable.getItems().size() + 1),
@@ -305,12 +356,21 @@ public class CanvasAlarmDisplay extends CanvasObject {
         this.alarmsTable.getItems().add(alarmRow);
     }
 
+    /**
+     * Permite definir las filas de la tabla basándose en una lista de objetos de alarma
+     * @param tableItems Lista de objetos de alarma
+     */
     public void setTableItems(ArrayList<Alarm> tableItems) {
         for (Alarm tableItem : tableItems) {
             addTableItem(tableItem);
         }
     }
 
+    /**
+     * Permite obtener el índice de una alarma en la tabla
+     * @param name Nombre de alarma a buscarse dentro de la tabla
+     * @return Índice de alarma encontrada
+     */
     private int getAlarmIndex(String name) {
         int res = -1;
         for (int i = 0; i < alarmsTable.getItems().size(); i++) {

@@ -2,6 +2,9 @@ package andrade.luis.librehmi.views.windows;
 
 import andrade.luis.librehmi.views.SizeVBox;
 
+/**
+ * Ventana de definición de propiedades de texto de entrada
+ */
 public class SetInputTextPropertiesWindow extends SetTextPropertiesWindow{
 
     public SizeVBox getSizeVBox() {
@@ -14,6 +17,11 @@ public class SetInputTextPropertiesWindow extends SetTextPropertiesWindow{
 
     private SizeVBox sizeVBox;
 
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Altura de la ventana
+     */
     public SetInputTextPropertiesWindow(double width, double height) {
         super(340,275);
         sizeVBox = new SizeVBox(width,height,196,196);

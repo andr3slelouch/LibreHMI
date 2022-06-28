@@ -16,6 +16,9 @@ import javafx.util.converter.DoubleStringConverter;
 
 import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
+/**
+ * Ventana de definición de propiedades de texto
+ */
 public class SetTextPropertiesWindow extends Stage {
     protected final VBox vbox;
     private final RotationHBox rotationHBox;
@@ -43,10 +46,18 @@ public class SetTextPropertiesWindow extends Stage {
     private final ComboBox<String> fontFamilyComboBox;
     private final TextField fontSizeField;
 
+    /**
+     * Constructor de la ventana
+     */
     public SetTextPropertiesWindow(){
         this(350,200);
     }
 
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     */
     public SetTextPropertiesWindow(double width, double height) {
         StackPane root = new StackPane();
         // font weight names
@@ -133,6 +144,10 @@ public class SetTextPropertiesWindow extends Stage {
         return fontSizeField;
     }
 
+    /**
+     * Permite obtener un FontWeight basado en el estilo seleccionado
+     * @return FontWeight seleccionado
+     */
     public FontWeight getFontStyle(){
         String style = fontStyleComboBox.getValue();
         switch (style) {

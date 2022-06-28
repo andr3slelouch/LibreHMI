@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
+/**
+ * Ventana de definición de propiedades del gráfico de tendencias
+ */
 public class SetTrendChartPropertiesWindow extends Stage {
 
     public SizeVBox getSizeVBox() {
@@ -69,6 +72,12 @@ public class SetTrendChartPropertiesWindow extends Stage {
     private ArrayList<Tag> localTags;
 
 
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     * @param localTags ArrayList de tag locales
+     */
     public SetTrendChartPropertiesWindow(double width, double height,ArrayList<Tag> localTags) {
         this.setTitle("Propiedades para el Gráfico de tendencias");
         this.localTags = localTags;
@@ -131,6 +140,10 @@ public class SetTrendChartPropertiesWindow extends Stage {
         this.setScene(mainScene);
     }
 
+    /**
+     * Permite actualizar el ArrayList de series de datos para el gráfico de tendencias
+     * @return true si se actualiza el arrayList
+     */
     public boolean updateTrendChartSerieDataArrayList() {
         for (TrendChartExpressionHBox expressionHBox : expressionHBoxes) {
             if (expressionHBox.getEnableChartExpression().isSelected()) {

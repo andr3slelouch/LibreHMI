@@ -5,20 +5,38 @@ import andrade.luis.librehmi.views.windows.SetGeometricFigurePropertiesWindow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 
-
+/**
+ * Clase que define el objeto CanvasEllipse, que permitirá tener la figura de una elipse en el canvas
+ */
 public class CanvasEllipse extends CanvasObject{
     private Ellipse ellipse;
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasEllipse al canvas
+     *
+     * @param center CanvasPoint con la posición del objeto
+     */
     public CanvasEllipse(CanvasPoint center){
         super(center);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 75,75);
     }
 
+    /**
+     * Constructor para pegar un CanvasEllipse copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasEllipse(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
     }
 
+    /**
+     * Método para definir las propiedades del objeto
+     * @param x Posición en X del objeto
+     * @param y Posición en Y del objeto
+     * @param width Ancho del objeto
+     * @param height Alto del objeto
+     */
     private void setData(double x, double y, double width, double height) {
         this.ellipse = new Ellipse(x, y, width, height);
         this.getCanvasObjectData().setWidth(width);
@@ -34,6 +52,9 @@ public class CanvasEllipse extends CanvasObject{
         }
     }
 
+    /**
+     * Permite mostrar una ventana de definición de propiedades para actualizarlas
+     */
     @Override
     public void setProperties(){
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());

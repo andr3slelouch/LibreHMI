@@ -31,6 +31,9 @@ import java.util.logging.Level;
 
 import static javafx.geometry.Pos.CENTER;
 
+/**
+ * Clase que define el objeto CanvasRectangle, que permitirá tener la figura de rectángulo en el canvas
+ */
 public class CanvasRectangle extends CanvasObject {
     private CanvasOrientation perfectFillOrientation;
     private Timeline refillRectangleTimeline;
@@ -39,11 +42,20 @@ public class CanvasRectangle extends CanvasObject {
 
     private Rectangle rectangle;
 
+    /**
+     * Constructor para pegar un CanvasRectangle copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasRectangle(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), canvasObjectData.getWidth(), canvasObjectData.getHeight());
     }
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasRectangle al canvas
+     *
+     * @param center CanvasPoint con la posición del objeto
+     */
     public CanvasRectangle(CanvasPoint center) {
         super(center);
         setData(this.getCanvasObjectData().getPosition().getX(), this.getCanvasObjectData().getPosition().getY(), 150, 150);
@@ -53,6 +65,13 @@ public class CanvasRectangle extends CanvasObject {
 
     }
 
+    /**
+     * Método para definir las propiedades del objeto
+     * @param x Posición en X del objeto
+     * @param y Posición en Y del objeto
+     * @param width Ancho del objeto
+     * @param height Alto del objeto
+     */
     public void setData(double x, double y, double width, double height) {
         this.rectangle = new Rectangle(x, y);
 
@@ -78,6 +97,9 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
 
+    /**
+     * Permite mostrar una ventana de definición de propiedades para actualizarlas
+     */
     @Override
     public void setProperties() {
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.getCanvasObjectData().getWidth(),this.getCanvasObjectData().getHeight());
@@ -118,8 +140,9 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
 
-
-
+    /**
+     * Permite mostrar la ventana de definición de atributos de la animación de relleno porcentual
+     */
     private void setPercentFill() {
         SetPercentFillPropertiesWindow writeExpressionWindow;
         if (this.getCanvasObjectData().getExpression() != null) {
@@ -169,6 +192,13 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir la animación de relleno porcentual
+     * @param exp Expresión a ser evaluada
+     * @param primaryColor Color primario
+     * @param backgroundColor Color de fondo
+     * @param orientation Orientación de la animación
+     */
     public void setPercentFill(Expression exp, CanvasColor primaryColor, CanvasColor backgroundColor, CanvasOrientation orientation) {
         if (exp != null) {
             this.getCanvasObjectData().setExpression(exp);
@@ -262,6 +292,9 @@ public class CanvasRectangle extends CanvasObject {
         }
     }
 
+    /**
+     * Permite definir el hilo de animación de relleno del rectángulo
+     */
     private void setRefillRectangleTimeline() {
         this.refillRectangleTimeline = new Timeline(
                 new KeyFrame(
@@ -299,6 +332,11 @@ public class CanvasRectangle extends CanvasObject {
         this.refillRectangleTimeline.setCycleCount(Animation.INDEFINITE);
     }
 
+    /**
+     * Permite calcular el valor de porcentaje de relleno
+     * @param evaluatedValue Valor de porcentaje de relleno
+     * @return Retorna un valor porcentual de relleno
+     */
     private double calculatePercentFillValue(double evaluatedValue) {
         if (evaluatedValue < this.getCanvasObjectData().getMinValue()) {
             return 0;
@@ -316,6 +354,9 @@ public class CanvasRectangle extends CanvasObject {
         return -1;
     }
 
+    /**
+     * Permite definir la acción cuando se da clic en la figura
+     */
     private final EventHandler<MouseEvent> onMyMouseClicked = mouseEvent -> {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 1) {
             this.setSelected(true);
@@ -326,6 +367,9 @@ public class CanvasRectangle extends CanvasObject {
         }
     };
 
+    /**
+     * Permite reanudar o detener el hilo de animación porcentual según corresponda
+     */
     private void playOrStopIfCorrespond() {
         if (refillRectangleTimeline.getStatus().toString().equals("RUNNING")) {
             refillRectangleTimeline.stop();

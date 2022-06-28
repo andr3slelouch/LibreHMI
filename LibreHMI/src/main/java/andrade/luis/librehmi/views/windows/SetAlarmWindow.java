@@ -11,6 +11,9 @@ import java.util.logging.Logger;
 
 import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
+/**
+ * Ventana de definición de alarma
+ */
 public class SetAlarmWindow extends WriteExpressionWindow {
     private final HBox doubleLimitHBox;
     private final HBox booleanConditionsHBox;
@@ -28,6 +31,10 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     private TextField lowLimitTF;
     private final HMIApp hmiApp;
 
+    /**
+     * Constructor de ventana
+     * @param hmiApp Objeto de aplicación
+     */
     public SetAlarmWindow(HMIApp hmiApp) {
         super(750, 300);
         setTitle("Crear alarma");
@@ -100,6 +107,9 @@ public class SetAlarmWindow extends WriteExpressionWindow {
         this.finishSelectionButton.setOnAction(mouseEvent -> finishingAction());
     }
 
+    /**
+     * Permite inicializar los campos de alto-alto
+     */
     private void initHiHiLimitField(){
         hiHiLimitCheckBox = new CheckBox("HiHi");
         hiHiLimitTF = new TextField("0");
@@ -119,6 +129,9 @@ public class SetAlarmWindow extends WriteExpressionWindow {
         hiHiLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> hiHiLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
     }
 
+    /**
+     * Permite inicializar los campos de alto
+     */
     private void initHighLimitField(){
         highLimitCheckBox = new CheckBox("High");
         highLimitTF = new TextField("0");
@@ -138,6 +151,9 @@ public class SetAlarmWindow extends WriteExpressionWindow {
         highLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> highLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
     }
 
+    /**
+     * Permite inicializar los campos de bajo-bajo
+     */
     private void initLoloLimitField(){
         loloLimitCheckBox = new CheckBox("LoLo");
         loloLimitTF = new TextField("0");
@@ -157,6 +173,9 @@ public class SetAlarmWindow extends WriteExpressionWindow {
         loloLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> loloLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
     }
 
+    /**
+     * Permite inicializar los campos de bajo
+     */
     private void initLowLimitField(){
         lowLimitCheckBox = new CheckBox("Low");
         lowLimitTF = new TextField("0");
@@ -176,6 +195,9 @@ public class SetAlarmWindow extends WriteExpressionWindow {
         lowLimitCheckBox.selectedProperty().addListener((observableValue, oldBoolean, newBoolean) -> lowLimitTF.setDisable(!Boolean.TRUE.equals(newBoolean)));
     }
 
+    /**
+     * Permite validar los campos de definición de condiciones
+     */
     @Override
     public void finishingAction() {
         if (
@@ -230,6 +252,10 @@ public class SetAlarmWindow extends WriteExpressionWindow {
         }
     }
 
+    /**
+     * Permite habilitar los campos correspondientes al tipo
+     * @param type Tipo de campos a ser habilitados
+     */
     private void enableInputs(String type) {
         if (type.equals("Flotante") || type.equals("Entero")) {
             this.getVbox().getChildren().remove(doubleLimitHBox);

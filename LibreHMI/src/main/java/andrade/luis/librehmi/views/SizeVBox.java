@@ -9,6 +9,9 @@ import javafx.util.converter.DoubleStringConverter;
 
 import static andrade.luis.librehmi.util.TextFormatters.numberFilter;
 
+/**
+ * VBox con los campos de definición de tamaño utilizado por varias ventanas
+ */
 public class SizeVBox extends VBox {
     private final HBox heightValueHBox;
     private final HBox widthValueHBox;
@@ -25,6 +28,13 @@ public class SizeVBox extends VBox {
         return heightField.getText().isEmpty() ? minHeight : Double.parseDouble(heightField.getText());
     }
 
+    /**
+     * Constructor del VBox
+     * @param defWidth Ancho predefinido
+     * @param defHeight Alto predefinido
+     * @param widthFieldWidth Ancho del campo
+     * @param heightFieldWidth Alto del campo
+     */
     public SizeVBox(double defWidth,double defHeight,double widthFieldWidth,double heightFieldWidth) {
         Label widthLabel = new Label("Defina el ancho:");
         widthField = new TextField(String.valueOf(defWidth));

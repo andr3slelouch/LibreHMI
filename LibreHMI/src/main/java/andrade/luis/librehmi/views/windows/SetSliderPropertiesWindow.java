@@ -6,6 +6,9 @@ import andrade.luis.librehmi.views.SizeVBox;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
+/**
+ * Ventana de definición de propiedades del slider
+ */
 public class SetSliderPropertiesWindow extends WriteExpressionWindow {
     private String rotationValue;
     private SizeVBox sizeVBox;
@@ -36,12 +39,21 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
     private CheckBox showTicks;
     private CheckBox showLabelsTicks;
 
-
+    /**
+     * Constructor de la ventana
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     */
     public SetSliderPropertiesWindow(double width, double height) {
         super(415, 475);
         this.init(width, height);
     }
 
+    /**
+     * Permite inicializar los campos de la ventana
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana
+     */
     private void init(double width, double height) {
         textField.setEditable(false);
         this.setTitle("Propiedades del Slider");
@@ -112,12 +124,19 @@ public class SetSliderPropertiesWindow extends WriteExpressionWindow {
         this.setInputMode(true);
     }
 
+    /**
+     * Permite añadir un tag del tipo de escritura
+     */
     @Override
     protected void addTag() {
         textField.setText(super.updateInputExpression(this.isInputMode(), "numbers", false,textField.getText()));
 
     }
 
+    /**
+     * Permite determinar la orientación seleccionada
+     * @return CanvasOrientation con la orientación seleccionada
+     */
     public CanvasOrientation getSelectedOrientation() {
         RadioButton selectedRadioButton = (RadioButton) radioGroup.getSelectedToggle();
         if (selectedRadioButton != null) {

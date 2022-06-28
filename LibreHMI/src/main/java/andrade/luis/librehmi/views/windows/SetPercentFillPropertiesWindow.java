@@ -6,7 +6,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
-
+/**
+ * Ventana de definición de propiedades de animación de relleno porcentual
+ */
 public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
     public CheckBox getShowLabelChB() {
         return showLabelChB;
@@ -41,11 +43,19 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
     private TextField minValueField;
     private TextField maxValueField;
 
+    /**
+     * Constructor de la ventana con sus valores por defecto
+     */
     public SetPercentFillPropertiesWindow() {
         super(750, 340);
         this.init(Color.BLACK, Color.GREEN);
     }
 
+    /**
+     * Constructor de la ventana con los colores seleccionados
+     * @param primaryColor Color primario
+     * @param backgroundColor Color de fondo
+     */
     public SetPercentFillPropertiesWindow(Color primaryColor, Color backgroundColor) {
         super(750, 340);
         this.primaryColor = new CanvasColor(primaryColor);
@@ -53,6 +63,11 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         this.init(this.primaryColor.getColor(), this.backgroundColor.getColor());
     }
 
+    /**
+     * Permite inicializar los valores de la ventana
+     * @param primary Color primario
+     * @param background Color de fondo
+     */
     private void init(Color primary, Color background) {
         setTitle("Propiedades de Animación de Relleno Porcentual");
         HBox primaryHBox = new HBox();
@@ -129,6 +144,10 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         this.finishSelectionButton.setOnAction(actionEvent -> this.finishingAction());
     }
 
+    /**
+     * Permite definir la orientación de la animación
+     * @return CanvasOrientation con la orientación seleccionada
+     */
     public CanvasOrientation getSelectedOrientation() {
         RadioButton selectedRadioButton = (RadioButton) radioGroup.getSelectedToggle();
         if (selectedRadioButton != null) {
@@ -146,6 +165,10 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         return CanvasOrientation.HORIZONTAL;
     }
 
+    /**
+     * Permite seleccionar la orientación seleccionada
+     * @param selected La orientación seleccionada
+     */
     public void setSelectedOrientation(String selected) {
         for (int i = 0; i < radioGroup.getToggles().size(); i++) {
             if (((RadioButton) radioGroup.getToggles().get(i)).getId().toLowerCase().equals(selected)) {
@@ -154,6 +177,10 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         }
     }
 
+    /**
+     * Permite obtener el valor mínimo
+     * @return Valor mínimo
+     */
     public double getMinValue() {
         if (minValueField.getText().isEmpty()) {
             return 0;
@@ -162,6 +189,10 @@ public class SetPercentFillPropertiesWindow extends WriteExpressionWindow {
         }
     }
 
+    /**
+     * Permite obtener el valor máximo
+     * @return Valor máximo
+     */
     public double getMaxValue() {
         if (maxValueField.getText().isEmpty()) {
             return 100;

@@ -6,9 +6,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import java.util.ArrayList;
 
+/**
+ * Clase que define el objeto CanvasLine, que permitirá tener la figura de una línea en el canvas
+ */
 public class CanvasLine extends CanvasObject{
     private Line line;
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasLine al canvas
+     * @param positionCanvasPoint Posición del objeto en el canvas
+     * @param positionCanvasPoints Puntos del canvas para dibujar la línea
+     */
     public CanvasLine(CanvasPoint positionCanvasPoint, ArrayList<Double> positionCanvasPoints){
         super(positionCanvasPoint);
         if(positionCanvasPoints.size()==4){
@@ -18,12 +26,23 @@ public class CanvasLine extends CanvasObject{
         }
     }
 
+    /**
+     * Constructor para pegar un CanvasLine copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasLine(CanvasObjectData canvasObjectData){
         super(canvasObjectData);
         this.getCanvasObjectData().setPolygonPoints(canvasObjectData.getPolygonPoints());
         setData(this.getCanvasObjectData().getPolygonPoints().get(0), this.getCanvasObjectData().getPolygonPoints().get(1),this.getCanvasObjectData().getPolygonPoints().get(2),this.getCanvasObjectData().getPolygonPoints().get(3));
     }
 
+    /**
+     * Permite definir las propiedades de la línea con los puntos de inicio y de fin
+     * @param x1 Posición de inicio en X
+     * @param y1 Posición de inicio en Y
+     * @param x2 Posición de fin en X
+     * @param y2 Posición de fin en Y
+     */
     public void setData(double x1, double y1,double x2,double y2){
         this.line = new Line();
         this.line.setStartX(x1);
@@ -49,6 +68,9 @@ public class CanvasLine extends CanvasObject{
         this.setRotate(this.getCanvasObjectData().getRotation());
     }
 
+    /**
+     * Permite mostrar la ventana de propiedades
+     */
     @Override
     public void setProperties(){
         SetGeometricFigurePropertiesWindow setGeometricFigurePropertiesWindow = new SetGeometricFigurePropertiesWindow(this.line.getStrokeWidth(),this.getCanvasObjectData().getHeight());

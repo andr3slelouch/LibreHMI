@@ -20,6 +20,9 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * HBox para definir los campos de fecha y hora
+ */
 public class DateHBox extends HBox {
 
     private static final String FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -50,6 +53,9 @@ public class DateHBox extends HBox {
     private LocalDateTime localDateTime;
     private boolean isLocalUpdate = true;
 
+    /**
+     * Constructor
+     */
     public DateHBox() {
         datePicker = new DatePicker();
         datePicker.valueProperty().addListener((observableValue, oldDate, newDate) -> this.setSliderValue());
@@ -61,6 +67,10 @@ public class DateHBox extends HBox {
         this.getChildren().addAll(datePicker, hoursTextField, hoursLabel, minutesTextField, minutesLabel, secondsTextField);
     }
 
+    /**
+     * Permite definir la fecha y hora en los campos
+     * @param localDateTime LocalDateTime con la hora requerida
+     */
     public void setDateTime(LocalDateTime localDateTime) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         this.localDateTime = localDateTime;
@@ -72,6 +82,9 @@ public class DateHBox extends HBox {
         isLocalUpdate = true;
     }
 
+    /**
+     * Permite inicializar los campos de horas HBox
+     */
     private void initHoursTextField(){
         hoursTextField = new TextField("");
         hoursTextField.setPrefWidth(50);
@@ -96,6 +109,9 @@ public class DateHBox extends HBox {
         });
     }
 
+    /**
+     * Permite inicializar los campos de minutos del HBox
+     */
     private void initMinutesTextField(){
         minutesTextField = new TextField("");
         minutesTextField.setPrefWidth(50);
@@ -120,6 +136,9 @@ public class DateHBox extends HBox {
         });
     }
 
+    /**
+     * Permite inicializar los campos de minutos del HBox
+     */
     private void initSecondsTextField(){
         secondsTextField = new TextField("");
         secondsTextField.setPrefWidth(50);
@@ -144,6 +163,12 @@ public class DateHBox extends HBox {
         });
     }
 
+    /**
+     * Permite obtener el LocalDateTime a partir del string ingresado
+     * @param dateFormatString Fecha y hora en string
+     * @return LocalDateTime convertido a partir del string
+     * @throws ParseException
+     */
     public LocalDateTime getDateTimeFromString(String dateFormatString) throws ParseException {
         Locale spanishLocale = new Locale("es", "ES");
         DateFormat dateFormat = new SimpleDateFormat(FORMAT, spanishLocale);
@@ -153,6 +178,9 @@ public class DateHBox extends HBox {
 
     }
 
+    /**
+     * Permite definir el valor del slider
+     */
     public void setSliderValue() {
         if (this.dateSlider != null && this.sliderDateTime != null && isLocalUpdate) {
             String dateFormatString = this.datePicker.getValue() + " " + hoursTextField.getText() + ":" + minutesTextField.getText() + ":" + secondsTextField.getText();
@@ -167,6 +195,12 @@ public class DateHBox extends HBox {
         }
     }
 
+    /**
+     * Permite obtener un valor de slider a partir de un LocalDateTime
+     * @param currentLocalDateTime LocalDateTime de fecha y hora actual
+     * @param sliderDateTime LocalDateTime del slider
+     * @return Valor del slider
+     */
     public int convertDateFormatStringToSliderValue(LocalDateTime currentLocalDateTime, LocalDateTime sliderDateTime) {
         return (int) ChronoUnit.SECONDS.between(currentLocalDateTime, sliderDateTime);
     }

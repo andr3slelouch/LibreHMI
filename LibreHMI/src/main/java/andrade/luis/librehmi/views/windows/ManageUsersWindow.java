@@ -22,10 +22,16 @@ import java.util.logging.Logger;
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
+/**
+ * Ventana para la administración de usuarios
+ */
 public class ManageUsersWindow extends Stage {
     private final TableView<HMIUserRow> table;
 
 
+    /**
+     * Constructor de la ventana de administración de usuarios
+     */
     public ManageUsersWindow(){
         StackPane root = new StackPane();
 
@@ -63,6 +69,9 @@ public class ManageUsersWindow extends Stage {
         this.setScene(scene);
     }
 
+    /**
+     * Define la fábrica de filas de la tabla
+     */
     private void setTableRowFactory(){
         table.setRowFactory(param -> new TableRow<>() {
             @Override
@@ -81,6 +90,10 @@ public class ManageUsersWindow extends Stage {
         });
     }
 
+    /**
+     * Permite generar un menú para la creación de un nuevo usuario
+     * @return MenuItem con el comportamiento de creación de nuevo usuario
+     */
     private MenuItem createNewMenuItem(){
         MenuItem newItem = new MenuItem();
         newItem.setText("Nuevo");
@@ -92,6 +105,11 @@ public class ManageUsersWindow extends Stage {
         return newItem;
     }
 
+    /**
+     * Permite generar un menú para la creación de menú de editar un usuario
+     * @param row Fila de usuario con los datos de usuario a ser mostrado
+     * @return MenuItem con el comportamiento de edición de usuario
+     */
     private MenuItem createSaveMenuItem(HMIUserRow row){
         MenuItem saveItem = new MenuItem();
         saveItem.setText("Editar");
@@ -103,6 +121,11 @@ public class ManageUsersWindow extends Stage {
         return saveItem;
     }
 
+    /**
+     * Permite generar un menú para eliminación de un usuario
+     * @param row Fila de usuarios con los datos de usuario a ser eliminado
+     * @return MenuItem con el comportamiento de eliminación de usuario
+     */
     private MenuItem createDeleteMenuItem(HMIUserRow row){
         MenuItem deleteItem = new MenuItem();
         deleteItem.setText("Eliminar");
@@ -118,6 +141,10 @@ public class ManageUsersWindow extends Stage {
         return deleteItem;
     }
 
+    /**
+     * Permite obtener los usuarios del sistema
+     * @return Lista de usuarios a ser mostrada en la ventana
+     */
     public ObservableList<HMIUserRow> getUsers() {
         String query = "SELECT u.first, u.last, u.email,u.username,u.role from Users u;";
         ObservableList<HMIUserRow> users = FXCollections.observableArrayList();
@@ -135,6 +162,13 @@ public class ManageUsersWindow extends Stage {
         logger.log(Level.INFO, e.getMessage());
     }
 
+    /**
+     * Permite leer los usuarios desde la base de datos
+     * @param con Conexión de base de datos
+     * @param users Lista de usuarios
+     * @param query Sentencia SQL a ejecutarse
+     * @return Lista de usuarios
+     */
     public ObservableList<HMIUserRow> readUsers(Connection con,ObservableList<HMIUserRow> users,String query) {
         try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);

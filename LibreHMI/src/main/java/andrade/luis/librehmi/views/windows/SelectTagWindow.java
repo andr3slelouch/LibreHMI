@@ -12,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -27,6 +26,9 @@ import java.util.logging.Logger;
 import static andrade.luis.librehmi.util.Alerts.showAlert;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 
+/**
+ * Ventana de selección de tag
+ */
 public class SelectTagWindow extends Stage {
     private final TableView.TableViewSelectionModel<TagRow> selectionModel;
     private final TableView<TagRow> table;
@@ -55,6 +57,13 @@ public class SelectTagWindow extends Stage {
 
     private Tag selectedTagRow;
 
+    /**
+     * Constructor de la ventana
+     * @param inputMode Permite filtrar los tags a aquellos que solo sean de escritura
+     * @param filter Permite aplica un filtro de tags basado en su tipo
+     * @param testMode Bandera para mostrar la ventana en modo test
+     * @param localTags ArrayList de tags locales
+     */
     public SelectTagWindow(boolean inputMode, String filter, boolean testMode, ArrayList<Tag> localTags) {
         StackPane root = new StackPane();
 
@@ -133,6 +142,12 @@ public class SelectTagWindow extends Stage {
 
     }
 
+    /**
+     * Permite inicializar los tags que existen desde la base de datos
+     * @param inputMode Bandera para filtrar solamente los tags de escritura
+     * @param filter Filtro para filtrar por tipo
+     * @return Lista de Tags existentes
+     */
     private ObservableList<TagRow> initExistingTags(boolean inputMode, String filter) {
         ObservableList<TagRow> existingTagsObsList = FXCollections.observableArrayList();
         if (filter.equals("LocalTags")) {
@@ -161,6 +176,10 @@ public class SelectTagWindow extends Stage {
         return existingTagsObsList;
     }
 
+    /**
+     * Permite crear el menú de creación de nuevo tag local
+     * @return MenuItem con el comportamiento para la creación de un tag local
+     */
     private MenuItem createNewMenuItem() {
         MenuItem newItem = new MenuItem();
         newItem.setText("Nuevo");
@@ -180,6 +199,12 @@ public class SelectTagWindow extends Stage {
         return newItem;
     }
 
+    /**
+     * Permite crear el menu de edición de tag local
+     * @param row Fila del tag a ser editado
+     * @param index Índice del tag a ser editado
+     * @return MenuItem con el comportamiento de edición de tag local
+     */
     private MenuItem createSaveMenuItem(TagRow row, int index) {
         MenuItem saveItem = new MenuItem();
         saveItem.setText("Editar");
@@ -199,6 +224,12 @@ public class SelectTagWindow extends Stage {
         return saveItem;
     }
 
+    /**
+     * Permite crear un menu de eliminación de tag local
+     * @param row Fila del tag a ser eliminado
+     * @param index Índice del tag a ser eliminado
+     * @return MenuItem con el comportamiento de eliminación de tag local
+     */
     private MenuItem createDeleteMenuItem(TagRow row, int index) {
         MenuItem deleteItem = new MenuItem();
         deleteItem.setText("Eliminar");
@@ -210,6 +241,12 @@ public class SelectTagWindow extends Stage {
         return deleteItem;
     }
 
+    /**
+     * Permite obtener una lista de filas de tag con los tags existentes
+     * @param inputMode
+     * @param filter
+     * @return
+     */
     public ObservableList<TagRow> getExistingTags(boolean inputMode, String filter) {
         String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
         if (inputMode) {
@@ -235,6 +272,12 @@ public class SelectTagWindow extends Stage {
         return data;
     }
 
+    /**
+     * Permite leer los tags desde la base de datos
+     * @param con Conexión a la base de datos
+     * @param data Lista de filas de tags
+     * @param query Sentencia SQL
+     */
     private void readTags(Connection con, ObservableList<TagRow> data, String query) {
         try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
@@ -260,9 +303,11 @@ public class SelectTagWindow extends Stage {
         logger.log(Level.INFO, e.getMessage());
     }
 
+    /**
+     * Permite definir el tag seleccionado
+     */
     public void setSelectedTag() {
         ObservableList<TagRow> selected = selectionModel.getSelectedItems();
-
         if (!selected.isEmpty()) {
             this.selectedTagRow = selected.get(0).generateTag();
             this.cancelled = false;
@@ -272,6 +317,9 @@ public class SelectTagWindow extends Stage {
         }
     }
 
+    /**
+     * Permite mostrar una ventana de confirmación de selección de tag
+     */
     public void confirmExit() {
         alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia");
@@ -287,6 +335,9 @@ public class SelectTagWindow extends Stage {
         }
     }
 
+    /**
+     * Permite mostrar una ventana de advertencia
+     */
     public void setAlertIfTableIsEmpty() {
         alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia");

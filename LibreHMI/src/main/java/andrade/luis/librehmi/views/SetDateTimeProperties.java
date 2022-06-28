@@ -5,6 +5,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
+/**
+ * Ventana de definición de propiedades para la representación de fecha y hora
+ */
 public class SetDateTimeProperties extends SetTextPropertiesWindow {
     public TextField getDateTimeField() {
         return dateTimeField;
@@ -12,6 +15,9 @@ public class SetDateTimeProperties extends SetTextPropertiesWindow {
 
     private final TextField dateTimeField;
 
+    /**
+     * Constructor de la ventana
+     */
     public SetDateTimeProperties() {
         super(340,250);
         this.setTitle("Propiedades de Etiqueta de Fecha y Hora");

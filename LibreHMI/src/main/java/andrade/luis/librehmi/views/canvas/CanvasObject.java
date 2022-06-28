@@ -36,6 +36,9 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Clase que define el objeto CanvasObject, que será el padre de todas las figuras que se pueden agregar al canvas
+ */
 public class CanvasObject extends BorderPane {
     Logger logger = Logger.getLogger(this.getClass().getName());
     private Timeline visibilityTimeline;
@@ -60,6 +63,11 @@ public class CanvasObject extends BorderPane {
 
     private HMIUser user;
 
+    /**
+     * Permite definir la posición del canvas
+     * @param center Posición del objeto dentro del canvas
+     * @param force Bandera para forzar que el objeto se mueva
+     */
     public void setPosition(CanvasPoint center, boolean force) {
         this.canvasObjectData.setPosition(center);
         if (force) {
@@ -68,6 +76,10 @@ public class CanvasObject extends BorderPane {
         }
     }
 
+    /**
+     * Método que define la operación de copia hacia el portapapeles
+     * @param operation String que define el tipo de operación
+     */
     public void copy(String operation) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         this.canvasObjectData.setId(this.getId());
@@ -75,11 +87,17 @@ public class CanvasObject extends BorderPane {
         clipboard.setContents(this.canvasObjectData, null);
     }
 
+    /**
+     * Método que define la operación de cortar hacia el portapapeles
+     */
     public void cut() {
         this.copy("Cut");
         canvas.delete(this.canvasObjectData);
     }
 
+    /**
+     * Método que define la operación eliminación de la figura
+     */
     public void delete() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar eliminación");
@@ -98,6 +116,10 @@ public class CanvasObject extends BorderPane {
         }
     }
 
+    /**
+     * Permite actualizar el valor de un tag para el hilo de animación de visualización
+     * @param tag Tag para actualizar
+     */
     public void updateTag(Tag tag){
         if(visibilityTimeline!=null){
             ArrayList<Tag> parameters = this.getCanvasObjectData().getVisibilityExpression().getParameters();
@@ -110,6 +132,9 @@ public class CanvasObject extends BorderPane {
         }
     }
 
+    /**
+     * Permite ocultar el borde de la representación gráfica
+     */
     public void hideBorder() {
         CanvasObject.this.borderActive.set(false);
         CanvasObject.this.setStyle("");
@@ -124,6 +149,9 @@ public class CanvasObject extends BorderPane {
         }
     }
 
+    /**
+     * Permite mostrar el borde de la representación gráfica
+     */
     public void showBorder() {
         CanvasObject.this.setStyle("-fx-border-color: red;-fx-border-width: 2;");
         for (int i = 0; i < CanvasObject.this.getChildren().size(); i++) {
@@ -137,17 +165,28 @@ public class CanvasObject extends BorderPane {
         }
     }
 
+    /**
+     * Permite mostrar el menú de opciones
+     * @param screenX Posición en X para mostrar el menú
+     * @param screenY Posición en Y para mostrar el menú
+     */
     public void showContextMenu(double screenX, double screenY) {
         rightClickMenu.show(CanvasObject.this, screenX, screenY);
         showBorder();
     }
 
+    /**
+     * Permite definir la acción cuando se da doble clic en la representación gráfica
+     */
     protected EventHandler<MouseEvent> onDoubleClick = t -> {
         if (t.getButton() == MouseButton.PRIMARY && t.getClickCount() == 2) {
             CanvasObject.this.hmiApp.loginUser("Ejecutar");
         }
     };
 
+    /**
+     * Permite definir la acción cuando se da clic en la representación gráfica
+     */
     private final EventHandler<MouseEvent> onMyMousePressed = t->{
             start = new CanvasPoint(t.getSceneX(), t.getSceneY());
             end = new CanvasPoint(((BorderPane) (t.getSource())).getTranslateX(), ((BorderPane) (t.getSource())).getTranslateY());
@@ -157,6 +196,9 @@ public class CanvasObject extends BorderPane {
             }
     };
 
+    /**
+     * Permite definir la acción cuando se arrastra la representación gráfica
+     */
     private final EventHandler<MouseEvent> onMyMouseDragged = t -> {
             double offsetX = t.getSceneX() - start.getX();
             double offsetY = t.getSceneY() - start.getY();
@@ -173,11 +215,17 @@ public class CanvasObject extends BorderPane {
             }
     };
 
+    /**
+     * Permite definir la acción cuando el mouse se alza luego de dar clic en la representación gráfica
+     */
     private final EventHandler<MouseEvent> onMyMouseReleased = mouseEvent -> {
         CanvasObject.this.getCanvasObjectData().setSelected(false);
         CanvasObject.this.setCursor(Cursor.DEFAULT);
     };
 
+    /**
+     * Permite definir la acción cuando se da clic en la representación gráfica
+     */
     private final EventHandler<MouseEvent> onMyMouseClicked = mouseEvent -> {
         if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 1) {
             this.setSelected(true);
@@ -186,7 +234,10 @@ public class CanvasObject extends BorderPane {
         }
     };
 
-
+    /**
+     * Permite definir la representación como seleccionada
+     * @param selected Bandera que determina si la figura esta seleccionada
+     */
     public void setSelected(boolean selected) {
         this.canvasObjectData.setSelected(selected);
         if (this.canvasObjectData.isSelected()) {
@@ -203,6 +254,10 @@ public class CanvasObject extends BorderPane {
         return canvasObjectData.isSelected();
     }
 
+    /**
+     * Permite definir la posición de la representación gráfica
+     * @param center Posición de la figura dentro del canvas
+     */
     public void setPosition(CanvasPoint center) {
 
         this.canvasObjectData.setPosition(center);
@@ -217,6 +272,10 @@ public class CanvasObject extends BorderPane {
 
     }
 
+    /**
+     * Constructor para pegar un CanvasObject copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasObject(CanvasObjectData canvasObjectData) {
         super();
 
@@ -241,10 +300,16 @@ public class CanvasObject extends BorderPane {
         setContextMenu();
     }
 
+    /**
+     * Permite eliminar los elementos del menú contextual
+     */
     public void clearContextMenu() {
         rightClickMenu.getItems().clear();
     }
 
+    /**
+     * Permite definir el menú contextual con sus opciones básicas
+     */
     public void setContextMenu() {
         rightClickMenu = new ContextMenu();
         rightClickMenu.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
@@ -271,6 +336,10 @@ public class CanvasObject extends BorderPane {
         rightClickMenu.getItems().addAll(copyMenuItem, cutMenuItem, resizeMI, deleteMenuItem,visibilityAnimationMI);
     }
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasObject al canvas
+     * @param positionCanvasPoint Posición del objeto en el canvas
+     */
     public CanvasObject(CanvasPoint positionCanvasPoint) {
         super();
 
@@ -287,11 +356,20 @@ public class CanvasObject extends BorderPane {
         setContextMenu();
     }
 
+    /**
+     * Permite modificar el tamaño de la representación gráfica
+     * @param width Ancho de la representación
+     * @param height Alto de la representación
+     */
     public void setSize(double width, double height) {
         setPrefWidth(width);
         setPrefHeight(height);
     }
 
+    /**
+     * Permite habilitar o deshabilitar los listeners para el clic, arrastre, soltar de la representación gráfica
+     * @param enabled Bandera para habilitar los listeners de la representación gráfica
+     */
     public void enableListeners(boolean enabled) {
         if (enabled) {
             this.setOnMousePressed(onMyMousePressed);
@@ -433,6 +511,11 @@ public class CanvasObject extends BorderPane {
         return rightClickMenu;
     }
 
+    /**
+     * Permite actualizar el hilo con un nuevo valor del tag
+     * @param linkedTag Tag enlazado
+     * @param timeline Timeline a ser actualizado
+     */
     public void updateTimeline(Tag linkedTag, Timeline timeline){
         if (linkedTag != null && timeline!=null) {
             linkedTag.setValue(this.getCanvasObjectData().getData());
@@ -454,6 +537,11 @@ public class CanvasObject extends BorderPane {
         }
     }
 
+    /**
+     * Permite actualizar el valor de un tag y retornar dicho valor
+     * @param tag Tag
+     * @return Valor del tag actualizado
+     */
     public String updateInputTag(Tag tag){
         int floatPrecision = this.getCanvasObjectData().getTag().getFloatPrecision();
         updateTag(tag);

@@ -25,6 +25,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+/**
+ * Clase que define el objeto CanvasText, que permitirá mostrar el valor de un tag o de un valor definido por el usuario
+ */
 public class CanvasText extends CanvasLabel {
     private String text;
 
@@ -42,6 +45,10 @@ public class CanvasText extends CanvasLabel {
         this.text = text;
     }
 
+    /**
+     * Constructor para pegar un CanvasText copiado o regenerarlo desde el archivo
+     * @param canvasObjectData CanvasObjectData conteniendo la información del objeto a generar
+     */
     public CanvasText(CanvasObjectData canvasObjectData) {
         super(canvasObjectData);
         this.getCanvasObjectData().setType("Text");
@@ -50,6 +57,11 @@ public class CanvasText extends CanvasLabel {
         setData();
     }
 
+    /**
+     * Constructor que permite agregar un nuevo CanvasText al canvas
+     * @param content Texto del label
+     * @param center Posición del objeto
+     */
     public CanvasText(String content, CanvasPoint center) {
         super(content, center);
         this.getCanvasObjectData().setType("Text");
@@ -59,6 +71,9 @@ public class CanvasText extends CanvasLabel {
         setData();
     }
 
+    /**
+     * Permite definir los datos del objeto
+     */
     private void setData() {
         this.setContextMenu();
         this.setExpression(this.getCanvasObjectData().getExpression());
@@ -81,6 +96,10 @@ public class CanvasText extends CanvasLabel {
         this.setRotate(this.getCanvasObjectData().getRotation());
     }
 
+    /**
+     * Permite mostrar la ventana de definición de propiedades del texto y modificar la representación
+     * con los nuevos datos definidos
+     */
     @Override
     public void setProperties() {
         SetTextPropertiesWindow propertiesWindow = new SetTextPropertiesWindow();
@@ -99,6 +118,9 @@ public class CanvasText extends CanvasLabel {
         this.getHmiApp().setWasModified(true);
     }
 
+    /**
+     * Permite mostrar la ventana de definición de expresión asociada a la rerpesentación
+     */
     private void setExpression() {
         WriteExpressionWindow writeExpressionWindow = new WriteExpressionWindow();
         writeExpressionWindow.setTitle("Propiedades de valor del Texto");
@@ -134,6 +156,10 @@ public class CanvasText extends CanvasLabel {
         }
     }
 
+    /**
+     * Permite asociar la expresión definida desde la ventana al objeto
+     * @param expression Expresión a ser asociada al objeto
+     */
     public void setExpression(Expression expression) {
         if (expression != null) {
             this.getCanvasObjectData().setExpression(expression);
@@ -141,6 +167,9 @@ public class CanvasText extends CanvasLabel {
         }
     }
 
+    /**
+     * Permite definir el hilo de actualización del valor de la expresión asociada al objeto
+     */
     public void setTimeline() {
         timeline = new Timeline(
                 new KeyFrame(
