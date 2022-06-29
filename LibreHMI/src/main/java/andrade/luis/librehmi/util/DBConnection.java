@@ -26,6 +26,7 @@ public class DBConnection {
     public static Connection createConnection(String schema) throws SQLException, IOException {
         Properties properties = readPropertiesFile();
         Connection con;
+
         if (!schema.isEmpty()) schema = "/".concat(schema);
         String url = "jdbc:mysql://" + properties.getProperty("hostname") + ":" + properties.getProperty("port") + schema; //MySQL URL and followed by the database name
         String username = properties.getProperty("username"); //MySQL username

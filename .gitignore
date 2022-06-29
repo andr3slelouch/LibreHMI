@@ -1,6 +1,7 @@
 /LibreHMI/.idea/sonarlint/
-*.xml
 LibreHMI/.idea/sonarlint/issuestore/index.pb
 *.pb
 /LibreHMI/target/
 *.class
+/.idea/
+/LibreHMI/.idea/
