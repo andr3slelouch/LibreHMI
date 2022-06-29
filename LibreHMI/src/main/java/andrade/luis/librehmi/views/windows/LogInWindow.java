@@ -23,6 +23,9 @@ import static javafx.geometry.Pos.CENTER;
  */
 public class LogInWindow extends Stage {
     private final StackPane root;
+    public final TextField usernameEmailField;
+    public final PasswordField passwordField;
+    public final Button signInButton;
 
     public HMIUser getLoggedUser() {
         return loggedUser;
@@ -46,19 +49,22 @@ public class LogInWindow extends Stage {
         titleHBox.setAlignment(CENTER);
 
         Label usernameEmailLabel = new Label("Nombre de Usuario/Email:");
-        TextField usernameEmailField = new TextField("");
+        this.usernameEmailField = new TextField("");
+        usernameEmailField.setId("#usernameField");
         HBox usernameEmailHBox = new HBox(usernameEmailLabel, usernameEmailField);
         usernameEmailHBox.setSpacing(10);
 
         Label passwordLabel = new Label("Contraseña:");
-        PasswordField passwordField = new PasswordField();
+        this.passwordField = new PasswordField();
+        passwordField.setId("#passwordField");
 
         HBox passwordHBox = new HBox(passwordLabel, passwordField);
         passwordHBox.setSpacing(100);
 
         HBox signInHBox = new HBox();
         signInHBox.setAlignment(CENTER);
-        Button signInButton = new Button("Iniciar Sesión");
+        this.signInButton = new Button("Iniciar Sesión");
+        signInButton.setId("#logInBtn");
         signInButton.setOnAction(mouseEvent -> {
             Logger logger = Logger.getLogger(this.getClass().getName());
             try {

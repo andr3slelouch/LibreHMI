@@ -1,4 +1,4 @@
 --patch-module
-andrade.luis.hmiethernetip=_
+andrade.luis.librehmi=_
 --add-reads
-andrade.luis.hmiethernetip=ALL-UNNAMED
+andrade.luis.librehmi=ALL-UNNAMED
