@@ -1,0 +1,6 @@
+projectKey=LibreHMI
+serverUrl=http://localhost:9005
+serverVersion=9.3.0.51899
+dashboardUrl=http://localhost:9005/dashboard?id=LibreHMI
+ceTaskId=AYGjilWHZHxGpq7U3EQo
+ceTaskUrl=http://localhost:9005/api/ce/task?id=AYGjilWHZHxGpq7U3EQo

@@ -288,7 +288,6 @@ public class HMIApp extends Application {
      */
     public void setHMIStage(String filenamePath, String mode) throws IOException {
         if (mode.equals(EDITAR_STR)) {
-            user = null;
             loginUser(mode);
             this.modeLabel = EJECUTAR_STR;
             this.mode = EDITAR_STR;
@@ -1119,9 +1118,9 @@ public class HMIApp extends Application {
                 new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
         );
         File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            loadHMIData(file.getAbsolutePath());
-        }
+
+        loadHMIData(file.getAbsolutePath());
+
     }
 
     /**

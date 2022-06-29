@@ -1,4 +1,4 @@
-module andrade.luis.librehmi {
+module andrade.luis.hmiethernetip {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;

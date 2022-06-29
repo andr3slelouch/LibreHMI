@@ -4,4 +4,3 @@ LibreHMI/.idea/sonarlint/issuestore/index.pb
 *.pb
 /LibreHMI/target/
 *.class
-*.class
