@@ -1,5 +1,6 @@
-/HMIEthernetIP/target/
-/HMIEthernetIP/.idea/sonarlint/
+/LibreHMI/.idea/sonarlint/
 *.xml
-HMIEthernetIP/.idea/sonarlint/issuestore/index.pb
+LibreHMI/.idea/sonarlint/issuestore/index.pb
 *.pb
+/LibreHMI/target/
+*.class
