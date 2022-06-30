@@ -103,7 +103,6 @@ public class SelectTagWindow extends Stage {
                         localTag.getAddress(),
                         localTag.getAction()
                 );
-                row.setTagValue(localTag.getValue());
                 existingTagsObsList.add(row);
             }
         }
@@ -130,7 +129,13 @@ public class SelectTagWindow extends Stage {
 
 
         finishSelectionButton.setAlignment(Pos.CENTER);
-        finishSelectionButton.setOnAction(actionEvent -> setSelectedTag());
+        finishSelectionButton.setOnAction(actionEvent -> {
+            try {
+                setSelectedTag();
+            } catch (SQLException | IOException e) {
+                log(e.getMessage());
+            }
+        });
         HBox hbox = new HBox();
         hbox.getChildren().add(finishSelectionButton);
         hbox.setAlignment(Pos.BASELINE_RIGHT);
@@ -192,7 +197,7 @@ public class SelectTagWindow extends Stage {
                     localTags.add(manageLocalTagWindow.getTag());
                 }
             } catch (SQLException | IOException e) {
-                log(e);
+                log(e.getMessage());
             }
 
         });
@@ -217,7 +222,7 @@ public class SelectTagWindow extends Stage {
                     localTags.set(index, manageLocalTagWindow.getTag());
                 }
             } catch (SQLException | IOException e) {
-                log(e);
+                log(e.getMessage());
             }
 
         });
@@ -243,9 +248,9 @@ public class SelectTagWindow extends Stage {
 
     /**
      * Permite obtener una lista de filas de tag con los tags existentes
-     * @param inputMode
-     * @param filter
-     * @return
+     * @param inputMode Bandera de definición de filtro de tags de escritura
+     * @param filter Filtro para aplicar en cuanto al tipo
+     * @return Lista de filas para la tabla
      */
     public ObservableList<TagRow> getExistingTags(boolean inputMode, String filter) {
         String query = "SELECT p.plcNombre, p.direccionIP,p.deviceGroup,t.nombreTag,t.tipoTag,t.tag,t.accion from plcs p , tags t, intermedia i WHERE p.idPLCS = i.idPLCS  AND t.idTAGS = i.idTAGS ";
@@ -267,7 +272,7 @@ public class SelectTagWindow extends Stage {
         try (Connection con = DBConnection.createConnectionToBDDriverEIP()) {
             readTags(con, data, query);
         } catch (SQLException | IOException e) {
-            log(e);
+            log(e.getMessage());
         }
         return data;
     }
@@ -279,9 +284,11 @@ public class SelectTagWindow extends Stage {
      * @param query Sentencia SQL
      */
     private void readTags(Connection con, ObservableList<TagRow> data, String query) {
+        log(query);
         try (Statement statement = con.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
+                log(resultSet.getString("nombreTag"));
                 TagRow row = new TagRow(
                         resultSet.getString("plcNombre"),
                         resultSet.getString("direccionIP"),
@@ -290,23 +297,24 @@ public class SelectTagWindow extends Stage {
                         resultSet.getString("tipoTag"),
                         resultSet.getString("tag"),
                         resultSet.getString("accion"));
-                row.setTagValue("");
                 data.add(row);
+                log("Size:"+ data.size());
             }
         } catch (Exception e) {
-            log(e);
+            e.printStackTrace();
+            log("Error cacthed"+e.getMessage());
         }
     }
 
-    private void log(Exception e) {
+    private void log(String e) {
         Logger logger = Logger.getLogger(this.getClass().getName());
-        logger.log(Level.INFO, e.getMessage());
+        logger.log(Level.INFO, e);
     }
 
     /**
      * Permite definir el tag seleccionado
      */
-    public void setSelectedTag() {
+    public void setSelectedTag() throws SQLException, IOException {
         ObservableList<TagRow> selected = selectionModel.getSelectedItems();
         if (!selected.isEmpty()) {
             this.selectedTagRow = selected.get(0).generateTag();

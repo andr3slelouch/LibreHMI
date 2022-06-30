@@ -4,6 +4,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.SimpleStringProperty;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
  * Clase que contendrá los datos de un tag en cada fila de una tabla de selección de tags
  * o de administración de tag locales
@@ -96,17 +99,6 @@ public class TagRow {
         this.tagAction.set(tagAction);
     }
 
-    public String getTagValue() {
-        return tagValue.get();
-    }
-
-    public SimpleStringProperty tagValueProperty() {
-        return tagValue;
-    }
-
-    public void setTagValue(String tagValue) {
-        this.tagValue.set(tagValue);
-    }
 
     @SerializedName("plcName")
     @Expose
@@ -129,9 +121,7 @@ public class TagRow {
     @SerializedName("tagAction")
     @Expose
     private final SimpleStringProperty tagAction;
-    @SerializedName("tagValue")
-    @Expose
-    private SimpleStringProperty tagValue;
+
 
     public TagRow(String plcName, String plcAddress, String plcDeviceGroup, String tagName, String tagType, String tagAddress, String tagAction) {
         this.plcName = new SimpleStringProperty(plcName);
@@ -143,11 +133,13 @@ public class TagRow {
         this.tagAction = new SimpleStringProperty(tagAction);
     }
 
-    public Tag generateTag() {
-        Tag tag = new Tag(getTagName(), getTagType(), getTagAddress(), getTagAction(), getTagValue(), 0);
+    public Tag generateTag() throws SQLException, IOException {
+        Tag tag = new Tag(getTagName(), getTagType(), getTagAddress(), getTagAction(), "", 0);
         tag.setPLCValues(getPlcName(), getPlcAddress(), getPlcDeviceGroup());
         if (tag.getPlcName().equals("LibreHMI") && tag.getPlcAddress().equals("localhost") && tag.getPlcDeviceGroup().equals("Local") && tag.getAddress().equals("Local")) {
             tag.setLocalTag(true);
+        }else{
+            tag.read();
         }
         return tag;
     }

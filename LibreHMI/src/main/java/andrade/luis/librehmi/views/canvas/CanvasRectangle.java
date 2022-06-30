@@ -181,6 +181,8 @@ public class CanvasRectangle extends CanvasObject {
                 this.getCanvasObjectData().setMinValue(writeExpressionWindow.getMinValue());
                 this.getCanvasObjectData().setMaxValue(writeExpressionWindow.getMaxValue());
                 this.getCanvasObjectData().setSamplingTime(this.getCanvasObjectData().getSamplingTime()<1 ? 1:this.getCanvasObjectData().getSamplingTime());
+                this.setRefillRectangleTimeline();
+                this.refillRectangleTimeline.play();
             }
         } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
