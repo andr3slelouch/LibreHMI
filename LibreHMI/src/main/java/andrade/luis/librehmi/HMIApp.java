@@ -563,7 +563,13 @@ public class HMIApp extends Application {
                 int finalI = i;
                 recentMenuItem.setOnAction(mouseEvent -> {
                     try {
-                        this.loadHMIData(menuItems.get(finalI));
+                        if (wasModified) {
+                            if(showSaveDialog(false,"")){
+                                this.loadHMIData(menuItems.get(finalI));
+                            }
+                        } else {
+                            this.loadHMIData(menuItems.get(finalI));
+                        }
                     } catch (IOException e) {
                         showAlert(Alert.AlertType.ERROR, "Error al cargar archivo reciente","Existió un error al cargar un archivo reciente" ,e.getMessage());
                     }
@@ -1780,7 +1786,7 @@ public class HMIApp extends Application {
      * Permite mostrar el diálogo de guardar cambios
      * @param errorMode Bandera para indicar que se trata de un error
      * @param message Mensaje a mostrarse en la ventana
-     * @return true si el usuario da clic en Guardar
+     * @return false si el usuario da clic en Cancelar
      */
     public boolean showSaveDialog(boolean errorMode, String message) {
         Alert alert;
