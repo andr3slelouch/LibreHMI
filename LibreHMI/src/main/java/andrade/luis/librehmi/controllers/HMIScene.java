@@ -72,6 +72,7 @@ public class HMIScene extends Scene {
         this.hmiSceneData.setBackground(new CanvasColor(background));
         this.background = background;
         this.backgroundScrollPane.setBackground(new Background(new BackgroundFill(background, CornerRadii.EMPTY, Insets.EMPTY)));
+        this.backgroundScrollPane.setStyle("-background-color: "+this.hmiSceneData.getBackground().toHexString());
     }
 
     public String getSceneCommentary() {
@@ -220,6 +221,8 @@ public class HMIScene extends Scene {
                 if (selected != null) {
                     selected.delete();
                 }
+            } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                this.getCanvas().setAddOnClickEnabled(false);
             }
         });
     }

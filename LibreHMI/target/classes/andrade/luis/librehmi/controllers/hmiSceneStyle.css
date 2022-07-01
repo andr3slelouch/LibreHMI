@@ -13,7 +13,7 @@
 }
 
 .scroll-pane .viewport {
-    -fx-background-color: -background-color; /*or whatever you want*/
+    -fx-background-color: -background-color;
 }
 
 .scroll-pane {
