@@ -35,6 +35,7 @@ public class SetWindowPropertiesWindow extends Stage {
     }
 
     private boolean cancelled =true;
+    private boolean isCreating = false;
     private TextField nameField;
     private TextField commentField;
     private ColorPicker windowColorPicker;
@@ -45,6 +46,7 @@ public class SetWindowPropertiesWindow extends Stage {
      */
     public SetWindowPropertiesWindow(){
         init("","",Color.WHITESMOKE);
+        this.isCreating = true;
     }
 
     /**
@@ -55,6 +57,7 @@ public class SetWindowPropertiesWindow extends Stage {
      */
     public SetWindowPropertiesWindow(String title, String commentary, Color color){
         init(title,commentary,color);
+        this.isCreating = false;
     }
 
     /**
@@ -91,10 +94,9 @@ public class SetWindowPropertiesWindow extends Stage {
         finishButton.setOnAction(actionEvent -> {
             if(nameField.getText().isEmpty()){
                 confirmExit(Alert.AlertType.WARNING, "Advertencia","El campo nombre no puede estar vacío");
-            } else if(windowsTitles.contains(nameField.getText())){
+            } else if(windowsTitles.contains(nameField.getText()) && isCreating){
                 confirmExit(Alert.AlertType.ERROR, "Error","Ya existe una página con el nombre '"+nameField.getText()+"',utilice un nombre diferente");
-            }
-            else{
+            } else{
                 cancelled = false;
                 this.close();
             }

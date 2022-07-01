@@ -1505,11 +1505,12 @@ public class HMIApp extends Application {
             setWindowPropertiesWindow.showAndWait();
             if (!setWindowPropertiesWindow.isCancelled()) {
                 scene.update(setWindowPropertiesWindow.getNameField().getText(), setWindowPropertiesWindow.getCommentField().getText(), setWindowPropertiesWindow.getWindowColorPicker().getValue());
-                pages.set(index, scene);
+                this.pages.set(index, scene);
                 for (HMIScene page : pages) {
                     pagesTitles.set(index, page.getTitle());
                     page.updateItem(index, scene.getTitle());
                 }
+                setWasModified(true);
             }
         }
     }
@@ -1611,7 +1612,7 @@ public class HMIApp extends Application {
 
     /**
      * Permite cargar los datos de una escena a una página
-     * @throws IOException
+     * @throws IOException Si existen problemas para leer los datos de la página
      */
     private void loadSceneData() throws IOException {
         FileChooser fileChooser = new FileChooser();
@@ -1633,7 +1634,7 @@ public class HMIApp extends Application {
     /**
      * Permite cargar los datos de una escena de una página
      * @param filenamePath Path del archivo de página
-     * @throws IOException
+     * @throws IOException Si existen problemas para leer los datos de la página
      */
     private void loadSceneData(String filenamePath) throws IOException {
         String[] filenamePathArr = filenamePath.split("\\.");

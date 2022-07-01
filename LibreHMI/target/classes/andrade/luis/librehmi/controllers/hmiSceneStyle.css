@@ -7,3 +7,15 @@
 .deactivatedAlarm{
     -fx-text-background-color: black;
 }
+
+.scroll-pane{
+    -background-color: #f5f5f5;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: -background-color; /*or whatever you want*/
+}
+
+.scroll-pane {
+    -fx-background-color:transparent;
+}

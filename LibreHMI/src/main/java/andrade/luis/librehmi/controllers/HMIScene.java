@@ -23,6 +23,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Esta clase se encargará de contener el canvas, y de administrar ciertas propiedades
@@ -59,6 +61,7 @@ public class HMIScene extends Scene {
 
     public void setTitle(String title) {
         this.title = title;
+        this.hmiSceneData.setTitle(title);
     }
 
     public Color getBackground() {
@@ -66,6 +69,7 @@ public class HMIScene extends Scene {
     }
 
     public void setBackground(Color background) {
+        this.hmiSceneData.setBackground(new CanvasColor(background));
         this.background = background;
         this.backgroundScrollPane.setBackground(new Background(new BackgroundFill(background, CornerRadii.EMPTY, Insets.EMPTY)));
     }
@@ -76,6 +80,7 @@ public class HMIScene extends Scene {
 
     public void setSceneCommentary(String sceneCommentary) {
         this.sceneCommentary = sceneCommentary;
+        this.hmiSceneData.setSceneCommentary(sceneCommentary);
     }
 
     public HMIApp getHmiApp() {
@@ -91,6 +96,11 @@ public class HMIScene extends Scene {
 
     private HMIApp hmiApp;
 
+    /**
+     * Permite actualizar los títulos de las páginas en los menús laterales de cada página
+     * @param index Índice de la página a actualizar
+     * @param value Título nuevo de la página
+     */
     public void updateItem(int index, String value){
         this.listViewReference.getItems().set(index, value);
     }
@@ -147,6 +157,9 @@ public class HMIScene extends Scene {
                             hmiApp.changeSelectedScene(getItem());
                         }
                     });
+                    if(hmiSceneData.getSceneCommentary()!=null && !hmiSceneData.getSceneCommentary().isEmpty()){
+                        setTooltip(new Tooltip(hmiSceneData.getSceneCommentary()));
+                    }
                 }
             }
         });
@@ -190,6 +203,8 @@ public class HMIScene extends Scene {
         this.hmiSceneData.setSceneCommentary(sceneCommentary);
         this.hmiCanvas = hmiCanvas;
         this.hmiSceneData.setBackground(new CanvasColor((Color) paint));
+        scrollPane.setStyle("-background-color: "+this.hmiSceneData.getBackground().toHexString());
+        this.setFill(paint);
         this.getStylesheets().add(getClass().getResource("hmiSceneStyle.css").toExternalForm());
         this.setOnMouseClicked(mouseEvent -> {
             if (this.hmiCanvas.isAddOnClickEnabled()) {
