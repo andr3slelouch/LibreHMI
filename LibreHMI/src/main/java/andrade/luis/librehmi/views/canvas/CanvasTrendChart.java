@@ -33,12 +33,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -472,16 +467,13 @@ public class CanvasTrendChart extends CanvasObject {
         this.endRangeSlider.setMax(sliderRange);
         this.endRangeSlider.setValue(sliderRange);
         if (isFilterEnabled) {
-            LocalDateTime startD = convertStringToLocalDateTime(convertSliderValueToString(sliderLocalDateTime, startRangeSlider.getValue()));
-            LocalDateTime endD = convertStringToLocalDateTime(convertSliderValueToString(sliderLocalDateTime, endRangeSlider.getValue()));
+            LocalDateTime startD = sliderLocalDateTime.plusSeconds(((Double)startRangeSlider.getValue()).longValue());
+            LocalDateTime endD = sliderLocalDateTime.plusSeconds(((Double)endRangeSlider.getValue()).longValue());
             this.lineChart.getData().clear();
-            for (XYChart.Series<String, Number> lineChartSerie : this.lineChartSeries) {
+            for (XYChart.Series<LocalDateTime, Number> lineChartSerie : this.lineChartSeriesToExport) {
                 XYChart.Series<String, Number> filteredSerie = filterSerie(startD, endD, lineChartSerie);
                 if (showingExpressions.contains(filteredSerie.getName())) {
                     this.lineChart.getData().add(filteredSerie);
-                    logger.log(Level.INFO,"Filtered");
-                }else{
-                    logger.log(Level.INFO,"Not Filtered");
                 }
             }
         } else {
@@ -491,9 +483,6 @@ public class CanvasTrendChart extends CanvasObject {
             for (XYChart.Series<String, Number> lineChartSerie : this.lineChartSeries) {
                 if (showingExpressions.contains(lineChartSerie.getName()) && !this.lineChart.getData().contains(lineChartSerie)) {
                     this.lineChart.getData().add(lineChartSerie);
-                    logger.log(Level.INFO,"UnFiltered");
-                }else{
-                    logger.log(Level.INFO,"Not UnFiltered");
                 }
             }
         }
@@ -507,37 +496,16 @@ public class CanvasTrendChart extends CanvasObject {
      * @param serie Serie a la cual se aplicará el filtro
      * @return Serie filtrada
      */
-    public XYChart.Series<String, Number> filterSerie(LocalDateTime start, LocalDateTime end, XYChart.Series<String, Number> serie) {
+    public XYChart.Series<String, Number> filterSerie(LocalDateTime start, LocalDateTime end, XYChart.Series<LocalDateTime, Number> serie) {
         XYChart.Series<String, Number> filteredSerie = new XYChart.Series<>();
         for (int i = 0; i < serie.getData().size(); i++) {
-            LocalDateTime serieDateTime = convertStringToLocalDateTime(serie.getData().get(i).getXValue());
+            LocalDateTime serieDateTime = serie.getData().get(i).getXValue();
             if (serieDateTime.isAfter(start) && serieDateTime.isBefore(end)) {
-                filteredSerie.getData().add(serie.getData().get(i));
+                filteredSerie.getData().add(new LineChart.Data<>(dtf.format(serieDateTime), serie.getData().get(i).getYValue()));
             }
         }
         filteredSerie.setName(serie.getName());
         return filteredSerie;
-    }
-
-    /**
-     * Permite convertir una fecha y hora de String a LocalDateTime
-     * @param dateFormatString Fecha y hora en string
-     * @return LocalDateTime obtenido a partir de la fecha y hora
-     */
-    public LocalDateTime convertStringToLocalDateTime(String dateFormatString) {
-        Locale spanishLocale = new Locale("es", "ES");
-        DateFormat dateFormat = new SimpleDateFormat(DISPLAY_FORMAT, spanishLocale);
-        Date startD = null;
-        try {
-            startD = dateFormat.parse(dateFormatString);
-        } catch (ParseException e) {
-            logger.log(Level.INFO,e.getMessage());
-        }
-        if (startD == null) {
-            return null;
-        } else {
-            return Instant.ofEpochMilli(startD.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
     }
 
     /**
@@ -592,6 +560,9 @@ public class CanvasTrendChart extends CanvasObject {
     private void updateTrendChartSerieData(TrendChartSerieData trendChartSerieData, int index, LocalDateTime now){
         if (trendChartSerieData != null && lineChartSeries.get(index).getName().equals(trendChartSerieData.getSerieDataName())) {
             try {
+                if(lineChartSeries.get(index).getData().size()>31){
+                    lineChartSeries.get(index).getData().remove(0);
+                }
                 lineChartSeries.get(index).getData().add(new LineChart.Data<>(dtf.format(now), (double) trendChartSerieData.getExpression().evaluate()));
                 lineChartSeriesToExport.get(index).getData().add(new LineChart.Data<>(now, (double) trendChartSerieData.getExpression().evaluate()));
             } catch (CompileException | InvocationTargetException | SQLException |
