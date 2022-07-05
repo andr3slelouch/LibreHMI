@@ -322,5 +322,8 @@ public class WriteExpressionWindow extends Stage {
     public TextField getSamplingTimeTextField() {
         return samplingTimeTextField;
     }
+    public void setDone(boolean done) {
+        this.done = done;
+    }
 
 }

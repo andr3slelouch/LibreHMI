@@ -29,10 +29,12 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     private TextField highLimitTF;
     private TextField loloLimitTF;
     private TextField lowLimitTF;
+    private boolean isCreating = false;
     private final HMIApp hmiApp;
 
     /**
      * Constructor de ventana
+     *
      * @param hmiApp Objeto de aplicación
      */
     public SetAlarmWindow(HMIApp hmiApp) {
@@ -110,7 +112,7 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     /**
      * Permite inicializar los campos de alto-alto
      */
-    private void initHiHiLimitField(){
+    private void initHiHiLimitField() {
         hiHiLimitCheckBox = new CheckBox("HiHi");
         hiHiLimitTF = new TextField("0");
         hiHiLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
@@ -132,7 +134,7 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     /**
      * Permite inicializar los campos de alto
      */
-    private void initHighLimitField(){
+    private void initHighLimitField() {
         highLimitCheckBox = new CheckBox("High");
         highLimitTF = new TextField("0");
         highLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
@@ -154,7 +156,7 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     /**
      * Permite inicializar los campos de bajo-bajo
      */
-    private void initLoloLimitField(){
+    private void initLoloLimitField() {
         loloLimitCheckBox = new CheckBox("LoLo");
         loloLimitTF = new TextField("0");
         loloLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
@@ -176,7 +178,7 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     /**
      * Permite inicializar los campos de bajo
      */
-    private void initLowLimitField(){
+    private void initLowLimitField() {
         lowLimitCheckBox = new CheckBox("Low");
         lowLimitTF = new TextField("0");
         lowLimitTF.setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), 0.0, numberFilter));
@@ -202,58 +204,61 @@ public class SetAlarmWindow extends WriteExpressionWindow {
     public void finishingAction() {
         if (
                 (
-                        Double.parseDouble(hiHiLimitTF.getText()) < Double.parseDouble(highLimitTF.getText())
+                        (Double.parseDouble(hiHiLimitTF.getText()) < Double.parseDouble(highLimitTF.getText()) && highLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(hiHiLimitTF.getText()) < Double.parseDouble(lowLimitTF.getText())
+                                (Double.parseDouble(hiHiLimitTF.getText()) < Double.parseDouble(lowLimitTF.getText()) && lowLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(hiHiLimitTF.getText()) < Double.parseDouble(loloLimitTF.getText())
+                                (Double.parseDouble(hiHiLimitTF.getText()) < Double.parseDouble(loloLimitTF.getText()) && loloLimitCheckBox.isSelected())
                 ) && hiHiLimitCheckBox.isSelected()
         ) {
             confirmExit(Alert.AlertType.ERROR, "Error en límites de HiHi", "El límite HiHi debe ser mayor que los demás límites");
         } else if (
                 (
-                        Double.parseDouble(highLimitTF.getText()) > Double.parseDouble(hiHiLimitTF.getText())
+                        (Double.parseDouble(highLimitTF.getText()) > Double.parseDouble(hiHiLimitTF.getText()) && highLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(highLimitTF.getText()) < Double.parseDouble(lowLimitTF.getText())
+                                (Double.parseDouble(highLimitTF.getText()) < Double.parseDouble(lowLimitTF.getText()) && lowLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(highLimitTF.getText()) < Double.parseDouble(loloLimitTF.getText())
+                                (Double.parseDouble(highLimitTF.getText()) < Double.parseDouble(loloLimitTF.getText()) && loloLimitCheckBox.isSelected())
                 ) && highLimitCheckBox.isSelected()
         ) {
             confirmExit(Alert.AlertType.ERROR, "Error en límites de High", "El límite High debe ser mayor que los límites Low y Lolo, así como menor que el límite HiHi");
         } else if (
                 (
-                        Double.parseDouble(lowLimitTF.getText()) > Double.parseDouble(hiHiLimitTF.getText())
+                        (Double.parseDouble(lowLimitTF.getText()) > Double.parseDouble(hiHiLimitTF.getText()) && hiHiLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(lowLimitTF.getText()) > Double.parseDouble(highLimitTF.getText())
+                                (Double.parseDouble(lowLimitTF.getText()) > Double.parseDouble(highLimitTF.getText()) && highLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(lowLimitTF.getText()) < Double.parseDouble(loloLimitTF.getText())
+                                (Double.parseDouble(lowLimitTF.getText()) < Double.parseDouble(loloLimitTF.getText()) && loloLimitCheckBox.isSelected())
                 ) && lowLimitCheckBox.isSelected()
         ) {
             confirmExit(Alert.AlertType.ERROR, "Error en límites de Low", "El límite Low debe ser mayor que el límite Lolo, así como menor que los límites HiHi y High");
         } else if (
                 (
-                        Double.parseDouble(loloLimitTF.getText()) > Double.parseDouble(hiHiLimitTF.getText())
+                        (Double.parseDouble(loloLimitTF.getText()) > Double.parseDouble(hiHiLimitTF.getText()) && hiHiLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(loloLimitTF.getText()) > Double.parseDouble(highLimitTF.getText())
+                                (Double.parseDouble(loloLimitTF.getText()) > Double.parseDouble(highLimitTF.getText()) && highLimitCheckBox.isSelected())
                                 ||
-                                Double.parseDouble(loloLimitTF.getText()) > Double.parseDouble(lowLimitTF.getText())
+                                (Double.parseDouble(loloLimitTF.getText()) > Double.parseDouble(lowLimitTF.getText()) && lowLimitCheckBox.isSelected())
                 ) && loloLimitCheckBox.isSelected()
         ) {
             confirmExit(Alert.AlertType.ERROR, "Error en límites de Lolo", "El límite Low debe ser menor que los demás límites");
-        } else if(alarmNameTF.getText().isEmpty()){
+        } else if (alarmNameTF.getText().isEmpty()) {
             confirmExit(Alert.AlertType.ERROR, "Error en nombre de alarma", "El nombre de la alarma no debe estar vacío");
-        } else if(hmiApp.getIndexForAlarm(alarmNameTF.getText()) != -1){
+        } else if (hmiApp.getIndexForAlarm(alarmNameTF.getText()) != -1 && isCreating) {
             confirmExit(Alert.AlertType.ERROR, "Error en nombre de alarma", "El nombre de la alarma ya existe");
-        }
-        else {
+        } else if (getLocalExpression().getResultType().equals("Flotante") && !hiHiLimitCheckBox.isSelected()&& !highLimitCheckBox.isSelected()&& !lowLimitCheckBox.isSelected()&& !loloLimitCheckBox.isSelected()) {
+            confirmExit(Alert.AlertType.ERROR, "Error en límites", "Se debe definir al menos un límite");
+        } else {
             Logger logger = Logger.getLogger(this.getClass().getName());
             logger.log(Level.INFO, "Finishing adding alarm");
             super.finishingAction();
+            setDone(true);
         }
     }
 
     /**
      * Permite habilitar los campos correspondientes al tipo
+     *
      * @param type Tipo de campos a ser habilitados
      */
     private void enableInputs(String type) {
@@ -323,6 +328,14 @@ public class SetAlarmWindow extends WriteExpressionWindow {
 
     public RadioButton getTrueRadioButton() {
         return trueRadioButton;
+    }
+
+    public boolean isCreating() {
+        return isCreating;
+    }
+
+    public void setCreating(boolean creating) {
+        isCreating = creating;
     }
 
 }

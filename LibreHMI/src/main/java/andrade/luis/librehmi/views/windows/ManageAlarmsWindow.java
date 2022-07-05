@@ -44,27 +44,30 @@ public class ManageAlarmsWindow extends Stage {
         canvasAlarmDisplay= new CanvasAlarmDisplay(new CanvasPoint(0,0),false);
         canvasAlarmDisplay.setSelected(false);
         canvasAlarmDisplay.setTableItems(alarmsList);
+        setRowFactory();
+        root.getChildren().add(canvasAlarmDisplay);
+        Scene scene = new Scene(root,1080,400);
+        this.setScene(scene);
+    }
+
+    private void setRowFactory(){
         canvasAlarmDisplay.getAlarmsTable().setRowFactory(alarmsTableView -> new TableRow<>() {
             @Override
             protected void updateItem(AlarmRow item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
-                        ContextMenu contextMenu = new ContextMenu();
-                        MenuItem newItem = createNewMenuIteM();
-                        MenuItem editItem = createEditMenuItem(item);
-                        MenuItem deleteItem = createDeleteMenuItem(item);
-                        contextMenu.getItems().addAll(newItem,editItem,deleteItem);
-                        setContextMenu(contextMenu);
+                    ContextMenu contextMenu = new ContextMenu();
+                    MenuItem newItem = createNewMenuIteM();
+                    MenuItem editItem = createEditMenuItem(item);
+                    MenuItem deleteItem = createDeleteMenuItem(item);
+                    contextMenu.getItems().addAll(newItem,editItem,deleteItem);
+                    setContextMenu(contextMenu);
 
                 } else {
                     setItem(null);
                 }
             }
         });
-
-        root.getChildren().add(canvasAlarmDisplay);
-        Scene scene = new Scene(root,1080,400);
-        this.setScene(scene);
     }
 
     /**
@@ -76,6 +79,7 @@ public class ManageAlarmsWindow extends Stage {
         newItem.setText("Nueva");
         newItem.setOnAction(event -> {
             SetAlarmWindow setAlarmWindow = new SetAlarmWindow(hmiApp);
+            setAlarmWindow.setCreating(true);
             createNewAlarm(setAlarmWindow);
         });
         return newItem;
@@ -90,13 +94,31 @@ public class ManageAlarmsWindow extends Stage {
         MenuItem editItem = new MenuItem();
         editItem.setText("Editar");
         editItem.setOnAction(event -> {
-            int index = hmiApp.getIndexForAlarm(item.getName());
+            int index = getIndexForAlarm(item.getName());
             if(index>=0){
                 editAlarm(alarmsList.get(index));
             }
         });
         return editItem;
     }
+
+    /**
+     * Permite obtener el índice de una alarma requerida
+     *
+     * @param name Nombre de la alarma
+     * @return Índice de la alarma
+     */
+    public int getIndexForAlarm(String name) {
+        int res = -1;
+        for (int i = 0; i < alarmsList.size(); i++) {
+            if (name.equals(alarmsList.get(i).getName())) {
+                res = i;
+            }
+        }
+        return res;
+    }
+
+
 
     /**
      * Permite crear el menú de eliminación de alarma
@@ -130,6 +152,7 @@ public class ManageAlarmsWindow extends Stage {
      */
     private void editAlarm(Alarm alarm){
         SetAlarmWindow setAlarmWindow = new SetAlarmWindow(hmiApp);
+        setAlarmWindow.setCreating(false);
         setAlarmWindow.setTitle("Editar Alarma");
         setAlarmWindow.getAlarmNameTF().setText(alarm.getName());
         setAlarmWindow.getAlarmCommentTF().setText(alarm.getComment());
@@ -147,20 +170,22 @@ public class ManageAlarmsWindow extends Stage {
         setAlarmWindow.getLowLimitTF().setText(String.valueOf(alarm.getLowLimit()));
         setAlarmWindow.getLoloLimitTF().setText(String.valueOf(alarm.getLoloLimit()));
         setAlarmWindow.showAndWait();
-        int index = hmiApp.getIndexForAlarm(alarm.getName());
-        Alarm updatedAlarm = new Alarm(
-                setAlarmWindow.getLocalExpression(),
-                setAlarmWindow.getAlarmNameTF().getText(),
-                setAlarmWindow.getAlarmCommentTF().getText()
-        );
-        updatedAlarm.setHighLimit(Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),setAlarmWindow.getHighLimitCheckBox().isSelected());
-        updatedAlarm.setHiHiLimit(Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),setAlarmWindow.getHiHiLimitCheckBox().isSelected());
-        updatedAlarm.setLowLimit(Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),setAlarmWindow.getLowLimitCheckBox().isSelected());
-        updatedAlarm.setLoloLimit(Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),setAlarmWindow.getLoloLimitCheckBox().isSelected());
-        if(index >= 0){
-            alarmsList.set(index,updatedAlarm);
-            ManageAlarmsWindow.this.canvasAlarmDisplay.updateTableItem(alarm.getName(),updatedAlarm);
-            this.hmiApp.setWasModified(true);
+        if(setAlarmWindow.isDone()){
+            int index = hmiApp.getIndexForAlarm(alarm.getName());
+            Alarm updatedAlarm = new Alarm(
+                    setAlarmWindow.getLocalExpression(),
+                    setAlarmWindow.getAlarmNameTF().getText(),
+                    setAlarmWindow.getAlarmCommentTF().getText()
+            );
+            updatedAlarm.setHighLimit(Double.parseDouble(setAlarmWindow.getHighLimitTF().getText()),setAlarmWindow.getHighLimitCheckBox().isSelected());
+            updatedAlarm.setHiHiLimit(Double.parseDouble(setAlarmWindow.getHiHiLimitTF().getText()),setAlarmWindow.getHiHiLimitCheckBox().isSelected());
+            updatedAlarm.setLowLimit(Double.parseDouble(setAlarmWindow.getLowLimitTF().getText()),setAlarmWindow.getLowLimitCheckBox().isSelected());
+            updatedAlarm.setLoloLimit(Double.parseDouble(setAlarmWindow.getLoloLimitTF().getText()),setAlarmWindow.getLoloLimitCheckBox().isSelected());
+            if(index >= 0){
+                alarmsList.set(index,updatedAlarm);
+                ManageAlarmsWindow.this.canvasAlarmDisplay.updateTableItem(alarm.getName(),updatedAlarm);
+                this.hmiApp.setWasModified(true);
+            }
         }
     }
 
@@ -170,7 +195,7 @@ public class ManageAlarmsWindow extends Stage {
      */
     private void createNewAlarm(SetAlarmWindow setAlarmWindow){
         setAlarmWindow.showAndWait();
-        if(hmiApp.getIndexForAlarm(setAlarmWindow.getAlarmNameTF().getText())==-1){
+        if(hmiApp.getIndexForAlarm(setAlarmWindow.getAlarmNameTF().getText())==-1 && setAlarmWindow.isDone()){
             if(setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")){
                 Alarm alarm = new Alarm(
                         setAlarmWindow.getLocalExpression(),
@@ -194,10 +219,10 @@ public class ManageAlarmsWindow extends Stage {
                 );
                 ManageAlarmsWindow.this.alarmsList.add(alarm);
                 this.canvasAlarmDisplay.addTableItem(alarm);
+                setRowFactory();
                 this.hmiApp.setWasModified(true);
             }
         }else{
-            showAlert(Alert.AlertType.ERROR,"El nombre de la nueva alarma ya existe","Ya existe una alarma con el nombre \"" +setAlarmWindow.getAlarmNameTF().getText()+ "\", cambia el nombre de la alarma","");
             createNewAlarm(setAlarmWindow);
         }
     }

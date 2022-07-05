@@ -739,6 +739,7 @@ public class HMIApp extends Application {
         alarmMI.setAccelerator(KeyCombination.keyCombination("Ctrl+A"));
         alarmMI.setOnAction(mouseEvent -> {
             SetAlarmWindow setAlarmWindow = new SetAlarmWindow(this);
+            setAlarmWindow.setCreating(true);
             setAlarmWindow.showAndWait();
             if (setAlarmWindow.isDone()) {
                 if (setAlarmWindow.getLocalExpression().determineResultType().equals("Flotante") || setAlarmWindow.getLocalExpression().determineResultType().equals("Entero")) {
