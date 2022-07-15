@@ -109,7 +109,7 @@ Si las credenciales son correctas se mostrará la pantalla de la Figura 10 que e
 
 ###### Figura 10. Pantalla de trabajo donde se podrán agregar las representaciones gráficas
 
-![](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig010.png)
+![](Figures/fig010.png)
 
 
 ---
@@ -124,7 +124,7 @@ Se mostrarán opciones para iniciar o cargar un proyecto, además de poder acced
 
 ###### Figura 11. Menú de opciones de Archivo
 
-![fig011](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.png)
+![fig011](Figures/fig011.png)
 
 #### 3.1.1 Opción de crear nuevo proyecto
 
@@ -132,7 +132,7 @@ Cuando se da clic en la opción *Nuevo*, la aplicación verificará que no exist
 
 ###### Figura 11.1 Ventana de diálogo mostrando que el proyecto contiene cambios no guardados.
 
-![fig011.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.1.png)
+![fig011.1](Figures/fig011.1.png)
 
 Entonces se reiniciará el lienzo terminado nuevamente con la pantalla de trabajo de la Figura 10.
 
@@ -142,24 +142,24 @@ Al dar clic en esta opción la aplicación también verificará que no existan c
 
 ###### Figura 11.2 Ventana de carga de archivos de proyecto del tipo JSON
 
-![fig011.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.2.png)
+![fig011.2](Figures/fig011.2.png)
 
 ###### Figura 11.3 Ventana de carga de archivos de proyecto del tipo LHMI
 
-![fig011.3](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.3.png)
+![fig011.3](Figures/fig011.3.png)
 
 ##### 3.1.2.1 Opción para cargar un proyecto previo cifrado
 
 En la ventana de la Figura 11.3 cuando un archivo del tipo LHMI es seleccionado, se trata de un archivo JSON cifrado por la aplicación bajo una contraseña, y luego de dar clic en el botón de *Open*, la aplicación solicitará dicha contraseña mostrando la ventana de la Figura 11.3.1.
 
 ###### Figura 11.3.1 Ventana de definición de contraseña de descifrado para archivo LHMI
-![fig011.3.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.3.1.png)
+![fig011.3.1](Figures/fig011.3.1.png)
 
 En el caso de definir una contraseña errónea la aplicación notificará al usuario de dicho problema a través de una ventana de diálogo como se muestra en la Figura 11.3.2.
 
 ###### Figura 11.3.2 Ventana de diálogo informando al usuario de contraseña incorrecta.
 
-![fig011.3.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.3.2.png)
+![fig011.3.2](Figures/fig011.3.2.png)
 
 Cuando se ingrese la contraseña correcta la aplicación realizará la carga de las páginas, representaciones gráficas, alarmas, etc que contiene el archivo de proyecto.
 
@@ -173,7 +173,7 @@ Si el proyecto es nuevo, al dar clic en este botón la aplicación mostrará una
 
 ###### Figura 11.4 Ventana de selección de archivo para guardar un nuevo proyecto
 
-![fig011.4](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.4.png)
+![fig011.4](Figures/fig011.4.png)
 
 Si en cambio el proceso anterior ya se realizó, la aplicación guardará los nuevos cambios al archivo de proyecto seleccionado.
 
@@ -187,19 +187,19 @@ Con esta opción se inicia un proceso similar al descrito en la sección 3.1.3.1
 
 ###### Figura 11.5 Ventana de selección de archivo para guardar un nuevo proyecto protegido
 
-![fig011.5](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.5.png)
+![fig011.5](Figures/fig011.5.png)
 
 Luego de que se ha seleccionado un archivo, la aplicación solicitará al usuario el ingreso de una contraseña para cifrar el archivo de proyecto, ejecutando una ventana como la de la Figura 11.6.
 
 ###### Figura 11.6 Ventana de definición de contraseña de cifrado de archivo de proyecto
 
-![fig011.6](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.6.png)
+![fig011.6](Figures/fig011.6.png)
 
 En este proceso la aplicación luego de dar clic en el botón *OK*, verificará que las contraseñas coincidan, en el caso de no hacerlo se mostrará la ventana de diálogo con dicho mensaje de error como se ilustra en la Figura 11.6.1.
 
 ###### Figura 11.6.1 Ventana de diálogo con el mensaje de que las contraseñas no coinciden 
 
-![fig011.6.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig011.6.1.png)
+![fig011.6.1](Figures/fig011.6.1.png)
 
 Finalmente cuando las contraseñas sean las mismas la aplicación guardará todos los datos del proyecto y luego cifrará el archivo con la contraseña.
 
@@ -229,7 +229,7 @@ Se mostrarán las opciones de edición para las representaciones gráficas, como
 
 ###### Figura 12. Menú de opciones de edición
 
-![fig012](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig012.png)
+![fig012](Figures/fig012.png)
 
 #### 3.2.1 Copiar
 
@@ -249,7 +249,7 @@ Este menú resumirá las opciones de creación de alarmas para un proyecto y de 
 
 ###### Figura 13. Menú de opciones de Alarma
 
-![fig013](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.png)
+![fig013](Figures/fig013.png)
 
 #### 3.3.1 Opción de creación de alarmas
 
@@ -257,7 +257,7 @@ Al dar clic en la opción de *Crear Alarma* se mostrará la ventana de la Figura
 
 ###### Figura 13.1 Ventana de creación de alarma
 
-![fig013.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.1.png)
+![fig013.1](Figures/fig013.1.png)
 
 A continuación se describirá el funcionamiento de esta ventana y de su comportamiento.
 
@@ -290,7 +290,7 @@ Si se agrega un tag del tipo entero o flotante se habilitarán en la ventana cua
 
 ###### Figura 13.2 Ventana de creación de alarma con un tag del tipo flotante o entero añadido
 
-![fig013.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.2.png)
+![fig013.2](Figures/fig013.2.png)
 
 A continuación se detallarán el significado de los campos:
 
@@ -303,7 +303,7 @@ Si se agrega un tag del tipo booleano se habilitarán en la ventana un área de 
 
 ###### Figura 13.3 Ventana de creación de alarma con un tag del tipo booleano
 
-![fig013.3](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.3.png)
+![fig013.3](Figures/fig013.3.png)
 
 ##### 3.3.1.7 Botón de limpieza de tags
 
@@ -315,13 +315,13 @@ La funcionalidad de este botón es la de mostrar la ventana de la Figura 13.4 qu
 
 ###### Figura 13.4 Ventana de selección de tags
 
-![fig013.4](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.4.png)
+![fig013.4](Figures/fig013.4.png)
 
 En esta ventana se mostrarán todos los tags disponibles, el usuario debe seleccionar una fila y dar clic en el botón *OK*, caso contrario se mostrará una mensaje de error como el de la Figura 13.5
 
 ###### Figura 13.5 Ventana de diálogo informando al usuario que debe seleccionar un tag para continuar
 
-![fig013.5](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.5.png)
+![fig013.5](Figures/fig013.5.png)
 
 ##### 3.3.1.9 Botón de OK
 
@@ -329,13 +329,13 @@ Este botón se encarga de finalizar el proceso de creación de la alarma, se enc
 
 ###### Figura 13.6 Ventana de diálogo informando al usuario que el nombre de alarma no puede estar vacío
 
-![fig013.6](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.6.png)
+![fig013.6](Figures/fig013.6.png)
 
 Además si el campo de expresión esta vacío también mostrará una ventana de diálogo como la Figura 13.7
 
 ###### Figura 13.7 Ventana de diálogo informando al usuario que la expresión no ha sido definida
 
-![fig013.7](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.7.png)
+![fig013.7](Figures/fig013.7.png)
 
 #### 3.3.2 Opción de administración de alarmas
 
@@ -343,13 +343,13 @@ Al dar clic en esta opción se pueden administrar las alarmas creadas dentro del
 
 ###### Figura 13.8 Ventana de administración de alarmas
 
-![fig013.8](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.8.png)
+![fig013.8](Figures/fig013.8.png)
 
 Al seleccionar una fila de la tabla mostrada en la ventana de la Figura 13.8 y dar clic derecho en ella se mostrarán las opciones que se muestran en la Figura 13.9.
 
 ###### Figura 13.9 Opciones de administración de alarmas
 
-![fig013.9](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.9.png)
+![fig013.9](Figures/fig013.9.png)
 
 Las opciones de administración disponibles son:
 
@@ -359,7 +359,7 @@ Las opciones de administración disponibles son:
 
 ###### Figura 13.10 Ventana de diálogo de confirmación de eliminación de alarma seleccionada
 
-![fig013.10](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig013.10.png)
+![fig013.10](Figures/fig013.10.png)
 
 
 ### 3.4 Configuraciones
@@ -372,7 +372,7 @@ A continuación se mostrará en la Figura 14 el menú de configuraciones y el su
 
 ###### Figura 14. Menú de Configuraciones, con el submenú de usuarios.
 
-![fig014](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig014.png)
+![fig014](Figures/fig014.png)
 
 En este submenú se ofrecerán opciones para los usuarios del sistema.
 
@@ -386,7 +386,7 @@ Al dar clic en esta opción si el usuario logueado es del tipo administrador se 
 
 ###### Figura 14.1 Ventana de administración de usuarios con sus opciones 
 
-![fig014.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig014.1.png)
+![fig014.1](Figures/fig014.1.png)
 
 A continuación se detallan los comportamientos de las opciones de administración de usuarios
 
@@ -396,7 +396,7 @@ Al dar clic en la opción de Nuevo de la Figura 14.1, provocará que la aplicaci
 
 ###### Figura 14.1.1 Ventana de registro de usuario
 
-![fig014.1.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig014.1.1.png)
+![fig014.1.1](Figures/fig014.1.1.png)
 
 Los roles disponibles para su selección son los siguientes:
 
@@ -408,25 +408,25 @@ Cuando el usuario da clic en el botón de *Guardar Usuario* la aplicación verif
 
 ###### Figura 14.1.1.1 Ventana de diálogo informando al usuario que existen campos vacíos
 
-![fig014.1.1.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig014.1.1.1.png)
+![fig014.1.1.1](Figures/fig014.1.1.1.png)
 
 Si el usuario ingresa un correo electrónico no válido la aplicación notificará al usuario de la misma forma en la Figura 14.1.1.2
 
 ###### Figura 14.1.1.2 Ventana de diálogo informando al usuario que existe un correo electrónico no válido
 
-![fig014.1.1.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig014.1.1.2.png)
+![fig014.1.1.2](Figures/fig014.1.1.2.png)
 
 Luego si el usuario ingresa un nombre de usuario que ya existe la aplicación notificará al usuario de este hecho como en la Figura 14.1.1.3
 
 ###### Figura 14.1.1.3 Ventana de diálogo informando al usuario que el nombre de usuario definido ya existe
 
-![fig014.1.1.3](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig014.1.1.3.png)
+![fig014.1.1.3](Figures/fig014.1.1.3.png)
 
 Después el usuario debe seleccionar un rol si no lo hace la aplicación ilustrará una ventana como la de la Figura 14.1.1.4.
 
 ###### Figura 14.1.1.4 Ventana de diálogo informando al usuario que debe seleccionar un rol
 
-![fig014.1.1.4](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig014.1.1.4.png)
+![fig014.1.1.4](Figures/fig014.1.1.4.png)
 
 Finalmente la aplicación verificará que las contraseñas coincidan en caso de no hacerlo también se mostrará un mensaje.
 
@@ -444,7 +444,7 @@ Luego se mostrarán las opciones en la Figura 15 el menú de configuraciones y e
 
 ###### Figura 15. Menú de Configuraciones, con el submenú de tag locales.
 
-![fig015](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig015.png)
+![fig015](Figures/fig015.png)
 
 ##### 3.4.2.1 Opción de creación de tag local
 
@@ -452,7 +452,7 @@ La aplicación es dependiente de los tags que vienen desde la base de datos, sin
 
 ###### Figura 15.1 Ventana de creación de tag local
 
-![fig015.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig015.1.png)
+![fig015.1](Figures/fig015.1.png)
 
 En primera instancia se mostrarán los tres campos más relevantes que son:
 
@@ -469,13 +469,13 @@ Cuando se selecciona un tag del tipo numérico, es decir, entero o flotante se m
 
 ###### Figura 15.2 Ventana de creación de tag para un tag del tipo numérico
 
-![fig015.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig015.2.png)
+![fig015.2](Figures/fig015.2.png)
 
 Cuando se selecciona un tag del tipo bool, se mostrará una ventana como se ilustra en la Figura 15.3
 
 ###### Figura 15.3 Ventana de creación de tag para un tag del tipo bool
 
-![fig015.3](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig015.3.png)
+![fig015.3](Figures/fig015.3.png)
 
 ##### 3.4.2.2 Opción de administración de tags locales
 
@@ -483,7 +483,7 @@ Para administrar los distintos tag locales creados dentro del proyecto se ha imp
 
 ###### Figura 15.4 Ventana de administración de tags con sus opciones
 
-![fig015.4](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig015.4.png)
+![fig015.4](Figures/fig015.4.png)
 
 A continuación se detallaran las opciones de administración:
 
@@ -497,7 +497,7 @@ Cuando la aplicación este en modo de ejecución bloquea todos los objetos, sin 
 
 ###### Figura 15.5 Ventana de definición de tiempo de bloqueo
 
-![fig015.5](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig015.5.png)
+![fig015.5](Figures/fig015.5.png)
 
 #### 3.4.4 Conexión de Base de Datos
 
@@ -509,7 +509,7 @@ En este menú se mostrarán como en la Figura 16 las opciones para navegar entra
 
 ###### Figura 16. Menú de ventanas
 
-![fig016](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig016.png)
+![fig016](Figures/fig016.png)
 
 #### 3.5.1 Opción para navegación entre ventanas
 
@@ -517,7 +517,7 @@ Esta opción permite la navegación entre páginas o ventanas, ya que aunque en 
 
 ###### Figura 16.1 Ventana de selección de ventana para navegar entre ella.
 
-![fig016.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig016.1.png)
+![fig016.1](Figures/fig016.1.png)
 
 #### 3.5.2 Opción para importar ventanas
 
@@ -525,7 +525,7 @@ La aplicación permite exportar las ventanas o páginas diseñadas dentro del li
 
 ###### Figura 16.2 Ventana de selección de archivo de ventana
 
-![fig016.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig016.2.png)
+![fig016.2](Figures/fig016.2.png)
 
 ### 3.6 Ayuda
 
@@ -533,7 +533,7 @@ En este menú se mostrará una opción para acceder a este manual como se ilustr
 
 ###### Figura 17. Menú de Ayuda
 
-![](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig017.png)
+![](Figures/fig017.png)
 
 ---
 
@@ -543,7 +543,7 @@ La aplicación muestra en el modo de diseño un menú lateral que permite agrega
 
 ###### Figura 18. Menú lateral de diseño de la aplicación
 
-![fig018](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig018.png)
+![fig018](Figures/fig018.png)
 
 ### 4.1 Área de elementos de diseño
 
@@ -571,7 +571,7 @@ En esta parte del menú lateral se encuentran las páginas disponibles dentro de
 
 ###### Figura 18.1. Área de páginas con sus opciones
 
-![fig018.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig018.1.png)
+![fig018.1](Figures/fig018.1.png)
 
 #### 4.2.1 Opción de crear nueva página
 
@@ -579,7 +579,7 @@ Al dar clic en esta opción la aplicación desplegará una ventana como se ilust
 
 ###### Figura 18.1.1. Ventana de definición de propiedades de ventana
 
-![fig018.1.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig018.1.1.png)
+![fig018.1.1](Figures/fig018.1.1.png)
 
 Al dar clic en el botón *OK* se verificará que no exista otra ventana con el mismo nombre, entonces en el caso de no existir se creará una nuevo con el nombre y el color de fondo seleccionado.
 
@@ -589,7 +589,7 @@ Con esta opción se iniciará el proceso para exportar la página seleccionada c
 
 ###### Figura 18.1.2. Ventana de selección de archivos para exportar ventana
 
-![fig018.1.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig018.1.2.png)
+![fig018.1.2](Figures/fig018.1.2.png)
 
 #### 4.2.3 Opción de exportar con contraseña
 
@@ -597,7 +597,7 @@ En este proceso sucederá lo mismo que en la sección anterior solo con un cambi
 
 Figura 18.1.3. Ventana de selección de archivos para exportar ventana de forma cifrada
 
-![fig018.1.3](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig018.1.3.png)
+![fig018.1.3](Figures/fig018.1.3.png)
 
 Luego se mostrará una ventana de definición de contraseña con un comportamiento similar al de la sección 3.1.5.
 
@@ -621,7 +621,7 @@ Luego de dar clic en el ícono, la aplicación esperará que el usuario de dos c
 
 ###### Figura 19. Representación gráfica de línea con sus opciones
 
-![fig019](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig019.png)
+![fig019](Figures/fig019.png)
 
 A continuación se detallarán las opciones de la representación:
 
@@ -635,7 +635,7 @@ Con esta opción se mostrará una ventana como la Figura 19.1 que permitirá def
 
 ###### Figura 19.1 Ventana de propiedades de linea
 
-![fig019.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig019.1.png)
+![fig019.1](Figures/fig019.1.png)
 
 Las propiedades de línea se detallan a continuación:
 
@@ -653,7 +653,7 @@ Al dar clic en esta opción permitirá definir la visibilidad de la representaci
 
 ###### Figura 19.2 Ventana de definición de propiedades de animación de visibilidad
 
-![fig019.2](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig019.2.png)
+![fig019.2](Figures/fig019.2.png)
 
 En esta ventana se requiere que el tipo de la expresión sea bool para así comparar con el valor definido en el segundo campo de verdadero o falso. Esta opción es común para todas las representaciones gráficas.
 
@@ -671,7 +671,7 @@ La animación de relleno porcentual permite generar una barra de progreso en bas
 
 ###### Figura 20. Ventana de definición de animación de relleno porcentual
 
-![fig020](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig020.png)
+![fig020](Figures/fig020.png)
 
 A continuación se detallarán los campos de la ventana de la Figura 20.
 
@@ -695,7 +695,7 @@ Luego de dar clic en le botón correspondiente, se agregará el texto de fecha y
 
 ###### Figura 21. Ventana de definición de propiedades de texto de fecha y hora
 
-![fig021](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig021.png)
+![fig021](Figures/fig021.png)
 
 Los campos de esta ventana son los siguientes:
 
@@ -711,7 +711,7 @@ Al dar clic en el botón de texto, se mostrará una ventana de definición de ex
 
 ###### Figura 22. Ventana de definición de propiedades de valor de texto
 
-![fig022](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig022.png)
+![fig022](Figures/fig022.png)
 
 Esta ventana tendrá el mismo comportamiento que las otras ventanas similares de asociación de tag.
 
@@ -723,13 +723,13 @@ Cuando se agrega esta representación gráfica se mostrará la ventana de defini
 
 ###### Figura 23. Ventana de definición de propiedades del valor de campo de entrada de texto
 
-![fig023](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig023.png)
+![fig023](Figures/fig023.png)
 
 La ventana de propiedades tambien presenta un cambio añadiendo los campos de definición de tamaño de ancho y alto, como se puede observar en la Figura 23.1.
 
 ###### Figura 23.1 Ventana de definición de propiedades del campo de texto
 
-![fig023.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig023.1.png)
+![fig023.1](Figures/fig023.1.png)
 
 ### 5.7 Imagen
 
@@ -737,7 +737,7 @@ Cuando se agrega esta representación gráfica se mostrará la ventana de la Fig
 
 ###### Figura 24. Ventana de propiedades de imagen
 
-![fig024](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig024.png)
+![fig024](Figures/fig024.png)
 
 A continuación se detallaran los campos de la ventana:
 
@@ -756,7 +756,7 @@ Al dar clic en esta opción se mostrará una ventana de galería de selección d
 
 ###### Figura 25. Ventana de selección de símbolos HMI por defecto
 
-![fig025](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig025.png)
+![fig025](Figures/fig025.png)
 
 Además se pueden aplicar las mismas propiedades de imagen como se detallo en la sección anterior 5.7, si se da clic en la opción de *Opciones de Imagen*.
 
@@ -766,7 +766,7 @@ El botón pulsador es un tipo de botón que envía un valor de escritura hacia l
 
 ###### Figura 26 Ventana de definición de propiedades de valor de botón pulsador
 
-![fig026](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig026.png)
+![fig026](Figures/fig026.png)
 
 A continuación se detallarán los campos de la ventana:
 
@@ -785,7 +785,7 @@ Al agregar la representación gráfica el usuario puede modificar su comportamie
 
 ###### Figura 27 Ventana de propiedades de botón
 
-![fig027](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig027.png)
+![fig027](Figures/fig027.png)
 
 Esta ventana de propiedades es la misma disponible para la el botón pulsador, sus propiedades son:
 
@@ -809,7 +809,7 @@ Al dar clic en el botón correspondiente se mostrará una ventana de definición
 
 ###### Figura 28. Ventana de definiciónde propiedades de Slider
 
-![fig028](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig028.png)
+![fig028](Figures/fig028.png)
 
 Los campos mostrados en la ventana son:
 
@@ -832,7 +832,7 @@ Al agregar esta representación gráfica se mostrará la ventana de la Figura 29
 
 ###### Figura 29. Ventana de definición de propiedades para el gráfico de tendencias
 
-![fig029](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig029.png)
+![fig029](Figures/fig029.png)
 
 A continuación se detallarán los campos de la ventana:
 
@@ -850,7 +850,7 @@ Además de estas opciones disponibles la representación gráfica en sí mismo c
 
 ###### Figura 30. Representación de gráfico de tendencias 
 
-![fig030](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig030.png)
+![fig030](Figures/fig030.png)
 
 En primera instancia se tiene el gráfico de tendencia, y luego se tiene la etiqueta del tag mostrado con un checkbox, que permitirá habilitar o deshabilitar ese tag mostrado, esta opción es útil si se tienen varios tags mostrandose al mismo tiempo.
 
@@ -860,4 +860,4 @@ Finalmente el gráfico de tendencias tiene la opción para exportar los datos re
 
 ###### Figura 30.1 Ventana de creación de archivo CSV
 
-![fig030.1](/home/andres/Insync/luis.andrade03@epn.edu.ec/OneDrive Biz - Shared/Tesis/Avances/TesisDocAndres/Recursos/LibreHMIManual/Figures/fig030.1.png)
+![fig030.1](Figures/fig030.1.png)
